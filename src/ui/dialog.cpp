@@ -16,6 +16,7 @@
 #include "ui/control.h"
 #include "ui/paletteid.h"
 #include "ui/hotkeys.h"
+#include "ui/terminal_emulator.h"
 #include <algorithm>
 #include <assert.h>
 
@@ -236,7 +237,8 @@ void Dialog::redraw ()
 		// Show the close button
 		if (!(options & DIALOG_NO_CLOSE_BUTTON) && size.x>=4) {
 			Size pos = make_size (size.x - 4, 0);
-			put (pos, L"[\u00d7]"); // u00d7 is multiplication sign
+			// u00d7 is multiplication sign
+			put (pos, terminal_emulator_correct_wcwidth () ? L"[\u00d7]" : L"[x]");
 		}
 	}
 

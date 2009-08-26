@@ -121,15 +121,7 @@ void commit_touched_lines ()
 					(win_right - win_left) * sizeof (*line));
 		}
 
-		// What characters for the border?
-		TerminalEmulator emul = get_terminal_emulator ();
-		bool use_acs_border = false
-			|| (emul == LINUX_CONSOLE)
-			|| (emul == RXVT_UNICODE)
-			|| (emul == KONSOLE)
-			|| (emul == ETERM)
-			|| (emul == MLTERM)
-			;
+		bool use_acs_border = terminal_emulator_correct_wcwidth ();
 
 		// Now actually commit to ncurses
 		cchar_t *p = (cchar_t *)memset (cchar_line, 0, (width+1) * sizeof (cchar_t));

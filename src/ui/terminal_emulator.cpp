@@ -1,3 +1,17 @@
+// -*- mode:c++; tab-width:4; -*-
+// vim:ft=cpp ts=4
+
+/***************************************************************************
+ *
+ * Tiary, a terminal-based diary keeping system for Unix-like systems
+ * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ *
+ * This software is licensed under the so-called 3-clause BSD license.
+ * See LICENSE in the source package and/or online info for details.
+ *
+ **************************************************************************/
+
+
 #include "ui/terminal_emulator.h"
 #include <unistd.h>
 #include <string.h>
@@ -26,6 +40,8 @@ TerminalEmulator detect_terminal_emulator ()
 			return LINUX_CONSOLE;
 		if (strcmp (term_env, "Eterm") == 0)
 			return ETERM;
+		if (memcmp (term_env, "screen", 6) == 0)
+			return UNKNOWN_TERMINAL;
 	}
 
 	char bufa[256];
@@ -96,6 +112,20 @@ TerminalEmulator get_terminal_emulator ()
 }
 
 
+bool terminal_emulator_correct_wcwidth ()
+{
+	switch (get_terminal_emulator ()) {
+		case LINUX_CONSOLE:
+		case RXVT_UNICODE:
+		case KONSOLE:
+		case ETERM:
+		case MLTERM:
+			return true;
+		default:
+			return false;
+
+	}
+}
 
 
 } // namespace ui

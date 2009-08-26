@@ -14,6 +14,7 @@
 
 #include "ui/checkbox.h"
 #include "ui/paletteid.h"
+#include "ui/terminal_emulator.h"
 
 namespace tiary {
 namespace ui {
@@ -70,7 +71,10 @@ void CheckBox::redraw ()
 	if (wid >= 3)
 		pos = put (pos, L'[');
 	move_cursor (pos);
-	pos = put (pos, status ? L'\u00d7' : L' '); // U+00D7 is Multipilcation sign
+	// U+00D7 is Multipilcation sign
+	pos = put (pos, status ? (
+				terminal_emulator_correct_wcwidth () ? L'\u00d7' : L'x'
+				) : L' ');
 	put (pos, L']');
 }
 
