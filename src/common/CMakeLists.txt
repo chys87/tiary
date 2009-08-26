@@ -4,7 +4,6 @@ add_library(tiary_common
 	bzip2.h
 	bzip2.cpp
 	callback.h
-	compiler.h
 	container_of.h
 	containers.h
 	datetime.h

@@ -294,37 +294,6 @@ ELSE(HAVE_UNORDERED_SET_MAP)
 	ENDIF(HAVE_TR1_UNORDERED_SET_MAP)
 ENDIF(HAVE_UNORDERED_SET_MAP)
 
-# std::array (>= gcc 4.3)
-CHECK_CXX_SOURCE_RUNS("
-	#include <array> \n
-	int main ()
-	{
-		std::array<int,5> a = { 1, 2, 3, 4, 5 };
-		int sum = 0;
-		for (std::array<int,5>::const_iterator it = a.begin(); it!=a.end(); ++it)
-			sum += *it;
-		return (sum == 15 ? 0 : 1);
-	} " HAVE_STD_ARRAY)
-IF(HAVE_STD_ARRAY)
-	ADD_DEFINITIONS("-DTIARY_HAVE_STD_ARRAY=1")
-ELSE(HAVE_STD_ARRAY)
-	# std::tr1::array (>= gcc 4)
-	CHECK_CXX_SOURCE_RUNS("
-		#include <tr1/array> \n
-		int main ()
-		{
-			std::tr1::array<int,5> a = { 1, 2, 3, 4, 5 };
-			int sum = 0;
-			for (std::tr1::array<int,5>::const_iterator it = a.begin(); it!=a.end(); ++it)
-				sum += *it;
-			return (sum == 15 ? 0 : 1);
-		} " HAVE_TR1_ARRAY)
-	IF(HAVE_TR1_ARRAY)
-		ADD_DEFINITIONS("-DTIARY_HAVE_TR1_ARRAY=1")
-	ENDIF(HAVE_TR1_ARRAY)
-ENDIF(HAVE_STD_ARRAY)
-
-
 
 # initializer list (>= gcc 4.4)
 CHECK_CXX_SOURCE_RUNS("
