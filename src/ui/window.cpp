@@ -127,42 +127,42 @@ void commit_touched_lines ()
 				continue;
 			switch (line[x].c) {
 				case BORDER_V:
-#ifdef WACS_VLINE
+#if 0 //def WACS_VLINE
 					*p = *WACS_VLINE;
 #else
 					p->chars[0] = L'|';
 #endif
 					break;
 				case BORDER_H:
-#ifdef WACS_HLINE
+#if 0 //def WACS_HLINE
 					*p = *WACS_HLINE;
 #else
 					p->chars[0] = L'-';
 #endif
 					break;
 				case BORDER_1:
-#ifdef WACS_ULCORNER
+#if 0 //def WACS_ULCORNER
 					*p = *WACS_ULCORNER;
 #else
 					p->chars[0] = L'/';
 #endif
 					break;
 				case BORDER_2:
-#ifdef WACS_URCORNER
+#if 0 //def WACS_URCORNER
 					*p = *WACS_URCORNER;
 #else
 					p->chars[0] = L'\\';
 #endif
 					break;
 				case BORDER_3:
-#ifdef WACS_LLCORNER
+#if 0 //def WACS_LLCORNER
 					*p = *WACS_LLCORNER;
 #else
 					p->chars[0] = L'\\';
 #endif
 					break;
 				case BORDER_4:
-#ifdef WACS_LRCORNER
+#if 0 //def WACS_LRCORNER
 					*p = *WACS_LRCORNER;
 #else
 					p->chars[0] = L'/';
