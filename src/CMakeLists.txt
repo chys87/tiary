@@ -1,0 +1,401 @@
+# Useful utilities
+INCLUDE(CheckIncludeFiles)
+INCLUDE(CheckLibraryExists)
+INCLUDE(CheckFunctionExists)
+INCLUDE(CheckTypeSize)
+INCLUDE(TestBigEndian)
+INCLUDE(FindBZip2)
+INCLUDE(FindLibXml2)
+INCLUDE(CheckCXXCompilerFlag)
+INCLUDE(CheckCXXSourceCompiles)
+INCLUDE(CheckCXXSourceRuns)
+INCLUDE(CheckCSourceRuns)
+
+# Check for required wchar_t functions
+CHECK_FUNCTION_EXISTS(wmemchr HAVE_WMEMCHR)
+CHECK_FUNCTION_EXISTS(mbrtowc HAVE_MBRTOWC)
+IF(NOT HAVE_WMEMCHR OR NOT HAVE_MBRTOWC)
+	MESSAGE(FATAL_ERROR "Unicode support is missing in your system.")
+ENDIF(NOT HAVE_WMEMCHR OR NOT HAVE_MBRTOWC)
+
+# Check whether this is a big endian system
+TEST_BIG_ENDIAN(BIG_ENDIAN)
+IF(BIG_ENDIAN)
+	ADD_DEFINITIONS("-DTIARY_BIG_ENDIAN=1")
+ENDIF(BIG_ENDIAN)
+
+# Check for required libbz2
+IF(NOT BZIP2_FOUND)
+	MESSAGE(FATAL_ERROR "libbz2 is required.")
+ENDIF(NOT BZIP2_FOUND)
+IF(NOT BZIP2_NEED_PREFIX)
+	MESSAGE(FATAL_ERROR "Please upgrade your bzip2 version.")
+ENDIF(NOT BZIP2_NEED_PREFIX)
+ADD_DEFINITIONS("-I${BZIP2_INCLUDE_DIR} ${BZIP2_DEFINITIONS}")
+
+# Check for required libncursesw
+CHECK_INCLUDE_FILES("ncursesw/curses.h" HAVE_NCURSESW_HEADERS)
+CHECK_LIBRARY_EXISTS(ncursesw waddwstr '' HAVE_LIBNCURSESW)
+IF(NOT HAVE_NCURSESW_HEADERS OR NOT HAVE_LIBNCURSESW)
+	MESSAGE(FATAL_ERROR "ncurses with Unicode support is required.")
+ENDIF(NOT HAVE_NCURSESW_HEADERS OR NOT HAVE_LIBNCURSESW)
+
+# Check for optional mouse support in libncursesw
+SET(CMAKE_REQUIRED_LIBRARIES -lncursesw)
+CHECK_FUNCTION_EXISTS(mousemask HAVE_MOUSE_SUPPORT)
+SET(CMAKE_REQUIRED_LIBRARIES)
+IF(HAVE_MOUSE_SUPPORT)
+	ADD_DEFINITIONS("-DTIARY_USE_MOUSE=1")
+ELSE(HAVE_MOUSE_SUPPORT)
+	MESSAGE(STATUS)
+	MESSAGE(STATUS "Mouse support is disabled.")
+	MESSAGE(STATUS)
+ENDIF(HAVE_MOUSE_SUPPORT)
+
+# Check for required libxml2
+IF(NOT LIBXML2_FOUND)
+	MESSAGE(FATAL_ERROR "libxml2 is required.")
+ENDIF(NOT LIBXML2_FOUND)
+ADD_DEFINITIONS("-I${LIBXML2_INCLUDE_DIR} ${LIBXML2_DEFINITIONS}")
+
+# Check for optional libpcre
+CHECK_INCLUDE_FILES("pcre.h" HAVE_PCRE_HEADER)
+CHECK_LIBRARY_EXISTS(pcre pcre_compile2 '' HAVE_PCRE)
+IF(HAVE_PCRE_HEADER AND HAVE_PCRE)
+	ADD_DEFINITIONS("-DTIARY_USE_PCRE=1")
+	SET(PCRE_LIBRARIES "-lpcre")
+ELSE(HAVE_PCRE_HEADER AND HAVE_PCRE)
+	MESSAGE(STATUS)
+	MESSAGE(STATUS "Regular expression support is disabled.")
+	MESSAGE(STATUS)
+	SET(PCRE_LIBRARIES)
+ENDIF(HAVE_PCRE_HEADER AND HAVE_PCRE)
+
+
+# Check for optional libc function wcwidth
+CHECK_FUNCTION_EXISTS(wcwidth HAVE_WCWIDTH)
+IF(HAVE_WCWIDTH)
+	ADD_DEFINITIONS("-DTIARY_HAVE_WCWIDTH=1")
+ENDIF(HAVE_WCWIDTH)
+
+# Check for optional libc function localtime_r and gmtime_r
+CHECK_FUNCTION_EXISTS(localtime_r HAVE_LOCALTIME_R)
+CHECK_FUNCTION_EXISTS(gmtime_r HAVE_GMTIME_R)
+IF(HAVE_LOCALTIME_R AND HAVE_GMTIME_R)
+	ADD_DEFINITIONS("-DTIARY_HAVE_LOCALTIME_R_AND_GMTIME_R=1")
+ENDIF(HAVE_LOCALTIME_R AND HAVE_GMTIME_R)
+
+# Check for optional libc function mempcpy
+CHECK_FUNCTION_EXISTS(mempcpy HAVE_MEMPCPY)
+IF(HAVE_MEMPCPY)
+	ADD_DEFINITIONS("-DTIARY_HAVE_MEMPCPY=1")
+ENDIF(HAVE_MEMPCPY)
+
+# Check for optional libc function stpcpy and wcpcpy
+CHECK_FUNCTION_EXISTS(stpcpy HAVE_STPCPY)
+CHECK_FUNCTION_EXISTS(wcpcpy HAVE_WCPCPY)
+IF(HAVE_STPCPY AND HAVE_WCPCPY)
+	ADD_DEFINITIONS("-DTIARY_HAVE_STPCPY=1")
+ENDIF(HAVE_STPCPY AND HAVE_WCPCPY)
+
+# Check for optional libc function rawmemchr
+CHECK_FUNCTION_EXISTS(rawmemchr HAVE_RAWMEMCHR)
+IF(HAVE_RAWMEMCHR)
+	ADD_DEFINITIONS("-DTIARY_HAVE_RAWMEMCHR=1")
+ENDIF(HAVE_RAWMEMCHR)
+
+# Check for optional libc function strchrnul
+CHECK_FUNCTION_EXISTS(strchrnul HAVE_STRCHRNUL)
+IF(HAVE_STRCHRNUL)
+	ADD_DEFINITIONS("-DTIARY_HAVE_STRCHRNUL=1")
+ENDIF(HAVE_STRCHRNUL)
+
+# Check for optional unlocked FILE operations
+SET(UNLOCKED_STDIO
+	getc getchar putc putchar clearerr feof ferror
+	fileno fflush fgetc fputc fread fwrite fgets fputs
+	fprintf vfprintf
+)
+FOREACH(FOO ${UNLOCKED_STDIO})
+	CHECK_FUNCTION_EXISTS(${FOO}_unlocked HAVE_${FOO}_unlocked)
+	IF(NOT HAVE_${FOO}_unlocked)
+		ADD_DEFINITIONS("-D${FOO}_unlocked=${FOO}")
+	ENDIF(NOT HAVE_${FOO}_unlocked)
+ENDFOREACH(FOO)
+
+# Check for optional extended "getcwd" function
+CHECK_C_SOURCE_RUNS("
+	#include <unistd.h> \n
+	#include <stdlib.h> \n
+	#include <string.h> \n
+	
+	int main ()
+	{
+		char *ptr;
+		chdir (\"/\");
+		ptr = getcwd (NULL, 0);
+		if (ptr == NULL)
+			exit (1);
+		exit (strcmp (ptr, \"/\"));
+	}" HAVE_EXTENDED_GETCWD)
+IF(HAVE_EXTENDED_GETCWD)
+	ADD_DEFINITIONS("-DTIARY_HAVE_EXTENDED_GETCWD=1")
+ENDIF(HAVE_EXTENDED_GETCWD)
+
+# Check for optional extended "realpath" function
+CHECK_C_SOURCE_RUNS("
+	#include <unistd.h> \n
+	#include <stdlib.h> \n
+	#include <string.h> \n
+	
+	int main ()
+	{
+		char *ptr;
+		chdir (\"/\");
+		ptr = realpath (\".\", NULL);
+		if (ptr == NULL)
+			exit (1);
+		exit (strcmp (ptr, \"/\"));
+	}" HAVE_EXTENDED_REALPATH)
+IF(HAVE_EXTENDED_REALPATH)
+	ADD_DEFINITIONS("-DTIARY_HAVE_EXTENDED_REALPATH=1")
+ENDIF(HAVE_EXTENDED_REALPATH)
+
+# Check for and sizeof(int) (Must be 4)
+CHECK_TYPE_SIZE(int SIZEOF_INT)
+IF(NOT SIZEOF_INT STREQUAL 4)
+	MESSAGE(FATAL_ERROR "This program cannot compile on a platform where sizeof(int) != 4")
+ENDIF(NOT SIZEOF_INT STREQUAL 4)
+
+# Check for sizeof(wchar_t) (Must be 4)
+SET(CMAKE_EXTRA_INCLUDE_FILES "wchar.h")
+CHECK_TYPE_SIZE(wchar_t SIZEOF_WCHAR_T)
+SET(CMAKE_EXTRA_INCLUDE_FILES)
+ADD_DEFINITIONS("-DTIARY_SIZEOF_WCHAR_T=${SIZEOF_WCHAR_T}")
+IF(NOT SIZEOF_WCHAR_T STREQUAL 4)
+	MESSAGE(FATAL_ERROR "This program cannot copmile on a platform where
+	sizeof(wchar_t) != 4")
+ENDIF(NOT SIZEOF_WCHAR_T STREQUAL 4)
+
+# Check for size of pointer
+CHECK_TYPE_SIZE("void *" SIZEOF_POINTER)
+ADD_DEFINITIONS("-DTIARY_SIZEOF_POINTER=${SIZEOF_POINTER}")
+
+# Check how to define a 64-bit integer
+CHECK_TYPE_SIZE("long" SIZEOF_LONG)
+CHECK_TYPE_SIZE("long long" SIZEOF_LONG_LONG)
+CHECK_TYPE_SIZE("__int64" SIZEOF___INT64)
+IF(SIZEOF_LONG STREQUAL 8)
+	ADD_DEFINITIONS("-DTIARY_INT64_TYPE=long")
+ELSEIF(SIZEOF_LONG_LONG STREQUAL 8)
+	ADD_DEFINITIONS("-DTIARY_INT64_TYPE=\"long long\"")
+ELSEIF(SIZEOF___INT64 STREQUAL 8)
+	ADD_DEFINITIONS("-DTIARY_INT64_TYPE=__int64")
+ELSE(SIZEOF_LONG STREQUAL 8)
+	MESSAGE(FATAL_ERROR "I do not know how to define a 64-bit integer.")
+ENDIF(SIZEOF_LONG STREQUAL 8)
+
+
+
+# Add options additional flags that will reduce the 
+# code size and/or improve efficiency
+CHECK_CXX_COMPILER_FLAG("-fno-threadsafe-statics" HAVE_NO_THREADSAFE_STATICS)
+IF(HAVE_NO_THREADSAFE_STATICS)
+	ADD_DEFINITIONS("-fno-threadsafe-statics")
+ENDIF(HAVE_NO_THREADSAFE_STATICS)
+CHECK_CXX_COMPILER_FLAG("-fno-exceptions" HAVE_NO_EXCEPTIONS)
+IF(HAVE_NO_EXCEPTIONS)
+	ADD_DEFINITIONS("-fno-exceptions")
+ENDIF(HAVE_NO_EXCEPTIONS)
+
+
+# Check whether the compiler has some support for C++0x
+# Currently supports: GCC (>= gcc 4.3); ICC (>= icc 11)
+CHECK_CXX_COMPILER_FLAG("-std=gnu++0x" HAVE_SOME_CXX0X)
+IF(HAVE_SOME_CXX0X)
+	ADD_DEFINITIONS("-std=gnu++0x")
+	SET(CMAKE_REQUIRED_FLAGS "-std=gnu++0x")
+ENDIF(HAVE_SOME_CXX0X)
+
+# Rvalue references (>= gcc 4.3)
+CHECK_CXX_SOURCE_COMPILES("
+	#include <algorithm>\n
+	int my_move (int && y) { return std::move(y); }\n
+	int main () { return my_move (0); }"
+	HAVE_RVALUE_REFERENCES)
+IF(HAVE_RVALUE_REFERENCES)
+	ADD_DEFINITIONS("-DTIARY_HAVE_RVALUE_REFERENCES=1")
+ENDIF (HAVE_RVALUE_REFERENCES)
+
+# static_assert (>= gcc 4.3)
+CHECK_CXX_SOURCE_COMPILES("static_assert (1 == 1, \"1 != 1\");\n int main () { return 0; }" HAVE_STATIC_ASSERT)
+IF(HAVE_STATIC_ASSERT)
+	ADD_DEFINITIONS("-DTIARY_HAVE_STATIC_ASSERT=1")
+ENDIF(HAVE_STATIC_ASSERT)
+
+# default/delete functions (>= gcc 4.4)
+CHECK_CXX_SOURCE_COMPILES("
+	struct A { A () = default; A (const A&) = delete; };
+	int main () { return 0; }" HAVE_DEFAULT_DELETE_FUNCTIONS)
+IF(HAVE_DEFAULT_DELETE_FUNCTIONS)
+	ADD_DEFINITIONS("-DTIARY_HAVE_DEFAULT_DELETE_FUNCTIONS=1")
+ENDIF(HAVE_DEFAULT_DELETE_FUNCTIONS)
+
+# unordered_set/unordered_map (>= gcc 4.3)
+# For new stuff related to libraries, compiling
+# is not enough (e.g. Headers for regex are ready in gcc 4.3,
+# but no library support)
+CHECK_CXX_SOURCE_RUNS("
+	#include <unordered_set> \n
+	#include <unordered_map> \n
+	#include <string> \n
+	#include <cstdlib> \n
+	using namespace std;
+	unordered_map <wstring, unordered_set <string> > map;
+	int main ()
+	{
+		unordered_set <string> & set = map[L\"hello\"];
+		set.insert (\"1\");
+		set.insert (\"2\");
+		const pair <const wstring, unordered_set <string> > &pr = *map.begin ();
+		if (pr.first != L\"hello\")
+			return EXIT_FAILURE;
+		if (pr.second.size () != 2)
+			return EXIT_FAILURE;
+		return 0;
+	}
+" HAVE_UNORDERED_SET_MAP)
+IF(HAVE_UNORDERED_SET_MAP)
+	ADD_DEFINITIONS("-DTIARY_HAVE_STD_UNORDERED_SET_MAP=1")
+ELSE(HAVE_UNORDERED_SET_MAP)
+	# tr1/unordered_{set,map} (>= gcc 4)
+	CHECK_CXX_SOURCE_RUNS("
+		#include <tr1/unordered_set> \n
+		#include <tr1/unordered_map> \n
+		#include <string> \n
+		#include <cstdlib> \n
+		using namespace std;
+		tr1::unordered_map <wstring, tr1::unordered_set <string> > map;
+		int main ()
+		{
+			tr1::unordered_set <string> & set = map[L\"hello\"];
+			set.insert (\"1\");
+			set.insert (\"2\");
+			const pair <const wstring, tr1::unordered_set <string> > &pr = *map.begin ();
+			if (pr.first != L\"hello\")
+				return EXIT_FAILURE;
+			if (pr.second.size () != 2)
+				return EXIT_FAILURE;
+			return 0;
+		}
+	" HAVE_TR1_UNORDERED_SET_MAP)
+	IF(HAVE_TR1_UNORDERED_SET_MAP)
+		ADD_DEFINITIONS("-DTIARY_HAVE_TR1_UNORDERED_SET_MAP=1")
+	ENDIF(HAVE_TR1_UNORDERED_SET_MAP)
+ENDIF(HAVE_UNORDERED_SET_MAP)
+
+# std::array (>= gcc 4.3)
+CHECK_CXX_SOURCE_RUNS("
+	#include <array> \n
+	int main ()
+	{
+		std::array<int,5> a = { 1, 2, 3, 4, 5 };
+		int sum = 0;
+		for (std::array<int,5>::const_iterator it = a.begin(); it!=a.end(); ++it)
+			sum += *it;
+		return (sum == 15 ? 0 : 1);
+	} " HAVE_STD_ARRAY)
+IF(HAVE_STD_ARRAY)
+	ADD_DEFINITIONS("-DTIARY_HAVE_STD_ARRAY=1")
+ELSE(HAVE_STD_ARRAY)
+	# std::tr1::array (>= gcc 4)
+	CHECK_CXX_SOURCE_RUNS("
+		#include <tr1/array> \n
+		int main ()
+		{
+			std::tr1::array<int,5> a = { 1, 2, 3, 4, 5 };
+			int sum = 0;
+			for (std::tr1::array<int,5>::const_iterator it = a.begin(); it!=a.end(); ++it)
+				sum += *it;
+			return (sum == 15 ? 0 : 1);
+		} " HAVE_TR1_ARRAY)
+	IF(HAVE_TR1_ARRAY)
+		ADD_DEFINITIONS("-DTIARY_HAVE_TR1_ARRAY=1")
+	ENDIF(HAVE_TR1_ARRAY)
+ENDIF(HAVE_STD_ARRAY)
+
+
+
+# initializer list (>= gcc 4.4)
+CHECK_CXX_SOURCE_RUNS("
+	#include <list> \n
+	using namespace std;
+	int main()
+	{
+		return (list<int>{2,3,4,5}.size() == 4) ? 0 : 1;
+	}" HAVE_INITIALIZER_LIST)
+IF(HAVE_INITIALIZER_LIST)
+	ADD_DEFINITIONS("-DTIARY_HAVE_INITIALIZER_LIST=1")
+ENDIF(HAVE_INITIALIZER_LIST)
+
+
+# decltype (>= gcc 4.3)
+
+CHECK_CXX_SOURCE_COMPILES("#include <iostream> \n
+#include <cstdlib> \n
+
+template <typename F>
+void test (F foo)
+{
+	decltype (foo ()) ret = foo ();
+	std::cout << ret;
+}
+
+int main()
+{
+	test (std::rand);
+}" HAVE_DECLTYPE)
+IF(HAVE_DECLTYPE)
+	ADD_DEFINITIONS("-DTIARY_HAVE_DECLTYPE=1")
+ENDIF(HAVE_DECLTYPE)
+
+SET(CMAKE_REQUIRED_FLAGS)
+# END OF C++0X FEATURES
+
+
+
+
+ADD_EXECUTABLE(tiary
+	main.cpp
+	)
+
+# The order is important here
+SET(TIARY_SUBDIRS
+	main
+	diary
+	ui
+	common
+	)
+
+SET(TIARY_SYSLIBS ncursesw ${BZIP2_LIBRARIES} ${LIBXML2_LIBRARIES}
+	${PCRE_LIBRARIES})
+
+
+FOREACH(DIR ${TIARY_SUBDIRS})
+	ADD_SUBDIRECTORY(${DIR})
+	ADD_DEPENDENCIES(tiary tiary_${DIR})
+	TARGET_LINK_LIBRARIES(tiary tiary_${DIR})
+ENDFOREACH(DIR)
+
+TARGET_LINK_LIBRARIES(tiary ${TIARY_SYSLIBS})
+
+
+
+
+# Test
+#ADD_EXECUTABLE(test test.cpp)
+#FOREACH(DIR ${TIARY_SUBDIRS})
+#	ADD_DEPENDENCIES(test tiary_${DIR})
+#	TARGET_LINK_LIBRARIES(test tiary_${DIR})
+#ENDFOREACH(DIR)
+#TARGET_LINK_LIBRARIES(test ${TIARY_SYSLIBS})

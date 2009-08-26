@@ -1,0 +1,4 @@
+*   Press ^Z in editor and then resume may lead to problems.
+*   valgrind reports "jumps depending on uninitialized variable".
+    Potentially some unidentified problems.
+*   Cannot cross compile (CMakeLists.txt problem)

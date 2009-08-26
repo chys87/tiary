@@ -1,0 +1,9 @@
+add_library(tiary_diary
+	config.h
+	config.cpp
+	diary.h
+	diary.cpp
+	diary_edit_time.cpp
+	file.h
+	file.cpp
+)
