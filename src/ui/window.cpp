@@ -17,6 +17,7 @@
 #include "common/containers.h"
 #include "common/unicode.h"
 #include "common/misc.h"
+#include "ui/terminal_emulator.h"
 #include <vector>
 #include <stack>
 #include <string.h>
@@ -120,6 +121,16 @@ void commit_touched_lines ()
 					(win_right - win_left) * sizeof (*line));
 		}
 
+		// What characters for the border?
+		TerminalEmulator emul = get_terminal_emulator ();
+		bool use_acs_border = false
+			|| (emul == LINUX_CONSOLE)
+			|| (emul == RXVT_UNICODE)
+			|| (emul == KONSOLE)
+			|| (emul == ETERM)
+			|| (emul == MLTERM)
+			;
+
 		// Now actually commit to ncurses
 		cchar_t *p = (cchar_t *)memset (cchar_line, 0, (width+1) * sizeof (cchar_t));
 		for (unsigned x = 0; x < width; ++x) {
@@ -127,46 +138,40 @@ void commit_touched_lines ()
 				continue;
 			switch (line[x].c) {
 				case BORDER_V:
-#if 0 //def WACS_VLINE
-					*p = *WACS_VLINE;
-#else
-					p->chars[0] = L'|';
-#endif
+					if (use_acs_border)
+						*p = *WACS_VLINE;
+					else
+						p->chars[0] = L'|';
 					break;
 				case BORDER_H:
-#if 0 //def WACS_HLINE
-					*p = *WACS_HLINE;
-#else
-					p->chars[0] = L'-';
-#endif
+					if (use_acs_border)
+						*p = *WACS_HLINE;
+					else
+						p->chars[0] = L'-';
 					break;
 				case BORDER_1:
-#if 0 //def WACS_ULCORNER
-					*p = *WACS_ULCORNER;
-#else
-					p->chars[0] = L'/';
-#endif
+					if (use_acs_border)
+						*p = *WACS_ULCORNER;
+					else
+						p->chars[0] = L'/';
 					break;
 				case BORDER_2:
-#if 0 //def WACS_URCORNER
-					*p = *WACS_URCORNER;
-#else
-					p->chars[0] = L'\\';
-#endif
+					if (use_acs_border)
+						*p = *WACS_URCORNER;
+					else
+						p->chars[0] = L'\\';
 					break;
 				case BORDER_3:
-#if 0 //def WACS_LLCORNER
-					*p = *WACS_LLCORNER;
-#else
-					p->chars[0] = L'\\';
-#endif
+					if (use_acs_border)
+						*p = *WACS_LLCORNER;
+					else
+						p->chars[0] = L'\\';
 					break;
 				case BORDER_4:
-#if 0 //def WACS_LRCORNER
-					*p = *WACS_LRCORNER;
-#else
-					p->chars[0] = L'/';
-#endif
+					if (use_acs_border)
+						*p = *WACS_LRCORNER;
+					else
+						p->chars[0] = L'/';
 					break;
 				default:
 					p->chars[0] = line[x].c;

@@ -39,6 +39,8 @@ add_library(tiary_ui
 	scroll.h
 	scroll.cpp
 	size.h
+	terminal_emulator.h
+	terminal_emulator.cpp
 	textbox.h
 	textbox.cpp
 	ui.h
