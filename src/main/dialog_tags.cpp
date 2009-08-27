@@ -102,13 +102,13 @@ DialogTags::DialogTags (WStringLocaleOrderedSet &tags_, WStringLocaleOrderedSet 
 		;
 	layout_middle.add
 		(2, 2)
-		(btn_add, 3, 3, 10)
+		(btn_add, 3, 3, 10, 0)
 		(1, 1)
-		(btn_remove, 3, 3, 10)
+		(btn_remove, 3, 3, 10, 0)
 		(1, 1)
-		(btn_new, 3, 3, 10)
+		(btn_new, 3, 3, 13, 0)
 		(1, Layout::UNLIMITED)
-		(btn_ok, 3, 3, 10)
+		(btn_ok, 3, 3, 10, 0)
 		;
 	layout_right.add
 		(lbl_all, 1, 1)
@@ -118,7 +118,7 @@ DialogTags::DialogTags (WStringLocaleOrderedSet &tags_, WStringLocaleOrderedSet 
 	layout_main.add
 		(layout_left, 2, Layout::UNLIMITED)
 		(2, 2)
-		(layout_middle, 10, 10)
+		(layout_middle, 13, 13)
 		(2, 2)
 		(layout_right, 2, Layout::UNLIMITED)
 		;

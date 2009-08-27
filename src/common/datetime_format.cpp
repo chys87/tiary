@@ -36,28 +36,77 @@ T *to_string_4 (T *buffer, unsigned x)
 	return buffer;
 }
 
-const unsigned char weekday_name[] = "SunMonTueWedThuFriSat";
+inline char *strcpy_end (char *buffer, const char *s)
+{
+	return stpcpy (buffer, s);
+}
 
-template <typename T>
+wchar_t *strcpy_end (wchar_t *buffer, const char *s)
+{
+	while (*s)
+		*buffer++ = *s++;
+	return buffer;
+}
+
+const char weekday_name[] = "SunMonTueWedThuFriSat";
+
+template <typename T> inline
 T *fill_weekday_name (T *buffer, unsigned n)
 {
-	const unsigned char *p = &weekday_name[n*3];
+	const char *p = &weekday_name[n*3];
 	*buffer++ = T(*p++);
 	*buffer++ = T(*p++);
 	*buffer++ = T(*p++);
 	return buffer;
 }
 
-const unsigned char month_name[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+const char full_weekday_name[][10] = {
+	"Sunday",
+	"Monday",
+	"Tuesday",
+	"Wednesday",
+	"Thursday",
+	"Friday",
+	"Saturday"
+};
 
-template <typename T>
+template <typename T> inline
+T *fill_full_weekday_name (T *buffer, unsigned n)
+{
+	return strcpy_end (buffer, full_weekday_name[n]);
+}
+
+const char month_name[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+
+template <typename T> inline
 T *fill_month_name (T *buffer, unsigned m)
 {
-	const unsigned char *p = &month_name[m*3-3];
+	const char *p = &month_name[m*3-3];
 	*buffer++ = T(*p++);
 	*buffer++ = T(*p++);
 	*buffer++ = T(*p++);
 	return buffer;
+}
+
+const char full_month_name[][10] = {
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December"
+};
+
+template <typename T> inline
+T *fill_full_month_name (T *buffer, unsigned m)
+{
+	return strcpy_end (buffer, full_month_name[m-1]);
 }
 
 template <typename T> inline
@@ -93,6 +142,12 @@ std::basic_string<T> format_datetime (const DateTime &dt, const T *fmt)
 				break;
 			case T('w'):
 				q = fill_weekday_name (q, rdt.w);
+				break;
+			case T('B'):
+				q = fill_full_month_name (q, rdt.m);
+				break;
+			case T('W'):
+				q = fill_full_weekday_name (q, rdt.w);
 				break;
 			case T('H'):
 				q = to_string_2 (q, rdt.H);

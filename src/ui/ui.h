@@ -73,6 +73,9 @@
  *
  * To write to a Window, using tiary::ui::Window::put.
  *
+ * For efficiency purposes, output functions only support printable
+ * characters. It is the caller's responsibility to guarantee this.
+ *
  * In most cases we don't want to directly use tiary::ui::Window. Instead,
  * we want to use tiary::ui::Dialog.
  *

@@ -49,23 +49,14 @@ std::vector<char> touched_lines; // 1 = Touched; 0 = Not
 void touch_lines ()
 {
 	std::fill (touched_lines.begin (), touched_lines.end (), '\1');
-	unsigned lines = get_screen_size ().y;
-	if (lines != touched_lines.size ())
-		touched_lines.resize (lines, '\1');
 }
 
 void touch_lines (unsigned top, unsigned height)
 {
-	unsigned lines = get_screen_size ().y;
-	if (lines == touched_lines.size ()) {
-		if (top >= lines)
-			return;
-		height = minU (height, lines - top);
-	} else {
-		touched_lines.resize (lines, '\1');
-		top = 0;
-		height = lines;
-	}
+	unsigned lines = touched_lines.size ();
+	if (top >= lines)
+		return;
+	height = minU (height, lines - top);
 	std::fill_n (touched_lines.begin () + top, height, '\1');
 }
 
@@ -73,25 +64,23 @@ void touch_line (unsigned line)
 {
 	if (line < touched_lines.size ())
 		touched_lines[line] = '\1';
-	unsigned scrheight = get_screen_size ().y;
-	if (scrheight != touched_lines.size ()) {
-		std::fill (touched_lines.begin (), touched_lines.end (), '\1');
-		touched_lines.resize (scrheight, '\1');
-	}
 }
 
 void commit_touched_lines ()
 {
+	static Size last_commit_size = { 0, 0 };
+
 	Size size = get_screen_size ();
 	unsigned width = size.x;
 	unsigned height = size.y;
 
-	if (height != touched_lines.size ()) {
+	if (last_commit_size != size) {
+		last_commit_size = size;
 		std::fill (touched_lines.begin (), touched_lines.end (), '\1');
 		touched_lines.resize (height, '\1');
 	}
 
-	CharColorAttr *line =new CharColorAttr[width];
+	CharColorAttr *line = new CharColorAttr[width];
 	cchar_t *cchar_line = new cchar_t[width+1];
 	CharColorAttr def = { L' ', { DEFAULT_FORECOLOR, DEFAULT_BACKCOLOR, 0 } };
 
@@ -190,32 +179,6 @@ void commit_touched_lines ()
 	delete [] line;
 }
 
-
-unsigned dig1num (char c)
-{
-	unsigned a = (unsigned char)c;
-	if ((a -= '0') < 10)
-		return a;
-	return 0;
-}
-
-unsigned dig1num (wchar_t c)
-{
-	unsigned a = c;
-	if ((a -= L'0') < 10)
-		return a;
-	return 0;
-}
-
-unsigned hex2num (const char *s)
-{
-	return (hex_to_num (s[0]) * 16 + hex_to_num (s[1]));
-}
-
-unsigned hex2num (const wchar_t *s)
-{
-	return (hex_to_num (s[0]) * 16 + hex_to_num (s[1]));
-}
 
 /*
  * Does not handle Alt + Letter
@@ -462,73 +425,9 @@ void Window::move_cursor (Size newpos)
 }
 
 
-Size Window::put (Size blkpos, Size blksize, Size relpos, char ch)
-{
-	return put (blkpos, blksize, relpos, wchar_t (ch));
-}
-
 Size Window::put (Size blkpos, Size blksize, Size relpos, wchar_t ch)
 {
-	if (either (blkpos >= size))
-		return relpos;
-	if (either (blkpos + blksize > size))
-		return relpos;
-	if (either (relpos >= blksize))
-		return relpos;
-
-//	unsigned left = pos.x + blkpos.x;
-	unsigned top  = pos.y + blkpos.y;
-	unsigned x = relpos.x;
-	unsigned y = relpos.y;
-
-	unsigned w;
-
-	switch (ch) {
-		case L'\b':
-			if (x)
-				--x;
-			break;
-		case L'\n':
-			x = 0;
-			if (y+1 < blksize.y)
-				++y;
-			break;
-		case L'\r':
-			x = 0;
-			break;
-		case L'\t':
-			x = minU (blksize.x, (x + 8) & ~unsigned(7));
-			break;
-		default:
-			if (!special_printable(ch) && !iswprint (ch))
-				break;
-			w = ucs_width (ch);
-			if (x + w > blksize.x)
-				break;
-			touch_line (top + y);
-
-			// Position relative to window
-			unsigned winx = blkpos.x + x;
-			unsigned winy = blkpos.y + y;
-			CharColorAttr *line = char_table[winy];
-
-			if (winx && line[winx].c == L'\0')
-				line[winx-1].c = L' ';
-
-			line[winx].c = ch;
-			line[winx].a = cur_attr;
-			++x;
-			++winx;
-			if (w == 2) {
-				line[winx].c = L'\0';
-				line[winx].a = cur_attr;
-				++x;
-				++winx;
-			}
-			if (winx<size.x && line[winx].c==L'\0')
-				line[winx].c = L' ';
-	}
-	return make_size (x, y);
+	return put (blkpos, blksize, relpos, &ch, 1);
 }
 
 void Window::move_resize (Size newpos, Size newsize)
@@ -583,48 +482,57 @@ void Window::fill (Size top_left, Size fill_size, wchar_t ch)
 	}
 }
 
-Size Window::put (Size blkpos, Size blksize, Size relpos, const char *s, size_t n)
+Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s)
 {
-	// This function supports multi-byte characters
-	if (n == size_t(-1))
-		n = strlen (s);
-	const char *end = s + n;
-	mbstate_t state;
-	memset (&state, 0, sizeof state);
-	while (s < end) {
-		if ((uint8_t)*s < 0x80)
-			relpos = put (blkpos, blksize, relpos, wchar_t (*s++));
-		else {
-			// Convert to Unicode
-			wchar_t wc;
-			ssize_t r = mbrtowc (&wc, s, end-s, &state);
-			if (r <= 0) {
-				if (size_t (r) == size_t (-2))
-					break;
-				memset (&state, 0, sizeof state);
-				++s;
-			} else {
-				s += r;
-				relpos = put (blkpos, blksize, relpos, wc);
-			}
-		}
-	}
-	return relpos;
+	return put (blkpos, blksize, relpos, s, wcslen (s));
 }
 
 Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size_t n)
 {
-	if (n == size_t(-1))
-		n = wcslen (s);
-	const wchar_t *end = s + n;
-	while (s < end)
-			relpos = put (blkpos, blksize, relpos, *s++);
-	return relpos;
-}
+	if (either (blkpos >= size))
+		return relpos;
+	if (either (blkpos + blksize > size))
+		return relpos;
+	if (either (relpos >= blksize))
+		return relpos;
 
-Size Window::put (Size blkpos, Size blksize, Size relpos, const std::string &s)
-{
-	return put (blkpos, blksize, relpos, s.data(), s.length ());
+//	unsigned left = pos.x + blkpos.x;
+	unsigned top  = pos.y + blkpos.y;
+	unsigned x = relpos.x;
+	unsigned y = relpos.y;
+
+	// Position relative to window
+	unsigned winx = blkpos.x + x;
+	unsigned winy = blkpos.y + y;
+
+	touch_line (top + y);
+	CharColorAttr *line = char_table[winy];
+
+	if (winx && line[winx].c == L'\0')
+		line[winx-1].c = L' ';
+
+	for (; n; --n) {
+
+		wchar_t ch = *s++;
+		unsigned w = ucs_width (ch);
+
+		if (x + w > blksize.x)
+			break;
+
+		line[winx].c = ch;
+		line[winx].a = cur_attr;
+		++x;
+		++winx;
+		if (w == 2) {
+			line[winx].c = L'\0';
+			line[winx].a = cur_attr;
+			++x;
+			++winx;
+		}
+	}
+	if (winx<size.x && line[winx].c==L'\0')
+		line[winx].c = L' ';
+	return make_size (x, y);
 }
 
 Size Window::put (Size blkpos, Size blksize, Size relpos, const std::wstring &s)
@@ -632,19 +540,14 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const std::wstring &s)
 	return put (blkpos, blksize, relpos, s.data(), s.length ());
 }
 
-Size Window::put (Size relpos, char ch)
-{
-	return put (make_size (), size, relpos, ch);
-}
-
 Size Window::put (Size relpos, wchar_t ch)
 {
 	return put (make_size (), size, relpos, ch);
 }
 
-Size Window::put (Size relpos, const char *s, size_t n)
+Size Window::put (Size relpos, const wchar_t *s)
 {
-	return put (make_size (), size, relpos, s, n);
+	return put (make_size (), size, relpos, s);
 }
 
 Size Window::put (Size relpos, const wchar_t *s, size_t n)
@@ -652,44 +555,9 @@ Size Window::put (Size relpos, const wchar_t *s, size_t n)
 	return put (make_size (), size, relpos, s, n);
 }
 
-Size Window::put (Size relpos, const std::string &s)
-{
-	return put (make_size (), size, relpos, s);
-}
-
 Size Window::put (Size relpos, const std::wstring & s)
 {
 	return put (make_size (), size, relpos, s);
-}
-
-void Window::put (char c)
-{
-	curpos = put (curpos, c);
-}
-
-void Window::put (wchar_t c)
-{
-	curpos = put (curpos, c);
-}
-
-void Window::put (const char *s, size_t n)
-{
-	curpos = put (curpos, s, n);
-}
-
-void Window::put (const wchar_t *s, size_t n)
-{
-	curpos = put (curpos, s, n);
-}
-
-void Window::put (const std::string &s)
-{
-	curpos = put (curpos, s);
-}
-
-void Window::put (const std::wstring &s)
-{
-	curpos = put (curpos, s);
 }
 
 void Window::touch_screen ()

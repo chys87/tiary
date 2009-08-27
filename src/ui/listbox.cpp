@@ -202,9 +202,9 @@ void ListBox::redraw ()
 		const std::wstring &str = items[info.first+i];
 		choose_palette ((select_any && i==info.focus_pos) ? PALETTE_ID_LISTBOX_SELECT : PALETTE_ID_LISTBOX);
 		Size pos = make_size (0, i);
-		unsigned scrwid = ucs_width (str);
+		unsigned strwid = ucs_width (str);
 		// Are we going to overflow?
-		if (scrwid <= get_size().x) {
+		if (strwid <= get_size().x) {
 			//NO:
 			pos = put (pos, str);
 			if (select_any && i==info.focus_pos) // Focus? Highlight the whole line

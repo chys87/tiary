@@ -86,7 +86,7 @@ DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring
 	, btn_cancel (*this, L"&Cancel")
 	, layout_main (VERTICAL)
 	, layout_buttons (HORIZONTAL)
-	, result ()
+	, result (default_file)
 	, list_dir ()
 	, options (options_)
 {
@@ -130,9 +130,11 @@ DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring
 		(1, 1)
 		(layout_buttons, 3, 3);
 
-	set_text (default_file);
-
+	// redraw before set_text so that the focus is properly positioned
+	// (redraw guarantees that list_files has a non-zero height)
 	DialogSelectFile::redraw ();
+
+	set_text (default_file);
 }
 
 DialogSelectFile::~DialogSelectFile()
@@ -238,19 +240,20 @@ void DialogSelectFile::set_text (const std::wstring &newname, bool rewrite_input
 		text_input.set_text (display_name, false, display_name.length ());
 	}
 	if (list_dir != split_fullname.first) {
-		list_dir.swap (split_fullname.first);
+		list_dir = split_fullname.first;
 		// Refresh items in list_files
 		std::list<DirEnt<wchar_t> > files = tiary::list_dir (list_dir, FilterDots(list_dir == L"/", check_hidden_files.get_status ()));
-		ListBox::ItemList display_list (files.size ());
-		ListBox::ItemList::iterator it_out = display_list.begin ();
-		for (std::list<DirEnt<wchar_t> >::iterator it = files.begin();
+		ListBox::ItemList display_list;
+		display_list.reserve (files.size ());
+		for (std::list<DirEnt<wchar_t> >::const_iterator it = files.begin();
 				it != files.end();
-				++it_out, ++it) {
-			it_out->swap (it->name);
+				++it) {
+			std::wstring name = it->name;
 			if (it->attr & FILE_ATTR_DIRECTORY)
-				*it_out += L'/';
+				name += L'/';
+			display_list.push_back (name);
 		}
-		list_files.set_items (display_list);
+		list_files.set_items (TIARY_STD_MOVE (display_list), size_t(-1), false);
 	}
 	// Select a corresponding item
 	// If our item is "r", and we have "rel" and "r", we must make
