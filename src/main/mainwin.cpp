@@ -6,13 +6,14 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
 
 
 #include "main/mainwin.h"
+#include "common/string.h"
 #include "ui/dialog_message.h"
 #include "ui/dialog_select_file.h"
 #include "ui/dialog_input.h"
@@ -714,7 +715,7 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 				return;
 			}
 			for (; k < num_ents; k += inc) {
-				if (regex_obj.match (entries[k]->text)) {
+				if (regex_obj.match (entries[k]->title) || regex_obj.match (entries[k]->text)) {
 					main_ctrl.set_focus (k);
 					return;
 				}
@@ -723,7 +724,8 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 #endif
 		{
 			for (; k < num_ents; k += inc) {
-				if (entries[k]->text.find (last_search_text) != std::string::npos) {
+				if (find_caseless (entries[k]->title, last_search_text) != std::wstring::npos ||
+						find_caseless (entries[k]->text, last_search_text) != std::wstring::npos) {
 					main_ctrl.set_focus (k);
 					return;
 				}

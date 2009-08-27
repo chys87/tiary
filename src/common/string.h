@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -70,6 +70,15 @@ inline char *strend (char *str) { return strlen (str) + str; }
 inline const wchar_t *strend (const wchar_t *str) { return ::wcslen (str) + str; }
 inline wchar_t *strend (wchar_t *str) { return ::wcslen (str) + str; }
 
+
+/// @brief	Make a string lowercase
+void tolower (std::wstring &);
+
+/**
+ * @brief	Find the first occurrence of a substring, ignoring case
+ * @result	Return std::wstring::npos if not found
+ */
+size_t find_caseless (const std::wstring &haystack, const std::wstring &needle);
 
 // Remove spaces at the beginning and the end
 void strip (std::string &);
