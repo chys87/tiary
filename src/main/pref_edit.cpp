@@ -231,7 +231,7 @@ void DialogGlobalOptions::slot_default_file ()
 {
 	lbl_default_file_name.set_text(
 			get_full_pathname (
-				dialog_select_file (std::wstring (),
+				dialog_select_file (L"Default file",
 					lbl_default_file_name.get_text (),
 					SELECT_FILE_READ)),
 			UIString::NO_HOTKEY);

@@ -61,7 +61,7 @@ void Scroll::modify_focus (unsigned new_focus)
 	if (new_focus - first >= len) {
 		if (new_focus < first) { // Scroll backward (upward)
 			first = new_focus;
-		} else { // Scroll forward (backward)
+		} else { // Scroll forward (downward)
 			// Let's put the focus in the last line.
 			put_focus_last_line ();
 		}

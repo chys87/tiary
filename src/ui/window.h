@@ -70,22 +70,11 @@ public:
 	// The character must be half-widthed; otherwise the behavior is undefined.
 	void fill (Size fill_pos, Size fill_size, wchar_t);
 
-	// These functions output at the current cursor position,
-	// and moves the cursor to the new position
-	void put (char); // NOT supporting multi-byte characters
-	void put (wchar_t);
-	void put (const char *, size_t = size_t(-1));
-	void put (const wchar_t *, size_t = size_t(-1));
-	void put (const std::string &);
-	void put (const std::wstring &);
-
 	// These functions output at a specified cursor position,
 	// does NOT move the current cursor position, and returns the new position
-	Size put (Size, char);
 	Size put (Size, wchar_t);
-	Size put (Size, const char *, size_t = size_t (-1));
-	Size put (Size, const wchar_t *, size_t = size_t (-1));
-	Size put (Size, const std::string &);
+	Size put (Size, const wchar_t *);
+	Size put (Size, const wchar_t *, size_t);
 	Size put (Size, const std::wstring &);
 
 	// These functions are designed to facilitate the implementation of dialogs and controls
@@ -93,11 +82,9 @@ public:
 	// Assumes a small block defined by (blk_pos, blk_size), and all outputs are carried
 	// out in that small block.
 	// The return value is the new cursor position relative to the small block
-	Size put (Size, Size, Size, char);
 	Size put (Size, Size, Size, wchar_t);
-	Size put (Size, Size, Size, const char *, size_t = size_t (-1));
-	Size put (Size, Size, Size, const wchar_t *, size_t = size_t (-1));
-	Size put (Size, Size, Size, const std::string &);
+	Size put (Size, Size, Size, const wchar_t *);
+	Size put (Size, Size, Size, const wchar_t *, size_t);
 	Size put (Size, Size, Size, const std::wstring &);
 
 	// Touches (but not updates) the whole screen.

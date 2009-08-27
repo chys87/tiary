@@ -94,6 +94,8 @@ struct DateTime
 	 * %d	2-digit day (04)
 	 * %b	3-character month (Jun)
 	 * %w	3-character weekday (Sun)
+	 * %B	Full month (June)
+	 * %W	Full weekday (July)
 	 * %H	2-digit hour (0-24) (03)
 	 * %h	2-digit hour (1-12) (03)
 	 * %M	2-digit minute (20)

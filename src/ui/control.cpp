@@ -40,7 +40,7 @@ Control::~Control ()
 
 void Control::move_resize (Size newpos, Size newsize)
 {
-	if (either (pos != newpos) || either (size != newsize)) {
+	if ((pos != newpos) || (size != newsize)) {
 		dlg.choose_palette (PALETTE_ID_BACKGROUND);
 		Size oldpos = pos;
 		Size oldsize = size;
@@ -137,29 +137,19 @@ void Control::set_attr (ColorAttr at)
 	dlg.set_attr (at);
 }
 
-Size Control::put (Size xy, char c)
-{
-	return dlg.put (pos, size, xy, c);
-}
-
 Size Control::put (Size xy, wchar_t c)
 {
 	return dlg.put (pos, size, xy, c);
 }
 
-Size Control::put (Size xy, const char *s, size_t n)
+Size Control::put (Size xy, const wchar_t *s)
 {
-	return dlg.put (pos, size, xy, s, n);
+	return dlg.put (pos, size, xy, s);
 }
 
 Size Control::put (Size xy, const wchar_t *s, size_t n)
 {
 	return dlg.put (pos, size, xy, s, n);
-}
-
-Size Control::put (Size xy, const std::string &s)
-{
-	return dlg.put (pos, size, xy, s);
 }
 
 Size Control::put (Size xy, const std::wstring &s)

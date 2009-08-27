@@ -76,11 +76,9 @@ public:
 	void attribute_off (Attr);
 	ColorAttr get_attr () const;
 	void set_attr (ColorAttr);
-	Size put (Size xy, char c);
 	Size put (Size xy, wchar_t c);
-	Size put (Size xy, const char *, size_t = size_t (-1));
-	Size put (Size xy, const wchar_t *, size_t = size_t (-1));
-	Size put (Size xy, const std::string &);
+	Size put (Size xy, const wchar_t *);
+	Size put (Size xy, const wchar_t *, size_t);
 	Size put (Size xy, const std::wstring &);
 	void clear ();
 	void clear (Size, Size);

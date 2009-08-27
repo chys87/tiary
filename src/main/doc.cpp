@@ -36,8 +36,8 @@ KEYBOARD COMMANDS\n\
       Esc                  Go to menu\n\
       k UP                 Backward one line\n\
       j DOWN               Forward one line\n\
-      ^ HOME               Jump to the first entry\n\
-      $ END                Jump to the last entry\n\
+      ^ g < HOME           Jump to the first entry\n\
+      $ G > END            Jump to the last entry\n\
       b PAGEUP             Backward one page\n\
       f PAGEDOWN           Forward one page\n\
       v ENTER RIGHT        View the selected entry\n\

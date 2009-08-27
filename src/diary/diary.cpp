@@ -39,12 +39,17 @@ namespace {
 // If tags!=0, also displays the tags
 std::string split_text_for_display (const DiaryEntry &ent, bool extra)
 {
+	const unsigned line_width = 78;
 	// Title
-	std::string mbs = wstring_to_mbs (ent.title);
+	std::string mbs (line_width, '=');
+	mbs += '\n';
+	mbs += wstring_to_mbs (ent.title);
+	mbs += '\n';
+	mbs.append (78, '=');
 
 	// Time and tags
 	if (extra) {
-		mbs += ent.local_time.format ("\n\n%w %b %d, %Y  %h:%M:%S %P");
+		mbs += ent.local_time.format ("\n%W %B %d, %Y  %h:%M:%S %P");
 		if (!ent.tags.empty ()) {
 			mbs += "\nTags: ";
 			DiaryEntry::TagList::const_iterator it = ent.tags.begin (), e = ent.tags.end ();
@@ -63,7 +68,7 @@ std::string split_text_for_display (const DiaryEntry &ent, bool extra)
 	size_t offset = 0;
 	SplitStringLine split_info;
 	while (offset < s.length ()) {
-		offset = split_line (split_info, 78, s, offset);
+		offset = split_line (split_info, line_width, s, offset);
 		mbs += wstring_to_mbs (s.data () + split_info.begin, split_info.len);
 		mbs += '\n';
 	}

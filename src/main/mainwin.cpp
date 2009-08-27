@@ -129,11 +129,15 @@ bool MainCtrl::on_key (wchar_t key)
 			return true;
 
 		case L'^':
+		case L'g':
+		case L'<':
 		case ui::HOME:
 			set_focus (0);
 			return true;
 
 		case L'$':
+		case L'G':
+		case L'>':
 		case ui::END:
 			set_focus (std::numeric_limits<int>::max ());
 			return true;
@@ -238,7 +242,7 @@ void MainCtrl::redraw ()
 
 	ui::Size pos = ui::make_size ();
 
-	const char *date_format = w().global_options.get (GLOBAL_OPTION_DATETIME_FORMAT).c_str ();
+	std::wstring date_format = w().global_options.get_wstring (GLOBAL_OPTION_DATETIME_FORMAT);
 
 	wchar_t *disp_buffer = new wchar_t [get_size ().x];
 
@@ -251,7 +255,7 @@ void MainCtrl::redraw ()
 		const DiaryEntry &entry = *w().entries[i+info.first];
 		// Date
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_DATE_SELECT : ui::PALETTE_ID_ENTRY_DATE);
-		pos = put (pos, entry.local_time.format (date_format));
+		pos = put (pos, entry.local_time.format (date_format.c_str ()));
 		pos.x++;
 
 		// Title
@@ -459,7 +463,7 @@ void MainWin::load (const std::wstring &filename)
 			error_info = format (L"File not found: %a") << filename;
 			break;
 		case LOAD_FILE_PASSWORD: // Password incorrect.
-			error_info = L"Password incorrect.";
+			error_info = L"Incorrect password.";
 			break;
 		case LOAD_FILE_READ_ERROR:
 			error_info = format (L"Cannot read file: %a") << filename;
@@ -503,7 +507,7 @@ void MainWin::default_save ()
 void MainWin::save_as ()
 {
 	std::wstring filename = ui::dialog_select_file (
-			std::wstring (),
+			L"Save as",
 			current_filename,
 			ui::SELECT_FILE_WRITE | ui::SELECT_FILE_WARN_OVERWRITE);
 	if (!filename.empty ())
@@ -660,7 +664,7 @@ void MainWin::open_file ()
 {
 	if (check_save ()) {
 		std::wstring new_filename = ui::dialog_select_file (
-				std::wstring (),
+				L"Open",
 				std::wstring (),
 				ui::SELECT_FILE_READ);
 		if (!new_filename.empty ())

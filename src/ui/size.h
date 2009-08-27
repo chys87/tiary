@@ -131,6 +131,8 @@ inline Size operator | (const Size &a, const Size &b)
 /**
  * @defgroup	sizecompare Compare the size of two Size strucutres
  *
+ * The result of == or != is a single boolean value, whose meaning is clear
+ *
  * The result of a comparison between two Size strucutres has type
  * tiary::ui::SizeCompareResult. The comparison is respectively
  * carried our for the x and y components, and the result is
@@ -139,8 +141,21 @@ inline Size operator | (const Size &a, const Size &b)
  * helps simplify the process of checking the result.
  *
  * @{
- * @brief	The result of the comparison between to Size strucutres
  *
+ */
+
+inline bool operator == (Size a, Size b)
+{
+	return (a.x == b.x) && (a.y == b.y);
+}
+
+inline bool operator != (Size a, Size b)
+{
+	return !(a == b);
+}
+
+/**
+ * @brief	The result of the comparison between to Size strucutres
  */
 struct SizeCompareResult
 {
@@ -148,30 +163,29 @@ struct SizeCompareResult
 
 	bool both () const { return (x && y); }
 	bool either () const { return (x || y); }
-	bool none () const { return (!x && !y); }
+	bool neither () const { return (!x && !y); }
 };
 
-inline bool both (const SizeCompareResult &r) { return r.both (); }
-inline bool either (const SizeCompareResult &r) { return r.either (); }
-inline bool none (const SizeCompareResult &r) { return r.none (); }
+inline bool both (SizeCompareResult r) { return r.both (); }
+inline bool either (SizeCompareResult r) { return r.either (); }
+inline bool neither (SizeCompareResult r) { return r.neither (); }
 
 #define TIARY_UI_SIZE_DEF_COMP(op) \
-	inline SizeCompareResult operator op (const Size &a, const Size &b) {	\
-		SizeCompareResult ret;												\
-		ret.x = (a.x op b.x);												\
-		ret.y = (a.y op b.y);												\
-		return ret;															\
+	inline SizeCompareResult operator op (Size a, Size b) {	\
+		SizeCompareResult ret;								\
+		ret.x = (a.x op b.x);								\
+		ret.y = (a.y op b.y);								\
+		return ret;											\
 	}
-/// @}
 
 TIARY_UI_SIZE_DEF_COMP(<)
 TIARY_UI_SIZE_DEF_COMP(>)
 TIARY_UI_SIZE_DEF_COMP(<=)
 TIARY_UI_SIZE_DEF_COMP(>=)
-TIARY_UI_SIZE_DEF_COMP(==)
-TIARY_UI_SIZE_DEF_COMP(!=)
 
 #undef TIARY_UI_SIZE_DEF_COMP
+
+/// @}
 
 } // namespace tiary::ui
 } // namespace tiary
