@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -18,8 +18,10 @@
 #include "ui/dialog_message.h"
 #include "common/external.h"
 #include "ui/dialog_input.h"
+#include "ui/dialog_richtext.h"
 #include "common/string.h"
 #include "common/datetime.h"
+#include "ui/paletteid.h"
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -35,56 +37,45 @@ namespace tiary {
 
 namespace {
 
-// Format text to a human-friendly format
-// If tags!=0, also displays the tags
-std::string split_text_for_display (const DiaryEntry &ent, bool extra)
+using namespace ui;
+
+const unsigned edit_line_width = 78;
+const unsigned view_line_width = 78;
+
+void write_for_view (RichTextList &lst, const DiaryEntry &ent)
 {
-	const unsigned line_width = 78;
-	// Title
-	std::string mbs (line_width, '=');
-	mbs += '\n';
-	mbs += wstring_to_mbs (ent.title);
-	mbs += '\n';
-	mbs.append (78, '=');
-
-	// Time and tags
-	if (extra) {
-		mbs += ent.local_time.format ("\n%W %B %d, %Y  %h:%M:%S %P");
-		if (!ent.tags.empty ()) {
-			mbs += "\nTags: ";
-			DiaryEntry::TagList::const_iterator it = ent.tags.begin (), e = ent.tags.end ();
-			do {
-				mbs += wstring_to_mbs (*it);
-				if (++it != e)
-					mbs += ", ";
-			} while (it != e);
-		}
+	lst.push_back (RichTextLine (PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'=')));
+	lst.push_back (RichTextLine (PALETTE_ID_SHOW_BOLD, ent.title));
+	lst.push_back (RichTextLine (PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'=')));
+	lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, ent.local_time.format (L"%W %B %d, %Y  %h:%M:%S %P")));
+	if (!ent.tags.empty ()) {
+		std::wstring tagstr = L"Tags: " + join (ent.tags.begin (), ent.tags.end (), L", ");
+		lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, tagstr));
 	}
-
-	mbs.append (2, '\n');
+	lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, std::wstring ()));
 
 	// Text
-	const std::wstring &s = ent.text;
-	size_t offset = 0;
-	SplitStringLine split_info;
-	while (offset < s.length ()) {
-		offset = split_line (split_info, line_width, s, offset);
-		mbs += wstring_to_mbs (s.data () + split_info.begin, split_info.len);
+	SplitStringLineList split_list = split_line (edit_line_width, ent.text);
+	for (SplitStringLineList::const_iterator it = split_list.begin ();
+			it != split_list.end (); ++it) {
+		lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL,
+					ent.text.substr (it->begin, it->len)));
+	}
+}
+
+// Write the title and text to a file which will be passed to an editor
+bool write_for_edit (int fd, const std::wstring &title, const std::wstring &text)
+{
+	std::string mbs = wstring_to_mbs (title);
+	mbs.reserve (text.length () * 2);
+	mbs.append (2, '\n');
+	SplitStringLineList split_list = split_line (edit_line_width, text);
+	for (SplitStringLineList::const_iterator it = split_list.begin ();
+			it != split_list.end (); ++it) {
+		mbs += wstring_to_mbs (text.data() + it->begin, it->len);
 		mbs += '\n';
 	}
-	return mbs;
-}
-
-bool split_write (int fd, const DiaryEntry &ent, bool extra)
-{
-	std::string mbs = split_text_for_display (ent, extra);
 	return (size_t)write (fd, mbs.data (), mbs.length ()) == mbs.length ();
-}
-
-bool split_write (FILE *fp, const DiaryEntry &ent, bool extra)
-{
-	std::string mbs = split_text_for_display (ent, extra);
-	return fwrite_unlocked (mbs.data (), 1, mbs.length (), fp) == mbs.length ();
 }
 
 // The argument points to a memory-mapped area that maps the edited file.
@@ -136,7 +127,7 @@ void reformat_content (std::wstring &title, std::wstring &text, const char *s)
 			} else {
 				// A single newline character.
 				// Drop it or replace it with a space character
-				if (ucs_isalpha (last) && ucs_isalpha (*ir))
+				if (iswgraph (last) && !ucs_iscjk (last) && iswgraph (*ir) && !ucs_iscjk (*ir))
 					*iw++ = L' ';
 			}
 		} else
@@ -171,7 +162,7 @@ bool DiaryEntry::edit (const char *editor)
 
 	// There is no universal method to notify the editor of the encoding;
 	// So the best way is to use LC_CTYPE
-	if (!split_write (fd, *this, false)) {
+	if (!write_for_edit (fd, title, text)) {
 		close (fd);
 		unlink (temp_file);
 		return error_false (L"Failed to write to temporary file :( Why?");
@@ -243,27 +234,28 @@ bool DiaryEntry::edit_tags ()
 	return (tags != newtags);
 }
 
-void DiaryEntry::view (const char *pager)
+void DiaryEntry::view (const char *)
 {
-	ui::Window::suspend ();
-	FILE *fp = call_external_program_popen (pager, "", "w");
-	// SIGPIPE is ignored (signal called by main)
-	split_write (fp, *this, true);
-	pclose (fp);
-	ui::Window::resume ();
+	RichTextList text_list;
+	write_for_view (text_list, *this);
+	ui::dialog_richtext (
+			title,
+			text_list,
+			make_size (view_line_width + 3, 0));
 }
 
 void DiaryEntry::view_all (const char *pager, const DiaryEntryList &entries)
 {
-	ui::Window::suspend ();
-	FILE *fp = call_external_program_popen (pager, "", "w");
-	// SIGPIPE is ignored (signal called by main)
+	ui::RichTextList text_list;
 	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {
-		split_write (fp, **it, true);
-		fwrite_unlocked ("\n\n\n\n", 1, 4, fp);
+		write_for_view (text_list, **it);
+		text_list.insert (text_list.end (),
+				4, ui::RichTextLine (ui::PALETTE_ID_SHOW_NORMAL, std::wstring ()));
 	}
-	pclose (fp);
-	ui::Window::resume ();
+	ui::dialog_richtext (
+			L"View all entries",
+			text_list,
+			make_size (view_line_width + 3, 0));
 }
 
 } // namespace tairy

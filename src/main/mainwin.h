@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -117,6 +117,7 @@ private:
 	void remove_current ();
 	void move_up_current ();
 	void move_down_current ();
+	void sort_all ();
 
 	void search (bool /**< false = backward */);
 	void search_continue (bool /**< false = previous */);

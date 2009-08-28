@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -65,15 +65,7 @@ struct ContainerOf : public C
 {
 	typedef typename C::value_type T;
 
-#ifdef TIARY_HAVE_DEFAULT_DELETE_FUNCTIONS
-	ContainerOf () = default;
-#else
-	ContainerOf () { }
-#endif
-	explicit ContainerOf (const T &x)  { C::push_back (x); }
-
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	ContainerOf (T &&x) { C::push_back (std::forward<T> (x)); }
 	ContainerOf &operator ,  (T &&x) { C::push_back (std::forward<T> (x)); return *this; }
 #endif
 	ContainerOf &operator ,  (const T &x) { C::push_back (x); return *this; }

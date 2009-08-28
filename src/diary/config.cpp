@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -25,7 +25,7 @@ namespace tiary {
 extern const OptionDescription g_global_option_descriptions[] = {
 	{ GLOBAL_OPTION_DEFAULT_FILE      , "" },
 	{ GLOBAL_OPTION_EXPAND_LINES      , "4" },
-	{ GLOBAL_OPTION_EDITOR            , "$EDITOR|rvim|vim|emacs -nw" },
+	{ GLOBAL_OPTION_EDITOR            , "$EDITOR|rvim|vim|emacs -nw|nano|gedit|kwrite" },
 	{ GLOBAL_OPTION_PAGER             , "$PAGER|less -icM|more" },
 	{ GLOBAL_OPTION_DATETIME_FORMAT   , "%m/%d/%Y" },
 	{ 0, 0 }

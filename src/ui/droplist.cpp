@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -74,6 +74,11 @@ bool DropList::on_key (wchar_t key)
 
 		default:
 			for (size_t k = select+1; k<items.size(); ++k)
+				if (items[k][0] == key) {
+					set_select (k);
+					return true;
+				}
+			for (size_t k = 0; k <= select; ++k)
 				if (items[k][0] == key) {
 					set_select (k);
 					return true;

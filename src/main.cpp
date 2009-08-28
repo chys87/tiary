@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -54,21 +54,21 @@ int main (int argc, char **argv)
 
 namespace {
 
-#define N(n) N_IMPL(n)
-#define N_IMPL(n) #n
-
 void option_version ()
 {
-	fputs_unlocked ("\
-Tiary " N(TIARY_MAJOR_VERSION) "." N(TIARY_MINOR_VERSION) "." N(TIARY_PATCH_VERSION) " (c) " N(TIARY_COPYRIGHT_YEAR) "\n\
+	fprintf_unlocked (stderr, "\
+Tiary %u.%u.%u\n\
 \n\
 \n\
 Tiary, a terminal-based diary keeping system for Unix-like systems\n\
-Copyright (C) 2009, chys <admin@CHYS.INFO>\n\
+Copyright (C) %u, chys <admin@CHYS.INFO>\n\
 \n\
-This software is licensed under the so-called 3-clause BSD license.\n\
+This software is licensed under the 3-clause BSD license.\n\
 See LICENSE in the source package and/or online info for details.\n",
-		stderr);
+		TIARY_MAJOR_VERSION,
+		TIARY_MINOR_VERSION,
+		TIARY_PATCH_VERSION,
+		TIARY_COPYRIGHT_YEAR);
 	exit (EXIT_SUCCESS);
 }
 

@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -400,6 +400,12 @@ bool ucs_isalnum (wchar_t c)
 	return find (alnum_table, array_end (alnum_table), c);
 }
 
+bool ucs_iscjk (wchar_t c)
+{
+	unsigned ch = c;
+	return (ch>=0x4E00u) && (ch<0xA000u);
+}
+
 bool allow_line_beginning (wchar_t c)
 {
 	static const unsigned chars[] = {
@@ -455,6 +461,7 @@ size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size
 	}
 	// Not the whold string. Neither has a newline character been encountered
 	// Now scan backward to find a proper line-breaking point
+	unsigned extra_skip = 0;
 	if (!(options & SPLIT_CUT_WORD)) {
 		unsigned xcur = cur;
 		for (;;) {
@@ -468,11 +475,13 @@ size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size
 			}
 			curwid -= ucs_width (s[--xcur]);
 		}
+		while (cur+extra_skip+1<slen && s[cur+extra_skip]==L' ')
+			++extra_skip;
 	}
 	result.begin = offset;
 	result.len = cur;
 	result.wid = curwid;
-	return (offset + cur);
+	return (offset + cur + extra_skip);
 }
 
 size_t split_line (SplitStringLine &result, unsigned wid, const std::wstring &str, size_t offset, unsigned options)

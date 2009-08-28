@@ -6,13 +6,15 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
 
 
 #include "common/string.h"
+#include <algorithm>
+#include <wctype.h>
 
 namespace tiary {
 
@@ -63,6 +65,23 @@ const wchar_t *strchrnul (const wchar_t *str, wchar_t ch)
 		++str;
 	return str;
 }
+
+void strlower (std::wstring &str)
+{
+	std::transform (str.begin (), str.end (), str.begin (), towlower);
+}
+
+size_t find_caseless (const std::wstring &haystack, const std::wstring &needle)
+{
+	if (haystack.length () < needle.length ())
+		return std::wstring::npos;
+	std::wstring hay (haystack);
+	std::wstring nee (needle);
+	strlower (hay);
+	strlower (nee);
+	return hay.find (nee);
+}
+
 
 namespace {
 

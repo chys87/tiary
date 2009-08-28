@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -38,16 +38,13 @@ namespace {
 
 std::string get_home_dir_base ()
 {
-	struct passwd *data = getpwuid (getuid ());
-	const char *result;
-	if (data)
-		result = data->pw_dir;
-	else { // VERY rare error. Try $HOME
-		result = getenv ("HOME");
-		// C++ standard does not allow passing 0 to std::string's ctor
-		if (result == 0)
-			result = "";
+	const char *result = getenv ("HOME");
+	if (result == 0) {
+		if (struct passwd *data = getpwuid (getuid ()))
+			result = data->pw_dir;
 	}
+	if (result==0 || *result=='\0')
+		result = "/";
 	return result;
 }
 
@@ -71,9 +68,11 @@ template <> std::basic_string<char> get_home_dir <char> (const char *user)
 	if (!user || !*user)
 		result = get_home_dir <char> ().c_str ();
 	else {
-		struct passwd *data = getpwnam (user);
-		result = data ? data->pw_dir : "";
+		if (struct passwd *data = getpwnam (user))
+			result = data->pw_dir;
 	}
+	if (result==0 || *result=='\0')
+		result = "/";
 	return result;
 }
 
@@ -493,7 +492,9 @@ template std::list<DirEnt<wchar_t> > list_dir (const wchar_t *dir,
 std::string find_executable (const std::string &exe)
 {
 	std::string result;
-	if (memchr (exe.data (), '/', exe.length ())) {
+	if (exe.empty ()) {
+		// Empty input. Return empty string
+	} else if (memchr (exe.data (), '/', exe.length ())) {
 		// exe is a full/relative pathname
 		if (exe[0] == '~')
 			home_expand_pathname (exe).swap (result);

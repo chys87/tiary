@@ -12,6 +12,8 @@ add_library(tiary_ui
 	dialog_input.cpp
 	dialog_message.h
 	dialog_message.cpp
+	dialog_richtext.h
+	dialog_richtext.cpp
 	dialog_select_file.h
 	dialog_select_file.cpp
 	direction.h
@@ -36,6 +38,10 @@ add_library(tiary_ui
 	object.h
 	paletteid.h
 	paletteid.cpp
+	richtext.h
+	richtext.cpp
+	richtextlist.h
+	richtextlist.cpp
 	scroll.h
 	scroll.cpp
 	size.h

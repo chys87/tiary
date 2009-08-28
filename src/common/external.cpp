@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -39,6 +39,9 @@ std::string make_external_command_line (const char *prog, const char *extra_para
 	std::list <std::string> progs = split_string (prog, '|');
 	for (std::list <std::string>::iterator it = progs.begin (); it != progs.end (); ++it) {
 		environment_expand (*it);
+		strip (*it);
+		if (it->empty ())
+			continue;
 		const char *p = it->c_str ();
 		size_t tokenlen = strchrnul (p, ' ') - p;
 		if (!find_executable (std::string (p, tokenlen)).empty ()) {

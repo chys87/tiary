@@ -6,7 +6,7 @@
  * Tiary, a terminal-based diary keeping system for Unix-like systems
  * Copyright (C) 2009, chys <admin@CHYS.INFO>
  *
- * This software is licensed under the so-called 3-clause BSD license.
+ * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
  *
  **************************************************************************/
@@ -56,6 +56,15 @@ const ColorAttr mdesc[] = {
 	,/*20: Select text  */ { WHITE, MAGENTA, HIGHLIGHT }
 	,/*21: Select title */ { YELLOW, MAGENTA, HIGHLIGHT }
 	,/*22: Select tags  */ { CYAN, MAGENTA, HIGHLIGHT }
+	,/*23: Reserved     */ { }
+	,/*24: Reserved     */ { }
+	,/*25: Reserved     */ { }
+	,/*26: Reserved     */ { }
+	,/*27: Reserved     */ { }
+	,/*28: Reserved     */ { }
+	,/*29: Reserved     */ { }
+	,/*30: Rich normal  */ { WHITE, BLACK, 0 }
+	,/*31: Rich bold    */ { WHITE, BLACK, HIGHLIGHT }
 };
 
 MetaPaletteMapping mapping[] = {
@@ -73,6 +82,7 @@ MetaPaletteMapping mapping[] = {
 	, { PALETTE_ID_MENUBAR,            0 }
 	, { PALETTE_ID_MENUBAR_SELECT,     1 }
 	, { PALETTE_ID_DROPLIST,           1 }
+	, { PALETTE_ID_RICHTEXT,           1 }
 
 	, { PALETTE_ID_ENTRY,              10 }
 	, { PALETTE_ID_ENTRY_TEXT,         10 }
@@ -84,6 +94,9 @@ MetaPaletteMapping mapping[] = {
 	, { PALETTE_ID_ENTRY_DATE_SELECT,  20 }
 	, { PALETTE_ID_ENTRY_TITLE_SELECT, 21 }
 	, { PALETTE_ID_ENTRY_TAGS_SELECT,  22 }
+
+	, { PALETTE_ID_SHOW_NORMAL,        30 }
+	, { PALETTE_ID_SHOW_BOLD,          31 }
 
 };
 
