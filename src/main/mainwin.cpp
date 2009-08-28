@@ -797,8 +797,8 @@ void MainWin::edit_password ()
 	}
 
 	std::wstring new_password1 = ui::dialog_input (L"Please enter your new password:",
-			password, 35, ui::INPUT_PASSWORD, password);
-	if (new_password1 == password) // Not modified
+			std::wstring (), 35, ui::INPUT_PASSWORD, L"\n\r");
+	if (new_password1 == L"\n\r") // Canceled
 		return;
 
 	const wchar_t *info = 0;
