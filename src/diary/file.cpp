@@ -381,12 +381,17 @@ LoadFileRet load_file (
 
 namespace {
 
-XMLNodeTree *make_xml_tree_from_options (const OptionGroupBase &opts)
+XMLNodeTree *make_xml_tree_from_options (const OptionGroupBase &opts, const OptionGroupBase &default_options)
 {
 	XMLNode node_dummy;
 	XMLNode *p = &node_dummy;
 
 	for (OptionGroupBase::const_iterator it=opts.begin (); it!=opts.end(); ++it) {
+		// If the option is the same as default, do not save it
+
+		if (default_options.get (it->first) == it->second)
+			continue;
+
 		// For readability, insert "\n\t" before each option
 		p = p->next = new XMLNodeText ("\n\t");
 
@@ -411,7 +416,7 @@ XMLNodeTree *make_xml_tree_from_options (const OptionGroupBase &opts)
 bool save_global_options (const GlobalOptionGroup &options)
 {
 	// First create the XML tree
-	XMLNodeTree *root = make_xml_tree_from_options (options);
+	XMLNodeTree *root = make_xml_tree_from_options (options, GlobalOptionGroup ());
 	std::string xml = xml_make (root);
 	xml_free (root);
 
@@ -425,7 +430,7 @@ bool save_file (const char *filename,
 		const std::wstring &password)
 {
 	// First create the XML tree
-	XMLNodeTree *root = make_xml_tree_from_options (options);
+	XMLNodeTree *root = make_xml_tree_from_options (options, PerFileOptionGroup ());
 
 	// Find the last child of root node <tiary>
 	XMLNode *ptr = root->children;
