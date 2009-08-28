@@ -647,14 +647,13 @@ void MainWin::view_current ()
 {
 	if (!entries.empty ()) {
 		DiaryEntry *ent = entries[main_ctrl.current_focus ()];
-		ent->view (global_options.get (GLOBAL_OPTION_PAGER).c_str());
+		ent->view ();
 	}
 }
 
 void MainWin::view_all ()
 {
-	DiaryEntry::view_all (global_options.get (GLOBAL_OPTION_PAGER).c_str (),
-			entries);
+	DiaryEntry::view_all (entries);
 }
 
 /*
