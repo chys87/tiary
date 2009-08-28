@@ -252,12 +252,18 @@ void MainCtrl::redraw ()
 	wchar_t *disp_buffer = new wchar_t [get_size ().x];
 
 	for (unsigned i=0; i<info.len; ++i) {
+
+		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_SELECT : ui::PALETTE_ID_ENTRY);
+
 		if (i == info.focus_pos) {
 			move_cursor (pos);
-			w().choose_palette (ui::PALETTE_ID_ENTRY_SELECT);
 			clear (pos, ui::make_size (get_size().x, expand_lines));
 		}
 		const DiaryEntry &entry = *w().entries[i+info.first];
+
+		// Entry ID
+		pos = put (pos, format (L"%04a  ") << (info.first + i + 1));
+
 		// Date
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_DATE_SELECT : ui::PALETTE_ID_ENTRY_DATE);
 		pos = put (pos, entry.local_time.format (date_format.c_str ()));
