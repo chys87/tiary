@@ -97,7 +97,6 @@ struct Palettes
 	}
 
 	ColorAttr &operator [] (size_t k) { return t[k]; }
-	const ColorAttr &operator [] (size_t k) const { return t[k]; }
 };
 
 Palettes palette_table;
