@@ -785,7 +785,18 @@ void MainWin::reset_file ()
 
 void MainWin::edit_password ()
 {
-	std::wstring new_password1 = ui::dialog_input (L"Please enter new password:",
+	if (!password.empty ()) {
+		std::wstring old_password = ui::dialog_input (L"Please enter your old password:",
+				std::wstring (), 35, ui::INPUT_PASSWORD, std::wstring ());
+		if (old_password.empty ())
+			return;
+		if (old_password != password) {
+			ui::dialog_message (L"Incorrect password.");
+			return;
+		}
+	}
+
+	std::wstring new_password1 = ui::dialog_input (L"Please enter your new password:",
 			password, 35, ui::INPUT_PASSWORD, password);
 	if (new_password1 == password) // Not modified
 		return;
