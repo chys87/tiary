@@ -27,6 +27,7 @@
 #include "ui/dialog_richtext.h"
 #include "ui/paletteid.h"
 #include "common/algorithm.h"
+#include "common/format.h"
 
 namespace tiary {
 
@@ -84,18 +85,12 @@ void show_doc ()
 			);
 }
 
-#define N(x) W(S(x))
-#define W(x) W_IMPL(x)
-#define W_IMPL(x) L##x
-#define S(x) S_IMPL(x)
-#define S_IMPL(x) #x
-
 const wchar_t about [] = L"\
-Tiary " N(TIARY_MAJOR_VERSION) L"." N(TIARY_MINOR_VERSION) L"." N(TIARY_PATCH_VERSION) L" (c) " N(TIARY_COPYRIGHT_YEAR) L"\n\
+Tiary %a.%b.%c\n\
 \n\
 \n\
 Tiary, a terminal-based diary keeping system for Unix-like systems\n\
-Copyright (C) 2009, chys <admin@CHYS.INFO>\n\
+Copyright (C) %d, chys <admin@CHYS.INFO>\n\
 \n\
 This software is licensed under the 3-clause BSD license.\n\
 See LICENSE in the source package and/or online info for details.\n\
@@ -103,7 +98,10 @@ See LICENSE in the source package and/or online info for details.\n\
 
 void show_about ()
 {
-	ui::dialog_message (about, L"About");
+	ui::dialog_message (format (about) << unsigned (TIARY_MAJOR_VERSION)
+			<< unsigned (TIARY_MINOR_VERSION)
+			<< unsigned (TIARY_PATCH_VERSION)
+			<< unsigned (TIARY_COPYRIGHT_YEAR), L"About");
 }
 
 }
