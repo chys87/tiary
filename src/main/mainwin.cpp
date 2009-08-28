@@ -86,6 +86,10 @@ bool MainCtrl::on_key (wchar_t key)
 			w().move_down_current ();
 			return true;
 
+		case L'S':
+			w().sort_all ();
+			return true;
+
 		case L'p':
 		case L'P':
 			w().edit_password ();
@@ -364,11 +368,13 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		(L"&Delete",                Signal (this, &MainWin::remove_current))
 		(L"&Edit",                  Signal (this, &MainWin::edit_current))
 		(L"Edit &tags...",          Signal (this, &MainWin::edit_tags_current))
+		(L"Edit tags (&quick)...",  Signal (this, &MainWin::edit_tags_current_expert))
 		(L"Edit t&ime...",          Signal (this, &MainWin::edit_time_current))
 		(L"&View",                  Signal (this, &MainWin::view_current))
 		(L"View &all",              Signal (this, &MainWin::view_all))
 		(L"&Move up",               Signal (this, &MainWin::move_up_current))
 		(L"Move dow&n",             Signal (this, &MainWin::move_down_current))
+		(L"&Soft all",              Signal (this, &MainWin::sort_all))
 		;
 	menu_bar.add (L"&Search")
 		(L"&Find...        Ctrl+F", Signal (this, &MainWin::search, false))
@@ -608,6 +614,27 @@ void MainWin::move_down_current ()
 	std::swap (entries[k+1], entries[k]);
 	main_ctrl.touch ();
 	main_ctrl.set_focus (k+1);
+}
+
+namespace {
+
+bool compare_entry (const DiaryEntry *a, const DiaryEntry *b)
+{
+	if (a->local_time < b->local_time)
+		return true;
+	else
+		return false;
+}
+
+} // anonymous namespace
+
+void MainWin::sort_all ()
+{
+	if (ui::dialog_message (L"Are you sure you want to sort all entries by time? This operation cannot be undone.",
+				ui::MESSAGE_YES|ui::MESSAGE_NO) == ui::MESSAGE_YES) {
+		std::stable_sort (entries.begin (), entries.end (), compare_entry);
+		main_ctrl.touch ();
+	}
 }
 
 void MainWin::view_current ()

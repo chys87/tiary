@@ -117,6 +117,7 @@ private:
 	void remove_current ();
 	void move_up_current ();
 	void move_down_current ();
+	void sort_all ();
 
 	void search (bool /**< false = backward */);
 	void search_continue (bool /**< false = previous */);

@@ -24,62 +24,64 @@
 #include "common/external.h"
 #include "ui/window.h"
 #include "ui/dialog_message.h"
+#include "ui/dialog_richtext.h"
+#include "ui/paletteid.h"
+#include "common/algorithm.h"
 
 namespace tiary {
 
-const char info [] = "\
-KEYBOARD COMMANDS\n\
-=================\n\
-\n\
-      Key                  Description\n\
-      ============         =================================================\n\
-      Esc                  Go to menu\n\
-      k UP                 Backward one line\n\
-      j DOWN               Forward one line\n\
-      ^ g < HOME           Jump to the first entry\n\
-      $ G > END            Jump to the last entry\n\
-      b PAGEUP             Backward one page\n\
-      f PAGEDOWN           Forward one page\n\
-      v ENTER RIGHT        View the selected entry\n\
-      V                    View all entries\n\
-      e E                  Edit the selected entry\n\
-      t                    Edit tags of the selected entry\n\
-      T                    Edit tags of the selected entry (quick)\n\
-      i I                  Change the time of the selected entry\n\
-      a A INSERT           Add a new entry\n\
-      d D DELETE           Remove the selected entry\n\
-      m                    Move the selected entry up\n\
-      M                    Move the selected entry down\n\
-      / CTRL+F             Search forward (supports regular expressions)\n\
-      ?                    Search backward (supports regular expressions)\n\
-      n F3                 Search next\n\
-      N                    Search previous\n\
-      p P                  Create/modify/remove password\n\
-      r                    Edit per-file preferences\n\
-      R                    Edit global preferences\n\
-      CTRL+L               Refresh the screen\n\
-      h H F1               View this help info\n\
-      CTRL+N               New file\n\
-      CTRL+O               Open file\n\
-      w CTRL+S             Save\n\
-      W                    Save as\n\
-      q Q                  Quit\n\
-\n\
-\n\
-For technical reasons, if you press Esc, there will be a delay (approximately\n\
-.5 seconds) before the the program responds.\n\
-";
+const ui::RichTextLineC info[] = {
+	{ ui::PALETTE_ID_SHOW_BOLD  , L"KEYBOARD COMMANDS" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"=================" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    Key                  Description" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    ============         =================================================" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    Esc                  Go to menu" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    k UP                 Backward one line" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    j DOWN               Forward one line" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    ^ g < HOME           Jump to the first entry" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    $ G > END            Jump to the last entry" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    b PAGEUP             Backward one page" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    f PAGEDOWN           Forward one page" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    v ENTER RIGHT        View the selected entry" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    V                    View all entries" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    e E                  Edit the selected entry" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    t                    Edit tags of the selected entry" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    T                    Edit tags of the selected entry (quick)" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    i I                  Change the time of the selected entry" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    a A INSERT           Add a new entry" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    d D DELETE           Remove the selected entry" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    m                    Move the selected entry up" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    M                    Move the selected entry down" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    S                    Sort all entries by date and time" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    / CTRL+F             Search forward (supports regular expressions)" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    ?                    Search backward (supports regular expressions)" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    n F3                 Search next" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    N                    Search previous" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    p P                  Create/modify/remove password" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    r                    Edit per-file preferences" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    R                    Edit global preferences" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+L               Refresh the screen" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    h H F1               View this help info" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+N               New file" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+O               Open file" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    w CTRL+S             Save" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    W                    Save as" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    q Q                  Quit" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"For technical reasons, if you press Esc, there will be a delay (approximately" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L".5 seconds) before the the program responds." },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"" }
+};
 
 
 
 void show_doc ()
 {
-	ui::Window::suspend ();
-	FILE *fp = call_external_program_popen ("less", "", "w");
-	// SIGPIPE is ignored (in main)
-	fwrite_unlocked (info, 1, sizeof info - 1, fp);
-	pclose (fp);
-	ui::Window::resume ();
+	ui::dialog_richtext (L"Help",
+			ui::RichTextList (info, array_end (info))
+			);
 }
 
 #define N(x) W(S(x))

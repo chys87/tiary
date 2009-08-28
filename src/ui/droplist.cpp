@@ -78,6 +78,11 @@ bool DropList::on_key (wchar_t key)
 					set_select (k);
 					return true;
 				}
+			for (size_t k = 0; k <= select; ++k)
+				if (items[k][0] == key) {
+					set_select (k);
+					return true;
+				}
 			return false;
 	}
 }

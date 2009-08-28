@@ -493,7 +493,9 @@ template std::list<DirEnt<wchar_t> > list_dir (const wchar_t *dir,
 std::string find_executable (const std::string &exe)
 {
 	std::string result;
-	if (memchr (exe.data (), '/', exe.length ())) {
+	if (exe.empty ()) {
+		// Empty input. Return empty string
+	} else if (memchr (exe.data (), '/', exe.length ())) {
 		// exe is a full/relative pathname
 		if (exe[0] == '~')
 			home_expand_pathname (exe).swap (result);

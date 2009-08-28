@@ -201,6 +201,10 @@ wchar_t ucs_reverse_case (wchar_t c);
  */
 bool ucs_isalpha (wchar_t);
 /**
+ * @brief	Determine whether a character is a CJK character
+ */
+bool ucs_iscjk (wchar_t);
+/**
  * @brief	Determines whether a character is an alphabetic or numeric character
  *
  * This function is different from <code>iswalnum</code> in the return type,

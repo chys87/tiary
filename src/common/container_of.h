@@ -65,15 +65,7 @@ struct ContainerOf : public C
 {
 	typedef typename C::value_type T;
 
-#ifdef TIARY_HAVE_DEFAULT_DELETE_FUNCTIONS
-	ContainerOf () = default;
-#else
-	ContainerOf () { }
-#endif
-	explicit ContainerOf (const T &x)  { C::push_back (x); }
-
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	ContainerOf (T &&x) { C::push_back (std::forward<T> (x)); }
 	ContainerOf &operator ,  (T &&x) { C::push_back (std::forward<T> (x)); return *this; }
 #endif
 	ContainerOf &operator ,  (const T &x) { C::push_back (x); return *this; }
