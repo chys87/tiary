@@ -25,7 +25,6 @@ namespace tiary {
 #define GLOBAL_OPTION_DEFAULT_FILE     "default_file"
 #define GLOBAL_OPTION_EXPAND_LINES     "expand_lines"
 #define GLOBAL_OPTION_EDITOR           "editor"
-#define GLOBAL_OPTION_PAGER            "pager"
 #define GLOBAL_OPTION_DATETIME_FORMAT  "time_format"
 
 

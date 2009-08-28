@@ -60,15 +60,14 @@ struct DiaryEntry
 	 */
 	bool edit_time ();
 	/**
-	 * @brief	View the content in an external pager
-	 * @param	pager	External pager (ref. tiary::DiaryEntry::edit)
+	 * @brief	View the content in a dialog
 	 */
-	void view (const char *pager);
+	void view ();
 
 	/**
 	 * @brief	View many items at one time
 	 */
-	static void view_all (const char *pager, const DiaryEntryList &);
+	static void view_all (const DiaryEntryList &);
 };
 
 

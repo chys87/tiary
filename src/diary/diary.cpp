@@ -234,7 +234,7 @@ bool DiaryEntry::edit_tags ()
 	return (tags != newtags);
 }
 
-void DiaryEntry::view (const char *)
+void DiaryEntry::view ()
 {
 	RichTextList text_list;
 	write_for_view (text_list, *this);
@@ -244,7 +244,7 @@ void DiaryEntry::view (const char *)
 			make_size (view_line_width + 3, 0));
 }
 
-void DiaryEntry::view_all (const char *pager, const DiaryEntryList &entries)
+void DiaryEntry::view_all (const DiaryEntryList &entries)
 {
 	ui::RichTextList text_list;
 	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {

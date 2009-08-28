@@ -25,6 +25,14 @@
 namespace tiary {
 namespace ui {
 
+MenuItem::MenuItem ()
+	: text ()
+	, sig ()
+	, hidden (false)
+	, submenu (0)
+{
+}
+
 MenuItem::MenuItem (const std::wstring &text_, const Signal &sig_)
 	: text (text_)
 	, sig (sig_)
@@ -93,6 +101,12 @@ Menu &MenuItem::get_submenu ()
 
 
 
+
+MenuItem &Menu::add ()
+{
+	item_list.push_back (MenuItem ());
+	return item_list.back ();
+}
 
 MenuItem &Menu::add (const std::wstring &text, const Signal &sig)
 {
@@ -187,8 +201,12 @@ ItemControl::~ItemControl ()
 
 bool ItemControl::on_focus ()
 {
-	ItemControl::redraw ();
-	return true;
+	if (item.text.empty ())
+		return false;
+	else {
+		ItemControl::redraw ();
+		return true;
+	}
 }
 
 void ItemControl::on_defocus ()
@@ -226,11 +244,21 @@ bool ItemControl::on_mouse (MouseEvent me)
 
 void ItemControl::redraw ()
 {
-	choose_palette (dlg.get_focus () == this ? PALETTE_ID_MENU_SELECT : PALETTE_ID_MENU);
-	clear ();
-	text.output (*this, make_size (), get_size ().x);
-	if (item.submenu)
-		put (make_size (get_size ().x-1, 0), L'>');
+	if (item.text.empty ()) {
+		// Separator
+
+		choose_palette (PALETTE_ID_MENU);
+		fill (make_size (), get_size (), BORDER_H);
+
+	} else {
+
+		choose_palette (dlg.get_focus () == this ? PALETTE_ID_MENU_SELECT : PALETTE_ID_MENU);
+		clear ();
+		text.output (*this, make_size (), get_size ().x);
+		if (item.submenu)
+			put (make_size (get_size ().x-1, 0), L'>');
+
+	}
 }
 
 void ItemControl::slot_trigger ()
@@ -260,19 +288,25 @@ MenuDialog::MenuDialog (const Menu &menu_, Size left, Size right, bool unget_lef
 	, unget_left (unget_left_)
 {
 	ItemControl **ctrls = new ItemControl * [menu_.size ()];
+	ItemControl **valid_ctrls = new ItemControl * [menu_.size ()]; // Excluding separators
 	ItemControl **pi = ctrls;
+	ItemControl **pv = valid_ctrls;
 	unsigned maxwid = 0;
 	for (Menu::const_iterator it = menu_.begin (); it != menu_.end (); ++it) {
 		if (!it->hidden) {
 			ItemControl *p = *pi++ = new ItemControl (*this, *it);
-			maxwid = maxU (maxwid, p->text.get_width ());
+			if (!p->text.get_text ().empty ()) {
+				*pv++ = p;
+				maxwid = maxU (maxwid, p->text.get_width ());
+			}
 		}
 	}
 
 	// Actual number of menu items shown on screen
 	size_t actual_size = pi - ctrls;
 
-	ChainControlsVertical (ctrls, actual_size);
+	ChainControlsVertical (valid_ctrls, pv-valid_ctrls);
+	delete [] valid_ctrls;
 
 	// Now determine the proper position and size
 	Size size = make_size (maxwid+2/*Border*/+1/*>*/+3/*Space*/, actual_size + 2);

@@ -252,12 +252,18 @@ void MainCtrl::redraw ()
 	wchar_t *disp_buffer = new wchar_t [get_size ().x];
 
 	for (unsigned i=0; i<info.len; ++i) {
+
+		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_SELECT : ui::PALETTE_ID_ENTRY);
+
 		if (i == info.focus_pos) {
 			move_cursor (pos);
-			w().choose_palette (ui::PALETTE_ID_ENTRY_SELECT);
 			clear (pos, ui::make_size (get_size().x, expand_lines));
 		}
 		const DiaryEntry &entry = *w().entries[i+info.first];
+
+		// Entry ID
+		pos = put (pos, format (L"%04a  ") << (info.first + i + 1));
+
 		// Date
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_DATE_SELECT : ui::PALETTE_ID_ENTRY_DATE);
 		pos = put (pos, entry.local_time.format (date_format.c_str ()));
@@ -357,24 +363,30 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	menu_bar.add (L"&File")
 		(L"&New            Ctrl+N", Signal (this, &MainWin::new_file))
 		(L"&Open...        Ctrl+O", Signal (this, &MainWin::open_file))
+		()
 		(L"&Save           Ctrl+S", Signal (this, &MainWin::default_save))
 		(L"Save &as...",            Signal (this, &MainWin::save_as))
+		()
 		(L"&Password...",           Signal (this, &MainWin::edit_password))
+		()
 		(L"&Quit           Ctrl+Q", Signal (this, &MainWin::quit))
 		;
 	context_menu = &menu_bar.add (L"&Entry");
 	(*context_menu)
 		(L"&New entry",             Signal (this, &MainWin::append))
 		(L"&Delete",                Signal (this, &MainWin::remove_current))
+		()
 		(L"&Edit",                  Signal (this, &MainWin::edit_current))
 		(L"Edit &tags...",          Signal (this, &MainWin::edit_tags_current))
 		(L"Edit tags (&quick)...",  Signal (this, &MainWin::edit_tags_current_expert))
 		(L"Edit t&ime...",          Signal (this, &MainWin::edit_time_current))
+		()
 		(L"&View",                  Signal (this, &MainWin::view_current))
 		(L"View &all",              Signal (this, &MainWin::view_all))
+		()
 		(L"&Move up",               Signal (this, &MainWin::move_up_current))
 		(L"Move dow&n",             Signal (this, &MainWin::move_down_current))
-		(L"&Soft all",              Signal (this, &MainWin::sort_all))
+		(L"&Sort all",              Signal (this, &MainWin::sort_all))
 		;
 	menu_bar.add (L"&Search")
 		(L"&Find...        Ctrl+F", Signal (this, &MainWin::search, false))
@@ -641,14 +653,13 @@ void MainWin::view_current ()
 {
 	if (!entries.empty ()) {
 		DiaryEntry *ent = entries[main_ctrl.current_focus ()];
-		ent->view (global_options.get (GLOBAL_OPTION_PAGER).c_str());
+		ent->view ();
 	}
 }
 
 void MainWin::view_all ()
 {
-	DiaryEntry::view_all (global_options.get (GLOBAL_OPTION_PAGER).c_str (),
-			entries);
+	DiaryEntry::view_all (entries);
 }
 
 /*
@@ -774,9 +785,20 @@ void MainWin::reset_file ()
 
 void MainWin::edit_password ()
 {
-	std::wstring new_password1 = ui::dialog_input (L"Please enter new password:",
-			password, 35, ui::INPUT_PASSWORD, password);
-	if (new_password1 == password) // Not modified
+	if (!password.empty ()) {
+		std::wstring old_password = ui::dialog_input (L"Please enter your old password:",
+				std::wstring (), 35, ui::INPUT_PASSWORD, std::wstring ());
+		if (old_password.empty ())
+			return;
+		if (old_password != password) {
+			ui::dialog_message (L"Incorrect password.");
+			return;
+		}
+	}
+
+	std::wstring new_password1 = ui::dialog_input (L"Please enter your new password:",
+			std::wstring (), 35, ui::INPUT_PASSWORD, L"\n\r");
+	if (new_password1 == L"\n\r") // Canceled
 		return;
 
 	const wchar_t *info = 0;

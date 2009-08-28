@@ -64,7 +64,7 @@ template <> const std::basic_string<wchar_t> &get_home_dir <wchar_t> ()
 
 std::string get_home_dir (const char *user)
 {
-	const char *result;
+	const char *result = 0;
 	if (!user || !*user)
 		result = get_home_dir <char> ().c_str ();
 	else {

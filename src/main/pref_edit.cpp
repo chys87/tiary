@@ -56,11 +56,6 @@ class DialogGlobalOptions : public FixedDialog
 	TextBox txt_editor;
 	Layout layout_editor;
 
-	// GLOBAL_OPTION_PAGER
-	Label lbl_pager;
-	TextBox txt_pager;
-	Layout layout_pager;
-
 	// GLOBAL_OPTION_DATETIME_FORMAT
 	Label lbl_datetime_format;
 	TextBox txt_datetime_format;
@@ -102,9 +97,6 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 	, lbl_editor (*this, L"&Editor:")
 	, txt_editor (*this)
 	, layout_editor (HORIZONTAL)
-	, lbl_pager (*this, L"&Pager:")
-	, txt_pager (*this)
-	, layout_pager (HORIZONTAL)
 	, lbl_datetime_format (*this, L"&Time format:")
 	, txt_datetime_format (*this)
 	, layout_datetime_format (HORIZONTAL)
@@ -115,7 +107,7 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 	, layout_buttons (HORIZONTAL)
 	, layout_main (VERTICAL)
 {
-	FixedDialog::resize (get_screen_size () & make_size (80, 24));
+	FixedDialog::resize (get_screen_size () & make_size (80, 15));
 
 	// Set up layout
 
@@ -138,12 +130,6 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 		(lbl_editor, 20, 20)
 		(1, 1)
 		(txt_editor, 2, Layout::UNLIMITED)
-		;
-
-	layout_pager.add
-		(lbl_pager, 20, 20)
-		(1, 1)
-		(txt_pager, 2, Layout::UNLIMITED)
 		;
 
 	layout_datetime_format.add
@@ -169,8 +155,6 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 		(1, 1)
 		(layout_editor, 1, 1)
 		(1, 1)
-		(layout_pager, 1, 1)
-		(1, 1)
 		(layout_datetime_format, 1, 1)
 		(1, 1)
 		(layout_buttons, 3, 3);
@@ -185,7 +169,6 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 		(btn_default_file)
 		(drp_expand_lines)
 		(txt_editor)
-		(txt_pager)
 		(txt_datetime_format)
 		(btn_ok);
 	btn_reset.ctrl_up = btn_cancel.ctrl_up = btn_help.ctrl_up = btn_ok.ctrl_up;
@@ -223,7 +206,6 @@ void DialogGlobalOptions::copy_options_to_controls (const GlobalOptionGroup &grp
 	lbl_default_file_name.set_text (grp.get_wstring (GLOBAL_OPTION_DEFAULT_FILE), UIString::NO_HOTKEY);
 	drp_expand_lines.set_select (grp.get_num (GLOBAL_OPTION_EXPAND_LINES) - 1, false);
 	txt_editor.set_text (grp.get_wstring (GLOBAL_OPTION_EDITOR), false);
-	txt_pager.set_text (grp.get_wstring (GLOBAL_OPTION_PAGER), false);
 	txt_datetime_format.set_text (grp.get_wstring (GLOBAL_OPTION_DATETIME_FORMAT), false);
 }
 
@@ -242,7 +224,6 @@ void DialogGlobalOptions::slot_ok ()
 	options.set (GLOBAL_OPTION_DEFAULT_FILE, lbl_default_file_name.get_text ());
 	options.set (GLOBAL_OPTION_EXPAND_LINES, unsigned (drp_expand_lines.get_select ())+1);
 	options.set (GLOBAL_OPTION_EDITOR, txt_editor.get_text ());
-	options.set (GLOBAL_OPTION_PAGER, txt_pager.get_text ());
 	options.set (GLOBAL_OPTION_DATETIME_FORMAT, txt_datetime_format.get_text ());
 	Window::request_close ();
 }
@@ -264,9 +245,7 @@ Expand lines: The number of lines the selected diary entry should use ons creen.
 \n\
 Editor: The editor used to edit diary entries.\n\
 \n\
-Pager: The pager used to view diary entries.\n\
-\n\
-    You can specify multiple editors/pagers, delimited by pipe signs(|).\n\
+    You can specify multiple editors, delimited by pipe signs(|).\n\
     You can also refer to environment variables, e.g. \"$EDITOR|vi\"\n\
 \n\
 Time format: This specifies how to display date/time.\n\
