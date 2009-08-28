@@ -108,6 +108,7 @@ bool RichText::on_key (wchar_t key)
 
 		case PAGEDOWN:
 		case L'f':
+		case L' ':
 			if (top_line + 1 < line_list.size ()) {
 				top_line = minU (line_list.size () - 1, top_line + get_size ().y - 2);
 				RichText::redraw ();

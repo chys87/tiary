@@ -62,7 +62,7 @@ template <> const std::basic_string<wchar_t> &get_home_dir <wchar_t> ()
 	return dir;
 }
 
-template <> std::basic_string<char> get_home_dir <char> (const char *user)
+std::string get_home_dir (const char *user)
 {
 	const char *result;
 	if (!user || !*user)
@@ -76,28 +76,38 @@ template <> std::basic_string<char> get_home_dir <char> (const char *user)
 	return result;
 }
 
-template <> std::basic_string<wchar_t> get_home_dir <wchar_t> (const wchar_t *user)
+std::wstring get_home_dir (const wchar_t *user)
 {
-	return mbs_to_wstring (get_home_dir <char> (wstring_to_mbs (user).c_str()));
+	return mbs_to_wstring (get_home_dir (wstring_to_mbs (user).c_str()));
 }
 
-template <> std::basic_string<char> get_home_dir <char> (const std::basic_string<char> &user)
+std::string get_home_dir (const std::string &user)
 {
-	return get_home_dir <char> (user.c_str ());
+	return get_home_dir (user.c_str ());
 }
 
-template <> std::basic_string<wchar_t> get_home_dir <wchar_t> (const std::basic_string<wchar_t> &user)
+std::wstring get_home_dir (const std::wstring &user)
 {
-	return mbs_to_wstring (get_home_dir <char> (wstring_to_mbs (user).c_str()));
+	return mbs_to_wstring (get_home_dir (wstring_to_mbs (user).c_str()));
 }
 
-template <typename ChT>
-std::basic_string<ChT> make_home_dirname (const ChT *file)
+std::string make_home_dirname (const char *file)
 {
-	std::basic_string<ChT> ret = get_home_dir <ChT> ();
+	std::string ret = get_home_dir <char> ();
 	if (file) {
-		if (file[0] != ChT('/'))
-			ret += ChT('/');
+		if (file[0] != '/')
+			ret += '/';
+		ret += file;
+	}
+	return ret;
+}
+
+std::wstring make_home_dirname (const wchar_t *file)
+{
+	std::wstring ret = get_home_dir <wchar_t> ();
+	if (file) {
+		if (file[0] != L'/')
+			ret += L'/';
 		ret += file;
 	}
 	return ret;
@@ -130,7 +140,7 @@ template <> std::basic_string<wchar_t> get_current_dir <wchar_t> ()
 	return mbs_to_wstring (get_current_dir<char>());
 }
 
-template <> std::basic_string<char> get_full_pathname <char> (const char *name)
+std::string get_full_pathname (const char *name)
 {
 	std::string ret;
 #ifdef TIARY_HAVE_EXTENDED_REALPATH
@@ -148,17 +158,17 @@ template <> std::basic_string<char> get_full_pathname <char> (const char *name)
 	return ret;
 }
 
-template <> std::basic_string<wchar_t> get_full_pathname <wchar_t> (const wchar_t *name)
+std::wstring get_full_pathname (const wchar_t *name)
 {
 	return mbs_to_wstring (get_full_pathname (wstring_to_mbs (name).c_str ()));
 }
 
-template <> std::basic_string<char> get_full_pathname (const std::basic_string<char> &name)
+std::string get_full_pathname (const std::string &name)
 {
 	return get_full_pathname (name.c_str ());
 }
 
-template <> std::basic_string<wchar_t> get_full_pathname (const std::basic_string<wchar_t> &name)
+std::wstring get_full_pathname (const std::wstring &name)
 {
 	return mbs_to_wstring (get_full_pathname (wstring_to_mbs (name).c_str ()));
 }
@@ -289,8 +299,7 @@ std::basic_string<ChT> get_nice_pathname (const std::basic_string<ChT> &name)
 	return get_nice_pathname (name.c_str ());
 }
 
-template <>
-unsigned get_file_attr<char> (const char *name)
+unsigned get_file_attr (const char *name)
 {
 	struct stat st_buf;
 	if (stat (name, &st_buf) == 0)
@@ -307,8 +316,7 @@ unsigned get_file_attr<char> (const char *name)
 		return FILE_ATTR_NONEXIST;
 }
 
-template <>
-unsigned get_file_attr<wchar_t> (const wchar_t *name)
+unsigned get_file_attr (const wchar_t *name)
 {
 	return get_file_attr (wstring_to_mbs (name).c_str ());
 }
@@ -441,12 +449,7 @@ template <typename ChT> std::list<DirEnt<ChT> > list_dir (
 
 // Explicit instantiations (char)
 template const std::basic_string<char> &get_home_dir<char> ();
-template std::basic_string<char> get_home_dir<char> (const char *);
-template std::basic_string<char> get_home_dir<char> (const std::basic_string <char> &);
-template std::basic_string<char> make_home_dirname<char> (const char *);
 template std::basic_string<char> get_current_dir<char> ();
-template std::basic_string<char> get_full_pathname<char> (const char *);
-template std::basic_string<char> get_full_pathname<char> (const std::basic_string <char> &);
 template std::basic_string<char> home_fold_pathname (const std::basic_string <char> &);
 template std::basic_string<char> home_expand_pathname (const std::basic_string <char> &);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
@@ -455,7 +458,6 @@ template std::basic_string<char> home_expand_pathname (std::basic_string <char> 
 #endif
 template std::basic_string<char> get_nice_pathname<char> (const char *);
 template std::basic_string<char> get_nice_pathname<char> (const std::basic_string <char> &);
-template unsigned get_file_attr<char> (const char *);
 template std::pair<std::basic_string<char>,std::basic_string<char> > split_pathname (const std::basic_string<char> &, bool);
 template std::basic_string<char> combine_pathname (const std::basic_string<char> &, const std::basic_string<char> &);
 template bool DirEnt<char>::DefaultComparator::operator () (const DirEnt<char> &a, const DirEnt<char> &b) const;
@@ -465,12 +467,7 @@ template std::list<DirEnt<char> > list_dir (const char *dir,
 
 // Explicit instantiations (wchar_t)
 template const std::basic_string<wchar_t> &get_home_dir<wchar_t> ();
-template std::basic_string<wchar_t> get_home_dir (const wchar_t *);
-template std::basic_string<wchar_t> get_home_dir (const std::basic_string <wchar_t> &);
-template std::basic_string<wchar_t> make_home_dirname<wchar_t> (const wchar_t *);
 template std::basic_string<wchar_t> get_current_dir<wchar_t> ();
-template std::basic_string<wchar_t> get_full_pathname<wchar_t> (const wchar_t *);
-template std::basic_string<wchar_t> get_full_pathname<wchar_t> (const std::basic_string <wchar_t> &);
 template std::basic_string<wchar_t> home_fold_pathname (const std::basic_string <wchar_t> &);
 template std::basic_string<wchar_t> home_expand_pathname (const std::basic_string <wchar_t> &);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
@@ -479,7 +476,6 @@ template std::basic_string<wchar_t> home_expand_pathname (std::basic_string <wch
 #endif
 template std::basic_string<wchar_t> get_nice_pathname<wchar_t> (const wchar_t *);
 template std::basic_string<wchar_t> get_nice_pathname<wchar_t> (const std::basic_string <wchar_t> &);
-template unsigned get_file_attr<wchar_t> (const wchar_t *);
 template std::pair<std::basic_string<wchar_t>,std::basic_string<wchar_t> > split_pathname (const std::basic_string<wchar_t> &, bool);
 template std::basic_string<wchar_t> combine_pathname (const std::basic_string<wchar_t> &, const std::basic_string<wchar_t> &);
 template bool DirEnt<wchar_t>::DefaultComparator::operator () (const DirEnt<wchar_t> &a, const DirEnt<wchar_t> &b) const;

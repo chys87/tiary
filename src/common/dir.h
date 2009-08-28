@@ -33,8 +33,10 @@ template <typename ChT> const std::basic_string<ChT> &get_home_dir ();
  *
  * If the empty is NULL or empty, returns the home dir of the current user
  */
-template <typename ChT> std::basic_string<ChT> get_home_dir (const ChT *);
-template <typename ChT> std::basic_string<ChT> get_home_dir (const std::basic_string <ChT> &);
+std::string get_home_dir (const char *user);
+std::wstring get_home_dir (const wchar_t *user);
+std::string get_home_dir (const std::string &);
+std::wstring get_home_dir (const std::wstring &);
 
 /**
  * @brief	Concatenates the home dir with a name under the home
@@ -43,7 +45,8 @@ template <typename ChT> std::basic_string<ChT> get_home_dir (const std::basic_st
  *
  * make_home_dirname("abc") = "/home/xxx/abc";
  */
-template <typename ChT> std::basic_string<ChT> make_home_dirname (const ChT *);
+std::string make_home_dirname (const char *);
+std::wstring make_home_dirname (const wchar_t *);
 
 /**
  * @brief	Return the absolute path of current directory
@@ -53,8 +56,10 @@ template <typename ChT> std::basic_string<ChT> get_current_dir ();
 /**
  * @brief	Returns the full path
  */
-template <typename ChT> std::basic_string<ChT> get_full_pathname (const ChT *);
-template <typename ChT> std::basic_string<ChT> get_full_pathname (const std::basic_string <ChT> &);
+std::string get_full_pathname (const char *);
+std::wstring get_full_pathname (const wchar_t *);
+std::string get_full_pathname (const std::string &);
+std::wstring get_full_pathname (const std::wstring &);
 
 /**
  * @brief	Replaces home dir name with "~"
@@ -84,11 +89,15 @@ template <typename ChT> std::basic_string<ChT> get_nice_pathname (const std::bas
 const unsigned FILE_ATTR_DIRECTORY = 1;
 const unsigned FILE_ATTR_NONEXIST  = 0x8000u;
 
-template <typename ChT> unsigned get_file_attr (const ChT *);
-template <typename ChT> inline unsigned get_file_attr (const std::basic_string<ChT> &s)
-{
-	return get_file_attr (s.c_str ());
-}
+/**
+ * @brief	Get the attributes of a given file/directory
+ *
+ * Currently only supports ui::FILE_ATTR_DIRECTORY and ui::FILE_ATTR_NONEXIST
+ */
+unsigned get_file_attr (const char *);
+unsigned get_file_attr (const wchar_t *);
+inline unsigned get_file_attr (const std::string &s) { return get_file_attr (s.c_str ()); }
+inline unsigned get_file_attr (const std::wstring &s) { return get_file_attr (s.c_str ()); }
 
 /**
  * @brief	Split a full pathname to directory name and basename

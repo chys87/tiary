@@ -19,6 +19,7 @@
 #include "ui/terminal_emulator.h"
 #include <algorithm>
 #include <assert.h>
+#include <signal.h>
 
 
 namespace tiary {
@@ -197,6 +198,11 @@ bool Dialog::on_key (wchar_t c)
 			case RIGHT:
 				processed = set_focus_direction (&Control::ctrl_right);
 				break;
+			case CTRL_Z:
+				Window::suspend ();
+				raise (SIGTSTP);
+				Window::resume ();
+				// Fall into ...
 			case CTRL_L:
 				Window::touch_screen ();
 				processed = true;
