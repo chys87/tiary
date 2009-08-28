@@ -112,8 +112,9 @@ T *fill_full_month_name (T *buffer, unsigned m)
 template <typename T> inline
 std::basic_string<T> format_datetime (const DateTime &dt, const T *fmt)
 {
+	// FIXME: Directly write to a string object, barring any overflow potential
 	ReadableDateTime rdt = dt.extract ();
-	T *buffer = new T[strlen(fmt)*2];
+	T *buffer = new T[strlen(fmt)*5+1];
 	T *q = buffer;
 	while (const T *p = strchr (fmt, T('%'))) {
 		if (p[1] == T('\0'))
