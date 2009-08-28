@@ -38,16 +38,13 @@ namespace {
 
 std::string get_home_dir_base ()
 {
-	struct passwd *data = getpwuid (getuid ());
-	const char *result;
-	if (data)
-		result = data->pw_dir;
-	else { // VERY rare error. Try $HOME
-		result = getenv ("HOME");
-		// C++ standard does not allow passing 0 to std::string's ctor
-		if (result == 0)
-			result = "";
+	const char *result = getenv ("HOME");
+	if (result == 0) {
+		if (struct passwd *data = getpwuid (getuid ()))
+			result = data->pw_dir;
 	}
+	if (result==0 || *result=='\0')
+		result = "/";
 	return result;
 }
 
@@ -71,9 +68,11 @@ template <> std::basic_string<char> get_home_dir <char> (const char *user)
 	if (!user || !*user)
 		result = get_home_dir <char> ().c_str ();
 	else {
-		struct passwd *data = getpwnam (user);
-		result = data ? data->pw_dir : "";
+		if (struct passwd *data = getpwnam (user))
+			result = data->pw_dir;
 	}
+	if (result==0 || *result=='\0')
+		result = "/";
 	return result;
 }
 
