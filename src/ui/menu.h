@@ -35,16 +35,18 @@ struct Menu;
 
 struct MenuItem
 {
-	std::wstring text;
+	std::wstring text; ///< Empty string indicates a separator
 	Signal sig; ///< A Signal associated with this item
 	bool hidden; ///< Don't display this item. Can be useful in some contexts, i.e. a Recent File list
 	Menu *submenu; ///< Submenu
 
+	MenuItem (); ///< Initialize to a separator
+
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 	MenuItem (const std::wstring &, const Signal &);
-	MenuItem (const std::wstring &, Signal && = Signal ());
+	explicit MenuItem (const std::wstring &, Signal && = Signal ());
 #else
-	MenuItem (const std::wstring &, const Signal & = Signal ());
+	explicit MenuItem (const std::wstring &, const Signal & = Signal ());
 #endif
 
 	MenuItem (const MenuItem &); ///< Deep copy...
@@ -78,6 +80,7 @@ struct Menu
 	iterator end () { return item_list.end (); }
 	size_t size () const { return item_list.size (); }
 
+	MenuItem &add (); ///< Add a separator
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 	MenuItem &add (const std::wstring &text, const Signal &sig);
 	MenuItem &add (const std::wstring &text, Signal &&sig = Signal ());
@@ -89,6 +92,11 @@ struct Menu
 #endif
 
 	// operator () is identical to add (), except that it returns *this
+	Menu &operator () ()
+	{
+		add ();
+		return *this;
+	}
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 	Menu &operator () (const std::wstring &text, Signal &&sig = Signal ())
 	{
