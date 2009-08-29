@@ -8,8 +8,6 @@ add_library(tiary_ui
 	checkbox.cpp
 	control.h
 	control.cpp
-	dialog.h
-	dialog.cpp
 	dialog_input.h
 	dialog_input.cpp
 	dialog_message.h

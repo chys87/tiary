@@ -17,31 +17,59 @@
 
 #include "ui/object.h"
 #include "ui/ui.h"
+#include "ui/hotkeys.h"
+#include "ui/uistring.h"
 #include <stddef.h> // ::size_t
 #include <string>
 
 namespace tiary {
 namespace ui {
 
+class Control;
+
 /**
  * @brief	Window: An object-oriented event-driven portion of the screen
- *
- * Again, remember the difference between a Window and a Dialog:
- *  - A Dialog is derived from Window
- *  - A Dialog is a container of Controls; a Window is not
  */
-class Window : public Object
+class Window : public Object, public Hotkeys
 {
 public:
+	/*
+	 * If you use a border, it is your responsibility to guarantee
+	 * no control uses the top/bottom lines and left/right columns.
+	 *
+	 * If the close button is clicked, it is as if Escape is pressed.
+	 */
 
-	explicit Window (Size pos = make_size (), Size size = make_size ());
+	static const unsigned WINDOW_NO_BORDER = 1;
+	static const unsigned WINDOW_NO_CLOSE_BUTTON = 2;
+
+	explicit Window (unsigned = 0, const std::wstring &title = std::wstring ());
 	virtual ~Window ();
+
+	/**
+	 * fall_direction = 
+	 * 0: Try only the specified control;
+	 * 1: Repeatedly try the next control until success or a complete failure
+	 * -1: Repeatedly try the previous control until success or a complete failure
+	 */
+	bool set_focus_id (unsigned, int fall_direction = 0);
+	bool set_focus_ptr (Control *, int fall_direction = 0);
+	bool set_focus (unsigned id, int fall_direction = 0) { return set_focus_id (id, fall_direction); }
+	bool set_focus (Control &ctrl, int fall_direction = 0) { return set_focus_ptr (&ctrl, fall_direction); }
+	bool set_focus (Control *ctrl, int fall_direction = 0) { return set_focus_ptr (ctrl, fall_direction); }
+	bool set_focus_next (bool keep_trying = false);
+	bool set_focus_prev (bool keep_trying = false);
+	// Argument = one of Control::ctrl_{up,down,left,right}
+	bool set_focus_direction (Control *Control::*);
+	Control *get_focus () const;
+
 
 	// Interfaces:
 	virtual bool on_key (wchar_t); ///< Returns true/false = the input is/isn't handled
 	virtual bool on_mouse (MouseEvent); // Mouse coordinates are relative to window
-	virtual void on_winch () = 0; // There's no default way to handle WINCH
+	virtual void on_winch (); ///< Called when screen size changed. Default: call redraw
 	virtual bool on_mouse_outside (MouseEvent); // Mouse event outside the window boundary. Coordinates are absolute
+	virtual void redraw (); // Default behavior: Clear window and call every control's redraw functions
 
 	void event_loop (); // Main event loop
 
@@ -54,10 +82,9 @@ public:
 	ColorAttr get_attr () const { return cur_attr; }
 	void set_attr (const ColorAttr &);
 
-	void move_cursor (Size); // Move cursor
-	Size get_cursor_pos () const { return curpos; }
-	void set_cursor_visibility (bool v) { cursor_visible = v; }
-	bool get_cursor_visibility () const { return cursor_visible; }
+	// Cursor is positioned where the focus control wants it to be
+	Size get_cursor_pos () const;
+	bool get_cursor_visibility () const;
 
 	Size get_pos () const { return pos; }
 	Size get_size () const { return size; }
@@ -71,7 +98,7 @@ public:
 	void fill (Size fill_pos, Size fill_size, wchar_t);
 
 	// These functions output at a specified cursor position,
-	// does NOT move the current cursor position, and returns the new position
+	// Returns the new position
 	Size put (Size, wchar_t);
 	Size put (Size, const wchar_t *);
 	Size put (Size, const wchar_t *, size_t);
@@ -90,6 +117,9 @@ public:
 	// Touches (but not updates) the whole screen.
 	// Next time refresh is called, the whole screen is redrawn (like ^L in many apps)
 	static void touch_screen ();
+	// Forces all windows to redraw themselves
+	// Useful after modifications of palettes (also in other special cases)
+	static void touch_windows ();
 	// Get a key/mouse event
 	static wchar_t get (MouseEvent *);
 	static wchar_t get_noblock (MouseEvent *); ///< Returns L'\0' if no input
@@ -108,14 +138,16 @@ public:
 	void request (unsigned);
 	void request_close (); ///< Equivalent to request (REQUEST_CLOSE)
 
+
+	typedef std::vector<Control *> ControlList;
+
+	const ControlList &get_control_list () const { return control_list; }
+
 private:
 	unsigned requests;
 
 	Size pos, size; // Position and size
-	Size curpos;    // Cursor position
 	ColorAttr cur_attr; // Current attribute
-
-	bool cursor_visible; ///< Whether the cursor should be visible
 
 	// Remember the character and attribute at every point
 	// The area is contiguous. i.e.
@@ -126,6 +158,18 @@ private:
 
 	void reallocate_char_table ();
 	void deallocate_char_table ();
+
+
+	unsigned options;
+	UIStringOne title;
+
+	ControlList control_list;
+	int focus_id; ///< -1 = none
+
+	// To be used by Control's contructor only
+	void add_control (Control *);
+
+	friend class Control;
 };
 
 } // namespace tiary::ui

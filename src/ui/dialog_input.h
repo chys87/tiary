@@ -20,12 +20,12 @@
 namespace tiary {
 namespace ui {
 
-typedef unsigned DialogInputAttribute;
+typedef unsigned WindowInputAttribute;
 
 /// If INPUTBOX_PASSWORD is set in the attribute argument in
 /// tiary::ui::input_box, the input is not echoed. Instead,
 /// asterisks are displayed.
-const DialogInputAttribute INPUT_PASSWORD = 1;
+const WindowInputAttribute INPUT_PASSWORD = 1;
 
 /// @brief	Displays a dialog to receive keyboard inputs from the user
 /// @result	The entered text, or @c return_on_error if the user presses Esc
@@ -33,7 +33,7 @@ std::wstring dialog_input (
 		const std::wstring &hint, ///< The hint text.
 		const std::wstring &default_text = std::wstring (), ///< Default text in the box
 		unsigned text_box_width = 16, ///< Screen width of the textbox
-		DialogInputAttribute attributes = 0, ///< Currently only 0 or tiary::ui::INPUT_PASSWORD
+		WindowInputAttribute attributes = 0, ///< Currently only 0 or tiary::ui::INPUT_PASSWORD
 		const std::wstring &return_on_error = std::wstring () ///< What to return if the user presses Esc
 		);
 
@@ -43,7 +43,7 @@ std::wstring dialog_input2 (
 		const std::wstring &hint, ///< The hint text.
 		const std::wstring &default_text = std::wstring (), ///< Default text in the box
 		unsigned text_box_width = 16, ///< Screen width of the textbox
-		DialogInputAttribute attributes = 0, ///< Currently only 0 or tiary::ui::INPUT_PASSWORD
+		WindowInputAttribute attributes = 0, ///< Currently only 0 or tiary::ui::INPUT_PASSWORD
 		const std::wstring &return_on_error = std::wstring () ///< What to return if the user presses Esc
 		);
 

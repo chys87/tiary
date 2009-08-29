@@ -13,7 +13,7 @@
 
 
 #include "ui/dialog_select_file.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "ui/label.h"
 #include "ui/textbox.h"
 #include "ui/listbox.h"
@@ -41,14 +41,13 @@ namespace {
 [Show Hidden?][Text][OK][Cancel]
  */
 
-class DialogSelectFile : public virtual Dialog, private ButtonDefault
+class WindowSelectFile : public virtual Window, private ButtonDefault
 {
 public:
-	DialogSelectFile (const std::wstring &hint_, const std::wstring &default_file, unsigned options_);
-	~DialogSelectFile ();
+	WindowSelectFile (const std::wstring &hint_, const std::wstring &default_file, unsigned options_);
+	~WindowSelectFile ();
 
 	void redraw ();
-	void on_winch ();
 
 	const std::wstring &get_result () const { return result; }
 
@@ -77,8 +76,8 @@ const wchar_t string_show_hidden_files[] = L"Show &hidden files";
 // Minus 2: Null terminator and the "&" character
 const size_t len_show_hidden_files = sizeof string_show_hidden_files / sizeof (wchar_t) - 2;
 
-DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring &default_file, unsigned options_)
-	: Dialog (0, hint)
+WindowSelectFile::WindowSelectFile (const std::wstring &hint, const std::wstring &default_file, unsigned options_)
+	: Window (0, hint)
 	, ButtonDefault ()
 	, text_input (*this)
 	, list_files (*this)
@@ -97,12 +96,12 @@ DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring
 	check_hidden_files.ctrl_up = btn_cancel.ctrl_up = &list_files;
 	check_hidden_files.ctrl_down = btn_cancel.ctrl_down = &text_input;
 
-	text_input.sig_changed.connect (this, &DialogSelectFile::slot_input);
-	check_hidden_files.sig_toggled.connect (this, &DialogSelectFile::slot_refresh);
-	list_files.sig_focus.connect (this, &DialogSelectFile::slot_select);
-	list_files.sig_select_changed.connect (this, &DialogSelectFile::slot_select);
-	list_files.sig_double_clicked.connect (this, &DialogSelectFile::slot_ok);
-	btn_ok.sig_clicked.connect (this, &DialogSelectFile::slot_ok);
+	text_input.sig_changed.connect (this, &WindowSelectFile::slot_input);
+	check_hidden_files.sig_toggled.connect (this, &WindowSelectFile::slot_refresh);
+	list_files.sig_focus.connect (this, &WindowSelectFile::slot_select);
+	list_files.sig_select_changed.connect (this, &WindowSelectFile::slot_select);
+	list_files.sig_double_clicked.connect (this, &WindowSelectFile::slot_ok);
+	btn_ok.sig_clicked.connect (this, &WindowSelectFile::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 
 	set_default_button (btn_ok);
@@ -111,11 +110,11 @@ DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring
 	lbl_hidden_files.sig_hotkey.connect (
 			TIARY_LIST_OF(Signal)
 				Signal (check_hidden_files, &CheckBox::toggle, true),
-				Signal (this, &Dialog::set_focus_ptr, &check_hidden_files, 0)
+				Signal (this, &Window::set_focus_ptr, &check_hidden_files, 0)
 			TIARY_LIST_OF_END
 			);
 	lbl_hidden_files.sig_clicked.connect (lbl_hidden_files.sig_hotkey);
-//	register_hotkey (F5, Signal (this, &DialogSelectFile::slot_refresh));
+//	register_hotkey (F5, Signal (this, &WindowSelectFile::slot_refresh));
 
 	layout_buttons.add
 		(check_hidden_files, 3, 3, 1, 0)
@@ -134,16 +133,16 @@ DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring
 
 	// redraw before set_text so that the focus is properly positioned
 	// (redraw guarantees that list_files has a non-zero height)
-	DialogSelectFile::redraw ();
+	WindowSelectFile::redraw ();
 
 	set_text (default_file);
 }
 
-DialogSelectFile::~DialogSelectFile()
+WindowSelectFile::~WindowSelectFile()
 {
 }
 
-void DialogSelectFile::redraw ()
+void WindowSelectFile::redraw ()
 {
 	Size scrsize = get_screen_size ();
 	Size size = scrsize & make_size (100, 40);
@@ -151,20 +150,15 @@ void DialogSelectFile::redraw ()
 
 	layout_main.move_resize (make_size (2,1), size - make_size (4, 2));
 
-	Dialog::redraw ();
+	Window::redraw ();
 }
 
-void DialogSelectFile::on_winch ()
-{
-	DialogSelectFile::redraw ();
-}
-
-void DialogSelectFile::slot_input ()
+void WindowSelectFile::slot_input ()
 {
 	set_text (text_input.get_text (), false);
 }
 
-void DialogSelectFile::slot_select ()
+void WindowSelectFile::slot_select ()
 {
 	size_t select = list_files.get_select ();
 	if (select < list_files.get_items (). size()) {
@@ -177,7 +171,7 @@ void DialogSelectFile::slot_select ()
 	}
 }
 
-void DialogSelectFile::slot_ok ()
+void WindowSelectFile::slot_ok ()
 {
 	std::wstring expanded_name = home_expand_pathname (text_input.get_text ());
 	unsigned attr = get_file_attr (expanded_name);
@@ -208,7 +202,7 @@ void DialogSelectFile::slot_ok ()
 	request_close ();
 }
 
-void DialogSelectFile::slot_refresh ()
+void WindowSelectFile::slot_refresh ()
 {
 	list_dir.clear ();
 	slot_input ();
@@ -235,7 +229,7 @@ bool FilterDots::operator () (const DirEnt &ent) const
 	return false;
 }
 
-void DialogSelectFile::set_text (const std::wstring &newname, bool rewrite_input_box)
+void WindowSelectFile::set_text (const std::wstring &newname, bool rewrite_input_box)
 {
 	std::wstring newname_expanded = home_expand_pathname (newname);
 	std::pair<std::wstring, std::wstring> split_fullname = split_pathname (newname_expanded, true);
@@ -286,7 +280,7 @@ std::wstring dialog_select_file (
 		unsigned options
 		)
 {
-	DialogSelectFile win (hint, default_file, options);
+	WindowSelectFile win (hint, default_file, options);
 	win.event_loop ();
 	return win.get_result ();
 }

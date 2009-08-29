@@ -13,14 +13,14 @@
 
 
 #include "ui/control.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "ui/paletteid.h"
 
 namespace tiary {
 namespace ui {
 
 
-Control::Control (Dialog &dlg_)
+Control::Control (Window &dlg_)
 	: dlg (dlg_)
 	, pos (make_size ())
 	, size (make_size ())
@@ -59,7 +59,7 @@ bool Control::on_mouse (MouseEvent)
 bool Control::on_key (wchar_t)
 {
 	// Need not handle hotkeys here.
-	// Done by Dialog::on_key
+	// Done by Window::on_key
 	return false;
 }
 
@@ -93,8 +93,6 @@ void Control::focus ()
 void Control::move_cursor (Size newpos)
 {
 	curpos = newpos;
-	if (dlg.get_focus () == this)
-		dlg.move_cursor (newpos + pos);
 }
 
 void Control::choose_palette (PaletteID id)

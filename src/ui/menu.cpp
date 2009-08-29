@@ -13,7 +13,7 @@
 
 
 #include "ui/menu.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "ui/control.h"
 #include "ui/uistring.h"
 #include "ui/paletteid.h"
@@ -140,12 +140,12 @@ Menu &Menu::add_submenu (const std::wstring &text)
 namespace {
 
 class ItemControl;
-class MenuDialog;
+class MenuWindow;
 
 class ItemControl : public Control
 {
 public:
-	ItemControl (MenuDialog &, const MenuItem &);
+	ItemControl (MenuWindow &, const MenuItem &);
 	~ItemControl ();
 
 	bool on_focus ();
@@ -160,19 +160,19 @@ private:
 	const MenuItem &item;
 	UIStringOne text;
 
-	friend class MenuDialog;
+	friend class MenuWindow;
 };
 
-class MenuDialog : public Dialog
+class MenuWindow : public Window
 {
 public:
-	MenuDialog (const Menu &, Size left, Size right, bool unget_left_);
-	~MenuDialog ();
+	MenuWindow (const Menu &, Size left, Size right, bool unget_left_);
+	~MenuWindow ();
 
 	void on_winch ();
 	bool on_key (wchar_t);
 	bool on_mouse_outside (MouseEvent);
-	void redraw (); // Dialog::redraw is ok
+	void redraw (); // Window::redraw is ok
 
 	MenuItem *get_result () const { return result; }
 
@@ -185,7 +185,7 @@ private:
 	friend class ItemControl;
 };
 
-ItemControl::ItemControl (MenuDialog &dlg, const MenuItem &item_)
+ItemControl::ItemControl (MenuWindow &dlg, const MenuItem &item_)
 	: Control (dlg)
 	, item (item_)
 	, text (item_.text)
@@ -266,23 +266,23 @@ void ItemControl::slot_trigger ()
 	focus ();
 	if (item.submenu == 0) {
 		// No submenu
-		static_cast <MenuDialog &>(dlg).result = const_cast <MenuItem *>(&item);
+		static_cast <MenuWindow &>(dlg).result = const_cast <MenuItem *>(&item);
 		dlg.request_close ();
 	} else {
 		// Has submenu
 		Size right = dlg.get_pos () + get_pos ();
 		Size left = right + make_size (get_size ().x, 0);
-		MenuDialog subwin (*item.submenu, left, right, false);
+		MenuWindow subwin (*item.submenu, left, right, false);
 		subwin.event_loop ();
 		if (MenuItem *subret = subwin.get_result ()) {
-			static_cast<MenuDialog&>(dlg).result = subret;
+			static_cast<MenuWindow&>(dlg).result = subret;
 			dlg.request_close ();
 		}
 	}
 }
 
-MenuDialog::MenuDialog (const Menu &menu_, Size left, Size right, bool unget_left_)
-	: Dialog (Dialog::DIALOG_NO_CLOSE_BUTTON)
+MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_left_)
+	: Window (Window::WINDOW_NO_CLOSE_BUTTON)
 	, result (0)
 	, menu (menu_)
 	, unget_left (unget_left_)
@@ -324,20 +324,20 @@ MenuDialog::MenuDialog (const Menu &menu_, Size left, Size right, bool unget_lef
 	for (size_t i=0; i<actual_size; ++i)
 		ctrls[i]->move_resize (make_size (1, i+1), make_size (size.x-1, 1));
 	delete [] ctrls;
-	MenuDialog::redraw ();
+	MenuWindow::redraw ();
 }
 
-MenuDialog::~MenuDialog ()
+MenuWindow::~MenuWindow ()
 {
 	// Delete objects new'd in ctor
-	const Dialog::ControlList &lst = get_control_list ();
-	for (Dialog::ControlList::const_iterator it = lst.begin (); it != lst.end (); ++it)
+	const Window::ControlList &lst = get_control_list ();
+	for (Window::ControlList::const_iterator it = lst.begin (); it != lst.end (); ++it)
 		delete dynamic_cast <ItemControl *>(*it);
 }
 
-bool MenuDialog::on_key (wchar_t c)
+bool MenuWindow::on_key (wchar_t c)
 {
-	if (Dialog::on_key (c))
+	if (Window::on_key (c))
 		return true;
 
 	if ((unget_left || c!=LEFT) && c!=ESCAPE)
@@ -346,17 +346,17 @@ bool MenuDialog::on_key (wchar_t c)
 	return true;
 }
 
-void MenuDialog::on_winch ()
+void MenuWindow::on_winch ()
 {
 	request_close ();
 }
 
-void MenuDialog::redraw ()
+void MenuWindow::redraw ()
 {
-	Dialog::redraw ();
+	Window::redraw ();
 }
 
-bool MenuDialog::on_mouse_outside (MouseEvent me)
+bool MenuWindow::on_mouse_outside (MouseEvent me)
 {
 	if (me.m & MOUSE_ALL_BUTTON) {
 		// Mouse key pressed outside window
@@ -372,7 +372,7 @@ MenuItem *Menu::show (Size left, Size right, bool emit_signal)
 {
 	MenuItem *sel;
 	{
-		MenuDialog win (*this, left, right, true);
+		MenuWindow win (*this, left, right, true);
 		win.event_loop ();
 		sel = win.get_result ();
 	}

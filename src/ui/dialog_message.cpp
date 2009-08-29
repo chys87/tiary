@@ -13,7 +13,7 @@
 
 
 #include "ui/dialog_message.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "ui/label.h"
 #include "ui/button.h"
 #include "ui/button_default.h"
@@ -25,32 +25,31 @@ namespace ui {
 
 namespace {
 
-class DialogMessage : public virtual Dialog, private ButtonDefault
+class WindowMessage : public virtual Window, private ButtonDefault
 {
 
 	Label lbl_text;
 
-	DialogMessageButton button_mask;
-	DialogMessageButton result;
+	WindowMessageButton button_mask;
+	WindowMessageButton result;
 	unsigned n_buttons;
 	Button *p_buttons[4];
 
 public:
-	DialogMessage (const std::wstring &text, const std::wstring &title,
-			DialogMessageButton buttons);
-	~DialogMessage ();
+	WindowMessage (const std::wstring &text, const std::wstring &title,
+			WindowMessageButton buttons);
+	~WindowMessage ();
 
-	DialogMessageButton get_result () const { return result; }
+	WindowMessageButton get_result () const { return result; }
 
-	void slot_click (DialogMessageButton);
+	void slot_click (WindowMessageButton);
 
-	void on_winch ();
 	void redraw ();
 };
 
-DialogMessage::DialogMessage (const std::wstring &text, const std::wstring &title,
-		DialogMessageButton mask)
-	: Dialog (0, title)
+WindowMessage::WindowMessage (const std::wstring &text, const std::wstring &title,
+		WindowMessageButton mask)
+	: Window (0, title)
 	, ButtonDefault ()
 	, lbl_text (*this, text)
 	, button_mask (mask)
@@ -66,22 +65,22 @@ DialogMessage::DialogMessage (const std::wstring &text, const std::wstring &titl
 	Button **p = p_buttons;
 	if (mask & MESSAGE_OK) {
 		btn_ok = new Button (*this, L"&OK");
-		btn_ok->sig_clicked.connect (this, &DialogMessage::slot_click, MESSAGE_OK);
+		btn_ok->sig_clicked.connect (this, &WindowMessage::slot_click, MESSAGE_OK);
 		*p++ = btn_ok;
 	}
 	if (mask & MESSAGE_YES) {
 		btn_yes = new Button (*this, L"&Yes");
-		btn_yes->sig_clicked.connect (this, &DialogMessage::slot_click, MESSAGE_YES);
+		btn_yes->sig_clicked.connect (this, &WindowMessage::slot_click, MESSAGE_YES);
 		*p++ = btn_yes;
 	}
 	if (mask & MESSAGE_NO) {
 		btn_no = new Button (*this, L"&No");
-		btn_no->sig_clicked.connect (this, &DialogMessage::slot_click, MESSAGE_NO);
+		btn_no->sig_clicked.connect (this, &WindowMessage::slot_click, MESSAGE_NO);
 		*p++ = btn_no;
 	}
 	if (mask & MESSAGE_CANCEL) {
 		btn_cancel = new Button (*this, L"&Cancel");
-		btn_cancel->sig_clicked.connect (this, &DialogMessage::slot_click, MESSAGE_CANCEL);
+		btn_cancel->sig_clicked.connect (this, &WindowMessage::slot_click, MESSAGE_CANCEL);
 		*p++ = btn_cancel;
 	}
 	n_buttons = p - p_buttons;
@@ -104,27 +103,22 @@ DialogMessage::DialogMessage (const std::wstring &text, const std::wstring &titl
 				btn_escape = btn_ok;
 	register_hotkey (ESCAPE, btn_escape->sig_clicked);
 
-	DialogMessage::redraw ();
+	WindowMessage::redraw ();
 }
 
-DialogMessage::~DialogMessage ()
+WindowMessage::~WindowMessage ()
 {
 	for (unsigned i=0; i<n_buttons; ++i)
 		delete p_buttons[i];
 }
 
-void DialogMessage::slot_click (DialogMessageButton button)
+void WindowMessage::slot_click (WindowMessageButton button)
 {
 	result = button;
 	request (REQUEST_CLOSE);
 }
 
-void DialogMessage::on_winch ()
-{
-	DialogMessage::redraw ();
-}
-
-void DialogMessage::redraw ()
+void WindowMessage::redraw ()
 {
 	Size scr_size = get_screen_size ();
 	// Estimate the width: Every button is 10-char wide, plus 2 spaces
@@ -154,31 +148,31 @@ void DialogMessage::redraw ()
 		button_pos.x += 12;
 	}
 
-	Dialog::redraw ();
+	Window::redraw ();
 }
 
 } // anonymous namespace
 
-DialogMessageButton dialog_message (const std::wstring &text, DialogMessageButton buttons)
+WindowMessageButton dialog_message (const std::wstring &text, WindowMessageButton buttons)
 {
 	return dialog_message (text, std::wstring (), buttons);
 }
 
-DialogMessageButton dialog_message (const wchar_t *text, DialogMessageButton buttons)
+WindowMessageButton dialog_message (const wchar_t *text, WindowMessageButton buttons)
 {
 	return dialog_message (std::wstring (text), buttons);
 }
 
-DialogMessageButton dialog_message (const std::wstring &text, const std::wstring &title,
-		DialogMessageButton buttons)
+WindowMessageButton dialog_message (const std::wstring &text, const std::wstring &title,
+		WindowMessageButton buttons)
 {
-	DialogMessage win (text, title, buttons);
+	WindowMessage win (text, title, buttons);
 	win.event_loop ();
 	return win.get_result ();
 }
 
-DialogMessageButton dialog_message (const wchar_t *text, const wchar_t *title,
-		DialogMessageButton buttons)
+WindowMessageButton dialog_message (const wchar_t *text, const wchar_t *title,
+		WindowMessageButton buttons)
 {
 	return dialog_message (std::wstring (text), std::wstring (title), buttons);
 }

@@ -28,12 +28,12 @@ Size calculate_pos (Size size)
 
 } // anonymous namespace
 
-void FixedDialog::resize (Size newsize)
+void FixedWindow::resize (Size newsize)
 {
 	move_resize (calculate_pos (newsize), newsize);
 }
 
-void FixedDialog::on_winch ()
+void FixedWindow::on_winch ()
 {
 	Size size = get_size ();
 	move_resize (calculate_pos (size), size);

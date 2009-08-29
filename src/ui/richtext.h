@@ -45,9 +45,9 @@ public:
 	typedef RichTextLine Line;
 	typedef RichTextList LineList;
 
-	RichText (Dialog &, const LineList &);
+	RichText (Window &, const LineList &);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	RichText (Dialog &, LineList &&);
+	RichText (Window &, LineList &&);
 #endif
 	~RichText ();
 

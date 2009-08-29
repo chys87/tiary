@@ -14,7 +14,7 @@
 
 #include "main/dialog_labels.h"
 #include "diary/diary.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "ui/layout.h"
 #include "ui/label.h"
 #include "ui/button.h"
@@ -34,7 +34,7 @@ using namespace ui;
 /**
  * @brief	Class for the Label editing dialog
  */
-class DialogLabels : public virtual Dialog, private ButtonDefault
+class WindowLabels : public virtual Window, private ButtonDefault
 {
 
 	WStringLocaleOrderedSet &labels;
@@ -54,18 +54,17 @@ class DialogLabels : public virtual Dialog, private ButtonDefault
 
 public:
 
-	DialogLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_);
-	~DialogLabels ();
+	WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_);
+	~WindowLabels ();
 
 	void redraw ();
-	void on_winch ();
 
 	void slot_add ();
 	void slot_ok ();
 };
 
-DialogLabels::DialogLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_)
-	: ui::Dialog (0, L"Labels")
+WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_)
+	: ui::Window (0, L"Labels")
 	, ButtonDefault ()
 	, labels (labels_)
 	, all_labels (all_labels_)
@@ -106,32 +105,27 @@ DialogLabels::DialogLabels (WStringLocaleOrderedSet &labels_, const WStringLocal
 	set_default_button (btn_ok);
 	set_special_default_button (lst_all, btn_add);
 
-	btn_ok.sig_clicked.connect (this, &DialogLabels::slot_ok);
+	btn_ok.sig_clicked.connect (this, &WindowLabels::slot_ok);
 
-	btn_add.sig_clicked = lst_all.sig_double_clicked = Signal (this, &DialogLabels::slot_add);
+	btn_add.sig_clicked = lst_all.sig_double_clicked = Signal (this, &WindowLabels::slot_add);
 
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
 
-	DialogLabels::redraw ();
+	WindowLabels::redraw ();
 }
 
-DialogLabels::~DialogLabels ()
+WindowLabels::~WindowLabels ()
 {
 }
 
-void DialogLabels::redraw ()
+void WindowLabels::redraw ()
 {
 	Size scrsize = get_screen_size ();
 	Size size = scrsize & make_size (80, 25);
 	move_resize ((scrsize - size) / 2, size);
 	layout_main.move_resize (make_size (2,1), size - make_size (4,2));
-	Dialog::redraw ();
-}
-
-void DialogLabels::on_winch ()
-{
-	DialogLabels::redraw ();
+	Window::redraw ();
 }
 
 WStringLocaleOrderedSet set_from_text (const std::wstring &text)
@@ -143,7 +137,7 @@ WStringLocaleOrderedSet set_from_text (const std::wstring &text)
 	return set;
 }
 
-void DialogLabels::slot_add ()
+void WindowLabels::slot_add ()
 {
 	size_t k = lst_all.get_select ();
 	if (k < lst_all.get_items().size ()) {
@@ -156,7 +150,7 @@ void DialogLabels::slot_add ()
 	}
 }
 
-void DialogLabels::slot_ok ()
+void WindowLabels::slot_ok ()
 {
 	labels = set_from_text (txt_selected.get_text ());
 	Window::request_close ();
@@ -170,7 +164,7 @@ bool edit_labels (WStringLocaleOrderedSet &labels, const std::vector<DiaryEntry 
 	WStringLocaleOrderedSet all_labels; // The union of all label lists
 	for (std::vector<DiaryEntry *>::const_iterator it = entries.begin (); it != entries.end (); ++it)
 		all_labels.insert ((*it)->labels.begin (), (*it)->labels.end ());
-	DialogLabels (labels, all_labels).event_loop ();
+	WindowLabels (labels, all_labels).event_loop ();
 	return (labels != old_labels);
 }
 

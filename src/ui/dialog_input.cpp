@@ -26,7 +26,7 @@ namespace ui {
 
 namespace {
 
-class DialogInput : public FixedDialog, private ButtonDefault
+class WindowInput : public FixedWindow, private ButtonDefault
 {
 
 	Label lbl_hint;
@@ -36,25 +36,25 @@ class DialogInput : public FixedDialog, private ButtonDefault
 	std::wstring &result;
 
 public:
-	DialogInput (const std::wstring &title,
+	WindowInput (const std::wstring &title,
 			const std::wstring &hint, const std::wstring &default_text,
 			unsigned text_box_width,
-			DialogInputAttribute attr,
+			WindowInputAttribute attr,
 			std::wstring &result_);
-	~DialogInput ();
+	~WindowInput ();
 
 	//void redraw (); // The default one is okay
 
 	void slot_ok ();     // Pressed Enter or clicked OK Button
 };
 
-DialogInput::DialogInput (const std::wstring &title,
+WindowInput::WindowInput (const std::wstring &title,
 		const std::wstring &hint, const std::wstring &default_text,
 		unsigned text_box_width,
-		DialogInputAttribute attr,
+		WindowInputAttribute attr,
 		std::wstring &result_)
-	: Dialog (0, title)
-	, FixedDialog ()
+	: Window (0, title)
+	, FixedWindow ()
 	, ButtonDefault ()
 	, lbl_hint (*this, hint)
 	, box_input (*this, (attr & INPUT_PASSWORD) ? TextBox::PASSWORD_BOX : 0)
@@ -62,7 +62,7 @@ DialogInput::DialogInput (const std::wstring &title,
 	, result (result_)
 {
 	unsigned hint_height = lbl_hint.split_line (text_box_width).size ();
-	FixedDialog::resize (make_size (text_box_width + 4, hint_height + 8));
+	FixedWindow::resize (make_size (text_box_width + 4, hint_height + 8));
 	lbl_hint.move_resize (make_size (2, 1), make_size (text_box_width, hint_height));
 	box_input.move_resize (make_size (2, hint_height+2), make_size (text_box_width, 1));
 	btn_ok.move_resize (make_size (maxS (0, (text_box_width+4-10)/2), hint_height+4), make_size (10, 3));
@@ -72,15 +72,15 @@ DialogInput::DialogInput (const std::wstring &title,
 	box_input.set_text (default_text, false, default_text.length ());
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
 	set_default_button (btn_ok);
-	btn_ok.sig_clicked.connect (this, &DialogInput::slot_ok);
-	DialogInput::redraw ();
+	btn_ok.sig_clicked.connect (this, &WindowInput::slot_ok);
+	WindowInput::redraw ();
 }
 
-DialogInput::~DialogInput ()
+WindowInput::~WindowInput ()
 {
 }
 
-void DialogInput::slot_ok ()
+void WindowInput::slot_ok ()
 {
 	result = box_input.get_text ();
 	request_close ();
@@ -89,7 +89,7 @@ void DialogInput::slot_ok ()
 } // anonymous namespace
 
 std::wstring dialog_input (const std::wstring &hint, const std::wstring &default_text,
-		unsigned text_box_width, DialogInputAttribute attr,
+		unsigned text_box_width, WindowInputAttribute attr,
 		const std::wstring &return_on_error)
 {
 	return dialog_input2 (std::wstring (), hint, default_text, text_box_width,
@@ -98,10 +98,10 @@ std::wstring dialog_input (const std::wstring &hint, const std::wstring &default
 
 std::wstring dialog_input2 (const std::wstring &title, const std::wstring &hint,
 		const std::wstring &default_text, unsigned text_box_width,
-		DialogInputAttribute attr, const std::wstring &return_on_error)
+		WindowInputAttribute attr, const std::wstring &return_on_error)
 {
 	std::wstring ret = return_on_error;
-	DialogInput (title, hint, default_text, text_box_width, attr, ret).event_loop ();
+	WindowInput (title, hint, default_text, text_box_width, attr, ret).event_loop ();
 	return ret;
 }
 

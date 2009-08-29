@@ -23,7 +23,7 @@
 namespace tiary {
 namespace ui {
 
-TextBox::TextBox (Dialog &dlg, unsigned attr)
+TextBox::TextBox (Window &dlg, unsigned attr)
 	: Control (dlg)
 	, Scroll (0, true)
 	, text ()

@@ -1,7 +1,7 @@
 #include "main/dialog_all_labels.h"
 #include "ui/button.h"
 #include "ui/button_default.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "ui/listbox.h"
 #include "ui/fixed_dialog.h"
 #include "ui/label.h"
@@ -20,7 +20,7 @@ namespace {
 
 using namespace ui;
 
-class DialogAllLabels : public virtual Dialog, public FixedDialog, private ButtonDefault
+class WindowAllLabels : public virtual Window, public FixedWindow, private ButtonDefault
 {
 
 	ListBox lst_labels;
@@ -39,11 +39,10 @@ class DialogAllLabels : public virtual Dialog, public FixedDialog, private Butto
 	bool modified;
 
 public:
-	DialogAllLabels (DiaryEntryList &);
-	~DialogAllLabels ();
+	WindowAllLabels (DiaryEntryList &);
+	~WindowAllLabels ();
 
 	void redraw ();
-	void on_winch ();
 
 	void slot_rename ();
 	void slot_delete ();
@@ -54,9 +53,9 @@ public:
 	void refresh_list (const std::wstring &select_hint = std::wstring ());
 };
 
-DialogAllLabels::DialogAllLabels (DiaryEntryList &entries_)
-	: Dialog (0, L"All labels")
-	, FixedDialog ()
+WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
+	: Window (0, L"All labels")
+	, FixedWindow ()
 	, ButtonDefault ()
 	, lst_labels (*this)
 	, btn_rename (*this, L"&Rename")
@@ -85,36 +84,31 @@ DialogAllLabels::DialogAllLabels (DiaryEntryList &entries_)
 		(layout_right, 10, 10)
 		;
 
-	btn_rename.sig_clicked.connect (this, &DialogAllLabels::slot_rename);
-	btn_delete.sig_clicked.connect (this, &DialogAllLabels::slot_delete);
-	btn_ok.sig_clicked.connect (this, &DialogAllLabels::slot_ok);
+	btn_rename.sig_clicked.connect (this, &WindowAllLabels::slot_rename);
+	btn_delete.sig_clicked.connect (this, &WindowAllLabels::slot_delete);
+	btn_ok.sig_clicked.connect (this, &WindowAllLabels::slot_ok);
 
 	lst_labels.register_hotkey (DELETE, btn_delete.sig_clicked);
 
 	register_hotkey (ESCAPE, btn_ok.sig_clicked);
 	set_default_button (btn_ok);
 
-	DialogAllLabels::redraw ();
+	WindowAllLabels::redraw ();
 }
 
-DialogAllLabels::~DialogAllLabels ()
+WindowAllLabels::~WindowAllLabels ()
 {
 }
 
-void DialogAllLabels::redraw ()
+void WindowAllLabels::redraw ()
 {
 	Size size = get_screen_size () & make_size (40, 40);
-	FixedDialog::resize (size);
+	FixedWindow::resize (size);
 	layout_main.move_resize (make_size (2, 1), size - make_size (4, 2));
-	Dialog::redraw ();
+	Window::redraw ();
 }
 
-void DialogAllLabels::on_winch ()
-{
-	DialogAllLabels::redraw ();
-}
-
-void DialogAllLabels::slot_rename ()
+void WindowAllLabels::slot_rename ()
 {
 	size_t k = lst_labels.get_select ();
 	if (k < lst_labels.get_items ().size ()) {
@@ -151,11 +145,12 @@ void DialogAllLabels::slot_rename ()
 			}
 			modified = true;
 			refresh_list (new_name);
+			touch_windows (); // Reflect changes in MainWin
 		}
 	}
 }
 
-void DialogAllLabels::slot_delete ()
+void WindowAllLabels::slot_delete ()
 {
 	size_t k = lst_labels.get_select ();
 	if (k < lst_labels.get_items ().size ()) {
@@ -167,16 +162,17 @@ void DialogAllLabels::slot_delete ()
 				(*it)->labels.erase (old_name);
 			modified = true;
 			refresh_list ();
+			touch_windows (); // Reflect changes in MainWin
 		}
 	}
 }
 
-void DialogAllLabels::slot_ok ()
+void WindowAllLabels::slot_ok ()
 {
 	Window::request_close ();
 }
 
-void DialogAllLabels::refresh_list (const std::wstring &select_hint)
+void WindowAllLabels::refresh_list (const std::wstring &select_hint)
 {
 	size_t new_select;
 	WStringLocaleOrderedSet::const_iterator it = all_labels.find (select_hint);
@@ -192,7 +188,7 @@ void DialogAllLabels::refresh_list (const std::wstring &select_hint)
 
 bool edit_all_labels (DiaryEntryList &entries)
 {
-	DialogAllLabels win (entries);
+	WindowAllLabels win (entries);
 	win.event_loop ();
 	return win.get_modified ();
 }

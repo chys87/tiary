@@ -72,12 +72,10 @@
  * some interfaces not in Unicode.
  *
  * To write to a Window, using tiary::ui::Window::put.
+ * But more often, you should not do so, but rely on Controls
  *
  * For efficiency purposes, output functions only support printable
  * characters. It is the caller's responsibility to guarantee this.
- *
- * In most cases we don't want to directly use tiary::ui::Window. Instead,
- * we want to use tiary::ui::Dialog.
  *
  * @{
  * @}
@@ -233,7 +231,7 @@ const MouseMask MOUSE_CTRL       = 0x2000;
 const MouseMask MOUSE_ALT        = 0x4000;
 const MouseMask MOUSE_MOVE       = 0x8000;
 
-// No global I/O methods available. Use tiary::ui::Window or tiary::ui::Dialog!
+// No global I/O methods available. Use tiary::ui::Window or tiary::ui::Control!
 
 
 typedef unsigned char Attr;

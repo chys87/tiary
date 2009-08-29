@@ -35,7 +35,7 @@ class MenuBar : public UnfocusableControl
 {
 public:
 
-	explicit MenuBar (Dialog &);
+	explicit MenuBar (Window &);
 	~MenuBar ();
 
 	Menu &add (const std::wstring &); ///< Add an item to menu

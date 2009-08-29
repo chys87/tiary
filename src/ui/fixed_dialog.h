@@ -16,7 +16,7 @@
 #define TIARY_UI_FIXED_DIALOG_H
 
 
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include <string>
 
 namespace tiary {
@@ -27,7 +27,7 @@ namespace ui {
  * Automatically positioned in the middle of the screen
  */
 
-class FixedDialog : public virtual Dialog
+class FixedWindow : public virtual Window
 {
 public:
 

@@ -27,9 +27,9 @@ public:
 
 	typedef std::vector<std::wstring> ItemList;
 
-	DropList (Dialog &, const ItemList &, size_t default_select);
+	DropList (Window &, const ItemList &, size_t default_select);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	DropList (Dialog &, ItemList &&, size_t default_select);
+	DropList (Window &, ItemList &&, size_t default_select);
 #endif
 	~DropList ();
 

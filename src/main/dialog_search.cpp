@@ -30,7 +30,7 @@ namespace {
 
 using namespace tiary::ui;
 
-class DialogSearch : public FixedDialog, private ButtonDefault
+class WindowSearch : public FixedWindow, private ButtonDefault
 {
 
 	ui::TextBox box_input;
@@ -48,19 +48,19 @@ class DialogSearch : public FixedDialog, private ButtonDefault
 
 public:
 
-	DialogSearch (std::wstring &o_text, bool &o_bkwd, bool &o_regex, 
+	WindowSearch (std::wstring &o_text, bool &o_bkwd, bool &o_regex, 
 		const std::wstring &text, bool bkwd, bool regex);
-	~DialogSearch ();
+	~WindowSearch ();
 
 	//void redraw (); // The default one is okay
 
 	void slot_ok (); ///< Pressed Enter or clicked OK
 };
 
-DialogSearch::DialogSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_, 
+WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_, 
 		const std::wstring &text, bool bkwd, bool regex)
-	: Dialog (0, L"Search")
-	, FixedDialog ()
+	: Window (0, L"Search")
+	, FixedWindow ()
 	, box_input (*this, 0)
 	, chk_backward (*this, bkwd)
 	, lbl_backward (*this, L"&Backward")
@@ -73,7 +73,7 @@ DialogSearch::DialogSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 	, o_bkwd (o_bkwd_)
 	, o_regex (o_regex_)
 {
-	FixedDialog::resize (make_size (40, 7));
+	FixedWindow::resize (make_size (40, 7));
 	box_input.move_resize (make_size (2, 1), make_size (36, 1));
 	chk_backward.move_resize (make_size (2, 3), make_size (3, 1));
 	lbl_backward.move_resize (make_size (6, 3), make_size (10, 1));
@@ -99,7 +99,7 @@ DialogSearch::DialogSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 	lbl_backward.sig_hotkey.connect (
 			TIARY_LIST_OF (Signal)
 				Signal (chk_backward, &CheckBox::toggle, false),
-				Signal (this, &Dialog::set_focus_ptr, &chk_backward, 0)
+				Signal (this, &Window::set_focus_ptr, &chk_backward, 0)
 			TIARY_LIST_OF_END
 			);
 	lbl_backward.sig_clicked.connect (lbl_backward.sig_hotkey);
@@ -107,22 +107,22 @@ DialogSearch::DialogSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 	lbl_regex.sig_hotkey.connect (
 			TIARY_LIST_OF (Signal)
 				Signal (chk_regex, &CheckBox::toggle, false),
-				Signal (this, &Dialog::set_focus_ptr, &chk_regex, 0)
+				Signal (this, &Window::set_focus_ptr, &chk_regex, 0)
 			TIARY_LIST_OF_END
 			);
 	lbl_regex.sig_clicked.connect (lbl_regex.sig_hotkey);
 #endif
-	btn_ok.sig_clicked.connect (this, &DialogSearch::slot_ok);
+	btn_ok.sig_clicked.connect (this, &WindowSearch::slot_ok);
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
 
-	DialogSearch::redraw ();
+	WindowSearch::redraw ();
 }
 
-DialogSearch::~DialogSearch ()
+WindowSearch::~WindowSearch ()
 {
 }
 
-void DialogSearch::slot_ok ()
+void WindowSearch::slot_ok ()
 {
 	o_text = box_input.get_text ();
 	o_bkwd = chk_backward.get_status ();
@@ -141,7 +141,7 @@ void DialogSearch::slot_ok ()
 void dialog_search (std::wstring &o_text, bool &o_bkwd, bool &o_regex, 
 		const std::wstring &text, bool bkwd, bool regex)
 {
-	DialogSearch (o_text, o_bkwd, o_regex, text, bkwd, regex).event_loop ();
+	WindowSearch (o_text, o_bkwd, o_regex, text, bkwd, regex).event_loop ();
 }
 
 

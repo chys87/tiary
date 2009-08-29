@@ -15,7 +15,7 @@
 #ifndef TIARY_MAIN_MAINWIN_H
 #define TIARY_MAIN_MAINWIN_H
 
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "ui/control.h"
 #include "ui/scroll.h"
 #include "ui/menubar.h"
@@ -56,7 +56,7 @@ private:
 	void touch (); ///< Call this when any entry is modified
 };
 
-class MainWin : public ui::Dialog
+class MainWin : public ui::Window
 {
 public:
 	// Constructor & destructor
@@ -64,8 +64,6 @@ public:
 	~MainWin ();
 
 	// Overload virtual functions
-	void on_winch ();
-
 	void redraw ();
 
 	friend class MainCtrl;

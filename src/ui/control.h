@@ -25,12 +25,12 @@
 namespace tiary {
 namespace ui {
 
-class Dialog;
+class Window;
 
 class Control : public Object, public Hotkeys
 {
 public:
-	explicit Control (Dialog &);
+	explicit Control (Window &);
 	virtual ~Control ();
 
 	// move_resize does not imply redraw
@@ -48,7 +48,7 @@ public:
 	virtual void on_move_resize (Size oldpos, Size oldsize); // Called by Control::move_resize
 
 	bool is_focus () const;
-	void focus (); ///< Make this Control the focus of the Dialog
+	void focus (); ///< Make this Control the focus of the Window
 
 	// Redraw the control.
 	// Typically called when the pos/size of the control is changed,
@@ -84,7 +84,7 @@ public:
 	void clear (Size, Size);
 	void fill (Size, Size, wchar_t);
 
-	Dialog &dlg; // The dialog containing the control
+	Window &dlg; // The dialog containing the control
 
 private:
 	Size pos; ///< Position of the control. Relative to dialog
@@ -101,7 +101,7 @@ public:
 	Signal sig_focus;
 	Signal sig_clicked;
 
-	friend class Dialog;
+	friend class Window;
 };
 
 
@@ -109,7 +109,7 @@ public:
 class UnfocusableControl : public virtual Control
 {
 public:
-	UnfocusableControl (Dialog &dlg) : Control (dlg) {}
+	UnfocusableControl (Window &dlg) : Control (dlg) {}
 	~UnfocusableControl ();
 	bool on_focus ();
 };

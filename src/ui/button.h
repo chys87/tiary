@@ -29,11 +29,11 @@ class Button : public Control
 public:
 	// The text must be a single line
 	// Otherwise, the behavior is undefined
-	Button (Dialog &, const std::wstring &);
+	Button (Window &, const std::wstring &);
 	~Button ();
 
 	bool on_key (wchar_t);
-//	bool on_mouse (MouseEvent); // Handled by Dialog
+//	bool on_mouse (MouseEvent); // Handled by Window
 	void on_focus_changed ();
 	void redraw ();
 

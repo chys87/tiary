@@ -21,20 +21,20 @@ namespace tiary {
 namespace ui {
 
 
-typedef unsigned DialogMessageButton;
+typedef unsigned WindowMessageButton;
 
-const DialogMessageButton MESSAGE_OK     = 0x01;
-const DialogMessageButton MESSAGE_YES    = 0x02;
-const DialogMessageButton MESSAGE_NO     = 0x04;
-const DialogMessageButton MESSAGE_CANCEL = 0x08;
-const DialogMessageButton MESSAGE_ALL    = 0x0f;
+const WindowMessageButton MESSAGE_OK     = 0x01;
+const WindowMessageButton MESSAGE_YES    = 0x02;
+const WindowMessageButton MESSAGE_NO     = 0x04;
+const WindowMessageButton MESSAGE_CANCEL = 0x08;
+const WindowMessageButton MESSAGE_ALL    = 0x0f;
 
-DialogMessageButton dialog_message (const std::wstring &text, DialogMessageButton buttons = MESSAGE_OK);
-DialogMessageButton dialog_message (const wchar_t *text, DialogMessageButton buttons = MESSAGE_OK);
-DialogMessageButton dialog_message (const std::wstring &text, const std::wstring &title,
-		DialogMessageButton buttons = MESSAGE_OK);
-DialogMessageButton dialog_message (const wchar_t *text, const wchar_t *title,
-		DialogMessageButton buttons = MESSAGE_OK);
+WindowMessageButton dialog_message (const std::wstring &text, WindowMessageButton buttons = MESSAGE_OK);
+WindowMessageButton dialog_message (const wchar_t *text, WindowMessageButton buttons = MESSAGE_OK);
+WindowMessageButton dialog_message (const std::wstring &text, const std::wstring &title,
+		WindowMessageButton buttons = MESSAGE_OK);
+WindowMessageButton dialog_message (const wchar_t *text, const wchar_t *title,
+		WindowMessageButton buttons = MESSAGE_OK);
 
 } // namespace tiary::ui
 } // namespace tiary

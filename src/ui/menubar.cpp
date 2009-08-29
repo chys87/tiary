@@ -15,7 +15,7 @@
 #include "ui/menubar.h"
 #include "ui/menu.h"
 #include "ui/paletteid.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include <utility> // std::forward
 #include <stack>
 #include <iterator> // std::advance
@@ -29,7 +29,7 @@ namespace ui {
 
 
 
-MenuBar::MenuBar (Dialog &dlg)
+MenuBar::MenuBar (Window &dlg)
 	: Control (dlg)
 	, UnfocusableControl (dlg)
 {

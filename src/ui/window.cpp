@@ -18,9 +18,13 @@
 #include "common/unicode.h"
 #include "common/misc.h"
 #include "ui/terminal_emulator.h"
+#include "ui/control.h"
+#include "ui/paletteid.h"
 #include <vector>
 #include <stack>
 #include <string.h>
+#include <assert.h>
+#include <signal.h>
 
 
 namespace tiary {
@@ -271,17 +275,20 @@ wchar_t get_input (MouseEvent *pmouse_event, bool block = true)
 }
 
 
-Window::Window (Size pos_, Size size_)
-	: requests (0)
-	, pos (pos_)
-	, size (size_)
-	, curpos (make_size (0, 0))
+Window::Window (unsigned options_, const std::wstring &title_)
+	: Object ()
+	, Hotkeys ()
+	, requests (0)
+	, pos (make_size ())
+	, size (make_size ())
 	, cur_attr (ColorAttr::make_default ())
-	, cursor_visible (true)
 	, char_table (0)
+	, options (options_)
+	, title (title_, UIStringBase::NO_HOTKEY)
+	, control_list ()
+	, focus_id (-1)
 {
 	reallocate_char_table ();
-	touch_lines (pos_.y, size_.y);
 	window_list.push_back (this);
 }
 
@@ -328,15 +335,9 @@ void Window::deallocate_char_table ()
 	}
 }
 
-// Default behavior of interface functions
-bool Window::on_key (wchar_t)
+void Window::on_winch ()
 {
-	return false;
-}
-
-bool Window::on_mouse (MouseEvent)
-{
-	return false;
+	redraw ();
 }
 
 bool Window::on_mouse_outside (MouseEvent)
@@ -346,6 +347,9 @@ bool Window::on_mouse_outside (MouseEvent)
 
 void Window::event_loop ()
 {
+	if (size_t (focus_id) >= control_list.size ())
+		set_focus_id (0, 1);
+
 	while (!(requests & REQUEST_CLOSE)) {
 		MouseEvent mouse_event;
 
@@ -417,11 +421,6 @@ void Window::attribute_off (Attr attr)
 void Window::set_attr (const ColorAttr &at)
 {
 	cur_attr = at;
-}
-
-void Window::move_cursor (Size newpos)
-{
-	curpos = newpos;
 }
 
 
@@ -566,6 +565,12 @@ void Window::touch_screen ()
 	clearok (stdscr, 1);
 }
 
+void Window::touch_windows ()
+{
+	for (WindowList::iterator it = window_list.begin (); it != window_list.end (); ++it)
+		(*it)->redraw ();
+}
+
 wchar_t Window::get (MouseEvent *pmouse_event)
 {
 	return get_input (pmouse_event);
@@ -612,6 +617,228 @@ void Window::request_close ()
 	request (REQUEST_CLOSE);
 }
 
+void Window::add_control (Control *ctrl)
+{
+	assert (&ctrl->dlg == this);
+
+	control_list.push_back (ctrl);
+}
+
+bool Window::set_focus_id (unsigned id, int fall_direction)
+{
+	if (id >= control_list.size ())
+		return false;
+	int old_focus = focus_id;
+	if (old_focus == int (id))
+		return true;
+	if (old_focus >= 0) {
+		focus_id = -1;
+		control_list[old_focus]->on_defocus ();
+	}
+	unsigned N = control_list.size ();
+	unsigned fall_add = N + fall_direction;
+	unsigned try_id = id;
+	for (;;) {
+		focus_id = try_id;
+		Control *try_ctrl = control_list[try_id];
+		if (try_ctrl->on_focus ()) {
+			// Notify every control
+			for (ControlList::iterator it = control_list.begin ();
+					it != control_list.end (); ++it)
+				(*it)->on_focus_changed ();
+			// Emit two signals
+			if (old_focus >= 0)
+				control_list[old_focus]->sig_defocus.emit ();
+			try_ctrl->sig_focus.emit ();
+			return true;
+		}
+		try_id = (try_id + fall_add) % N;
+		if (try_id == id) {
+			// Completely failed. Try refocusing the old focus
+			focus_id = old_focus;
+			if (old_focus >= 0)
+				control_list[old_focus]->on_focus ();
+			return false;
+		}
+	}
+}
+
+bool Window::set_focus_ptr (Control *ctrl, int fall_direction)
+{
+	ControlList::iterator it = std::find (control_list.begin (), control_list.end (), ctrl);
+	if (it == control_list.end ())
+		return false;
+	return set_focus_id (it - control_list.begin (), fall_direction);
+}
+
+bool Window::set_focus_next (bool keep_trying)
+{
+	unsigned id = focus_id + 1;
+	if (id>=control_list.size())
+		id = 0;
+	return set_focus_id (id, keep_trying ? 1 : 0);
+}
+
+bool Window::set_focus_prev (bool keep_trying)
+{
+	unsigned id = focus_id - 1;
+	if (id >= control_list.size())
+		id = control_list.size() - 1;
+	return set_focus_id (id, keep_trying ? -1 : 0);
+}
+
+bool Window::set_focus_direction (Control *Control::*dir)
+{
+	unsigned id = focus_id;
+	if (id < control_list.size ()) {
+		if (Control *new_focus = control_list[id]->*dir)
+			return set_focus_ptr (new_focus, 0);
+	}
+	return false;
+}
+
+Control *Window::get_focus () const
+{
+	unsigned id = focus_id;
+	return (id >= control_list.size ()) ? 0 : control_list[id];
+}
+
+bool Window::on_mouse (MouseEvent mouse_event)
+{
+	bool processed = false;
+
+	// First decide which control this event happens on
+	for (ControlList::iterator it = control_list.begin (); it != control_list.end (); ++it) {
+		if (both (mouse_event.p - (*it)->pos < (*it)->size)) {
+			// If it's any mouse key event, we should first try to focus it
+			// Otherwise, we do not.
+			if (mouse_event.m & MOUSE_ALL_BUTTON)
+				set_focus (it - control_list.begin (), 0); // Regardless whether it's successful or not
+			mouse_event.p -= (*it)->pos;
+			bool processed = (*it)->on_mouse (mouse_event);
+			if (!processed) {
+				if ((mouse_event.m&LEFT_CLICK) && (*it)->sig_clicked.is_really_connected ()) {
+					(*it)->sig_clicked.emit ();
+					processed = true;
+				}
+			}
+			break;
+		}
+	}
+
+	// Clicked close button?
+	if (!processed) {
+		if ((mouse_event.m & LEFT_CLICK) && (mouse_event.p.y == 0) &&
+				(get_size ().x - 2 - mouse_event.p.x < 3))
+			processed = on_key (ESCAPE);
+	}
+
+	return processed;
+}
+
+bool Window::on_key (wchar_t c)
+{
+	bool processed = false;
+	// First try the focused control
+	if (unsigned (focus_id) < control_list.size ()) {
+		processed = control_list[focus_id]->on_key (c);
+		// Not processed? How about local hotkeys?
+		if (!processed)
+			processed = control_list[focus_id]->emit_hotkey (c);
+	}
+	// Not processed? How about dialog hotkeys?
+	if (!processed)
+		processed = emit_hotkey (c);
+	// Still not processed? Interpret it ourselves
+	if (!processed) {
+		// Currently supports '\t', BACKTAB and arrow keys
+		switch (c) {
+			case L'\t':
+				processed = set_focus_next (true);
+				break;
+			case BACKTAB:
+				processed = set_focus_prev (true);
+				break;
+			case UP:
+				processed = set_focus_direction (&Control::ctrl_up);
+				break;
+			case DOWN:
+				processed = set_focus_direction (&Control::ctrl_down);
+				break;
+			case LEFT:
+				processed = set_focus_direction (&Control::ctrl_left);
+				break;
+			case RIGHT:
+				processed = set_focus_direction (&Control::ctrl_right);
+				break;
+			case CTRL_Z:
+				Window::suspend ();
+				raise (SIGTSTP);
+				Window::resume ();
+				// Fall into ...
+			case CTRL_L:
+				Window::touch_screen ();
+				processed = true;
+				break;
+		}
+	}
+	return processed;
+}
+
+void Window::redraw ()
+{
+	choose_palette (PALETTE_ID_BACKGROUND);
+	clear ();
+
+	Size size = get_size ();
+	// Draw the border
+	if (!(options & WINDOW_NO_BORDER) && both (size >= make_size (2, 2))) {
+
+		put (make_size (), BORDER_1); // Top, left
+		fill (make_size (1, 0), make_size (size.x-2, 1), BORDER_H); // Up
+		put (make_size (size.x-1, 0), BORDER_2); // Top, right
+		fill (make_size (0, 1), make_size (1, size.y-2), BORDER_V); // Left
+		fill (make_size (size.x-1, 1), make_size (1, size.y-2), BORDER_V); // Right
+		put (make_size (0, size.y-1), BORDER_3); // Bottom, left
+		fill (make_size (1, size.y-1), make_size (size.x-2, 1), BORDER_H); // Down
+		put (make_size (size.x-1, size.y-1), BORDER_4); // Bottom, right
+
+		// Show the title
+		if (!title.get_text().empty ()) {
+			unsigned title_width = minU (title.get_width (), size.x);
+			unsigned left = (size.x - title_width - 2) / 2;
+			Size pos = make_size (left, 0);
+			pos = put (pos, L' ');
+			pos = title.output (*this, pos, title_width);
+			pos = put (pos, L' ');
+		}
+
+		// Show the close button
+		if (!(options & WINDOW_NO_CLOSE_BUTTON) && size.x>=4) {
+			Size pos = make_size (size.x - 4, 0);
+			// u00d7 is multiplication sign
+			put (pos, terminal_emulator_correct_wcwidth () ? L"[\u00d7]" : L"[x]");
+		}
+	}
+
+	for (ControlList::iterator it = control_list.begin ();
+			it != control_list.end (); ++it)
+		(*it)->redraw ();
+}
+
+Size Window::get_cursor_pos () const
+{
+	if (Control *ctrl = get_focus ())
+		return ctrl->get_cursor_pos () + ctrl->get_pos ();
+	return make_size ();
+}
+
+bool Window::get_cursor_visibility () const
+{
+	if (Control *ctrl = get_focus ())
+		return ctrl->get_cursor_visibility ();
+	return false;
+}
 
 } // namespace tiary::ui
 } // namespace tiary

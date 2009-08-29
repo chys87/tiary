@@ -13,7 +13,7 @@
 
 
 #include "ui/label.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "common/unicode.h"
 #include "common/containers.h"
 #include "ui/paletteid.h"
@@ -23,7 +23,7 @@ namespace tiary {
 namespace ui {
 
 
-Label::Label (Dialog &dlg, const std::wstring &str, unsigned options)
+Label::Label (Window &dlg, const std::wstring &str, unsigned options)
 	: Control (dlg)
 	, UnfocusableControl (dlg)
 	, text (str, options)
@@ -31,7 +31,7 @@ Label::Label (Dialog &dlg, const std::wstring &str, unsigned options)
 	// Register hotkey
 	if (wchar_t c = text.get_hotkey ()) {
 		dlg.register_hotkey (c, Signal (sig_hotkey, 0));
-		sig_hotkey.connect (dlg, &Dialog::set_focus_ptr, this, 1);
+		sig_hotkey.connect (dlg, &Window::set_focus_ptr, this, 1);
 	}
 }
 

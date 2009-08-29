@@ -1,6 +1,6 @@
 #include "ui/dialog_richtext.h"
 #include "ui/richtext.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include <utility> // std::forward
 
 
@@ -9,7 +9,7 @@ namespace ui {
 
 namespace {
 
-class DialogRichText : public Dialog
+class WindowRichText : public Window
 {
 
 	RichText text;
@@ -17,19 +17,18 @@ class DialogRichText : public Dialog
 	unsigned max_text_width;
 
 public:
-	DialogRichText (const std::wstring &title, const RichTextList &list, Size size_hint);
+	WindowRichText (const std::wstring &title, const RichTextList &list, Size size_hint);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	DialogRichText (const std::wstring &title, RichTextList &&list, Size size_hint);
+	WindowRichText (const std::wstring &title, RichTextList &&list, Size size_hint);
 #endif
 	void ctor_finish ();
-	~DialogRichText ();
+	~WindowRichText ();
 
 	void redraw ();
-	void on_winch ();
 };
 
-DialogRichText::DialogRichText (const std::wstring &title, const RichTextList &lst, Size size_hint_)
-	: Dialog (0, title)
+WindowRichText::WindowRichText (const std::wstring &title, const RichTextList &lst, Size size_hint_)
+	: Window (0, title)
 	, text (*this, lst)
 	, size_hint (size_hint_)
 {
@@ -37,8 +36,8 @@ DialogRichText::DialogRichText (const std::wstring &title, const RichTextList &l
 }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-DialogRichText::DialogRichText (const std::wstring &title, RichTextList &&lst, Size size_hint_)
-	: Dialog (0, title)
+WindowRichText::WindowRichText (const std::wstring &title, RichTextList &&lst, Size size_hint_)
+	: Window (0, title)
 	, text (*this, std::forward <RichTextList> (lst))
 	, size_hint (size_hint_)
 {
@@ -46,7 +45,7 @@ DialogRichText::DialogRichText (const std::wstring &title, RichTextList &&lst, S
 }
 #endif
 
-void DialogRichText::ctor_finish ()
+void WindowRichText::ctor_finish ()
 {
 	// Continue with the c'tor
 	max_text_width = 0;
@@ -61,14 +60,14 @@ void DialogRichText::ctor_finish ()
 	register_hotkey (ESCAPE, sig_close);
 	register_hotkey (L'q', TIARY_STD_MOVE (sig_close));
 
-	DialogRichText::redraw ();
+	WindowRichText::redraw ();
 }
 
-DialogRichText::~DialogRichText ()
+WindowRichText::~WindowRichText ()
 {
 }
 
-void DialogRichText::redraw ()
+void WindowRichText::redraw ()
 {
 	Size ideal_size = size_hint;
 	if (ideal_size.x < max_text_width)
@@ -79,14 +78,9 @@ void DialogRichText::redraw ()
 	Size scrsize = get_screen_size ();
 	ideal_size &= scrsize;
 
-	Dialog::move_resize ((scrsize - ideal_size)/2, ideal_size);
+	Window::move_resize ((scrsize - ideal_size)/2, ideal_size);
 	text.move_resize (make_size (2, 1), ideal_size - make_size (4, 2));
-	Dialog::redraw ();
-}
-
-void DialogRichText::on_winch ()
-{
-	DialogRichText::redraw ();
+	Window::redraw ();
 }
 
 } // anonymous namespace
@@ -94,14 +88,14 @@ void DialogRichText::on_winch ()
 void dialog_richtext (const std::wstring &title, const RichTextList &list,
 		Size size_hint)
 {
-	DialogRichText (title, list, size_hint).event_loop ();
+	WindowRichText (title, list, size_hint).event_loop ();
 }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 void dialog_richtext (const std::wstring &title, RichTextList &&list,
 		Size size_hint)
 {
-	DialogRichText (title, std::forward <RichTextList> (list), size_hint).event_loop ();
+	WindowRichText (title, std::forward <RichTextList> (list), size_hint).event_loop ();
 }
 #endif
 

@@ -353,7 +353,7 @@ void MainCtrl::touch ()
 
 
 MainWin::MainWin (const std::wstring &initial_filename)
-	: ui::Dialog (ui::Dialog::DIALOG_NO_BORDER)
+	: ui::Window (ui::Window::WINDOW_NO_BORDER)
 	, menu_bar (*this)
 	, context_menu ()
 	, saved (true)
@@ -427,11 +427,6 @@ MainWin::~MainWin ()
 	std::for_each (entries.begin (), entries.end (), delete_fun <DiaryEntry> ());
 }
 
-void MainWin::on_winch ()
-{
-	MainWin::redraw ();
-}
-
 void MainWin::redraw ()
 {
 	ui::Size scrsize = ui::get_screen_size ();
@@ -439,7 +434,7 @@ void MainWin::redraw ()
 	move_resize (ui::make_size (), scrsize);
 	menu_bar.move_resize (ui::make_size (), ui::make_size (scrsize.x, 1));
 	main_ctrl.move_resize (ui::make_size (0, 1), scrsize - ui::make_size (0, 1));
-	Dialog::redraw ();
+	Window::redraw ();
 }
 
 namespace {

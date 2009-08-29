@@ -30,7 +30,7 @@ class TextBox : public Control, private Scroll
 {
 public:
 
-	explicit TextBox (Dialog &, unsigned attr = 0);
+	explicit TextBox (Window &, unsigned attr = 0);
 	~TextBox ();
 
 	bool on_key (wchar_t);

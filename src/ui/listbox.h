@@ -28,7 +28,7 @@ public:
 
 	typedef std::vector<std::wstring> ItemList;
 
-	explicit ListBox (Dialog &);
+	explicit ListBox (Window &);
 	~ListBox ();
 
 	size_t get_select () const; // -1 if none

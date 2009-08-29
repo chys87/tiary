@@ -15,13 +15,13 @@
 #include "ui/button.h"
 #include "ui/paletteid.h"
 #include "common/algorithm.h"
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "ui/button_default.h"
 
 namespace tiary {
 namespace ui {
 
-Button::Button (Dialog &dlg, const std::wstring &str)
+Button::Button (Window &dlg, const std::wstring &str)
 	: Control (dlg)
 	, text (str)
 	, attributes (0)

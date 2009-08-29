@@ -29,7 +29,7 @@ namespace {
 
 using namespace ui;
 
-class DialogTime : public FixedDialog, private ButtonDefault
+class WindowTime : public FixedWindow, private ButtonDefault
 {
 
 	Label lbl_weekday;
@@ -55,8 +55,8 @@ class DialogTime : public FixedDialog, private ButtonDefault
 	bool canceled;
 
 public:
-	explicit DialogTime (ReadableDateTime);
-	~DialogTime ();
+	explicit WindowTime (ReadableDateTime);
+	~WindowTime ();
 
 	bool get_canceled () const { return canceled; }
 	DateTime get_result () const;
@@ -99,9 +99,9 @@ const wchar_t num_names [][3] = {
 	L"50", L"51", L"52", L"53", L"54", L"55", L"56", L"57", L"58", L"59",
 };
 
-DialogTime::DialogTime (ReadableDateTime date_time)
-	: Dialog ()
-	, FixedDialog ()
+WindowTime::WindowTime (ReadableDateTime date_time)
+	: Window ()
+	, FixedWindow ()
 	, lbl_weekday (*this, std::wstring ())
 	, drp_month (*this, std::vector<std::wstring>(month_names, array_end(month_names)), date_time.m-1)
 	, drp_day (*this, std::vector<std::wstring>(day_names, array_end(day_names)), date_time.d-1)
@@ -127,7 +127,7 @@ DialogTime::DialogTime (ReadableDateTime date_time)
 
 	set_default_button (btn_ok);
 
-	FixedDialog::resize (make_size (26, 9));
+	FixedWindow::resize (make_size (26, 9));
 
 	layout_date.add
 		(lbl_weekday, 3, 3)
@@ -160,23 +160,23 @@ DialogTime::DialogTime (ReadableDateTime date_time)
 
 	layout_main.move_resize (make_size (2, 1), make_size (22, 7));
 
-	drp_month.sig_select_changed.connect (this, &DialogTime::slot_date_changed);
-	drp_day.sig_select_changed.connect (this, &DialogTime::slot_date_changed);
-	drp_year.sig_select_changed.connect (this, &DialogTime::slot_date_changed);
-	btn_now.sig_clicked.connect (this, &DialogTime::slot_now);
-	btn_ok.sig_clicked.connect (this, &DialogTime::slot_ok);
+	drp_month.sig_select_changed.connect (this, &WindowTime::slot_date_changed);
+	drp_day.sig_select_changed.connect (this, &WindowTime::slot_date_changed);
+	drp_year.sig_select_changed.connect (this, &WindowTime::slot_date_changed);
+	btn_now.sig_clicked.connect (this, &WindowTime::slot_now);
+	btn_ok.sig_clicked.connect (this, &WindowTime::slot_ok);
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
 
 	slot_date_changed ();
 
-	DialogTime::redraw ();
+	WindowTime::redraw ();
 }
 
-DialogTime::~DialogTime ()
+WindowTime::~WindowTime ()
 {
 }
 
-DateTime DialogTime::get_result () const
+DateTime WindowTime::get_result () const
 {
 	unsigned y = drp_year.get_select () + first_year;
 	unsigned m = drp_month.get_select () + 1;
@@ -187,7 +187,7 @@ DateTime DialogTime::get_result () const
 	return DateTime (y, m, d, H, M, S);
 }
 
-void DialogTime::slot_now ()
+void WindowTime::slot_now ()
 {
 	ReadableDateTime dt = DateTime (DateTime::LOCAL).extract ();
 	drp_year.set_select (dt.y - first_year, false);
@@ -198,13 +198,13 @@ void DialogTime::slot_now ()
 	drp_second.set_select (dt.S, false);
 }
 
-void DialogTime::slot_ok ()
+void WindowTime::slot_ok ()
 {
 	canceled = false;
 	request_close ();
 }
 
-void DialogTime::slot_date_changed ()
+void WindowTime::slot_date_changed ()
 {
 	DateTime dt = get_result ();
 	ReadableDateTime rdt = dt.extract ();
@@ -222,7 +222,7 @@ void DialogTime::slot_date_changed ()
 
 bool DiaryEntry::edit_time ()
 {
-	DialogTime win (local_time.extract ());
+	WindowTime win (local_time.extract ());
 	win.event_loop ();
 	if (win.get_canceled ())
 		return false;

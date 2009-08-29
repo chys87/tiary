@@ -44,7 +44,7 @@ public:
 	/**
 	 * @brief	Register a hotkey
 	 *
-	 * Tab and arrow keys are handled internally by tiary::ui::Dialog::on_key.
+	 * Tab and arrow keys are handled internally by tiary::ui::Window::on_key.
 	 *
 	 * Note that in dialogs, the currently focused control has the highest
 	 * priority for handling inputs. The hotkey signal is emitted

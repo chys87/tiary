@@ -14,7 +14,7 @@
 #ifndef TIARY_UI_BUTTON_DEFAULT_H
 #define TIARY_UI_BUTTON_DEFAULT_H
 
-#include "ui/dialog.h"
+#include "ui/window.h"
 #include "common/containers.h"
 
 namespace tiary {
@@ -24,7 +24,7 @@ class Control;
 class Button;
 
 /**
- * @brief	A class that helps deciding the default button of a Dialog
+ * @brief	A class that helps deciding the default button of a Window
  *
  * A "default button" is the one triggered when Enter is pressed, regardless
  * of focus.
@@ -32,7 +32,7 @@ class Button;
  * The default button may change depending on the current focus control
  */
 
-class ButtonDefault : public virtual Dialog
+class ButtonDefault : public virtual Window
 {
 public:
 	ButtonDefault ();

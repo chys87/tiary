@@ -36,7 +36,7 @@ namespace {
 
 using namespace ui;
 
-class DialogGlobalOptions : public FixedDialog, private ButtonDefault
+class WindowGlobalOptions : public FixedWindow, private ButtonDefault
 {
 
 	GlobalOptionGroup &options;
@@ -79,14 +79,14 @@ class DialogGlobalOptions : public FixedDialog, private ButtonDefault
 	void slot_help ();
 
 public:
-	DialogGlobalOptions (GlobalOptionGroup &options_);
-	~DialogGlobalOptions ();
+	WindowGlobalOptions (GlobalOptionGroup &options_);
+	~WindowGlobalOptions ();
 };
 
 const wchar_t expand_lines_array[][2] = { L"1", L"2", L"3", L"4", L"5", L"6", L"7", L"8" };
-DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
-	: Dialog (0, L"Preferences")
-	, FixedDialog ()
+WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_)
+	: Window (0, L"Preferences")
+	, FixedWindow ()
 	, options (options_)
 	, lbl_default_file (*this, L"Default &file:")
 	, btn_default_file (*this, L"Choose...")
@@ -109,7 +109,7 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 	, layout_buttons (HORIZONTAL)
 	, layout_main (VERTICAL)
 {
-	FixedDialog::resize (get_screen_size () & make_size (80, 15));
+	FixedWindow::resize (get_screen_size () & make_size (80, 15));
 
 	// Set up layout
 
@@ -180,15 +180,15 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 
 	lbl_default_file.sig_hotkey.connect (
 			TIARY_LIST_OF(Signal)
-				Signal (this, &Dialog::set_focus_ptr, &btn_default_file, 0),
+				Signal (this, &Window::set_focus_ptr, &btn_default_file, 0),
 				Signal (btn_default_file.sig_clicked, 0) // Connect to, not copy from
 			TIARY_LIST_OF_END
 			);
-	btn_default_file.sig_clicked.connect (this, &DialogGlobalOptions::slot_default_file);
-	btn_ok.sig_clicked.connect (this, &DialogGlobalOptions::slot_ok);
+	btn_default_file.sig_clicked.connect (this, &WindowGlobalOptions::slot_default_file);
+	btn_ok.sig_clicked.connect (this, &WindowGlobalOptions::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
-	btn_reset.sig_clicked.connect (this, &DialogGlobalOptions::slot_reset);
-	btn_help.sig_clicked.connect (this, &DialogGlobalOptions::slot_help);
+	btn_reset.sig_clicked.connect (this, &WindowGlobalOptions::slot_reset);
+	btn_help.sig_clicked.connect (this, &WindowGlobalOptions::slot_help);
 
 	set_default_button (btn_ok);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
@@ -196,14 +196,14 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 	// Copy existing option values to controls
 	copy_options_to_controls (options);
 
-	DialogGlobalOptions::redraw ();
+	WindowGlobalOptions::redraw ();
 }
 
-DialogGlobalOptions::~DialogGlobalOptions ()
+WindowGlobalOptions::~WindowGlobalOptions ()
 {
 }
 
-void DialogGlobalOptions::copy_options_to_controls (const GlobalOptionGroup &grp)
+void WindowGlobalOptions::copy_options_to_controls (const GlobalOptionGroup &grp)
 {
 	lbl_default_file_name.set_text (grp.get_wstring (GLOBAL_OPTION_DEFAULT_FILE), UIString::NO_HOTKEY);
 	drp_expand_lines.set_select (grp.get_num (GLOBAL_OPTION_EXPAND_LINES) - 1, false);
@@ -211,7 +211,7 @@ void DialogGlobalOptions::copy_options_to_controls (const GlobalOptionGroup &grp
 	txt_datetime_format.set_text (grp.get_wstring (GLOBAL_OPTION_DATETIME_FORMAT), false);
 }
 
-void DialogGlobalOptions::slot_default_file ()
+void WindowGlobalOptions::slot_default_file ()
 {
 	lbl_default_file_name.set_text(
 			get_full_pathname (
@@ -221,7 +221,7 @@ void DialogGlobalOptions::slot_default_file ()
 			UIString::NO_HOTKEY);
 }
 
-void DialogGlobalOptions::slot_ok ()
+void WindowGlobalOptions::slot_ok ()
 {
 	options.set (GLOBAL_OPTION_DEFAULT_FILE, lbl_default_file_name.get_text ());
 	options.set (GLOBAL_OPTION_EXPAND_LINES, unsigned (drp_expand_lines.get_select ())+1);
@@ -230,7 +230,7 @@ void DialogGlobalOptions::slot_ok ()
 	Window::request_close ();
 }
 
-void DialogGlobalOptions::slot_reset ()
+void WindowGlobalOptions::slot_reset ()
 {
 	if (ui::dialog_message (L"Do you really want to reset all settings to default?",
 				MESSAGE_YES|MESSAGE_NO) == MESSAGE_YES) {
@@ -260,7 +260,7 @@ Time format: This specifies how to display date/time.\n\
     Example: %b %d, %Y\n\
 ";
 
-void DialogGlobalOptions::slot_help ()
+void WindowGlobalOptions::slot_help ()
 {
 	dialog_message (help_info);
 }
@@ -271,7 +271,7 @@ void DialogGlobalOptions::slot_help ()
 
 void edit_options (GlobalOptionGroup &options)
 {
-	DialogGlobalOptions (options).event_loop ();
+	WindowGlobalOptions (options).event_loop ();
 }
 
 void edit_options (PerFileOptionGroup &)

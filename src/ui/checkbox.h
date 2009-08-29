@@ -23,7 +23,7 @@ namespace ui {
 class CheckBox : public Control
 {
 public:
-	explicit CheckBox (Dialog &, bool = false);
+	explicit CheckBox (Window &, bool = false);
 	~CheckBox ();
 
 	void set_status (bool, bool emit_signal = true);

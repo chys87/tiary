@@ -38,7 +38,7 @@ namespace ui {
 class Label : public UnfocusableControl
 {
 public:
-	Label (Dialog &, const std::wstring &, unsigned = 0 /**< UIString options */);
+	Label (Window &, const std::wstring &, unsigned = 0 /**< UIString options */);
 	~Label ();
 
 	void redraw ();

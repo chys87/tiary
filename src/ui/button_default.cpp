@@ -14,8 +14,8 @@ ButtonDefault::ButtonDefault ()
 	, special_map ()
 {
 	Signal sig_tmp (this, &ButtonDefault::slot_default_button);
-	Dialog::register_hotkey (RETURN, sig_tmp, Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
-	Dialog::register_hotkey (NEWLINE, TIARY_STD_MOVE (sig_tmp),
+	Window::register_hotkey (RETURN, sig_tmp, Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
+	Window::register_hotkey (NEWLINE, TIARY_STD_MOVE (sig_tmp),
 			Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
 }
 
@@ -31,7 +31,7 @@ void ButtonDefault::set_special_default_button (Control *focus, Button *btn)
 
 Button *ButtonDefault::get_current_default_button () const
 {
-	Control *focus = Dialog::get_focus ();
+	Control *focus = Window::get_focus ();
 	if (focus == 0)
 		return default_default;
 	if (Button *focus_button = dynamic_cast <Button *> (focus))

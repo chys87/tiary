@@ -18,7 +18,7 @@
  * @brief	Implements tiary::show_doc
  */
 
-// TODO: Use a Dialog instead of an external pager
+// TODO: Use a Window instead of an external pager
 
 #include "main/doc.h"
 #include "common/external.h"
