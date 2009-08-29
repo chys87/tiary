@@ -125,7 +125,7 @@ void WindowMessage::redraw ()
 	// Two spaces are left on each side of the window
 	unsigned width;
 
-	const unsigned ideal_width = 54;
+	const unsigned ideal_width = maxU (54, scr_size.x*2/3);
 	if (scr_size.x>ideal_width && lbl_text.get_max_text_width()>ideal_width &&
 		// First try not too wide.
 		// So that the box will seem better (if we only have a long single line)
