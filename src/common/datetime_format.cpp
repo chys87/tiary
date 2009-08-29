@@ -21,43 +21,38 @@ namespace tiary {
 namespace {
 
 template <typename T>
-T *to_string_2 (T *buffer, unsigned x)
+void to_string_2 (std::basic_string <T> &dst, unsigned x)
 {
-	buffer[0] = T('0') + (x/10)%10;
-	buffer[1] = T('0') + (x%10);
-	return buffer+2;
+	dst += T('0') + (x/10)%10;
+	dst += T('0') + (x%10);
 }
 
 template <typename T>
-T *to_string_4 (T *buffer, unsigned x)
+void to_string_4 (std::basic_string <T> &dst, unsigned x)
 {
-	buffer = to_string_2 (buffer, x/100);
-	buffer = to_string_2 (buffer, x);
-	return buffer;
-}
-
-inline char *strcpy_end (char *buffer, const char *s)
-{
-	return stpcpy (buffer, s);
-}
-
-wchar_t *strcpy_end (wchar_t *buffer, const char *s)
-{
-	while (*s)
-		*buffer++ = *s++;
-	return buffer;
+	to_string_2 (dst, x/100);
+	to_string_2 (dst, x);
 }
 
 const char weekday_name[] = "SunMonTueWedThuFriSat";
 
 template <typename T> inline
-T *fill_weekday_name (T *buffer, unsigned n)
+void fill_weekday_name (std::basic_string <T> &dst, unsigned n)
 {
 	const char *p = &weekday_name[n*3];
-	*buffer++ = T(*p++);
-	*buffer++ = T(*p++);
-	*buffer++ = T(*p++);
-	return buffer;
+	dst += T(*p++);
+	dst += T(*p++);
+	dst += T(*p++);
+}
+
+void append_str (std::string &dst, const char *str)
+{
+	dst += str;
+}
+
+void append_str (std::wstring &dst, const char *str)
+{
+	dst.append (str, strend (str));
 }
 
 const char full_weekday_name[][10] = {
@@ -71,21 +66,20 @@ const char full_weekday_name[][10] = {
 };
 
 template <typename T> inline
-T *fill_full_weekday_name (T *buffer, unsigned n)
+void fill_full_weekday_name (std::basic_string <T> &dst, unsigned n)
 {
-	return strcpy_end (buffer, full_weekday_name[n]);
+	append_str (dst, full_weekday_name[n]);
 }
 
 const char month_name[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
 template <typename T> inline
-T *fill_month_name (T *buffer, unsigned m)
+void fill_month_name (std::basic_string <T> &dst, unsigned m)
 {
 	const char *p = &month_name[m*3-3];
-	*buffer++ = T(*p++);
-	*buffer++ = T(*p++);
-	*buffer++ = T(*p++);
-	return buffer;
+	dst += T(*p++);
+	dst += T(*p++);
+	dst += T(*p++);
 }
 
 const char full_month_name[][10] = {
@@ -104,91 +98,88 @@ const char full_month_name[][10] = {
 };
 
 template <typename T> inline
-T *fill_full_month_name (T *buffer, unsigned m)
+void fill_full_month_name (std::basic_string <T> &dst, unsigned m)
 {
-	return strcpy_end (buffer, full_month_name[m-1]);
+	append_str (dst, full_month_name[m-1]);
 }
 
 template <typename T> inline
-std::basic_string<T> format_datetime (const DateTime &dt, const T *fmt)
+std::basic_string<T> format_time_impl (uint64_t v, const T *fmt)
 {
-	// FIXME: Directly write to a string object, barring any overflow potential
-	ReadableDateTime rdt = dt.extract ();
-	T *buffer = new T[strlen(fmt)*5+1];
-	T *q = buffer;
+	ReadableDateTime rdt = extract_time (v);
+	std::basic_string<T> ret;
+	ret.reserve (strlen (fmt)*2);
 	while (const T *p = strchr (fmt, T('%'))) {
 		if (p[1] == T('\0'))
 			break;
-		q = (T*) mempcpy (q, fmt, uintptr_t(p) - uintptr_t(fmt));
+		ret.append (fmt, p);
 		fmt = p+2;
 		switch (p[1]) {
 			default:
 			case T('%'):
-				*q++ = p[1];
+				ret += p[1];
 				break;
 			case T('Y'):
-				q = to_string_4 (q, rdt.y);
+				to_string_4 (ret, rdt.y);
 				break;
 			case T('y'):
-				q = to_string_2 (q, rdt.y);
+				to_string_2 (ret, rdt.y);
 				break;
 			case T('m'):
-				q = to_string_2 (q, rdt.m);
+				to_string_2 (ret, rdt.m);
 				break;
 			case T('d'):
-				q = to_string_2 (q, rdt.d);
+				to_string_2 (ret, rdt.d);
 				break;
 			case T('b'):
-				q = fill_month_name (q, rdt.m);
+				fill_month_name (ret, rdt.m);
 				break;
 			case T('w'):
-				q = fill_weekday_name (q, rdt.w);
+				fill_weekday_name (ret, rdt.w);
 				break;
 			case T('B'):
-				q = fill_full_month_name (q, rdt.m);
+				fill_full_month_name (ret, rdt.m);
 				break;
 			case T('W'):
-				q = fill_full_weekday_name (q, rdt.w);
+				fill_full_weekday_name (ret, rdt.w);
 				break;
 			case T('H'):
-				q = to_string_2 (q, rdt.H);
+				to_string_2 (ret, rdt.H);
 				break;
 			case T('h'):
-				q = to_string_2 (q, (rdt.H+11)%12+1);
+				to_string_2 (ret, (rdt.H+11)%12+1);
 				break;
 			case T('M'):
-				q = to_string_2 (q, rdt.S);
+				to_string_2 (ret, rdt.S);
 				break;
 			case T('S'):
-				q = to_string_2 (q, rdt.S);
+				to_string_2 (ret, rdt.S);
 				break;
 			case T('P'):
-				*q++ = (rdt.H < 12) ? T('A') : T('P');
-				*q++ = T('M');
+				ret += (rdt.H < 12) ? T('A') : T('P');
+				ret += T('M');
 				break;
 			case T('p'):
-				*q++ = (rdt.H < 12) ? T('a') : T('p');
-				*q++ = T('m');
+				ret += (rdt.H < 12) ? T('a') : T('p');
+				ret += T('m');
 				break;
 		}
 	}
-	q = stpcpy (q, fmt);
-	std::basic_string<T> ret (buffer, q);
-	delete [] buffer;
+	ret += fmt;
 	return ret;
 }
 
 
 } // anonymous namespace
 
-std::string DateTime::format (const char *fmtstr) const
+std::string format_time (uint64_t val, const char *fmtstr)
 {
-	return format_datetime (*this, fmtstr);
+	return format_time_impl (val, fmtstr);
 }
 
-std::wstring DateTime::format (const wchar_t *fmtstr) const
+std::wstring format_time (uint64_t val, const wchar_t *fmtstr)
 {
-	return format_datetime (*this, fmtstr);
+	return format_time_impl (val, fmtstr);
 }
 
 

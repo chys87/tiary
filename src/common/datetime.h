@@ -54,6 +54,25 @@ ReadableDateTime extract_time (uint64_t) throw ();
 void extract_time (uint64_t v, unsigned *y, unsigned *m, unsigned *d, unsigned *H, unsigned *M, unsigned *S, unsigned *w) throw ();
 unsigned extract_time_weekday (uint64_t) throw ();
 
+/*
+ * %Y	4-digit year (1989)
+ * %y	2-digit year (89)
+ * %m	2-digit month (06)
+ * %d	2-digit day (04)
+ * %b	3-character month (Jun)
+ * %w	3-character weekday (Sun)
+ * %B	Full month (June)
+ * %W	Full weekday (July)
+ * %H	2-digit hour (0-24) (03)
+ * %h	2-digit hour (1-12) (03)
+ * %M	2-digit minute (20)
+ * %S	2-digit second (00)
+ * %P	2-character AM/PM (AM)
+ * %p	2-character am/pm (am)
+ */
+std::string format_time (uint64_t, const char *format);
+std::wstring format_time (uint64_t, const wchar_t *format);
+
 
 /**
  * @brief	A OO wrapper of date-time
@@ -87,24 +106,8 @@ struct DateTime
 	}
 	unsigned extract_weekday () const /* 0 = Sun, 1 = Mon, ... */ { return extract_time_weekday (v); }
 
-	/*
-	 * %Y	4-digit year (1989)
-	 * %y	2-digit year (89)
-	 * %m	2-digit month (06)
-	 * %d	2-digit day (04)
-	 * %b	3-character month (Jun)
-	 * %w	3-character weekday (Sun)
-	 * %B	Full month (June)
-	 * %W	Full weekday (July)
-	 * %H	2-digit hour (0-24) (03)
-	 * %h	2-digit hour (1-12) (03)
-	 * %M	2-digit minute (20)
-	 * %S	2-digit second (00)
-	 * %P	2-character AM/PM (AM)
-	 * %p	2-character am/pm (am)
-	 */
-	std::string format (const char *) const;
-	std::wstring format (const wchar_t *) const;
+	std::string format (const char *format) const { return format_time (v, format); }
+	std::wstring format (const wchar_t *format) const { return format_time (v, format); }
 };
 
 inline bool operator == (const DateTime &a, const DateTime &b) { return a.v == b.v; }
