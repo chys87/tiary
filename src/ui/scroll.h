@@ -77,6 +77,7 @@ public:
 	void modify_focus_pos (unsigned); // Change cursor position by screen coordinate
 	void modify_height (unsigned);    // Change screen height. Caller's responsibility to make sure height >= max possible single item height
 	void modify_number (unsigned);    // Change the total number of items. accumulate_height is recalculated
+	void scroll_focus_to_first ();    // Scroll to make the focus the first one
 	// Three special cases: accumulate_height is not totally recalculated.
 	// Like pressing the Delete key
 	void modify_number_delete ();

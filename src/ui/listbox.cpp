@@ -59,11 +59,13 @@ void ListBox::set_items (ItemList &&new_items, size_t new_select, bool emit_sign
 }
 #endif
 
-void ListBox::set_select (size_t new_select, bool emit_signal)
+void ListBox::set_select (size_t new_select, bool emit_signal, bool scroll_to_top)
 {
 	if (new_select < items.size ()) {
 		select_any = true;
 		Scroll::modify_focus (new_select);
+		if (scroll_to_top)
+			Scroll::scroll_focus_to_first ();
 	} else {
 		select_any = false;
 	}
@@ -158,19 +160,26 @@ bool ListBox::on_key (wchar_t key)
 bool ListBox::on_mouse (MouseEvent mouse_event)
 {
 	size_t new_focus;
+	bool focus_to_first = false;
 	// Right click: Deselect all
 	if (mouse_event.m & (RIGHT_CLICK|RIGHT_PRESS))
 		new_focus = size_t(-1);
 	else if (mouse_event.m & (LEFT_CLICK|LEFT_PRESS|LEFT_DCLICK)) {
-		Scroll::Info info = Scroll::get_info ();
-		if (mouse_event.p.y >= info.len)
-			new_focus = size_t(-1);
-		else
-			new_focus = mouse_event.p.y + info.first;
+		if (mouse_event.p.x + 1 >= get_size().x) {
+			// Clicked on the scroll bar
+			new_focus = mouse_event.p.y * items.size () / get_size ().y;
+			focus_to_first = true;
+		} else {
+			Scroll::Info info = Scroll::get_info ();
+			if (mouse_event.p.y >= info.len)
+				new_focus = size_t(-1);
+			else
+				new_focus = mouse_event.p.y + info.first;
+		}
 	} else
 		return false;
-	set_select (new_focus);
-	if (new_focus < items.size () && (mouse_event.m & LEFT_DCLICK))
+	set_select (new_focus, true, focus_to_first);
+	if (new_focus < items.size () && (mouse_event.m & LEFT_DCLICK) && mouse_event.p.x+1 < get_size().x)
 		sig_double_clicked.emit ();
 	return true;
 }
@@ -195,6 +204,10 @@ void ListBox::on_move_resize (Size old_pos, Size old_size)
 
 void ListBox::redraw ()
 {
+	unsigned disp_wid = get_size().x - 1; // Reserve one for scrollbar
+	unsigned disp_hgt = get_size().y;
+	if (disp_wid==0 || disp_hgt==0)
+		return;
 	choose_palette (PALETTE_ID_LISTBOX);
 	clear ();
 	const Scroll::Info info = Scroll::get_info ();
@@ -204,21 +217,35 @@ void ListBox::redraw ()
 		Size pos = make_size (0, i);
 		unsigned strwid = ucs_width (str);
 		// Are we going to overflow?
-		if (strwid <= get_size().x) {
+		if (strwid <= disp_wid) {
 			//NO:
 			pos = put (pos, str);
 			if (select_any && i==info.focus_pos) // Focus? Highlight the whole line
-				clear (pos, make_size (get_size().x - pos.x, 1));
+				clear (pos, make_size (disp_wid - pos.x, 1));
 		} else {
 			// YES: Cannot display all
-			size_t display_wchars = max_chars_in_width (str, maxS (get_size().x - 4, 0));
+			size_t display_wchars = max_chars_in_width (str, maxS (disp_wid - 4, 0));
 			put (pos, str.c_str (), display_wchars);
 			choose_palette (PALETTE_ID_LISTBOX);
-			pos = put (make_size (maxS(get_size().x-4,0),i), L' ');
+			pos = put (make_size (maxS(disp_wid-4,0),i), L' ');
 			attribute_on (REVERSE);
 			pos = put (pos, L"...");
 		}
 	}
+	// Display the scroll bar
+	choose_palette (PALETTE_ID_LISTBOX);
+	clear (make_size (disp_wid,0), make_size (1, disp_hgt));
+	unsigned bar_start, bar_hgt;
+	if (items.empty ()) {
+		bar_start = 0;
+		bar_hgt = disp_hgt;
+	} else {
+		bar_start = info.first * disp_hgt / items.size ();
+		bar_hgt = (info.first + info.len) * disp_hgt / items.size () - bar_start;
+	}
+	attribute_on (REVERSE);
+	clear (make_size (disp_wid,bar_start), make_size (1, bar_hgt));
+
 	move_cursor (make_size (0, info.focus_pos));
 }
 

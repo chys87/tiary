@@ -39,7 +39,7 @@ public:
 	void set_items (ItemList &&, size_t = size_t(-1), bool emit_signal = true);
 #endif
 
-	void set_select (size_t /* -1 = none */, bool emit_signal = true);
+	void set_select (size_t /* -1 = none */, bool emit_signal = true, bool scroll_to_top = false);
 
 	// Interfaces for ancesters
 	bool on_key (wchar_t);

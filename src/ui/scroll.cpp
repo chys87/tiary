@@ -114,6 +114,12 @@ void Scroll::modify_number (unsigned new_number)
 	recalculate_len ();
 }
 
+void Scroll::scroll_focus_to_first ()
+{
+	first = focus;
+	recalculate_len ();
+}
+
 void Scroll::modify_number_delete ()
 {
 	if (focus >= number)
