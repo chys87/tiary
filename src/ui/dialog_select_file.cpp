@@ -212,24 +212,26 @@ void DialogSelectFile::slot_refresh ()
 	slot_input ();
 }
 
-struct FilterDots : public UnaryCallback<const DirEnt<wchar_t> &, bool>
+struct FilterDots : public UnaryCallback<const DirEnt &, bool>
 {
 	bool is_root;
 	bool show_hidden;
 	explicit FilterDots (bool is_root_, bool show_hidden_) : is_root (is_root_), show_hidden (show_hidden_) {}
-	bool operator () (const DirEnt<wchar_t> &ent) const
-	{
-		const std::wstring &name = ent.name;
-		if (name[0] == L'.') {
-			if (name.length() == 1)
-				return true;
-			if (name.length() == 2 && name[1] == L'.')
-				return is_root;
-			return !show_hidden;
-		}
-		return false;
-	}
+	bool operator () (const DirEnt &ent) const;
 };
+
+bool FilterDots::operator () (const DirEnt &ent) const
+{
+	const std::wstring &name = ent.name;
+	if (name[0] == L'.') {
+		if (name.length() == 1)
+			return true;
+		if (name.length() == 2 && name[1] == L'.')
+			return is_root;
+		return !show_hidden;
+	}
+	return false;
+}
 
 void DialogSelectFile::set_text (const std::wstring &newname, bool rewrite_input_box)
 {
@@ -242,16 +244,15 @@ void DialogSelectFile::set_text (const std::wstring &newname, bool rewrite_input
 	if (list_dir != split_fullname.first) {
 		list_dir = split_fullname.first;
 		// Refresh items in list_files
-		std::list<DirEnt<wchar_t> > files = tiary::list_dir (list_dir, FilterDots(list_dir == L"/", check_hidden_files.get_status ()));
+		DirEntList files = tiary::list_dir (list_dir, FilterDots(list_dir == L"/", check_hidden_files.get_status ()));
 		ListBox::ItemList display_list;
 		display_list.reserve (files.size ());
-		for (std::list<DirEnt<wchar_t> >::const_iterator it = files.begin();
+		for (DirEntList::iterator it = files.begin();
 				it != files.end();
 				++it) {
-			std::wstring name = it->name;
 			if (it->attr & FILE_ATTR_DIRECTORY)
-				name += L'/';
-			display_list.push_back (name);
+				it->name += L'/';
+			display_list.push_back (it->name);
 		}
 		list_files.set_items (TIARY_STD_MOVE (display_list), size_t(-1), false);
 	}

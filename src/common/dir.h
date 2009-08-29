@@ -64,18 +64,14 @@ std::wstring get_full_pathname (const std::wstring &);
 /**
  * @brief	Replaces home dir name with "~"
  */
-template <typename ChT> std::basic_string<ChT> home_fold_pathname (const std::basic_string <ChT> &);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-template <typename ChT> std::basic_string<ChT> home_fold_pathname (std::basic_string <ChT> &&);
-#endif
+std::string home_fold_pathname (const std::string &);
+std::wstring home_fold_pathname (const std::wstring &);
 
 /**
  * @brief	Expands "~" and "~user" with actual dir names
  */
-template <typename ChT> std::basic_string<ChT> home_expand_pathname (const std::basic_string <ChT> &);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-template <typename ChT> std::basic_string<ChT> home_expand_pathname (std::basic_string <ChT> &&);
-#endif
+std::string home_expand_pathname (const std::string &);
+std::wstring home_expand_pathname (const std::wstring &);
 
 /**
  * @brief	Return the "nice" name of the argument
@@ -83,8 +79,11 @@ template <typename ChT> std::basic_string<ChT> home_expand_pathname (std::basic_
  * It may be absolute or starting with "~" or relative,
  * whichever is "nicer" (shorter and/or easier to read)
  */
-template <typename ChT> std::basic_string<ChT> get_nice_pathname (const ChT *);
-template <typename ChT> std::basic_string<ChT> get_nice_pathname (const std::basic_string <ChT> &);
+std::string get_nice_pathname (const std::string &);
+std::wstring get_nice_pathname (const std::wstring &);
+
+
+
 
 const unsigned FILE_ATTR_DIRECTORY = 1;
 const unsigned FILE_ATTR_NONEXIST  = 0x8000u;
@@ -102,28 +101,29 @@ inline unsigned get_file_attr (const std::wstring &s) { return get_file_attr (s.
 /**
  * @brief	Split a full pathname to directory name and basename
  */
-template <typename ChT>
-std::pair<std::basic_string<ChT>,std::basic_string<ChT> > split_pathname (const std::basic_string<ChT> &, bool canonicalize = false);
+std::pair<std::string,std::string> split_pathname (const std::string &, bool canonicalize = false);
+std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &, bool canonicalize = false);
 
 /**
  * @brief	Combine a directory name and basename to a full name
  */
-template <typename ChT>
-std::basic_string<ChT> combine_pathname (const std::basic_string <ChT> &, const std::basic_string <ChT> &);
+std::string combine_pathname (const std::string &, const std::string &);
+std::wstring combine_pathname (const std::wstring &, const std::wstring &);
 
-template <typename ChT>
 struct DirEnt
 {
-	std::basic_string<ChT> name; ///< "Bare" filename (without path)
+	std::wstring name; ///< "Bare" filename (without path)
 	unsigned attr; ///< Attribute. Currently only supports FIILE_ATTR_DIRECTORY
 
-	class DefaultComparator : public BinaryCallback<const DirEnt<ChT> &, const DirEnt<ChT> &, bool>
+	class DefaultComparator : public BinaryCallback<const DirEnt &, const DirEnt &, bool>
 	{
 		std::locale loc;
 	public:
-		bool operator () (const DirEnt<ChT> &, const DirEnt<ChT> &) const;
+		bool operator () (const DirEnt &, const DirEnt &) const;
 	};
 };
+
+typedef std::list<DirEnt> DirEntList;
 
 /**
  * @brief	List all files/directories in a directory
@@ -131,22 +131,12 @@ struct DirEnt
  * By default, all items (include . and ..) are included. Strings are compared
  * using std::locale (equivalently, strcoll)
  */
-template <typename ChT> std::list<DirEnt<ChT> > list_dir (const ChT *dir, ///< Dir name
-		const UnaryCallback <const DirEnt<ChT> &, bool> &
-			= ConstantUnaryCallback<const DirEnt<ChT> &, bool, false> (), ///< A callback function to filter out unwanted items
-		const BinaryCallback <const DirEnt<ChT> &, const DirEnt<ChT> &, bool> &
-			= typename DirEnt<ChT>::DefaultComparator () ///< A callback function to compare two items (less_than semantics)
+DirEntList list_dir (const std::wstring &dir, ///< Dir name
+		const UnaryCallback <const DirEnt &, bool> &filter
+			= ConstantUnaryCallback<const DirEnt &, bool, false> (), ///< A callback function to filter out unwanted items
+		const BinaryCallback <const DirEnt &, const DirEnt &, bool> &comp
+			= DirEnt::DefaultComparator () ///< A callback function to compare two items (less_than semantics)
 		);
-
-template <typename ChT> std::list<DirEnt<ChT> > list_dir (const std::basic_string<ChT> &dir, ///< Dir name
-		const UnaryCallback <const DirEnt<ChT> &, bool> &filter
-			= ConstantUnaryCallback<const DirEnt<ChT> &, bool, false> (), ///< A callback function to filter out unwanted items
-		const BinaryCallback <const DirEnt<ChT> &, const DirEnt<ChT> &, bool> &comp
-			= typename DirEnt<ChT>::DefaultComparator () ///< A callback function to compare two items (less_than semantics)
-		)
-{
-	return list_dir (dir.c_str (), filter, comp);
-}
 
 
 
