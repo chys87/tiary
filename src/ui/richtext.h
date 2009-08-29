@@ -32,7 +32,8 @@ namespace ui {
 /**
  * @brief	A control for displaying "RichText"
  *
- * This control displays "rich text", i.e., allowing .
+ * This control displays "rich text", i.e., allowing setting
+ * a different PaletteID for each line.
  *
  * No automatic line wrap.
  *
@@ -52,6 +53,7 @@ public:
 	~RichText ();
 
 	void redraw ();
+	bool on_mouse (MouseEvent); // For scroll bar only
 	void on_move_resize (Size, Size);
 	bool on_key (wchar_t);
 

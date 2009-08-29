@@ -36,8 +36,10 @@ RichText::~RichText ()
 
 void RichText::redraw ()
 {
-	unsigned wid = get_size ().x;
+	unsigned wid = get_size ().x - 1;
 	unsigned hgt = get_size ().y - 1;
+	if (int (wid) < 0 || int (hgt) < 0)
+		return;
 	LineList::const_iterator it = line_list.begin () + top_line;
 	unsigned show_lines = minU (hgt, line_list.size () - top_line);
 	for (unsigned i=0; i<show_lines; ++it,++i) {
@@ -50,11 +52,28 @@ void RichText::redraw ()
 		choose_palette (PALETTE_ID_RICHTEXT);
 		clear (make_size (0, show_lines), make_size (wid, hgt - show_lines));
 	}
+	// Status bar
 	choose_palette (PALETTE_ID_BACKGROUND);
 	put (make_size (0, hgt),
 			format (L"Lines %a-%b/%c                      ") << top_line+1 << top_line+show_lines
 				<< unsigned (line_list.size ())
 			);
+	// Scroll bar
+	clear (make_size (wid, 0), make_size (1, hgt+1));
+	unsigned bar_start = top_line * hgt / line_list.size ();
+	unsigned bar_height = (top_line + show_lines) * hgt / line_list.size () - bar_start;
+	attribute_on (REVERSE);
+	clear (make_size (wid, bar_start), make_size (1, bar_height));
+}
+
+bool RichText::on_mouse (MouseEvent mouse_event)
+{
+	if (!(mouse_event.m & (LEFT_CLICK|LEFT_PRESS|LEFT_DCLICK)) ||
+			(mouse_event.p.x+1 < get_size().x))
+		return false;
+	top_line = mouse_event.p.y * line_list.size () / (get_size ().y - 1);
+	RichText::redraw ();
+	return true;
 }
 
 void RichText::on_move_resize (Size oldpos, Size oldsize)
