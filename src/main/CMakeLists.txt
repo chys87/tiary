@@ -5,8 +5,6 @@ add_library(tiary_main
 	dialog_labels.cpp
 	dialog_pref.h
 	dialog_pref.cpp
-	dialog_search.h
-	dialog_search.cpp
 	doc.h
 	doc.cpp
 	mainui.h

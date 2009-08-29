@@ -120,6 +120,12 @@ void Scroll::scroll_focus_to_first ()
 	recalculate_len ();
 }
 
+void Scroll::scroll_focus_to_last ()
+{
+	put_focus_last_line ();
+	recalculate_len ();
+}
+
 void Scroll::modify_number_delete ()
 {
 	if (focus >= number)

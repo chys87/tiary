@@ -14,6 +14,8 @@ add_library(tiary_ui
 	dialog_message.cpp
 	dialog_richtext.h
 	dialog_richtext.cpp
+	dialog_search.h
+	dialog_search.cpp
 	dialog_select_file.h
 	dialog_select_file.cpp
 	direction.h
@@ -44,6 +46,8 @@ add_library(tiary_ui
 	richtextlist.cpp
 	scroll.h
 	scroll.cpp
+	search_info.h
+	search_info.cpp
 	size.h
 	terminal_emulator.h
 	terminal_emulator.cpp

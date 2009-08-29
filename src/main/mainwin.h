@@ -19,6 +19,7 @@
 #include "ui/control.h"
 #include "ui/scroll.h"
 #include "ui/menubar.h"
+#include "ui/search_info.h"
 #include "diary/config.h"
 #include <vector>
 #include <string>
@@ -85,9 +86,7 @@ private:
 	// main_ctrl must be after other members, which they use in its constructor
 	MainCtrl main_ctrl;
 
-	std::wstring last_search_text; ///< The text of last search
-	bool last_search_backward; ///< The direction of last search. false = backward
-	bool last_search_regex; ///< Whether regex was used in the last search
+	ui::SearchInfo last_search; ///< Remember what we last searched for
 
 	// If successful, set current_filename
 	// If failed, reset everything

@@ -17,6 +17,7 @@
 #include "ui/dialog_message.h"
 #include "ui/dialog_select_file.h"
 #include "ui/dialog_input.h"
+#include "ui/search_info.h"
 #include "common/unicode.h"
 #include "common/format.h"
 #include "diary/file.h"
@@ -26,8 +27,6 @@
 #include "common/datetime.h"
 #include "common/algorithm.h"
 #include "main/doc.h"
-#include "main/dialog_search.h"
-#include "common/pcre.h"
 #include "main/dialog_pref.h"
 #include "main/dialog_labels.h"
 #include "main/dialog_all_labels.h"
@@ -358,8 +357,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	, context_menu ()
 	, saved (true)
 	, main_ctrl (*this)
-	, last_search_backward (false)
-	, last_search_regex (false)
+	, last_search ()
 {
 	menu_bar.add (L"&File")
 		(L"&New            Ctrl+N", Signal (this, &MainWin::new_file))
@@ -704,22 +702,16 @@ void MainWin::search (bool bkwd)
 {
 	if (entries.empty ())
 		return;
-	std::wstring search_text;
-	bool search_backward;
-	bool search_regex;
-	dialog_search (search_text, search_backward, search_regex,
-			last_search_text, bkwd, last_search_regex);
-	if (!search_text.empty ()) {
-		last_search_text.swap (search_text);
-		last_search_backward = search_backward;
-		last_search_regex = search_regex;
-		do_search (search_backward, true);
-	}
+	if (last_search.dialog (bkwd))
+		do_search (last_search.get_backward (), true);
 }
 
 void MainWin::search_continue (bool bkwd)
 {
-	do_search (bkwd, false);
+	if (!last_search)
+		search (bkwd);
+	else
+		do_search (bkwd, false);
 }
 
 void MainWin::do_search (bool bkwd, bool include_current_entry)
@@ -727,35 +719,17 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 	unsigned num_ents = entries.size ();
 	if (num_ents == 0)
 		return;
-	if (last_search_text.empty ())
+	if (!last_search)
 		return;
 	unsigned k = main_ctrl.current_focus ();
-	int inc = (!bkwd == !last_search_backward) ? 1 : -1;
+	int inc = (!bkwd == !last_search.get_backward ()) ? 1 : -1;
 	if (!include_current_entry)
 		k += inc;
 	if (k < num_ents) {
-#ifdef TIARY_USE_PCRE
-		if (last_search_regex) {
-			PcRe regex_obj (last_search_text);
-			if (!regex_obj) {
-				ui::dialog_message (L"Invalid regular expression");
+		for (; k < num_ents; k += inc) {
+			if (last_search.match (entries[k]->title) || last_search.match (entries[k]->text)) {
+				main_ctrl.set_focus (k);
 				return;
-			}
-			for (; k < num_ents; k += inc) {
-				if (regex_obj.match (entries[k]->title) || regex_obj.match (entries[k]->text)) {
-					main_ctrl.set_focus (k);
-					return;
-				}
-			}
-		} else
-#endif
-		{
-			for (; k < num_ents; k += inc) {
-				if (find_caseless (entries[k]->title, last_search_text) != std::wstring::npos ||
-						find_caseless (entries[k]->text, last_search_text) != std::wstring::npos) {
-					main_ctrl.set_focus (k);
-					return;
-				}
 			}
 		}
 	}

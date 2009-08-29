@@ -12,7 +12,7 @@
  **************************************************************************/
 
 
-#include "main/dialog_search.h"
+#include "ui/dialog_search.h"
 #include "ui/fixed_dialog.h"
 #include "ui/textbox.h"
 #include "ui/button.h"
@@ -24,11 +24,9 @@
 
 
 namespace tiary {
-
+namespace ui {
 
 namespace {
-
-using namespace tiary::ui;
 
 class WindowSearch : public FixedWindow, private ButtonDefault
 {
@@ -73,6 +71,12 @@ WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 	, o_bkwd (o_bkwd_)
 	, o_regex (o_regex_)
 {
+	box_input.set_text (text, false, text.size ());
+	chk_backward.set_status (bkwd, false);
+#ifdef TIARY_USE_PCRE
+	chk_regex.set_status (regex, false);
+#endif
+
 	FixedWindow::resize (make_size (40, 7));
 	box_input.move_resize (make_size (2, 1), make_size (36, 1));
 	chk_backward.move_resize (make_size (2, 3), make_size (3, 1));
@@ -144,5 +148,5 @@ void dialog_search (std::wstring &o_text, bool &o_bkwd, bool &o_regex,
 	WindowSearch (o_text, o_bkwd, o_regex, text, bkwd, regex).event_loop ();
 }
 
-
+} // namespace tiary::ui
 } // namespace tiary

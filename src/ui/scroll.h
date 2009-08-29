@@ -78,6 +78,7 @@ public:
 	void modify_height (unsigned);    // Change screen height. Caller's responsibility to make sure height >= max possible single item height
 	void modify_number (unsigned);    // Change the total number of items. accumulate_height is recalculated
 	void scroll_focus_to_first ();    // Scroll to make the focus the first one
+	void scroll_focus_to_last ();     // Scroll to make the focus the last one on screen
 	// Three special cases: accumulate_height is not totally recalculated.
 	// Like pressing the Delete key
 	void modify_number_delete ();

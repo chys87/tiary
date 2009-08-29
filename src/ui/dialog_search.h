@@ -12,12 +12,13 @@
  **************************************************************************/
 
 
-#ifndef TIARY_MAIN_DIALOG_SEARCH_H
-#define TIARY_MAIN_DIALOG_SEARCH_H
+#ifndef TIARY_UI_DIALOG_SEARCH_H
+#define TIARY_UI_DIALOG_SEARCH_H
 
 #include <string>
 
 namespace tiary {
+namespace ui {
 
 
 void dialog_search (
@@ -31,7 +32,7 @@ void dialog_search (
 
 
 
-
+} // namespace tiary::ui
 } // namespace tiary
 
 #endif // include gaurd
