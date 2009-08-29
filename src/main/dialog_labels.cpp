@@ -62,8 +62,6 @@ public:
 
 	void slot_add ();
 	void slot_ok ();
-
-	static void refresh_list (ListBox &lst_box, const WStringLocaleOrderedSet &labels, const std::wstring &selection);
 };
 
 DialogLabels::DialogLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_)
