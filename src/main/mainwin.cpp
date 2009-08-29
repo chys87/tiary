@@ -65,11 +65,8 @@ bool MainCtrl::on_key (wchar_t key)
 			return true;
 
 		case L'l':
-			w().edit_labels_current ();
-			return true;
-
 		case L'L':
-			w().edit_labels_current_expert ();
+			w().edit_labels_current ();
 			return true;
 
 		case L'd':
@@ -378,7 +375,6 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		()
 		(L"&Edit",                  Signal (this, &MainWin::edit_current))
 		(L"Edit &labels...",        Signal (this, &MainWin::edit_labels_current))
-		(L"Edit labels (&quick)...",Signal (this, &MainWin::edit_labels_current_expert))
 		(L"Edit t&ime...",          Signal (this, &MainWin::edit_time_current))
 		()
 		(L"&View",                  Signal (this, &MainWin::view_current))
@@ -569,14 +565,6 @@ void MainWin::edit_labels_current ()
 {
 	if (DiaryEntry *ent = get_current ()) {
 		if (edit_labels (ent->labels, entries))
-			main_ctrl.touch ();
-	}
-}
-
-void MainWin::edit_labels_current_expert ()
-{
-	if (DiaryEntry *ent = get_current ()) {
-		if (ent->edit_labels ())
 			main_ctrl.touch ();
 	}
 }

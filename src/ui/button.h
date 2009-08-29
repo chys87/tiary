@@ -37,11 +37,6 @@ public:
 	void on_focus_changed ();
 	void redraw ();
 
-	static const unsigned DEFAULT_BUTTON = 1;
-	static const unsigned ESCAPE_BUTTON  = 2;
-
-	void set_attribute (unsigned);
-
 private:
 	UIStringOne text;
 	unsigned attributes;

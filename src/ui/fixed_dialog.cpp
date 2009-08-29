@@ -28,21 +28,6 @@ Size calculate_pos (Size size)
 
 } // anonymous namespace
 
-FixedDialog::FixedDialog (unsigned options, const std::wstring &title)
-	: Dialog (options, title)
-{
-}
-
-FixedDialog::FixedDialog (Size size, unsigned options, const std::wstring &title)
-	: Dialog (options, title)
-{
-	resize (size);
-}
-
-FixedDialog::~FixedDialog ()
-{
-}
-
 void FixedDialog::resize (Size newsize)
 {
 	move_resize (calculate_pos (newsize), newsize);

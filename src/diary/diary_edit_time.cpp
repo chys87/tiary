@@ -17,6 +17,7 @@
 #include "ui/droplist.h"
 #include "ui/label.h"
 #include "ui/button.h"
+#include "ui/button_default.h"
 #include "ui/chain.h"
 #include "ui/layout.h"
 #include "common/datetime.h"
@@ -28,7 +29,7 @@ namespace {
 
 using namespace ui;
 
-class DialogTime : public FixedDialog
+class DialogTime : public FixedDialog, private ButtonDefault
 {
 
 	Label lbl_weekday;
@@ -99,7 +100,8 @@ const wchar_t num_names [][3] = {
 };
 
 DialogTime::DialogTime (ReadableDateTime date_time)
-	: FixedDialog ()
+	: Dialog ()
+	, FixedDialog ()
 	, lbl_weekday (*this, std::wstring ())
 	, drp_month (*this, std::vector<std::wstring>(month_names, array_end(month_names)), date_time.m-1)
 	, drp_day (*this, std::vector<std::wstring>(day_names, array_end(day_names)), date_time.d-1)
@@ -123,7 +125,7 @@ DialogTime::DialogTime (ReadableDateTime date_time)
 
 	btn_now.ctrl_up = btn_ok.ctrl_up = &drp_hour;
 
-	btn_ok.set_attribute (Button::DEFAULT_BUTTON);
+	set_default_button (btn_ok);
 
 	FixedDialog::resize (make_size (26, 9));
 

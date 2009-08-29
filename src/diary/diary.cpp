@@ -219,21 +219,6 @@ bool DiaryEntry::edit (const char *editor)
 	return true;
 }
 
-bool DiaryEntry::edit_labels ()
-{
-	std::wstring labelstr = join (labels.begin (), labels.end (), L", ");
-	std::wstring newlabelstr = ui::dialog_input2 (L"Labels", std::wstring (), labelstr, 30, 0, labelstr);
-	if (newlabelstr == labelstr)
-		return false;
-	std::list<std::wstring> labels_list = split_string (newlabelstr, L',');
-	std::for_each (labels_list.begin (), labels_list.end (), (void (*)(std::wstring &))strip);
-	// Here we may have empty strings which should be eliminated
-	LabelList newlabels (labels_list.begin (), labels_list.end ());
-	newlabels.erase (std::wstring ());
-	labels.swap (newlabels);
-	return (labels != newlabels);
-}
-
 void DiaryEntry::view ()
 {
 	RichTextList text_list;

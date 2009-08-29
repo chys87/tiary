@@ -19,6 +19,7 @@
 #include "ui/label.h"
 #include "ui/droplist.h"
 #include "ui/button.h"
+#include "ui/button_default.h"
 #include "ui/textbox.h"
 #include "ui/dialog_message.h"
 #include "ui/dialog_select_file.h"
@@ -35,7 +36,7 @@ namespace {
 
 using namespace ui;
 
-class DialogGlobalOptions : public FixedDialog
+class DialogGlobalOptions : public FixedDialog, private ButtonDefault
 {
 
 	GlobalOptionGroup &options;
@@ -84,7 +85,8 @@ public:
 
 const wchar_t expand_lines_array[][2] = { L"1", L"2", L"3", L"4", L"5", L"6", L"7", L"8" };
 DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
-	: FixedDialog (0, L"Preferences")
+	: Dialog (0, L"Preferences")
+	, FixedDialog ()
 	, options (options_)
 	, lbl_default_file (*this, L"Default &file:")
 	, btn_default_file (*this, L"Choose...")
@@ -188,8 +190,8 @@ DialogGlobalOptions::DialogGlobalOptions (GlobalOptionGroup &options_)
 	btn_reset.sig_clicked.connect (this, &DialogGlobalOptions::slot_reset);
 	btn_help.sig_clicked.connect (this, &DialogGlobalOptions::slot_help);
 
-	btn_ok.set_attribute (Button::DEFAULT_BUTTON);
-	btn_cancel.set_attribute (Button::ESCAPE_BUTTON);
+	set_default_button (btn_ok);
+	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
 
 	// Copy existing option values to controls
 	copy_options_to_controls (options);

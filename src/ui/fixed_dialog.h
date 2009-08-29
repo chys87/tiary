@@ -27,12 +27,9 @@ namespace ui {
  * Automatically positioned in the middle of the screen
  */
 
-class FixedDialog : public Dialog
+class FixedDialog : public virtual Dialog
 {
 public:
-	explicit FixedDialog (unsigned options = 0, const std::wstring & = std::wstring ());
-	explicit FixedDialog (Size size, unsigned options = 0, const std::wstring & = std::wstring ());
-	virtual ~FixedDialog ();
 
 	void resize (Size);
 	void on_winch ();

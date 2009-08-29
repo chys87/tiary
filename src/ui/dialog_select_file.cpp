@@ -18,6 +18,7 @@
 #include "ui/textbox.h"
 #include "ui/listbox.h"
 #include "ui/button.h"
+#include "ui/button_default.h"
 #include "ui/chain.h"
 #include "ui/layout.h"
 #include "common/dir.h"
@@ -40,7 +41,7 @@ namespace {
 [Show Hidden?][Text][OK][Cancel]
  */
 
-class DialogSelectFile : public Dialog
+class DialogSelectFile : public virtual Dialog, private ButtonDefault
 {
 public:
 	DialogSelectFile (const std::wstring &hint_, const std::wstring &default_file, unsigned options_);
@@ -78,6 +79,7 @@ const size_t len_show_hidden_files = sizeof string_show_hidden_files / sizeof (w
 
 DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring &default_file, unsigned options_)
 	: Dialog (0, hint)
+	, ButtonDefault ()
 	, text_input (*this)
 	, list_files (*this)
 	, check_hidden_files (*this, true)
@@ -95,9 +97,6 @@ DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring
 	check_hidden_files.ctrl_up = btn_cancel.ctrl_up = &list_files;
 	check_hidden_files.ctrl_down = btn_cancel.ctrl_down = &text_input;
 
-	btn_ok.set_attribute (Button::DEFAULT_BUTTON);
-	btn_cancel.set_attribute (Button::ESCAPE_BUTTON);
-
 	text_input.sig_changed.connect (this, &DialogSelectFile::slot_input);
 	check_hidden_files.sig_toggled.connect (this, &DialogSelectFile::slot_refresh);
 	list_files.sig_focus.connect (this, &DialogSelectFile::slot_select);
@@ -105,6 +104,9 @@ DialogSelectFile::DialogSelectFile (const std::wstring &hint, const std::wstring
 	list_files.sig_double_clicked.connect (this, &DialogSelectFile::slot_ok);
 	btn_ok.sig_clicked.connect (this, &DialogSelectFile::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
+
+	set_default_button (btn_ok);
+	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
 
 	lbl_hidden_files.sig_hotkey.connect (
 			TIARY_LIST_OF(Signal)

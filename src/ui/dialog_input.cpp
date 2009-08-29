@@ -16,6 +16,7 @@
 #include "ui/label.h"
 #include "ui/textbox.h"
 #include "ui/button.h"
+#include "ui/button_default.h"
 #include "ui/fixed_dialog.h"
 #include "ui/chain.h"
 #include "common/algorithm.h"
@@ -25,7 +26,7 @@ namespace ui {
 
 namespace {
 
-class DialogInput : public FixedDialog
+class DialogInput : public FixedDialog, private ButtonDefault
 {
 
 	Label lbl_hint;
@@ -52,7 +53,9 @@ DialogInput::DialogInput (const std::wstring &title,
 		unsigned text_box_width,
 		DialogInputAttribute attr,
 		std::wstring &result_)
-	: FixedDialog (0, title)
+	: Dialog (0, title)
+	, FixedDialog ()
+	, ButtonDefault ()
 	, lbl_hint (*this, hint)
 	, box_input (*this, (attr & INPUT_PASSWORD) ? TextBox::PASSWORD_BOX : 0)
 	, btn_ok (*this, L"&OK")
@@ -68,7 +71,7 @@ DialogInput::DialogInput (const std::wstring &title,
 
 	box_input.set_text (default_text, false, default_text.length ());
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
-	btn_ok.set_attribute (Button::DEFAULT_BUTTON);
+	set_default_button (btn_ok);
 	btn_ok.sig_clicked.connect (this, &DialogInput::slot_ok);
 	DialogInput::redraw ();
 }

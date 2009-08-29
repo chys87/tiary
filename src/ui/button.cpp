@@ -16,6 +16,7 @@
 #include "ui/paletteid.h"
 #include "common/algorithm.h"
 #include "ui/dialog.h"
+#include "ui/button_default.h"
 
 namespace tiary {
 namespace ui {
@@ -59,10 +60,8 @@ void Button::redraw ()
 	bool display_as_if_focus; // Whether display the "><" characters
 	if (focus_ctrl == this)
 		display_as_if_focus = true;
-	else if (!(attributes & DEFAULT_BUTTON))
-		display_as_if_focus = false;
-	else if (!dynamic_cast<Button *>(focus_ctrl)) // Currently focused on another button. Do not display
-		display_as_if_focus = true;
+	else if (ButtonDefault *def_chooser = dynamic_cast <ButtonDefault *> (&dlg))
+		display_as_if_focus = (def_chooser->get_current_default_button () == this);
 	else
 		display_as_if_focus = false;
 
@@ -73,19 +72,6 @@ void Button::redraw ()
 	pos = text.output (*this, pos, w-4);
 	pos = make_size (x+w-2, y);
 	pos = put (pos, display_as_if_focus ? L" <" : L"  ");
-}
-
-void Button::set_attribute (unsigned attr)
-{
-	attributes = attr;
-	if (attr & DEFAULT_BUTTON) {
-		Signal sig (sig_clicked, 0); // Connecting to, not copying from, sig_clicked
-		dlg.register_hotkey (RETURN, sig, Hotkeys::CASE_SENSITIVE | Hotkeys::DISALLOW_ALT);
-		dlg.register_hotkey (NEWLINE, TIARY_STD_MOVE (sig), Hotkeys::CASE_SENSITIVE | Hotkeys::DISALLOW_ALT);
-	}
-	if (attr & ESCAPE_BUTTON)
-		dlg.register_hotkey (ESCAPE, Signal (sig_clicked, 0), Hotkeys::CASE_SENSITIVE | Hotkeys::DISALLOW_ALT);
-	redraw ();
 }
 
 } // namespace tiary::ui

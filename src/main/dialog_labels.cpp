@@ -18,10 +18,11 @@
 #include "ui/layout.h"
 #include "ui/label.h"
 #include "ui/button.h"
+#include "ui/button_default.h"
 #include "ui/listbox.h"
 #include "ui/chain.h"
+#include "ui/textbox.h"
 #include "common/algorithm.h"
-#include "ui/dialog_input.h"
 #include "common/string.h"
 
 namespace tiary {
@@ -33,113 +34,86 @@ using namespace ui;
 /**
  * @brief	Class for the Label editing dialog
  */
-class DialogLabels : public Dialog
+class DialogLabels : public virtual Dialog, private ButtonDefault
 {
 
 	WStringLocaleOrderedSet &labels;
-	WStringLocaleOrderedSet &all_labels;
+	const WStringLocaleOrderedSet &all_labels;
 
 	Label lbl_selected;
-	ListBox lst_selected;
-	Button btn_add;
-	Button btn_remove;
-	Button btn_new;
-	Button btn_ok;
+	TextBox txt_selected;
 	Label lbl_all;
 	ListBox lst_all;
 
+	Button btn_add;
+	Button btn_ok;
+	Button btn_cancel;
+
 	Layout layout_main;
-	Layout layout_left;
-	Layout layout_middle;
-	Layout layout_right;
+	Layout layout_buttons;
 
 public:
 
-	// all_labels will be clobbered
-	DialogLabels (WStringLocaleOrderedSet &labels_, WStringLocaleOrderedSet &all_labels_);
+	DialogLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_);
 	~DialogLabels ();
 
 	void redraw ();
 	void on_winch ();
 
 	void slot_add ();
-	void slot_remove ();
-	void slot_new ();
+	void slot_ok ();
 
 	static void refresh_list (ListBox &lst_box, const WStringLocaleOrderedSet &labels, const std::wstring &selection);
 };
 
-DialogLabels::DialogLabels (WStringLocaleOrderedSet &labels_, WStringLocaleOrderedSet &all_labels_)
+DialogLabels::DialogLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_)
 	: ui::Dialog (0, L"Labels")
+	, ButtonDefault ()
 	, labels (labels_)
 	, all_labels (all_labels_)
-	, lbl_selected (*this, L"Selected labels")
-	, lst_selected (*this)
-	, btn_add (*this, L"&Add")
-	, btn_remove (*this, L"&Remove")
-	, btn_new (*this, L"&New label")
-	, btn_ok (*this, L"&OK")
-	, lbl_all (*this, L"All labels")
+	, lbl_selected (*this, L"&Labels for this entry:")
+	, txt_selected (*this)
+	, lbl_all (*this, L"All la&bels")
 	, lst_all (*this)
-	, layout_main (HORIZONTAL)
-	, layout_left (VERTICAL)
-	, layout_middle (VERTICAL)
-	, layout_right (VERTICAL)
+	, btn_add (*this, L"&Add")
+	, btn_ok (*this, L"&OK")
+	, btn_cancel (*this, L"&Cancel")
+	, layout_main (VERTICAL)
+	, layout_buttons (HORIZONTAL)
 {
-	refresh_list (lst_selected, labels_, std::wstring ());
-	refresh_list (lst_all, all_labels_, std::wstring ());
+	txt_selected.set_text (join (labels_.begin (), labels_.end (), L','));
+	lst_all.set_items (std::vector <std::wstring> (all_labels_.begin (), all_labels_.end ()), size_t(-1), false);
 
-	lst_selected.ctrl_right = &btn_remove;
-	lst_all.ctrl_left = &btn_add;
-	btn_add.ctrl_left = btn_remove.ctrl_left = btn_new.ctrl_left = btn_ok.ctrl_left = &lst_selected;
-	btn_add.ctrl_right = btn_remove.ctrl_right = btn_new.ctrl_right = btn_ok.ctrl_right = &lst_all;
-	ChainControlsVertical () (btn_add) (btn_remove) (btn_new) (btn_ok);
+	ChainControlsVertical () (txt_selected) (lst_all) (btn_ok);
+	ChainControlsHorizontal () (btn_ok) (btn_cancel);
 
-	layout_left.add
-		(lbl_selected, 1, 1)
-		(1, 1)
-		(lst_selected, 2, Layout::UNLIMITED)
-		;
-	layout_middle.add
-		(2, 2)
-		(btn_add, 3, 3, 10, 0)
-		(1, 1)
-		(btn_remove, 3, 3, 10, 0)
-		(1, 1)
-		(btn_new, 3, 3, 13, 0)
+	layout_buttons.add
+		(btn_add, 10, 10)
 		(1, Layout::UNLIMITED)
-		(btn_ok, 3, 3, 10, 0)
+		(btn_ok, 10, 10)
+		(1, Layout::UNLIMITED)
+		(btn_cancel, 10, 10)
 		;
-	layout_right.add
-		(lbl_all, 1, 1)
-		(1, 1)
-		(lst_all, 2, Layout::UNLIMITED)
-		;
+
 	layout_main.add
-		(layout_left, 2, Layout::UNLIMITED)
-		(2, 2)
-		(layout_middle, 13, 13)
-		(2, 2)
-		(layout_right, 2, Layout::UNLIMITED)
+		(lbl_selected, 1, 1)
+		(txt_selected, 1, 1)
+		(1, 1)
+		(lbl_all, 1, 1)
+		(lst_all, 1, Layout::UNLIMITED)
+		(1, 1)
+		(layout_buttons, 3, 3)
 		;
 
-	btn_new.sig_clicked.connect (this, &DialogLabels::slot_new);
-	btn_ok.set_attribute (Button::DEFAULT_BUTTON);
-	btn_ok.sig_clicked.connect (this, &Window::request_close);
+	set_default_button (btn_ok);
+	set_special_default_button (lst_all, btn_add);
 
-	Signal tmp_sig (this, &DialogLabels::slot_remove);
-	lst_selected.sig_double_clicked = tmp_sig;
-	lst_selected.register_hotkey (NEWLINE, tmp_sig, Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
-	lst_selected.register_hotkey (RETURN, tmp_sig, Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
-	btn_remove.sig_clicked = TIARY_STD_MOVE (tmp_sig);
+	btn_ok.sig_clicked.connect (this, &DialogLabels::slot_ok);
 
-	tmp_sig.connect (this, &DialogLabels::slot_add);
-	lst_all.sig_double_clicked = tmp_sig;
-	lst_all.register_hotkey (NEWLINE, tmp_sig, Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
-	lst_all.register_hotkey (RETURN, tmp_sig, Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
-	btn_add.sig_clicked = TIARY_STD_MOVE (tmp_sig);
+	btn_add.sig_clicked = lst_all.sig_double_clicked = Signal (this, &DialogLabels::slot_add);
 
-	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
+	btn_cancel.sig_clicked.connect (this, &Window::request_close);
+	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
 
 	DialogLabels::redraw ();
 }
@@ -162,49 +136,32 @@ void DialogLabels::on_winch ()
 	DialogLabels::redraw ();
 }
 
+WStringLocaleOrderedSet set_from_text (const std::wstring &text)
+{
+	std::list<std::wstring> lst = split_string (text, L',');
+	std::for_each (lst.begin (), lst.end (), (void (*)(std::wstring &))strip);
+	WStringLocaleOrderedSet set (lst.begin (), lst.end ());
+	set.erase (std::wstring ());
+	return set;
+}
+
 void DialogLabels::slot_add ()
 {
 	size_t k = lst_all.get_select ();
-	if (k != size_t (-1)) {
+	if (k < lst_all.get_items().size ()) {
 		const std::wstring &label = lst_all.get_items () [k];
-		if (labels.insert (label).second)
-			refresh_list (lst_selected, labels, label);
-	}
-}
-
-void DialogLabels::slot_remove ()
-{
-	size_t k = lst_selected.get_select ();
-	if (k != size_t (-1)) {
-		const std::wstring &label = lst_selected.get_items () [k];
-		labels.erase (label);
-		refresh_list (lst_selected, labels, std::wstring ());
-	}
-}
-
-void DialogLabels::slot_new ()
-{
-	std::wstring name = dialog_input (L"Please enter the name of the new label:", std::wstring (), 40);
-	strip (name);
-	if (!name.empty ()) {
-		if (labels.insert (name).second) {
-			refresh_list (lst_selected, labels, name);
-			if (all_labels.insert (name).second)
-				refresh_list (lst_all, all_labels, name);
+		WStringLocaleOrderedSet current_set = set_from_text (txt_selected.get_text ());
+		if (current_set.find (label) == current_set.end ()) {
+			std::wstring new_text = txt_selected.get_text () + L',' + label;
+			txt_selected.set_text (new_text, false, new_text.size ());
 		}
 	}
 }
 
-void DialogLabels::refresh_list (ListBox &lst_box, const WStringLocaleOrderedSet &labels, const std::wstring &selection)
+void DialogLabels::slot_ok ()
 {
-	std::vector <std::wstring> lst (labels.begin (), labels.end ());
-	size_t new_select = size_t (-1);
-	if (!selection.empty ()) {
-		std::vector <std::wstring>::const_iterator pos = std::lower_bound (lst.begin (), lst.end (), selection, std::locale ());
-		if (pos!=lst.end() && *pos==selection)
-			new_select = pos - lst.begin ();
-	}
-	lst_box.set_items (TIARY_STD_MOVE (lst), new_select, false);
+	labels = set_from_text (txt_selected.get_text ());
+	Window::request_close ();
 }
 
 } // anonymous namespace
@@ -215,8 +172,7 @@ bool edit_labels (WStringLocaleOrderedSet &labels, const std::vector<DiaryEntry 
 	WStringLocaleOrderedSet all_labels; // The union of all label lists
 	for (std::vector<DiaryEntry *>::const_iterator it = entries.begin (); it != entries.end (); ++it)
 		all_labels.insert ((*it)->labels.begin (), (*it)->labels.end ());
-	DialogLabels win (labels, all_labels);
-	win.event_loop ();
+	DialogLabels (labels, all_labels).event_loop ();
 	return (labels != old_labels);
 }
 

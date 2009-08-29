@@ -47,14 +47,6 @@ struct DiaryEntry
 	 */
 	bool edit (const char *editor);
 	/**
-	 * @brief	Edit labels in this entry
-	 * @result	Whether there is any modification
-	 *
-	 * This is called the "expert" editor of labels
-	 * A more GUI editor is provided in main/dialog_labels.h
-	 */
-	bool edit_labels ();
-	/**
 	 * @brief	Edit the time for this entry
 	 * @result	Whether there is any modification
 	 */

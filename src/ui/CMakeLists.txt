@@ -1,6 +1,8 @@
 add_library(tiary_ui
 	button.h
 	button.cpp
+	button_default.h
+	button_default.cpp
 	chain.h
 	checkbox.h
 	checkbox.cpp

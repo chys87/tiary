@@ -16,6 +16,7 @@
 #include "ui/dialog.h"
 #include "ui/label.h"
 #include "ui/button.h"
+#include "ui/button_default.h"
 #include "common/algorithm.h"
 #include "ui/chain.h"
 
@@ -24,7 +25,7 @@ namespace ui {
 
 namespace {
 
-class DialogMessage : public Dialog
+class DialogMessage : public virtual Dialog, private ButtonDefault
 {
 
 	Label lbl_text;
@@ -50,6 +51,7 @@ public:
 DialogMessage::DialogMessage (const std::wstring &text, const std::wstring &title,
 		DialogMessageButton mask)
 	: Dialog (0, title)
+	, ButtonDefault ()
 	, lbl_text (*this, text)
 	, button_mask (mask)
 	, result (0)
@@ -94,16 +96,14 @@ DialogMessage::DialogMessage (const std::wstring &text, const std::wstring &titl
 		if (!(btn_enter = btn_yes))
 			if (!(btn_enter = btn_no))
 				btn_enter = btn_cancel;
+	set_default_button (btn_enter);
+
 	if (!(btn_escape = btn_cancel))
 		if (!(btn_escape = btn_no))
 			if (!(btn_escape = btn_yes))
 				btn_escape = btn_ok;
-	if (btn_enter == btn_escape)
-		btn_enter->set_attribute (Button::DEFAULT_BUTTON | Button::ESCAPE_BUTTON);
-	else {
-		btn_enter->set_attribute (Button::DEFAULT_BUTTON);
-		btn_escape->set_attribute (Button::ESCAPE_BUTTON);
-	}
+	register_hotkey (ESCAPE, btn_escape->sig_clicked);
+
 	DialogMessage::redraw ();
 }
 

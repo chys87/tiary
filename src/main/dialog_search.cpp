@@ -16,6 +16,7 @@
 #include "ui/fixed_dialog.h"
 #include "ui/textbox.h"
 #include "ui/button.h"
+#include "ui/button_default.h"
 #include "ui/chain.h"
 #include "ui/checkbox.h"
 #include "ui/label.h"
@@ -29,7 +30,8 @@ namespace {
 
 using namespace tiary::ui;
 
-class DialogSearch : public ui::FixedDialog {
+class DialogSearch : public FixedDialog, private ButtonDefault
+{
 
 	ui::TextBox box_input;
 	ui::CheckBox chk_backward;
@@ -57,7 +59,8 @@ public:
 
 DialogSearch::DialogSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_, 
 		const std::wstring &text, bool bkwd, bool regex)
-	: ui::FixedDialog (0, L"Search")
+	: Dialog (0, L"Search")
+	, FixedDialog ()
 	, box_input (*this, 0)
 	, chk_backward (*this, bkwd)
 	, lbl_backward (*this, L"&Backward")
@@ -91,7 +94,7 @@ DialogSearch::DialogSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 #endif
 	btn_ok.ctrl_up = btn_ok.ctrl_down = &box_input;
 
-	btn_ok.set_attribute (Button::DEFAULT_BUTTON);
+	set_default_button (btn_ok);
 
 	lbl_backward.sig_hotkey.connect (
 			TIARY_LIST_OF (Signal)
