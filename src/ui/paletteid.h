@@ -52,8 +52,8 @@ const PaletteID PALETTE_ID_ENTRY_DATE_SELECT    = 62;
 const PaletteID PALETTE_ID_ENTRY_TITLE_SELECT   = 63;
 const PaletteID PALETTE_ID_ENTRY_LABELS_SELECT  = 64;
 
-const PaletteID PALETTE_ID_SHOW_NORMAL       = 100;
-const PaletteID PALETTE_ID_SHOW_BOLD         = 101;
+const PaletteID PALETTE_ID_SHOW_NORMAL          = 100;
+const PaletteID PALETTE_ID_SHOW_BOLD            = 101;
 
 void set_palettes ();
 
