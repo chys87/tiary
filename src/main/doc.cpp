@@ -69,10 +69,6 @@ const ui::RichTextLineC info[] = {
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    w CTRL+S             Save" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    W                    Save as" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    q Q                  Quit" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"For technical reasons, if you press Esc, there will be a delay (approximately" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L".5 seconds) before the the program responds." },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"" }
 };
 

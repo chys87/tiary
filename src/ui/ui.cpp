@@ -48,6 +48,11 @@ bool init ()
 		nonl ();
 		keypad (stdscr, TRUE);
 		intrflush (stdscr, FALSE);
+		// ESCDELAY is an undocumented feature
+		// The default value set in ncurses is way too long
+		// VIM uses 25 milliseconds
+		if (getenv ("ESCDELAY") == 0)
+			ESCDELAY = 50;
 		start_color ();
 		init_color_pairs ();
 #ifdef TIARY_USE_MOUSE
