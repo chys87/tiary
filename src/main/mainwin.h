@@ -102,6 +102,7 @@ private:
 	void new_file ();
 	void open_file ();
 	void edit_password ();
+	void edit_all_labels ();
 	void edit_global_options ();
 	void edit_perfile_options ();
 	void quit ();

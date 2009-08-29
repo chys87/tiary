@@ -1,4 +1,6 @@
 add_library(tiary_main
+	dialog_all_labels.h
+	dialog_all_labels.cpp
 	dialog_labels.h
 	dialog_labels.cpp
 	dialog_pref.h

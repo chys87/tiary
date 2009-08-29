@@ -30,6 +30,7 @@
 #include "common/pcre.h"
 #include "main/dialog_pref.h"
 #include "main/dialog_labels.h"
+#include "main/dialog_all_labels.h"
 #include <limits>
 
 namespace tiary {
@@ -65,9 +66,12 @@ bool MainCtrl::on_key (wchar_t key)
 			return true;
 
 		case L'l':
-		case L'L':
 			w().edit_labels_current ();
 			return true;
+
+		case L'L':
+			w().edit_all_labels ();
+			break;
 
 		case L'd':
 		case L'D':
@@ -389,9 +393,11 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		(L"Find &next      F3",     Signal (this, &MainWin::search_continue, false))
 		(L"Find &previous",         Signal (this, &MainWin::search_continue, true))
 		;
-	menu_bar.add (L"&Preferences")
-		(L"&Global preferences...", Signal (this, &MainWin::edit_global_options))
-		(L"&File perferences...",   Signal (this, &MainWin::edit_perfile_options))
+	menu_bar.add (L"Se&ttings")
+		(L"&Labels...",             Signal (this, &MainWin::edit_all_labels))
+		()
+		(L"&Preferences...",        Signal (this, &MainWin::edit_global_options))
+//		(L"&File perferences...",   Signal (this, &MainWin::edit_perfile_options))
 		;
 	menu_bar.add (L"&Help")
 		(L"&Help",                  Signal (show_doc))
@@ -810,6 +816,12 @@ void MainWin::edit_password ()
 	}
 	if (info)
 		ui::dialog_message (info);
+}
+
+void MainWin::edit_all_labels ()
+{
+	if (tiary::edit_all_labels (entries))
+		main_ctrl.touch ();
 }
 
 void MainWin::edit_global_options ()
