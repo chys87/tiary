@@ -90,15 +90,13 @@ Size get_screen_size ()
 
 namespace {
 
-const ColorAttr palette_default = { DEFAULT_FORECOLOR, DEFAULT_BACKCOLOR, 0 };
-
 struct Palettes
 {
 	ColorAttr t[NUMBER_PALETTES];
 
 	Palettes ()
 	{
-		std::fill_n (t, NUMBER_PALETTES, palette_default);
+		std::fill_n (t, NUMBER_PALETTES, ColorAttr::make_default ());
 	}
 
 	ColorAttr &operator [] (size_t k) { return t[k]; }
@@ -120,7 +118,7 @@ ColorAttr get_palette (PaletteID id)
 	if (id < NUMBER_PALETTES)
 		return palette_table[id];
 	else
-		return palette_default;
+		return ColorAttr::make_default ();
 }
 
 
