@@ -21,82 +21,54 @@ namespace ui {
 
 namespace {
 
-// Many palettes can map to a single meta-palette
+#define BACKGROUND         { BLACK, WHITE, 0 }
+#define EDIT_AREA          { WHITE, BLACK, 0 }
+#define EDIT_AREA_SELECT   { BLACK, YELLOW, 0 }
+#define ENTRY_TEXT         { DEFAULT_FORECOLOR, DEFAULT_BACKCOLOR, 0 }
+#define ENTRY_TITLE        { RED, DEFAULT_BACKCOLOR, HIGHLIGHT }
+#define ENTRY_LABEL        { CYAN, DEFAULT_BACKCOLOR, 0 }
+#define SELECT_ENTRY_TEXT  { WHITE, MAGENTA, HIGHLIGHT }
+#define SELECT_ENTRY_TITLE { YELLOW, MAGENTA, HIGHLIGHT }
+#define SELECT_ENTRY_LABEL { CYAN, MAGENTA, HIGHLIGHT }
+#define RICHTEXT_NORMAL    { WHITE, BLACK, 0 }
+#define RICHTEXT_BOLD      { WHITE, BLACK, HIGHLIGHT }
 
-typedef unsigned MetaPaletteID;
-
-struct MetaPaletteMapping {
+struct PaletteMap
+{
 	PaletteID id;
-	MetaPaletteID mid;
+	ColorAttr a;
 };
 
-const ColorAttr mdesc[] = {
+const PaletteMap mapping[] = {
 	// Put the commas in the beginning of lines to make VCS happy
+	{ PALETTE_ID_BACKGROUND,           BACKGROUND }
+	, { PALETTE_ID_LABEL,              BACKGROUND }
+	, { PALETTE_ID_BUTTON_FOCUS,       EDIT_AREA }
+	, { PALETTE_ID_BUTTON_UNFOCUS,     BACKGROUND }
+	, { PALETTE_ID_TEXTBOX,            EDIT_AREA }
+	, { PALETTE_ID_LISTBOX,            EDIT_AREA }
+	, { PALETTE_ID_LISTBOX_SELECT,     EDIT_AREA_SELECT }
+	, { PALETTE_ID_CHECKBOX,           EDIT_AREA }
+	, { PALETTE_ID_MENU,               BACKGROUND }
+	, { PALETTE_ID_MENU_SELECT,        EDIT_AREA }
+	, { PALETTE_ID_MENUBAR,            BACKGROUND }
+	, { PALETTE_ID_MENUBAR_SELECT,     EDIT_AREA }
+	, { PALETTE_ID_DROPLIST,           EDIT_AREA }
+	, { PALETTE_ID_RICHTEXT,           EDIT_AREA }
 
-	 /* 0: Background   */ { BLACK, WHITE, 0 }
-	,/* 1: Edit area    */ { WHITE, BLACK, 0 }
-	,/* 2: Edit area sel*/ { BLACK, YELLOW, 0 }
-	,/* 3: Reserved     */ { }
-	,/* 4: Reserved     */ { }
-	,/* 5: Reserved     */ { }
-	,/* 6: Reserved     */ { }
-	,/* 7: Reserved     */ { }
-	,/* 8: Reserved     */ { }
-	,/* 9: Reserved     */ { }
-	,/*10: Entry text   */ { DEFAULT_FORECOLOR, DEFAULT_BACKCOLOR, 0 }
-	,/*11: Entry title  */ { RED, DEFAULT_BACKCOLOR, HIGHLIGHT }
-	,/*12: Entry tags   */ { CYAN, DEFAULT_BACKCOLOR, 0 }
-	,/*13: Reserved     */ { }
-	,/*14: Reserved     */ { }
-	,/*15: Reserved     */ { }
-	,/*16: Reserved     */ { }
-	,/*17: Reserved     */ { }
-	,/*18: Reserved     */ { }
-	,/*19: Reserved     */ { }
-	,/*20: Select text  */ { WHITE, MAGENTA, HIGHLIGHT }
-	,/*21: Select title */ { YELLOW, MAGENTA, HIGHLIGHT }
-	,/*22: Select tags  */ { CYAN, MAGENTA, HIGHLIGHT }
-	,/*23: Reserved     */ { }
-	,/*24: Reserved     */ { }
-	,/*25: Reserved     */ { }
-	,/*26: Reserved     */ { }
-	,/*27: Reserved     */ { }
-	,/*28: Reserved     */ { }
-	,/*29: Reserved     */ { }
-	,/*30: Rich normal  */ { WHITE, BLACK, 0 }
-	,/*31: Rich bold    */ { WHITE, BLACK, HIGHLIGHT }
-};
+	, { PALETTE_ID_ENTRY,              ENTRY_TEXT }
+	, { PALETTE_ID_ENTRY_TEXT,         ENTRY_TEXT }
+	, { PALETTE_ID_ENTRY_DATE,         ENTRY_TEXT }
+	, { PALETTE_ID_ENTRY_TITLE,        ENTRY_TITLE }
+	, { PALETTE_ID_ENTRY_LABELS,       ENTRY_LABEL }
+	, { PALETTE_ID_ENTRY_SELECT,       SELECT_ENTRY_TEXT }
+	, { PALETTE_ID_ENTRY_TEXT_SELECT,  SELECT_ENTRY_TEXT }
+	, { PALETTE_ID_ENTRY_DATE_SELECT,  SELECT_ENTRY_TEXT }
+	, { PALETTE_ID_ENTRY_TITLE_SELECT, SELECT_ENTRY_TITLE }
+	, { PALETTE_ID_ENTRY_LABELS_SELECT,SELECT_ENTRY_LABEL }
 
-MetaPaletteMapping mapping[] = {
-	// Put the commas in the beginning of lines to make VCS happy
-	{ PALETTE_ID_BACKGROUND,           0 }
-	, { PALETTE_ID_LABEL,              0 }
-	, { PALETTE_ID_BUTTON_FOCUS,       1 }
-	, { PALETTE_ID_BUTTON_UNFOCUS,     0 }
-	, { PALETTE_ID_TEXTBOX,            1 }
-	, { PALETTE_ID_LISTBOX,            1 }
-	, { PALETTE_ID_LISTBOX_SELECT,     2 }
-	, { PALETTE_ID_CHECKBOX,           1 }
-	, { PALETTE_ID_MENU,               0 }
-	, { PALETTE_ID_MENU_SELECT,        1 }
-	, { PALETTE_ID_MENUBAR,            0 }
-	, { PALETTE_ID_MENUBAR_SELECT,     1 }
-	, { PALETTE_ID_DROPLIST,           1 }
-	, { PALETTE_ID_RICHTEXT,           1 }
-
-	, { PALETTE_ID_ENTRY,              10 }
-	, { PALETTE_ID_ENTRY_TEXT,         10 }
-	, { PALETTE_ID_ENTRY_DATE,         10 }
-	, { PALETTE_ID_ENTRY_TITLE,        11 }
-	, { PALETTE_ID_ENTRY_TAGS,         12 }
-	, { PALETTE_ID_ENTRY_SELECT,       20 }
-	, { PALETTE_ID_ENTRY_TEXT_SELECT,  20 }
-	, { PALETTE_ID_ENTRY_DATE_SELECT,  20 }
-	, { PALETTE_ID_ENTRY_TITLE_SELECT, 21 }
-	, { PALETTE_ID_ENTRY_TAGS_SELECT,  22 }
-
-	, { PALETTE_ID_SHOW_NORMAL,        30 }
-	, { PALETTE_ID_SHOW_BOLD,          31 }
+	, { PALETTE_ID_SHOW_NORMAL,        RICHTEXT_NORMAL }
+	, { PALETTE_ID_SHOW_BOLD,          RICHTEXT_BOLD }
 
 };
 
@@ -104,11 +76,8 @@ MetaPaletteMapping mapping[] = {
 
 void set_palettes ()
 {
-	for (const MetaPaletteMapping *x = mapping;
-			x != mapping + sizeof mapping / sizeof *mapping;
-			++x) {
-		set_palette (x->id, mdesc[x->mid]);
-	}
+	for (unsigned i=0; i<sizeof mapping/sizeof *mapping; ++i)
+		set_palette (mapping[i].id, mapping[i].a);
 }
 
 } // namespace tiary::ui

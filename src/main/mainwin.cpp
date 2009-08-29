@@ -283,7 +283,7 @@ void MainCtrl::redraw ()
 
 		// Labels
 		const DiaryEntry::LabelList &labels = entry.labels;
-		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_TAGS_SELECT : ui::PALETTE_ID_ENTRY_TAGS);
+		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_LABELS_SELECT : ui::PALETTE_ID_ENTRY_LABELS);
 		int left_wid = get_size().x - pos.x;
 		for (DiaryEntry::LabelList::const_iterator it=labels.begin(); it!=labels.end(); ) {
 			if (left_wid < 3)
