@@ -25,6 +25,7 @@ namespace ui {
 
 Label::Label (Dialog &dlg, const std::wstring &str, unsigned options)
 	: Control (dlg)
+	, UnfocusableControl (dlg)
 	, text (str, options)
 {
 	// Register hotkey
@@ -36,11 +37,6 @@ Label::Label (Dialog &dlg, const std::wstring &str, unsigned options)
 
 Label::~Label ()
 {
-}
-
-bool Label::on_focus ()
-{
-	return false;
 }
 
 void Label::redraw ()

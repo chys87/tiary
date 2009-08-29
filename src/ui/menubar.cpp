@@ -31,6 +31,7 @@ namespace ui {
 
 MenuBar::MenuBar (Dialog &dlg)
 	: Control (dlg)
+	, UnfocusableControl (dlg)
 {
 }
 
@@ -60,11 +61,6 @@ Menu &MenuBar::add (const std::wstring &text)
 Menu &MenuBar::add (const wchar_t *text)
 {
 	return add (std::wstring (text));
-}
-
-bool MenuBar::on_focus ()
-{
-	return false;
 }
 
 bool MenuBar::on_mouse (MouseEvent mouse_event)

@@ -104,6 +104,16 @@ public:
 	friend class Dialog;
 };
 
+
+// Some attributes of Controls that can be "pasted" using virtual inheritence
+class UnfocusableControl : public virtual Control
+{
+public:
+	UnfocusableControl (Dialog &dlg) : Control (dlg) {}
+	~UnfocusableControl ();
+	bool on_focus ();
+};
+
 } // namespace tiary::ui
 } // namespace tiary
 

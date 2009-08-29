@@ -31,7 +31,7 @@ namespace ui {
  * tiary::ui::show_menu, so we do not use tiary::ui::LLMenuItem, which
  * is considered a "low level" interface.
  */
-class MenuBar : public Control
+class MenuBar : public UnfocusableControl
 {
 public:
 
@@ -41,7 +41,6 @@ public:
 	Menu &add (const std::wstring &); ///< Add an item to menu
 	Menu &add (const wchar_t *); ///< Add an item to menu
 
-	bool on_focus (); ///< Refuse focus, but accepts mouse
 	bool on_mouse (MouseEvent);
 	void redraw ();
 

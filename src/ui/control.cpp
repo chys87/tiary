@@ -175,6 +175,15 @@ void Control::fill (Size fill_pos, Size fill_size, wchar_t ch)
 }
 
 
+UnfocusableControl::~UnfocusableControl ()
+{
+}
+
+bool UnfocusableControl::on_focus ()
+{
+	return false;
+}
+
 
 } // namespace tiary::ui
 } // namespace tiary

@@ -35,13 +35,12 @@ namespace ui {
  * If you use '&' and then modify the text, the hotkey is _not_ re-registered
  * (Behavior may change in the future.)
  */
-class Label : public Control
+class Label : public UnfocusableControl
 {
 public:
 	Label (Dialog &, const std::wstring &, unsigned = 0 /**< UIString options */);
 	~Label ();
 
-	bool on_focus (); ///< Returns false. A label cannot be focused on
 	void redraw ();
 
 	void set_text (const std::wstring &, unsigned = 0 /**< UIString options */);
