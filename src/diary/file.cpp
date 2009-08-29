@@ -40,8 +40,8 @@
  *  ....
  *  <entry>
  *    <time local="%Y-%m-%d %H:%M:%S" utc=".." />
- *    <tag name="..." />
- *    <tag name="..." />
+ *    <label name="..." />
+ *    <label name="..." />
  *    ....
  *    <title>.....</title>
  *    <text>.....</text>
@@ -112,7 +112,7 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 //	uint64_t utc_time = 0;
 	const char *title = 0;
 	const char *text = 0;
-	DiaryEntry::TagList tags;
+	DiaryEntry::LabelList labels;
 
 	for (const XMLNode *xptr = entry_node->children; xptr; xptr = xptr->next)
 		if (const XMLNodeTree *ptr = dynamic_cast <const XMLNodeTree *>(xptr)) {
@@ -129,16 +129,18 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 				if (!(local_time = parse_time (local))/* || !(utc_time = parse_time (utc))*/)
 					return 0;
 
-			} else if (ptr->name == "tag") {
+			} else if (ptr->name == "tag" || ptr->name == "label") {
+				// A "label" used to be called a "tag".
+				// Older formats use "tag" instead of "label"
 
 				const char *name = map_query (ptr->properties, "name");
 				if (!name)
 					return 0;
 				// Convert name from UTF-8 to UCS-4
 				std::wstring wname = utf8_to_wstring (name);
-				if (wname.empty ()) // Tags cannot be empty
+				if (wname.empty ()) // Labels cannot be empty
 					return 0;
-				tags.insert (wname);
+				labels.insert (wname);
 
 			} else if (ptr->name == "title") {
 
@@ -187,7 +189,7 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 //	entry->utc_time.assign (utc_time);
 	utf8_to_wstring (title).swap (entry->title);
 	utf8_to_wstring (text).swap (entry->text);
-	entry->tags.swap (tags);
+	entry->labels.swap (labels);
 	return entry;
 }
 
@@ -461,13 +463,13 @@ bool save_file (const char *filename,
 		time_node->properties["local"] = format_time (entry->local_time);
 //		time_node->properties["utc"] = format_time (entry->utc_time);
 
-		// Tags
-		for (DiaryEntry::TagList::const_iterator it = entry->tags.begin (); it != entry->tags.end (); ++it) {
+		// Labels
+		for (DiaryEntry::LabelList::const_iterator it = entry->labels.begin (); it != entry->labels.end (); ++it) {
 			sub_ptr = sub_ptr->next = new XMLNodeText ("\n\t\t");
-			XMLNodeTree *tag_node = new XMLNodeTree ("tag");
-			sub_ptr = sub_ptr->next = tag_node;
+			XMLNodeTree *label_node = new XMLNodeTree ("label");
+			sub_ptr = sub_ptr->next = label_node;
 			// Convert from UCS-4 to UTF-8
-			wstring_to_utf8 (*it).swap (tag_node->properties["name"]);
+			wstring_to_utf8 (*it).swap (label_node->properties["name"]);
 		}
 
 		// Text

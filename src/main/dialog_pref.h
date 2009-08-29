@@ -12,25 +12,16 @@
  **************************************************************************/
 
 
-#ifndef TIARY_MAIN_DIALOG_TAGS_H
-#define TIARY_MAIN_DIALOG_TAGS_H
+#ifndef TIARY_MAIN_DIALOG_PREF_H
+#define TIARY_MAIN_DIALOG_PREF_H
 
-#include "common/containers.h"
-#include <vector>
+#include "diary/config.h"
 
 namespace tiary {
 
+void edit_options (GlobalOptionGroup &);
+void edit_options (PerFileOptionGroup &);
 
-struct DiaryEntry;
-
-/**
- * @brief	Display a window to allow the user to edit tags
- * @param	tags	The set of tags to edit
- * @param	entries	The list of all entries
- * @result	If anything is changed
- */
-bool edit_tags (WStringLocaleOrderedSet &tags, const std::vector<DiaryEntry *> &entries);
-
-} // namespace tiary
+} //namespace tiary
 
 #endif // include guard

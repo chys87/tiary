@@ -109,8 +109,8 @@ private:
 	void append ();
 	DiaryEntry *get_current ();
 	void edit_current ();
-	void edit_tags_current ();
-	void edit_tags_current_expert ();
+	void edit_labels_current ();
+	void edit_labels_current_expert ();
 	void edit_time_current ();
 	void view_current ();
 	void view_all ();

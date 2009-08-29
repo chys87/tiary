@@ -12,7 +12,7 @@
  **************************************************************************/
 
 
-#include "main/pref_edit.h"
+#include "main/dialog_pref.h"
 #include "ui/fixed_dialog.h"
 #include "ui/layout.h"
 #include "ui/chain.h"

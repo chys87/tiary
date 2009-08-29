@@ -48,9 +48,9 @@ void write_for_view (RichTextList &lst, const DiaryEntry &ent)
 	lst.push_back (RichTextLine (PALETTE_ID_SHOW_BOLD, ent.title));
 	lst.push_back (RichTextLine (PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'=')));
 	lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, ent.local_time.format (L"%W %B %d, %Y  %h:%M:%S %P")));
-	if (!ent.tags.empty ()) {
-		std::wstring tagstr = L"Tags: " + join (ent.tags.begin (), ent.tags.end (), L", ");
-		lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, tagstr));
+	if (!ent.labels.empty ()) {
+		std::wstring labelstr = L"Labels: " + join (ent.labels.begin (), ent.labels.end (), L", ");
+		lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, labelstr));
 	}
 	lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, std::wstring ()));
 
@@ -219,19 +219,19 @@ bool DiaryEntry::edit (const char *editor)
 	return true;
 }
 
-bool DiaryEntry::edit_tags ()
+bool DiaryEntry::edit_labels ()
 {
-	std::wstring tagstr = join (tags.begin (), tags.end (), L", ");
-	std::wstring newtagstr = ui::dialog_input2 (L"Tags", std::wstring (), tagstr, 30, 0, tagstr);
-	if (newtagstr == tagstr)
+	std::wstring labelstr = join (labels.begin (), labels.end (), L", ");
+	std::wstring newlabelstr = ui::dialog_input2 (L"Labels", std::wstring (), labelstr, 30, 0, labelstr);
+	if (newlabelstr == labelstr)
 		return false;
-	std::list<std::wstring> tags_list = split_string (newtagstr, L',');
-	std::for_each (tags_list.begin (), tags_list.end (), (void (*)(std::wstring &))strip);
+	std::list<std::wstring> labels_list = split_string (newlabelstr, L',');
+	std::for_each (labels_list.begin (), labels_list.end (), (void (*)(std::wstring &))strip);
 	// Here we may have empty strings which should be eliminated
-	TagList newtags (tags_list.begin (), tags_list.end ());
-	newtags.erase (std::wstring ());
-	tags.swap (newtags);
-	return (tags != newtags);
+	LabelList newlabels (labels_list.begin (), labels_list.end ());
+	newlabels.erase (std::wstring ());
+	labels.swap (newlabels);
+	return (labels != newlabels);
 }
 
 void DiaryEntry::view ()

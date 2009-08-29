@@ -12,16 +12,25 @@
  **************************************************************************/
 
 
-#ifndef TIARY_MAIN_PREF_EDIT_H
-#define TIARY_MAIN_PREF_EDIT_H
+#ifndef TIARY_MAIN_DIALOG_LABELS_H
+#define TIARY_MAIN_DIALOG_LABELS_H
 
-#include "diary/config.h"
+#include "common/containers.h"
+#include <vector>
 
 namespace tiary {
 
-void edit_options (GlobalOptionGroup &);
-void edit_options (PerFileOptionGroup &);
 
-} //namespace tiary
+struct DiaryEntry;
+
+/**
+ * @brief	Display a window to allow the user to edit labels
+ * @param	labels	The set of labels to edit
+ * @param	entries	The list of all entries
+ * @result	If anything is changed
+ */
+bool edit_labels (WStringLocaleOrderedSet &labels, const std::vector<DiaryEntry *> &entries);
+
+} // namespace tiary
 
 #endif // include guard

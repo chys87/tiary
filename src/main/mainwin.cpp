@@ -28,8 +28,8 @@
 #include "main/doc.h"
 #include "main/dialog_search.h"
 #include "common/pcre.h"
-#include "main/pref_edit.h"
-#include "main/dialog_tags.h"
+#include "main/dialog_pref.h"
+#include "main/dialog_labels.h"
 #include <limits>
 
 namespace tiary {
@@ -59,17 +59,17 @@ bool MainCtrl::on_key (wchar_t key)
 			w().edit_current ();
 			return true;
 
-		case L'i':
-		case L'I':
+		case L't':
+		case L'T':
 			w().edit_time_current ();
 			return true;
 
-		case L't':
-			w().edit_tags_current ();
+		case L'l':
+			w().edit_labels_current ();
 			return true;
 
-		case L'T':
-			w().edit_tags_current_expert ();
+		case L'L':
+			w().edit_labels_current_expert ();
 			return true;
 
 		case L'd':
@@ -280,20 +280,20 @@ void MainCtrl::redraw ()
 						disp_buffer, std::not1 (std::ptr_fun (iswprint)), L' ') - disp_buffer);
 		pos.x++;
 
-		// Tags
-		const DiaryEntry::TagList &tags = entry.tags;
+		// Labels
+		const DiaryEntry::LabelList &labels = entry.labels;
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_TAGS_SELECT : ui::PALETTE_ID_ENTRY_TAGS);
 		int left_wid = get_size().x - pos.x;
-		for (DiaryEntry::TagList::const_iterator it=tags.begin(); it!=tags.end(); ) {
+		for (DiaryEntry::LabelList::const_iterator it=labels.begin(); it!=labels.end(); ) {
 			if (left_wid < 3)
 				break;
-			unsigned tagwid = ucs_width (*it);
-			if (tagwid + 2 > unsigned (left_wid)) {
+			unsigned labelwid = ucs_width (*it);
+			if (labelwid + 2 > unsigned (left_wid)) {
 				pos = put (pos, L"...", 3);
 				break;
 			}
 			pos = put (pos, *it);
-			if (++it != tags.end ())
+			if (++it != labels.end ())
 				pos = put (pos, L',');
 		}
 		pos.x++;
@@ -303,7 +303,7 @@ void MainCtrl::redraw ()
 		size_t offset = 0;
 		if (i == info.focus_pos && expand_lines >= 2) {
 			// Current entry
-			// [Date] [Title] [Tags]
+			// [Date] [Title] [Labels]
 			// [...]
 			for (unsigned j=1; j<expand_lines; ++j) {
 				pos = ui::make_size (0, pos.y+1);
@@ -316,7 +316,7 @@ void MainCtrl::redraw ()
 			}
 		} else {
 			// Other entry
-			// [Date] [Title] [Tags] [...]
+			// [Date] [Title] [Labels] [...]
 			offset = split_line (split_info, maxS (0, get_size().x - pos.x), text, offset,
 					SPLIT_NEWLINE_AS_SPACE|SPLIT_CUT_WORD);
 			wchar_t *bufend = std::replace_copy_if (
@@ -377,8 +377,8 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		(L"&Delete",                Signal (this, &MainWin::remove_current))
 		()
 		(L"&Edit",                  Signal (this, &MainWin::edit_current))
-		(L"Edit &tags...",          Signal (this, &MainWin::edit_tags_current))
-		(L"Edit tags (&quick)...",  Signal (this, &MainWin::edit_tags_current_expert))
+		(L"Edit &labels...",        Signal (this, &MainWin::edit_labels_current))
+		(L"Edit labels (&quick)...",Signal (this, &MainWin::edit_labels_current_expert))
 		(L"Edit t&ime...",          Signal (this, &MainWin::edit_time_current))
 		()
 		(L"&View",                  Signal (this, &MainWin::view_current))
@@ -565,18 +565,18 @@ void MainWin::edit_current ()
 	}
 }
 
-void MainWin::edit_tags_current ()
+void MainWin::edit_labels_current ()
 {
 	if (DiaryEntry *ent = get_current ()) {
-		if (edit_tags (ent->tags, entries))
+		if (edit_labels (ent->labels, entries))
 			main_ctrl.touch ();
 	}
 }
 
-void MainWin::edit_tags_current_expert ()
+void MainWin::edit_labels_current_expert ()
 {
 	if (DiaryEntry *ent = get_current ()) {
-		if (ent->edit_tags ())
+		if (ent->edit_labels ())
 			main_ctrl.touch ();
 	}
 }

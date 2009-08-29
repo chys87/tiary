@@ -28,13 +28,13 @@ typedef std::vector<DiaryEntry *> DiaryEntryList;
 
 struct DiaryEntry
 {
-	typedef WStringLocaleOrderedSet TagList;
+	typedef WStringLocaleOrderedSet LabelList;
 
 	DateTime local_time; // Local date and time
 //	DateTime utc_time; // UTC date and time
 	std::wstring title;
 	std::wstring text;
-	TagList tags;
+	LabelList labels;
 
 
 	/**
@@ -47,13 +47,13 @@ struct DiaryEntry
 	 */
 	bool edit (const char *editor);
 	/**
-	 * @brief	Edit tags in this entry
+	 * @brief	Edit labels in this entry
 	 * @result	Whether there is any modification
 	 *
-	 * This is called the "expert" editor of tags
-	 * A more GUI editor is provided in main/dialog_tags.h
+	 * This is called the "expert" editor of labels
+	 * A more GUI editor is provided in main/dialog_labels.h
 	 */
-	bool edit_tags ();
+	bool edit_labels ();
 	/**
 	 * @brief	Edit the time for this entry
 	 * @result	Whether there is any modification
