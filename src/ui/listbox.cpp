@@ -241,7 +241,7 @@ void ListBox::redraw ()
 		bar_hgt = disp_hgt;
 	} else {
 		bar_start = info.first * disp_hgt / items.size ();
-		bar_hgt = (info.first + info.len) * disp_hgt / items.size () - bar_start;
+		bar_hgt = maxU (1, (info.first + info.len) * disp_hgt / items.size () - bar_start);
 	}
 	attribute_on (REVERSE);
 	clear (make_size (disp_wid,bar_start), make_size (1, bar_hgt));

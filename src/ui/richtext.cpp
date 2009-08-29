@@ -61,7 +61,7 @@ void RichText::redraw ()
 	// Scroll bar
 	clear (make_size (wid, 0), make_size (1, hgt+1));
 	unsigned bar_start = top_line * hgt / line_list.size ();
-	unsigned bar_height = (top_line + show_lines) * hgt / line_list.size () - bar_start;
+	unsigned bar_height = maxU (1, (top_line + show_lines) * hgt / line_list.size () - bar_start);
 	attribute_on (REVERSE);
 	clear (make_size (wid, bar_start), make_size (1, bar_height));
 }
