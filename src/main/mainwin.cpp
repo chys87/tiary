@@ -361,7 +361,7 @@ void MainCtrl::redraw ()
 
 void MainCtrl::set_focus (unsigned k)
 {
-	unsigned num_ent = w().entries.size ();
+	unsigned num_ent = w().get_current_list ().size ();
 	if (num_ent == 0)
 		return;
 	if (int (k) < 0)
