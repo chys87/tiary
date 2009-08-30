@@ -23,11 +23,15 @@
 #include "diary/config.h"
 #include <vector>
 #include <string>
+#include <memory> // std::auto_ptr
 
 namespace tiary {
 
 // Defined in diary/diary.h
 struct DiaryEntry;
+
+// Defined in main/filter.h
+struct FilterGroup;
 
 class MainCtrl;
 class MainWin;
@@ -83,6 +87,11 @@ private:
 	std::vector<DiaryEntry *> entries; ///< Diary entries
 	bool saved; ///< Whether all modifications have been saved
 
+	std::auto_ptr<FilterGroup> filter; ///< Current filter
+	std::auto_ptr<std::vector<DiaryEntry *> > filtered_entries; ///< filter.filter(entries)
+	void updated_filter (); ///< Must be called every time filter is modified
+	bool unavailable_filtered (); ///< Display an error message "Unavaiable in filtering mode"
+
 	// main_ctrl must be after other members, which they use in its constructor
 	MainCtrl main_ctrl;
 
@@ -104,7 +113,11 @@ private:
 	void edit_perfile_options ();
 	void quit ();
 
+	void edit_filter ();
+	void clear_filter ();
+
 	void append ();
+	std::vector <DiaryEntry *> &get_current_list ();
 	DiaryEntry *get_current ();
 	void edit_current ();
 	void edit_labels_current ();

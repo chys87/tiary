@@ -38,14 +38,19 @@ TextBox::~TextBox ()
 bool TextBox::on_key (wchar_t key)
 {
 	Scroll::Info scroll_info = Scroll::get_info ();
+	bool processed = false;
 	switch (key) {
 		case LEFT:
-			if (scroll_info.focus)
+			if (scroll_info.focus) {
 				Scroll::modify_focus (scroll_info.focus - 1);
+				processed = true;
+			}
 			break;
 		case RIGHT:
-			if (scroll_info.focus < text.length ())
+			if (scroll_info.focus < text.length ()) {
 				Scroll::modify_focus (scroll_info.focus + 1);
+				processed = true;
+			}
 			break;
 		case HOME:
 			Scroll::modify_focus (0);
@@ -58,6 +63,7 @@ bool TextBox::on_key (wchar_t key)
 				text.erase (scroll_info.focus, 1);
 				Scroll::modify_number_delete ();
 				sig_changed.emit ();
+				processed = true;
 			}
 			break;
 		case BACKSPACE1:
@@ -66,18 +72,20 @@ bool TextBox::on_key (wchar_t key)
 				text.erase (scroll_info.focus-1, 1);
 				Scroll::modify_number_backspace ();
 				sig_changed.emit ();
+				processed = true;
 			}
 			break;
 		default:
-			if (!iswprint (key))
-				return false;
-			text.insert (scroll_info.focus, 1, key);
-			Scroll::modify_number_insert ();
-			sig_changed.emit ();
+			if (iswprint (key)) {
+				text.insert (scroll_info.focus, 1, key);
+				Scroll::modify_number_insert ();
+				sig_changed.emit ();
+				processed = true;
+			}
 			break;
 	}
 	TextBox::redraw ();
-	return true;
+	return processed;
 }
 
 bool TextBox::on_mouse (MouseEvent mouse_event)

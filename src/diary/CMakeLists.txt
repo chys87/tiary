@@ -4,4 +4,6 @@ add_library(tiary_diary
 	diary.h
 	file.h
 	file.cpp
+	filter.h
+	filter.cpp
 )

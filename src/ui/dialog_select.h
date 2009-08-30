@@ -11,39 +11,26 @@
  *
  **************************************************************************/
 
+#ifndef TIARY_UI_DIALOG_SELECT_H
+#define TIARY_UI_DIALOG_SELECT_H
 
-#ifndef TIARY_UI_SEARCH_INFO_H
-#define TIARY_UI_SEARCH_INFO_H
-
-#include "common/string_match.h"
 #include <string>
+#include <vector>
 
 namespace tiary {
 namespace ui {
 
+
 /**
- * This class mains information of a search request,
- * including the text, direction and 
+ * @brief	Displays a menu to allow the user to choose an item from the many
+ * @result	The subscript of the selected item; or size_t(-1) on error
  */
-class SearchInfo : public StringMatch
-{
-public:
-	SearchInfo ();
-	~SearchInfo ();
+size_t dialog_select (const std::wstring &title,
+		const std::vector <std::wstring> &selections);
 
-	/**
-	 * @brief	Show a dialog to ask user what to search for
-	 * @result	If true, we can go on with search
-	 */
-	bool dialog (bool default_backward);
 
-	bool get_backward () const { return backward; }
-
-private:
-	bool backward;             ///< Search backward?
-};
-
-} // namespace ui
+} // namespace tiary::ui
 } // namespace tiary
+
 
 #endif // include guard

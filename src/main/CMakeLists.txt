@@ -3,6 +3,8 @@ add_library(tiary_main
 	dialog_all_labels.cpp
 	dialog_edit_time.h
 	dialog_edit_time.cpp
+	dialog_filter.h
+	dialog_filter.cpp
 	dialog_labels.h
 	dialog_labels.cpp
 	dialog_pref.h

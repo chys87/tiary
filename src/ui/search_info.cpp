@@ -22,11 +22,8 @@ namespace tiary {
 namespace ui {
 
 SearchInfo::SearchInfo ()
-	: text ()
+	: StringMatch ()
 	, backward (false)
-#ifdef TIARY_USE_PCRE
-	, regex (0)
-#endif
 {
 }
 
@@ -36,61 +33,21 @@ SearchInfo::~SearchInfo ()
 
 bool SearchInfo::dialog (bool default_backward)
 {
-	std::wstring new_text;
+	std::wstring new_pattern;
 	bool new_backward;
 	bool new_regex;
 
-	ui::dialog_search (new_text, new_backward, new_regex, text, default_backward,
-#ifdef TIARY_USE_PCRE
-			bool (regex.get ())
-#else
-			false
-#endif
-			);
-	if (new_text.empty ())
+	ui::dialog_search (new_pattern, new_backward, new_regex,
+			get_pattern (), default_backward, get_use_regex ());
+	if (new_pattern.empty ())
 		return false;
-#ifdef TIARY_USE_PCRE
-	PcRe *new_pcre = 0;
-	if (new_regex) {
-		new_pcre = new PcRe (new_text);
-		if (!*new_pcre) {
-			// Invalid regular expression
-			ui::dialog_message (L"Invalid regular expression", L"Search");
-			delete new_pcre;
-			return false;
-		}
+	if (StringMatch::assign (new_pattern, new_regex)) {
+		backward = new_backward;
+		return true;
+	} else {
+		dialog_message (L"Invalid regular expression", L"Error");
+		return false;
 	}
-	// Must reset regex to 0 if !new_regex
-	regex.reset (new_pcre);
-#endif
-	text = new_text;
-	backward = new_backward;
-	return true;
-}
-
-SearchInfo::operator int BooleanConvert::* () const
-{
-	return (!text.empty () ? &BooleanConvert::valid : 0);
-}
-
-std::vector <std::pair <size_t, size_t> > SearchInfo::match (const std::wstring &haystack) const
-{
-#ifdef TIARY_USE_PCRE
-	if (PcRe *rex = regex.get ())
-		return rex->match (haystack);
-	else
-#endif
-		return find_all (strlower (haystack), strlower (text));
-}
-
-bool SearchInfo::basic_match (const std::wstring &haystack) const
-{
-#ifdef TIARY_USE_PCRE
-	if (PcRe *rex = regex.get ())
-		return rex->basic_match (haystack);
-	else
-#endif
-		return (strlower (haystack).find (strlower (text)) != std::wstring::npos);
 }
 
 

@@ -16,6 +16,8 @@ add_library(tiary_ui
 	dialog_richtext.cpp
 	dialog_search.h
 	dialog_search.cpp
+	dialog_select.h
+	dialog_select.cpp
 	dialog_select_file.h
 	dialog_select_file.cpp
 	direction.h

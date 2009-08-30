@@ -24,9 +24,11 @@
 #include "diary/diary.h"
 #include "ui/paletteid.h"
 #include "diary/config.h"
+#include "diary/filter.h"
 #include "common/datetime.h"
 #include "common/algorithm.h"
 #include "main/doc.h"
+#include "main/dialog_filter.h"
 #include "main/dialog_pref.h"
 #include "main/dialog_labels.h"
 #include "main/dialog_all_labels.h"
@@ -178,6 +180,17 @@ bool MainCtrl::on_key (wchar_t key)
 			w().view_all ();
 			return true;
 
+		case ui::CTRL_G:
+			w().edit_filter ();
+			return true;
+
+		case ui::LEFT:
+			if (w().filter.get ()) {
+				w().clear_filter ();
+				return true;
+			} else
+				return false;
+
 		case ui::CTRL_N:
 			w().new_file ();
 			return true;
@@ -240,6 +253,14 @@ void MainCtrl::redraw ()
 #ifdef TIARY_USE_MOUSE
 		put (ui::make_size (0, 2), L"You can also use your mouse.");
 #endif
+		return;
+	}
+
+	if (w().filtered_entries.get () && w().filtered_entries->empty ()) {
+		put (ui::make_size (), L"This is in filtered mode.");
+		put (ui::make_size (0, 1), L"But no entry satisfies your requirement.");
+		put (ui::make_size (0, 2), L"Press Ctrl-G to modify your filter; or LEFT to see all entries.");
+		return;
 	}
 
 	unsigned expand_lines = w().global_options.get_num (GLOBAL_OPTION_EXPAND_LINES);
@@ -251,6 +272,13 @@ void MainCtrl::redraw ()
 
 	std::wstring date_format = w().global_options.get_wstring (GLOBAL_OPTION_DATETIME_FORMAT);
 
+	// Build a map to get entry ID from pointer
+	unordered_map <const DiaryEntry *, unsigned> id_map;
+	for (size_t i=0; i<w().entries.size (); ++i)
+		id_map.insert (std::make_pair (w().entries[i], i+1));
+	// Is there a filter?
+	const DiaryEntryList &ent_lst = w().get_current_list ();
+
 	wchar_t *disp_buffer = new wchar_t [get_size ().x];
 
 	for (unsigned i=0; i<info.len; ++i) {
@@ -261,10 +289,10 @@ void MainCtrl::redraw ()
 			move_cursor (pos);
 			clear (pos, ui::make_size (get_size().x, expand_lines));
 		}
-		const DiaryEntry &entry = *w().entries[i+info.first];
+		const DiaryEntry &entry = *ent_lst[i+info.first];
 
 		// Entry ID
-		pos = put (pos, format (L"%04a  ") << (info.first + i + 1));
+		pos = put (pos, format (L"%04a  ") << id_map[&entry]);
 
 		// Date
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_DATE_SELECT : ui::PALETTE_ID_ENTRY_DATE);
@@ -346,7 +374,7 @@ void MainCtrl::set_focus (unsigned k)
 
 void MainCtrl::touch ()
 {
-	ui::Scroll::modify_number (w ().entries.size ());
+	ui::Scroll::modify_number (w ().get_current_list ().size ());
 	w().saved = false;
 	MainCtrl::redraw ();
 }
@@ -358,6 +386,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	, menu_bar (*this)
 	, context_menu ()
 	, saved (true)
+	, filter ()
 	, main_ctrl (*this)
 	, last_search ()
 {
@@ -387,6 +416,9 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		(L"&Move up",               Signal (this, &MainWin::move_up_current))
 		(L"Move dow&n",             Signal (this, &MainWin::move_down_current))
 		(L"&Sort all",              Signal (this, &MainWin::sort_all))
+		;
+	menu_bar.add (L"&View")
+		(L"&Filter...      CtrL+G", Signal (this, &MainWin::edit_filter))
 		;
 	menu_bar.add (L"&Search")
 		(L"&Find...        Ctrl+F", Signal (this, &MainWin::search, false))
@@ -435,6 +467,29 @@ void MainWin::redraw ()
 	menu_bar.move_resize (ui::make_size (), ui::make_size (scrsize.x, 1));
 	main_ctrl.move_resize (ui::make_size (0, 1), scrsize - ui::make_size (0, 1));
 	Window::redraw ();
+}
+
+void MainWin::updated_filter ()
+{
+	if (filter.get ()) {
+		filtered_entries.reset (new DiaryEntryList (filter->filter (entries)));
+		main_ctrl.ui::Scroll::modify_number (filtered_entries->size ());
+	} else {
+		filtered_entries.reset ();
+		main_ctrl.ui::Scroll::modify_number (entries.size ());
+	}
+	MainWin::redraw ();
+}
+
+bool MainWin::unavailable_filtered ()
+{
+	if (filter.get ()) {
+		ui::dialog_message (
+				L"This operation cannot be done in filtered mode.\n"
+				L"Pressed LEFT to return to normal mode.");
+		return false;
+	}
+	return true;
 }
 
 namespace {
@@ -532,6 +587,8 @@ void MainWin::save_as ()
 
 void MainWin::append ()
 {
+	if (!unavailable_filtered ())
+		return;
 	DiaryEntry *ent = new DiaryEntry;
 	time_t cur_time = time (0);
 //	ent->utc_time.assign_utc (cur_time);
@@ -546,27 +603,40 @@ void MainWin::append ()
 		delete ent;
 }
 
+DiaryEntryList &MainWin::get_current_list ()
+{
+	if (filtered_entries.get ())
+		return *filtered_entries;
+	else
+		return entries;
+}
+
 DiaryEntry *MainWin::get_current ()
 {
-	if (entries.empty ())
+	DiaryEntryList &lst = get_current_list ();
+	if (lst.empty ())
 		return 0;
 	else
-		return entries[main_ctrl.current_focus ()];
+		return lst[main_ctrl.current_focus ()];
 }
 
 void MainWin::edit_current ()
 {
 	if (DiaryEntry *ent = get_current ()) {
-		if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str()))
+		if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str())) {
+			updated_filter ();
 			main_ctrl.touch ();
+		}
 	}
 }
 
 void MainWin::edit_labels_current ()
 {
 	if (DiaryEntry *ent = get_current ()) {
-		if (edit_labels (ent->labels, entries))
+		if (edit_labels (ent->labels, entries)) {
+			updated_filter ();
 			main_ctrl.touch ();
+		}
 	}
 }
 
@@ -581,6 +651,8 @@ void MainWin::edit_time_current ()
 
 void MainWin::remove_current ()
 {
+	if (!unavailable_filtered ())
+		return;
 	if (entries.empty ())
 		return;
 	size_t k = main_ctrl.current_focus ();
@@ -595,6 +667,8 @@ void MainWin::remove_current ()
 
 void MainWin::move_up_current ()
 {
+	if (!unavailable_filtered ())
+		return;
 	if (entries.size () < 2)
 		return;
 	size_t k = main_ctrl.current_focus ();
@@ -607,6 +681,8 @@ void MainWin::move_up_current ()
 
 void MainWin::move_down_current ()
 {
+	if (!unavailable_filtered ())
+		return;
 	if (entries.size () < 2)
 		return;
 	size_t k = main_ctrl.current_focus ();
@@ -631,6 +707,8 @@ bool compare_entry (const DiaryEntry *a, const DiaryEntry *b)
 
 void MainWin::sort_all ()
 {
+	if (!unavailable_filtered ())
+		return;
 	if (ui::dialog_message (L"Are you sure you want to sort all entries by time? This operation cannot be undone.",
 				ui::MESSAGE_YES|ui::MESSAGE_NO) == ui::MESSAGE_YES) {
 		std::stable_sort (entries.begin (), entries.end (), compare_entry);
@@ -640,15 +718,15 @@ void MainWin::sort_all ()
 
 void MainWin::view_current ()
 {
-	if (!entries.empty ()) {
-		DiaryEntry *ent = entries[main_ctrl.current_focus ()];
+	if (DiaryEntry *ent = get_current ())
 		view_entry (*ent, global_options.get_wstring (GLOBAL_OPTION_LONGTIME_FORMAT));
-	}
 }
 
 void MainWin::view_all ()
 {
-	view_all_entries (entries, global_options.get_wstring (GLOBAL_OPTION_LONGTIME_FORMAT));
+	DiaryEntryList &lst = get_current_list ();
+	if (!lst.empty ())
+		view_all_entries (lst, global_options.get_wstring (GLOBAL_OPTION_LONGTIME_FORMAT));
 }
 
 /*
@@ -698,6 +776,24 @@ void MainWin::open_file ()
 		if (!new_filename.empty ())
 			load (new_filename);
 	}
+}
+
+void MainWin::edit_filter ()
+{
+	if (entries.empty ())
+		return;
+	if (!filter.get ())
+		filter.reset (new FilterGroup);
+	dialog_filter (entries, *filter);
+	if (filter->empty ())
+		filter.reset ();
+	updated_filter ();
+}
+
+void MainWin::clear_filter ()
+{
+	filter.reset ();
+	updated_filter ();
 }
 
 void MainWin::search (bool bkwd)

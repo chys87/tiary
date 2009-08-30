@@ -29,6 +29,8 @@ add_library(tiary_common
 	static_assert.h
 	string.h
 	string.cpp
+	string_match.h
+	string_match.cpp
 	types.h
 	unicode.h
 	unicode.cpp
