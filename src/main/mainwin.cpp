@@ -800,7 +800,7 @@ void MainWin::clear_filter ()
 
 void MainWin::search (bool bkwd)
 {
-	if (entries.empty ())
+	if (get_current_list ().empty ())
 		return;
 	if (last_search.dialog (bkwd))
 		do_search (false, true);
@@ -816,7 +816,8 @@ void MainWin::search_continue (bool bkwd)
 
 void MainWin::do_search (bool bkwd, bool include_current_entry)
 {
-	unsigned num_ents = entries.size ();
+	DiaryEntryList &entry_list = get_current_list ();
+	unsigned num_ents = entry_list.size ();
 	if (num_ents == 0)
 		return;
 	if (!last_search)
@@ -826,7 +827,7 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 	if (!include_current_entry)
 		k += inc;
 	for (; k < num_ents; k += inc) {
-		if (last_search.basic_match (entries[k]->title) || last_search.basic_match (entries[k]->text)) {
+		if (last_search.basic_match (entry_list[k]->title) || last_search.basic_match (entry_list[k]->text)) {
 			main_ctrl.set_focus (k);
 			return;
 		}
