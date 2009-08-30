@@ -71,16 +71,14 @@ SearchInfo::operator int BooleanConvert::* () const
 	return (!text.empty () ? &BooleanConvert::valid : 0);
 }
 
-bool SearchInfo::match (const std::wstring &haystack) const
+std::vector <std::pair <size_t, size_t> > SearchInfo::match (const std::wstring &haystack) const
 {
 #ifdef TIARY_USE_PCRE
-	if (PcRe *rex = regex.get ()) {
+	if (PcRe *rex = regex.get ())
 		return rex->match (haystack);
-	} else
+	else
 #endif
-	{
-		return find_caseless (haystack, text) != std::wstring::npos;
-	}
+		return find_all_caseless (haystack, text);
 }
 
 

@@ -19,6 +19,7 @@
 
 #include "common/noncopyable.h"
 #include <string>
+#include <vector>
 
 namespace tiary {
 
@@ -30,7 +31,11 @@ public:
 
 	operator void * () const { return re; }
 
-	bool match (const std::wstring &) const; ///< Returns true iff matches
+	/**
+	 * @brief	Match the pattern against a string
+	 * @result	For each pair, @c first is the offset, @c second is the length
+	 */
+	std::vector<std::pair <size_t, size_t> > match (const std::wstring &) const;
 
 public:
 	void *re, *re_ex;

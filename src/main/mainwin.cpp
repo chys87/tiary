@@ -727,7 +727,7 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 		k += inc;
 	if (k < num_ents) {
 		for (; k < num_ents; k += inc) {
-			if (last_search.match (entries[k]->title) || last_search.match (entries[k]->text)) {
+			if (!last_search.match (entries[k]->title).empty () || !last_search.match (entries[k]->text).empty ()) {
 				main_ctrl.set_focus (k);
 				return;
 			}

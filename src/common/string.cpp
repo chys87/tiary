@@ -71,15 +71,27 @@ void strlower (std::wstring &str)
 	std::transform (str.begin (), str.end (), str.begin (), towlower);
 }
 
-size_t find_caseless (const std::wstring &haystack, const std::wstring &needle)
+std::vector <std::pair <size_t, size_t> >
+find_all_caseless (const std::wstring &haystack, const std::wstring &needle)
 {
-	if (haystack.length () < needle.length ())
-		return std::wstring::npos;
-	std::wstring hay (haystack);
-	std::wstring nee (needle);
-	strlower (hay);
-	strlower (nee);
-	return hay.find (nee);
+	std::vector <std::pair <size_t, size_t> > ret;
+	size_t neelen = needle.length ();
+	size_t haylen = haystack.length ();
+	if (haylen >= neelen) {
+		std::wstring hay (haystack);
+		std::wstring nee (needle);
+		strlower (hay);
+		strlower (nee);
+		size_t offset = 0;
+		while (haylen - offset >= neelen) {
+			size_t found = hay.find (nee, offset);
+			if (found == std::wstring::npos)
+				break;
+			ret.push_back (std::make_pair (found, neelen));
+			offset = found + neelen;
+		}
+	}
+	return ret;
 }
 
 

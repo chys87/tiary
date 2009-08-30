@@ -76,9 +76,12 @@ void tolower (std::wstring &);
 
 /**
  * @brief	Find the first occurrence of a substring, ignoring case
- * @result	Return std::wstring::npos if not found
+ * @result	For each occurrence, return the offset and length
+ *
+ * We return the length in the result to align with PcRe::match
  */
-size_t find_caseless (const std::wstring &haystack, const std::wstring &needle);
+std::vector <std::pair <size_t, size_t> >
+	find_all_caseless (const std::wstring &haystack, const std::wstring &needle);
 
 // Remove spaces at the beginning and the end
 void strip (std::string &);
