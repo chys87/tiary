@@ -58,7 +58,7 @@ DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::w
 	, layout_main (VERTICAL)
 	, layout_buttons (HORIZONTAL)
 	, max_text_width (0)
-	, result (-1)
+	, result (size_t (-1))
 {
 	lst_items.set_items (items, size_t (-1), false);
 
