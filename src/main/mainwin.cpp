@@ -705,7 +705,7 @@ void MainWin::search (bool bkwd)
 	if (entries.empty ())
 		return;
 	if (last_search.dialog (bkwd))
-		do_search (last_search.get_backward (), true);
+		do_search (false, true);
 }
 
 void MainWin::search_continue (bool bkwd)
