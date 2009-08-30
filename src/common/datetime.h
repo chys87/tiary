@@ -108,6 +108,8 @@ struct DateTime
 
 	std::string format (const char *format) const { return format_time (v, format); }
 	std::wstring format (const wchar_t *format) const { return format_time (v, format); }
+	std::string format (const std::string &format) const { return format_time (v, format.c_str ()); }
+	std::wstring format (const std::wstring &format) const { return format_time (v, format.c_str ()); }
 };
 
 inline bool operator == (const DateTime &a, const DateTime &b) { return a.v == b.v; }

@@ -15,6 +15,7 @@
 #define TIARY_MAIN_DIALOG_VIEW_EDIT_H
 
 #include <vector>
+#include <string>
 
 namespace tiary {
 
@@ -33,12 +34,12 @@ bool edit_entry (DiaryEntry &, const char *editor);
 /**
  * @brief	View the content in a dialog
  */
-void view_entry (DiaryEntry &);
+void view_entry (DiaryEntry &, const std::wstring &longtime_format);
 
 /**
  * @brief	View many items at one time
  */
-void view_all_entries (const std::vector <DiaryEntry *> &);
+void view_all_entries (const std::vector <DiaryEntry *> &, const std::wstring &longtime_format);
 
 
 

@@ -43,12 +43,12 @@ using namespace ui;
 const unsigned edit_line_width = 78;
 const unsigned view_line_width = 78;
 
-void write_for_view (RichTextList &lst, const DiaryEntry &ent)
+void write_for_view (RichTextList &lst, const DiaryEntry &ent, const std::wstring &longtime_format)
 {
 	lst.push_back (RichTextLine (PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'=')));
 	lst.push_back (RichTextLine (PALETTE_ID_SHOW_BOLD, ent.title));
 	lst.push_back (RichTextLine (PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'=')));
-	lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, ent.local_time.format (L"%W %B %d, %Y  %h:%M:%S %P")));
+	lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format)));
 	if (!ent.labels.empty ()) {
 		std::wstring labelstr = L"Labels: " + join (ent.labels.begin (), ent.labels.end (), L", ");
 		lst.push_back (RichTextLine (PALETTE_ID_SHOW_NORMAL, labelstr));
@@ -220,21 +220,21 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	return true;
 }
 
-void view_entry (DiaryEntry &ent)
+void view_entry (DiaryEntry &ent, const std::wstring &longtime_format)
 {
 	RichTextList text_list;
-	write_for_view (text_list, ent);
+	write_for_view (text_list, ent, longtime_format);
 	ui::dialog_richtext (
 			ent.title,
 			text_list,
 			make_size (view_line_width + 3, 0));
 }
 
-void view_all_entries (const DiaryEntryList &entries)
+void view_all_entries (const DiaryEntryList &entries, const std::wstring &longtime_format)
 {
 	ui::RichTextList text_list;
 	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {
-		write_for_view (text_list, **it);
+		write_for_view (text_list, **it, longtime_format);
 		text_list.insert (text_list.end (),
 				4, ui::RichTextLine (ui::PALETTE_ID_SHOW_NORMAL, std::wstring ()));
 	}
