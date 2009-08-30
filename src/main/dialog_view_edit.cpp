@@ -232,9 +232,14 @@ void view_entry (DiaryEntry &ent, const std::wstring &longtime_format)
 
 void view_all_entries (const DiaryEntryList &entries, const std::wstring &longtime_format)
 {
+	if (entries.empty ())
+		return;
 	ui::RichTextList text_list;
-	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {
+	DiaryEntryList::const_iterator it = entries.begin ();
+	for (;;) {
 		write_for_view (text_list, **it, longtime_format);
+		if (++it == entries.end ())
+			break;
 		text_list.insert (text_list.end (),
 				4, ui::RichTextLine (ui::PALETTE_ID_SHOW_NORMAL, std::wstring ()));
 	}
