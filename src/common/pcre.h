@@ -37,6 +37,12 @@ public:
 	 */
 	std::vector<std::pair <size_t, size_t> > match (const std::wstring &) const;
 
+	/**
+	 * @brief	Match the pattern against a string
+	 * @result	@c true if there is any match; @c false otherwise
+	 */
+	bool basic_match (const std::wstring &) const;
+
 public:
 	void *re, *re_ex;
 };

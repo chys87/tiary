@@ -81,6 +81,16 @@ std::vector <std::pair <size_t, size_t> > SearchInfo::match (const std::wstring 
 		return find_all (strlower (haystack), strlower (text));
 }
 
+bool SearchInfo::basic_match (const std::wstring &haystack) const
+{
+#ifdef TIARY_USE_PCRE
+	if (PcRe *rex = regex.get ())
+		return rex->basic_match (haystack);
+	else
+#endif
+		return (strlower (haystack).find (strlower (text)) != std::wstring::npos);
+}
+
 
 } // namespace tiary::ui
 } // namespace tiary

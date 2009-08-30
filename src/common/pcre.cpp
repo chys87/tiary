@@ -76,6 +76,14 @@ std::vector <std::pair <size_t, size_t> > PcRe::match (const std::wstring &str) 
 	return ret;
 }
 
+bool PcRe::basic_match (const std::wstring &str) const
+{
+	std::string utf8 = wstring_to_utf8 (str);
+
+	return (pcre_exec ((const pcre *)re, (const pcre_extra *)re_ex,
+			utf8.data (), utf8.length (), 0, PCRE_NOTEMPTY, 0, 0) >= 0);
+}
+
 } // namespace tiary
 
 

@@ -44,7 +44,15 @@ public:
 	 */
 	operator int BooleanConvert::* () const;
 
+	/**
+	 * @brief	Match against a string, returning detailed results
+	 */
 	std::vector <std::pair <size_t, size_t> > match (const std::wstring &) const;
+
+	/**
+	 * @brief	Match against a string, returning only true/false
+	 */
+	bool basic_match (const std::wstring &) const;
 
 	bool get_backward () const { return backward; }
 
