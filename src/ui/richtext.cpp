@@ -6,6 +6,7 @@
 
 #include "ui/richtext.h"
 #include "ui/paletteid.h"
+#include "ui/dialog_message.h"
 #include "common/format.h"
 #include <utility> // std::forward
 
@@ -16,6 +17,8 @@ RichText::RichText (Window &dlg, const LineList &lst)
 	: Control (dlg)
 	, line_list (lst)
 	, top_line (0)
+	, highlight_list ()
+	, search_info ()
 {
 	set_cursor_visibility (false);
 }
@@ -25,6 +28,8 @@ RichText::RichText (Window &dlg, LineList &&lst)
 	: Control (dlg)
 	, line_list (std::forward <LineList> (lst))
 	, top_line (0)
+	, highlight_list ()
+	, search_info ()
 {
 	set_cursor_visibility (false);
 }
@@ -40,13 +45,30 @@ void RichText::redraw ()
 	unsigned hgt = get_size ().y - 1;
 	if (int (wid) < 0 || int (hgt) < 0)
 		return;
-	LineList::const_iterator it = line_list.begin () + top_line;
+	HighlightList *hllst = highlight_list.get ();
 	unsigned show_lines = minU (hgt, line_list.size () - top_line);
-	for (unsigned i=0; i<show_lines; ++it,++i) {
+
+	for (unsigned i=0; i<show_lines; ++i) {
 		Size pos = make_size (0, i);
-		choose_palette (it->id);
+		choose_palette (line_list[top_line+i].id);
 		clear (pos, make_size (wid, 1));
-		put (pos, it->text);
+		const std::wstring &text = line_list[top_line+i].text;
+		if (hllst && !(*hllst)[top_line+i].empty ()) {
+			const std::vector <std::pair <size_t, size_t> > &hl = (*hllst)[top_line+i];
+			size_t offset = 0;
+			for (std::vector <std::pair <size_t, size_t> >::const_iterator it = hl.begin ();
+					it != hl.end (); ++it) {
+				pos = put (pos, text.data()+offset, it->first-offset);
+				attribute_on (REVERSE);
+				pos = put (pos, text.data()+it->first, it->second);
+				attribute_off (REVERSE);
+				offset = it->first + it->second;
+			}
+			pos = put (pos, text.data()+offset);
+		} else {
+			// Nothing to highlight
+			put (pos, text);
+		}
 	}
 	if (show_lines < hgt) {
 		choose_palette (PALETTE_ID_RICHTEXT);
@@ -134,8 +156,64 @@ bool RichText::on_key (wchar_t key)
 				return true;
 			}
 			break;
+
+		case CTRL_F:
+		case L'/':
+			slot_search (false);
+			return true;
+
+		case L'?':
+			slot_search (true);
+			return true;
+
+		case F3:
+		case L'n':
+			slot_search_continue (false);
+			return true;
+
+		case L'N':
+			slot_search_continue (true);
+			return false;
 	}
 	return false;
+}
+
+void RichText::slot_search (bool bkwd)
+{
+	if (search_info.dialog (bkwd)) {
+		bkwd = search_info.get_backward ();
+		HighlightList *hllst = new HighlightList (line_list.size ());
+		highlight_list.reset (hllst);
+		for (size_t i=0, n=line_list.size(); i<n; ++i)
+			(*hllst)[i] = search_info.match (line_list[i].text);
+		do_search (false, true);
+	}
+}
+
+void RichText::slot_search_continue (bool previous)
+{
+	if (!search_info)
+		slot_search (previous);
+	else
+		do_search (previous, false);
+}
+
+void RichText::do_search (bool previous, bool include_current)
+{
+	unsigned k = top_line;
+	unsigned num_ents = line_list.size ();
+	int inc = (!previous == !search_info.get_backward ()) ? 1 : -1;
+	HighlightList *hllst = highlight_list.get ();
+	if (!include_current)
+		k += inc;
+	for (; k < num_ents; k += inc) {
+		if (!(*hllst)[k].empty ()) {
+			top_line = k;
+			RichText::redraw ();
+			return;
+		}
+	}
+	dialog_message (L"Not found", L"Error");
 }
 
 } // namespace tiary::ui

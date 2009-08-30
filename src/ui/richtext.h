@@ -24,7 +24,10 @@
 
 #include "ui/control.h"
 #include "ui/richtextlist.h"
+#include "ui/search_info.h"
 #include <vector>
+#include <utility> // std::pair
+#include <memory> // std::auto_ptr
 
 namespace tiary {
 namespace ui {
@@ -59,10 +62,20 @@ public:
 
 	const LineList &get_list () const { return line_list; }
 
+	void slot_search (bool backward);
+	void slot_search_continue (bool previous);
+
 private:
 
 	const LineList line_list;
 	unsigned top_line;
+
+	typedef std::vector <std::vector <std::pair <size_t, size_t> > > HighlightList;
+	std::auto_ptr <HighlightList> highlight_list;
+
+	SearchInfo search_info;
+
+	void do_search (bool previous, bool include_current);
 };
 
 
