@@ -50,16 +50,18 @@ bool SearchInfo::dialog (bool default_backward)
 	if (new_text.empty ())
 		return false;
 #ifdef TIARY_USE_PCRE
+	PcRe *new_pcre = 0;
 	if (new_regex) {
-		PcRe *new_pcre = new PcRe (new_text);
+		new_pcre = new PcRe (new_text);
 		if (!*new_pcre) {
 			// Invalid regular expression
 			ui::dialog_message (L"Invalid regular expression", L"Search");
 			delete new_pcre;
 			return false;
 		}
-		regex.reset (new_pcre);
 	}
+	// Must reset regex to 0 if !new_regex
+	regex.reset (new_pcre);
 #endif
 	text = new_text;
 	backward = new_backward;
