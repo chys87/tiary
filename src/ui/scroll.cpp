@@ -90,11 +90,29 @@ void Scroll::modify_height (unsigned new_height)
 {
 	if (new_height == 0)
 		return;
+	unsigned old_height = height;
 	height = new_height;
-	if (accumulate_height[focus+1] > accumulate_height[first] + new_height) {
-		// We need to scroll forward (downward)
-		// Let's put the focus in the last line.
-		put_focus_last_line ();
+	if (new_height < old_height) {
+		// Became narrower.
+		// We may need to scroll forward (downward)
+		// to keep the selected item visible
+		if (accumulate_height[focus+1] > accumulate_height[first] + new_height) {
+			// Let's put the focus in the last line.
+			put_focus_last_line ();
+		}
+	} else {
+		// Became wider.
+		// If this will lead to space in the end, scroll backward (upward)
+		unsigned max = max_possible_focus ();
+		if (accumulate_height[max+1] - accumulate_height[first] < new_height) {
+			// Find the smallest possible first, such that
+			// accumulate_height[max+1] <= accumulate_height[first] + height
+			unsigned j = max;
+			unsigned tmp = accumulate_height[max+1];
+			while (j && tmp<=accumulate_height[j-1]+height)
+				--j;
+			first = j;
+		}
 	}
 	recalculate_len ();
 }
