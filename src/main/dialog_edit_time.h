@@ -12,36 +12,22 @@
  **************************************************************************/
 
 
-#ifndef TIARY_DIARY_DIARY_H
-#define TIARY_DIARY_DIARY_H
+#ifndef TIARY_MAIN_DIALOG_EDIT_TIME_H
+#define TIARY_MAIN_DIALOG_EDIT_TIME_H
 
-#include "common/datetime.h"
-#include "common/containers.h"
-#include <string>
-#include <vector>
-
+#include "diary/diary.h"
 
 namespace tiary {
 
 struct DiaryEntry;
-typedef std::vector<DiaryEntry *> DiaryEntryList;
 
-struct DiaryEntry
-{
-	typedef WStringLocaleOrderedSet LabelList;
-
-	DateTime local_time; // Local date and time
-//	DateTime utc_time; // UTC date and time
-	std::wstring title;
-	std::wstring text;
-	LabelList labels;
-};
-
-
-
+/**
+ * @brief	Edit the time for an entry
+ * @result	Whether there is any modification
+ */
+bool edit_entry_time (DiaryEntry &);
 
 
 } // namespace tiary
 
-
-#endif // Include guard
+#endif // include guard

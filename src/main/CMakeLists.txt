@@ -1,10 +1,14 @@
 add_library(tiary_main
 	dialog_all_labels.h
 	dialog_all_labels.cpp
+	dialog_edit_time.h
+	dialog_edit_time.cpp
 	dialog_labels.h
 	dialog_labels.cpp
 	dialog_pref.h
 	dialog_pref.cpp
+	dialog_view_edit.h
+	dialog_view_edit.cpp
 	doc.h
 	doc.cpp
 	mainui.h

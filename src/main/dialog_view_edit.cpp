@@ -12,6 +12,7 @@
  **************************************************************************/
 
 
+#include "main/dialog_view_edit.h"
 #include "diary/diary.h"
 #include "common/unicode.h"
 #include "ui/window.h"
@@ -145,7 +146,7 @@ bool error_false (const wchar_t *info)
 
 } // anonymous namespace
 
-bool DiaryEntry::edit (const char *editor)
+bool edit_entry (DiaryEntry &ent, const char *editor)
 {
 	// Write the contents to a temp file
 	// Then invoke an editor
@@ -162,7 +163,7 @@ bool DiaryEntry::edit (const char *editor)
 
 	// There is no universal method to notify the editor of the encoding;
 	// So the best way is to use LC_CTYPE
-	if (!write_for_edit (fd, title, text)) {
+	if (!write_for_edit (fd, ent.title, ent.text)) {
 		close (fd);
 		unlink (temp_file);
 		return error_false (L"Failed to write to temporary file :( Why?");
@@ -214,22 +215,22 @@ bool DiaryEntry::edit (const char *editor)
 #ifdef MADV_SEQUENTIAL
 	madvise (raw, fsize, MADV_SEQUENTIAL);
 #endif
-	reformat_content (title, text, raw);
+	reformat_content (ent.title, ent.text, raw);
 	munmap (raw, fsize);
 	return true;
 }
 
-void DiaryEntry::view ()
+void view_entry (DiaryEntry &ent)
 {
 	RichTextList text_list;
-	write_for_view (text_list, *this);
+	write_for_view (text_list, ent);
 	ui::dialog_richtext (
-			title,
+			ent.title,
 			text_list,
 			make_size (view_line_width + 3, 0));
 }
 
-void DiaryEntry::view_all (const DiaryEntryList &entries)
+void view_all_entries (const DiaryEntryList &entries)
 {
 	ui::RichTextList text_list;
 	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {

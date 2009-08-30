@@ -12,6 +12,7 @@
  **************************************************************************/
 
 
+#include "main/dialog_edit_time.h"
 #include "diary/diary.h"
 #include "ui/fixed_dialog.h"
 #include "ui/droplist.h"
@@ -220,15 +221,15 @@ void WindowTime::slot_date_changed ()
 
 } // anonymous namespace
 
-bool DiaryEntry::edit_time ()
+bool edit_entry_time (DiaryEntry &ent)
 {
-	WindowTime win (local_time.extract ());
+	WindowTime win (ent.local_time.extract ());
 	win.event_loop ();
 	if (win.get_canceled ())
 		return false;
-	DateTime old = local_time;
-	local_time = win.get_result ();
-	return (old != local_time);
+	DateTime old = ent.local_time;
+	ent.local_time = win.get_result ();
+	return (old != ent.local_time);
 }
 
 

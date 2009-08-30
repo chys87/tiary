@@ -30,6 +30,8 @@
 #include "main/dialog_pref.h"
 #include "main/dialog_labels.h"
 #include "main/dialog_all_labels.h"
+#include "main/dialog_edit_time.h"
+#include "main/dialog_view_edit.h"
 #include <limits>
 
 namespace tiary {
@@ -536,7 +538,7 @@ void MainWin::append ()
 	ent->local_time = DateTime (DateTime::LOCAL, cur_time);
 	ent->title = L"Your title goes here.";
 	ent->text = L"Your contents go here.";
-	if (ent->edit (global_options.get (GLOBAL_OPTION_EDITOR).c_str()) && !ent->text.empty ()) {
+	if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str()) && !ent->text.empty ()) {
 		entries.push_back (ent);
 		main_ctrl.touch ();
 		main_ctrl.set_focus (std::numeric_limits<int>::max ());
@@ -555,7 +557,7 @@ DiaryEntry *MainWin::get_current ()
 void MainWin::edit_current ()
 {
 	if (DiaryEntry *ent = get_current ()) {
-		if (ent->edit (global_options.get (GLOBAL_OPTION_EDITOR).c_str()))
+		if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str()))
 			main_ctrl.touch ();
 	}
 }
@@ -571,7 +573,7 @@ void MainWin::edit_labels_current ()
 void MainWin::edit_time_current ()
 {
 	if (DiaryEntry *ent = get_current ()) {
-		if (ent->edit_time ())
+		if (edit_entry_time (*ent))
 			main_ctrl.touch ();
 	}
 }
@@ -640,13 +642,13 @@ void MainWin::view_current ()
 {
 	if (!entries.empty ()) {
 		DiaryEntry *ent = entries[main_ctrl.current_focus ()];
-		ent->view ();
+		view_entry (*ent);
 	}
 }
 
 void MainWin::view_all ()
 {
-	DiaryEntry::view_all (entries);
+	view_all_entries (entries);
 }
 
 /*
