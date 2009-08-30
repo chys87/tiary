@@ -78,7 +78,7 @@ std::vector <std::pair <size_t, size_t> > SearchInfo::match (const std::wstring 
 		return rex->match (haystack);
 	else
 #endif
-		return find_all_caseless (haystack, text);
+		return find_all (strlower (haystack), strlower (text));
 }
 
 

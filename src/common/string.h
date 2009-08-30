@@ -72,16 +72,16 @@ inline wchar_t *strend (wchar_t *str) { return ::wcslen (str) + str; }
 
 
 /// @brief	Make a string lowercase
-void tolower (std::wstring &);
+std::wstring strlower (const std::wstring &);
 
 /**
- * @brief	Find the first occurrence of a substring, ignoring case
+ * @brief	Find all occurrences of a substring
  * @result	For each occurrence, return the offset and length
  *
  * We return the length in the result to align with PcRe::match
  */
 std::vector <std::pair <size_t, size_t> >
-	find_all_caseless (const std::wstring &haystack, const std::wstring &needle);
+	find_all (const std::wstring &haystack, const std::wstring &needle);
 
 // Remove spaces at the beginning and the end
 void strip (std::string &);

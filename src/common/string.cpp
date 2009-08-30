@@ -66,30 +66,27 @@ const wchar_t *strchrnul (const wchar_t *str, wchar_t ch)
 	return str;
 }
 
-void strlower (std::wstring &str)
+std::wstring strlower (const std::wstring &str)
 {
-	std::transform (str.begin (), str.end (), str.begin (), towlower);
+	std::wstring result;
+	result.resize (str.length ());
+	std::transform (str.begin (), str.end (), result.begin (), towlower);
+	return result;
 }
 
 std::vector <std::pair <size_t, size_t> >
-find_all_caseless (const std::wstring &haystack, const std::wstring &needle)
+find_all (const std::wstring &haystack, const std::wstring &needle)
 {
 	std::vector <std::pair <size_t, size_t> > ret;
 	size_t neelen = needle.length ();
 	size_t haylen = haystack.length ();
-	if (haylen >= neelen) {
-		std::wstring hay (haystack);
-		std::wstring nee (needle);
-		strlower (hay);
-		strlower (nee);
-		size_t offset = 0;
-		while (haylen - offset >= neelen) {
-			size_t found = hay.find (nee, offset);
-			if (found == std::wstring::npos)
-				break;
-			ret.push_back (std::make_pair (found, neelen));
-			offset = found + neelen;
-		}
+	size_t offset = 0;
+	while (haylen - offset >= neelen) {
+		size_t found = haystack.find (needle, offset);
+		if (found == std::wstring::npos)
+			break;
+		ret.push_back (std::make_pair (found, neelen));
+		offset = found + neelen;
 	}
 	return ret;
 }
