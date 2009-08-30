@@ -727,12 +727,10 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 	int inc = (!bkwd == !last_search.get_backward ()) ? 1 : -1;
 	if (!include_current_entry)
 		k += inc;
-	if (k < num_ents) {
-		for (; k < num_ents; k += inc) {
-			if (!last_search.match (entries[k]->title).empty () || !last_search.match (entries[k]->text).empty ()) {
-				main_ctrl.set_focus (k);
-				return;
-			}
+	for (; k < num_ents; k += inc) {
+		if (!last_search.match (entries[k]->title).empty () || !last_search.match (entries[k]->text).empty ()) {
+			main_ctrl.set_focus (k);
+			return;
 		}
 	}
 	// Not found.
