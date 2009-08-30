@@ -233,7 +233,7 @@ bool MainCtrl::on_mouse (ui::MouseEvent mouse_event)
 		else
 			k -= expand_lines - 1;
 	}
-	if (k >= w().entries.size ())
+	if (k >= w().get_current_list ().size ())
 		return false;
 	set_focus (k);
 	if (mouse_event.m & ui::RIGHT_CLICK)
