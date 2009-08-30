@@ -51,29 +51,28 @@ PcRe::~PcRe ()
 
 std::vector <std::pair <size_t, size_t> > PcRe::match (const std::wstring &str) const
 {
-	size_t ovector_n = str.length () * 3;
-	int *ovector = new int [ovector_n]; // Only first two-thirds are used for return value
+	// We are not interested in subpatterns
+	// pcre_exec requires an extra 50% space in ovector
+	int ovector[3];
 
 	std::string utf8 = wstring_to_utf8 (str);
 
 	std::vector <std::pair <size_t, size_t> > ret;
 
 	int rc;
-	if ((rc = pcre_exec ((const pcre *)re, (const pcre_extra *)re_ex,
-			utf8.data (), utf8.length (), 0, 0, ovector, ovector_n)) > 0) {
+	size_t offset = 0;
+	while ((rc = pcre_exec ((const pcre *)re, (const pcre_extra *)re_ex,
+			utf8.data (), utf8.length (), offset, PCRE_NOTEMPTY, ovector, 3)) >= 0) {
 		// rc==0 means too many substrings.
-		// We have guaranteed enough space
+		// We do not distinguish these situations
 
 		// Values in ovector are in bytes, not in UTF-8 characters
-		ret.resize (rc);
-		// FIXME: We can do some optimizations here
-		for (int i=0; i<rc; ++i) {
-			ret[i].first = mbs_to_wstring (utf8.substr (0, ovector[i*2])).length ();
-			ret[i].second = mbs_to_wstring (utf8.substr (ovector[i*2], ovector[i*2+1]-ovector[i*2])).length ();
-		}
+		size_t wchar_offset = mbs_to_wstring (utf8.substr (0, ovector[0])).length ();
+		size_t wchar_len = mbs_to_wstring (utf8.substr (ovector[0], ovector[1]-ovector[0])).length ();
+		ret.push_back (std::make_pair (wchar_offset, wchar_len));
+		offset = ovector[1];
 	}
 
-	delete [] ovector;
 	return ret;
 }
 
