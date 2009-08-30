@@ -29,7 +29,12 @@ namespace tiary {
 void show_doc ();
 
 /**
- * @brief	Display the about box
+ * @brief	Displays the license box
+ */
+void show_license ();
+
+/**
+ * @brief	Displays the about box
  */
 void show_about ();
 

@@ -433,6 +433,8 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		;
 	menu_bar.add (L"&Help")
 		(L"&Help",                  Signal (show_doc))
+		()
+		(L"&License",               Signal (show_license))
 		(L"&About",                 Signal (show_about))
 		;
 	MainWin::redraw ();
