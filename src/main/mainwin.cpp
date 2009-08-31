@@ -401,32 +401,35 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		()
 		(L"&Quit           Ctrl+Q", Signal (this, &MainWin::quit))
 		;
+	Query <bool> q_normal (this, &MainWin::query_normal_mode);
+	Query <bool> q_nonempty (this, &MainWin::query_nonempty);
+	Query <bool> q_normal_nonempty (this, &MainWin::query_normal_mode_nonempty);
 	context_menu = &menu_bar.add (L"&Entry");
 	(*context_menu)
-		(L"&New entry",             Signal (this, &MainWin::append))
-		(L"&Delete",                Signal (this, &MainWin::remove_current))
+		(L"&New entry",             Signal (this, &MainWin::append), q_normal)
+		(L"&Delete",                Signal (this, &MainWin::remove_current), q_normal_nonempty)
 		()
-		(L"&Edit",                  Signal (this, &MainWin::edit_current))
-		(L"Edit &labels...",        Signal (this, &MainWin::edit_labels_current))
-		(L"Edit t&ime...",          Signal (this, &MainWin::edit_time_current))
+		(L"&Edit",                  Signal (this, &MainWin::edit_current), q_nonempty)
+		(L"Edit &labels...",        Signal (this, &MainWin::edit_labels_current), q_nonempty)
+		(L"Edit t&ime...",          Signal (this, &MainWin::edit_time_current), q_nonempty)
 		()
-		(L"&View",                  Signal (this, &MainWin::view_current))
-		(L"View &all",              Signal (this, &MainWin::view_all))
+		(L"&View",                  Signal (this, &MainWin::view_current), q_nonempty)
+		(L"View &all",              Signal (this, &MainWin::view_all), q_nonempty)
 		()
-		(L"&Move up",               Signal (this, &MainWin::move_up_current))
-		(L"Move dow&n",             Signal (this, &MainWin::move_down_current))
-		(L"&Sort all",              Signal (this, &MainWin::sort_all))
+		(L"&Move up",               Signal (this, &MainWin::move_up_current), q_normal_nonempty)
+		(L"Move dow&n",             Signal (this, &MainWin::move_down_current), q_normal_nonempty)
+		(L"&Sort all",              Signal (this, &MainWin::sort_all), q_normal_nonempty)
 		;
 	menu_bar.add (L"&View")
-		(L"&Filter...      CtrL+G", Signal (this, &MainWin::edit_filter))
+		(L"&Filter...      CtrL+G", Signal (this, &MainWin::edit_filter), q_nonempty)
 		;
 	menu_bar.add (L"&Search")
-		(L"&Find...        Ctrl+F", Signal (this, &MainWin::search, false))
-		(L"Find &next      F3",     Signal (this, &MainWin::search_continue, false))
-		(L"Find &previous",         Signal (this, &MainWin::search_continue, true))
+		(L"&Find...        Ctrl+F", Signal (this, &MainWin::search, false), q_nonempty)
+		(L"Find &next      F3",     Signal (this, &MainWin::search_continue, false), q_nonempty)
+		(L"Find &previous",         Signal (this, &MainWin::search_continue, true), q_nonempty)
 		;
 	menu_bar.add (L"Se&ttings")
-		(L"&Labels...",             Signal (this, &MainWin::edit_all_labels))
+		(L"&Labels...",             Signal (this, &MainWin::edit_all_labels), q_nonempty)
 		()
 		(L"&Preferences...",        Signal (this, &MainWin::edit_global_options))
 //		(L"&File perferences...",   Signal (this, &MainWin::edit_perfile_options))
@@ -606,6 +609,14 @@ void MainWin::append ()
 }
 
 DiaryEntryList &MainWin::get_current_list ()
+{
+	if (filtered_entries.get ())
+		return *filtered_entries;
+	else
+		return entries;
+}
+
+const DiaryEntryList &MainWin::get_current_list () const
 {
 	if (filtered_entries.get ())
 		return *filtered_entries;
@@ -909,6 +920,21 @@ void MainWin::quit ()
 {
 	if (check_save ())
 		request_close ();
+}
+
+bool MainWin::query_normal_mode () const
+{
+	return !filter.get ();
+}
+
+bool MainWin::query_nonempty () const
+{
+	return !get_current_list ().empty ();
+}
+
+bool MainWin::query_normal_mode_nonempty () const
+{
+	return (query_normal_mode () && query_nonempty ());
 }
 
 } // namespace tiary

@@ -118,6 +118,7 @@ private:
 
 	void append ();
 	std::vector <DiaryEntry *> &get_current_list ();
+	const std::vector <DiaryEntry *> &get_current_list () const;
 	DiaryEntry *get_current ();
 	void edit_current ();
 	void edit_labels_current ();
@@ -143,6 +144,10 @@ private:
 	 * If the user instructs to save, do it.
 	 */
 	bool check_save ();
+
+	bool query_normal_mode () const;
+	bool query_nonempty () const;
+	bool query_normal_mode_nonempty () const;
 };
 
 

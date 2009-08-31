@@ -24,6 +24,7 @@ namespace {
 #define BACKGROUND         { BLACK, WHITE, 0 }
 #define EDIT_AREA          { WHITE, BLACK, 0 }
 #define EDIT_AREA_SELECT   { BLACK, YELLOW, 0 }
+#define BACKGROUND_GRAY    { YELLOW, WHITE, 0 }
 #define ENTRY_TEXT         { DEFAULT_FORECOLOR, DEFAULT_BACKCOLOR, 0 }
 #define ENTRY_TITLE        { RED, DEFAULT_BACKCOLOR, HIGHLIGHT }
 #define ENTRY_LABEL        { CYAN, DEFAULT_BACKCOLOR, 0 }
@@ -51,6 +52,7 @@ const PaletteMap mapping[] = {
 	, { PALETTE_ID_CHECKBOX,           EDIT_AREA }
 	, { PALETTE_ID_MENU,               BACKGROUND }
 	, { PALETTE_ID_MENU_SELECT,        EDIT_AREA }
+	, { PALETTE_ID_MENU_INVALID,       BACKGROUND_GRAY }
 	, { PALETTE_ID_MENUBAR,            BACKGROUND }
 	, { PALETTE_ID_MENUBAR_SELECT,     EDIT_AREA }
 	, { PALETTE_ID_DROPLIST,           EDIT_AREA }

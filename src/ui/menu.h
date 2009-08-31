@@ -16,6 +16,7 @@
 #define TIARY_UI_MENU_H
 
 #include "common/signal.h"
+#include "common/query.h"
 #include <list>
 #include <string>
 
@@ -39,14 +40,14 @@ struct MenuItem
 	Signal sig; ///< A Signal associated with this item
 	bool hidden; ///< Don't display this item. Can be useful in some contexts, i.e. a Recent File list
 	Menu *submenu; ///< Submenu
+	Query<bool> valid_foo; ///< A callback function to determine whether an item is usable or not
 
 	MenuItem (); ///< Initialize to a separator
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
+	// valid_foo is not frequently used, so we do not initialize it in the constructor
 	MenuItem (const std::wstring &, const Signal &);
-	explicit MenuItem (const std::wstring &, Signal && = Signal ());
-#else
-	explicit MenuItem (const std::wstring &, const Signal & = Signal ());
+#ifdef TIARY_HAVE_RVALUE_REFERENCES
+	MenuItem (const std::wstring &, Signal &&);
 #endif
 
 	MenuItem (const MenuItem &); ///< Deep copy...
@@ -82,12 +83,9 @@ struct Menu
 
 	MenuItem &add (); ///< Add a separator
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	MenuItem &add (const std::wstring &text, const Signal &sig);
-	MenuItem &add (const std::wstring &text, Signal &&sig = Signal ());
 	MenuItem &add (const wchar_t *text, const Signal &sig);
 	MenuItem &add (const wchar_t *text, Signal &&sig = Signal ());
 #else
-	MenuItem &add (const std::wstring &text, const Signal &sig = Signal ());
 	MenuItem &add (const wchar_t *text, const Signal &sig = Signal ());
 #endif
 
@@ -98,38 +96,34 @@ struct Menu
 		return *this;
 	}
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	Menu &operator () (const std::wstring &text, Signal &&sig = Signal ())
+	Menu &operator () (const wchar_t *text, Signal &&sig = Signal (), Query <bool> &&foo = Query <bool> ())
 	{
-		add (text, std::forward<Signal> (sig));
+		add (text, std::forward<Signal> (sig)).valid_foo = std::forward <Query <bool> > (foo);
 		return *this;
 	}
-	Menu &operator () (const wchar_t *text, Signal &&sig = Signal ())
+	Menu &operator () (const wchar_t *text, Signal &&sig, const Query <bool> &foo)
 	{
-		add (text, std::forward<Signal> (sig));
+		add (text, std::forward<Signal> (sig)).valid_foo = foo;
+		return *this;
+	}
+	Menu &operator () (const wchar_t *text, const Signal &sig, Query <bool> &&foo = Query <bool> ())
+	{
+		add (text, sig).valid_foo = std::forward <Query <bool> > (foo);
 		return *this;
 	}
 #endif
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	Menu &operator () (const std::wstring &text, const Signal &sig)
+	Menu &operator () (const wchar_t *text, const Signal &sig, const Query <bool> &foo)
 #else
-	Menu &operator () (const std::wstring &text, const Signal &sig = Signal ())
+	Menu &operator () (const wchar_t *text, const Signal &sig = Signal (), const Query <bool> &foo = Query <bool> ())
 #endif
 	{
-		add (text, sig);
-		return *this;
-	}
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	Menu &operator () (const wchar_t *text, const Signal &sig)
-#else
-	Menu &operator () (const wchar_t *text, const Signal &sig = Signal ())
-#endif
-	{
-		add (text, sig);
+		add (text, sig).valid_foo = foo;
 		return *this;
 	}
 
-	Menu &add_submenu (const std::wstring &text);
+	Menu &add_submenu (const wchar_t *text);
 
 	/**
 	 * @param	left	The first-choice place to display the menu.

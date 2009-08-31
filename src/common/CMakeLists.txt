@@ -24,6 +24,7 @@ add_library(tiary_common
 	noncopyable.h
 	pcre.h
 	pcre.cpp
+	query.h
 	signal.h
 	signal.cpp
 	static_assert.h

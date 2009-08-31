@@ -36,10 +36,11 @@ const PaletteID PALETTE_ID_LISTBOX_SELECT       = 6;
 const PaletteID PALETTE_ID_CHECKBOX             = 7;
 const PaletteID PALETTE_ID_MENU                 = 8;
 const PaletteID PALETTE_ID_MENU_SELECT          = 9;
-const PaletteID PALETTE_ID_MENUBAR              = 10;
-const PaletteID PALETTE_ID_MENUBAR_SELECT       = 11;
-const PaletteID PALETTE_ID_DROPLIST             = 12;
-const PaletteID PALETTE_ID_RICHTEXT             = 13;
+const PaletteID PALETTE_ID_MENU_INVALID         = 10;
+const PaletteID PALETTE_ID_MENUBAR              = 11;
+const PaletteID PALETTE_ID_MENUBAR_SELECT       = 12;
+const PaletteID PALETTE_ID_DROPLIST             = 13;
+const PaletteID PALETTE_ID_RICHTEXT             = 14;
 
 const PaletteID PALETTE_ID_ENTRY                = 50;
 const PaletteID PALETTE_ID_ENTRY_TEXT           = 51;

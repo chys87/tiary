@@ -30,6 +30,7 @@ MenuItem::MenuItem ()
 	, sig ()
 	, hidden (false)
 	, submenu (0)
+	, valid_foo ()
 {
 }
 
@@ -38,6 +39,7 @@ MenuItem::MenuItem (const std::wstring &text_, const Signal &sig_)
 	, sig (sig_)
 	, hidden (false)
 	, submenu (0)
+	, valid_foo ()
 {
 }
 
@@ -46,6 +48,7 @@ MenuItem::MenuItem (const MenuItem &other)
 	, sig (other.sig)
 	, hidden (other.hidden)
 	, submenu (other.submenu ? new Menu (*other.submenu) : 0)
+	, valid_foo (other.valid_foo)
 {
 }
 
@@ -64,6 +67,7 @@ MenuItem::MenuItem (const std::wstring &text_, Signal &&sig_)
 	, sig (std::forward<Signal> (sig_))
 	, hidden (false)
 	, submenu (0)
+	, valid_foo ()
 {
 }
 
@@ -72,6 +76,7 @@ MenuItem::MenuItem (MenuItem &&other)
 	, sig (std::forward<Signal> (other.sig))
 	, hidden (other.hidden)
 	, submenu (other.submenu)
+	, valid_foo (std::forward <Query <bool> > (other.valid_foo))
 {
 	other.submenu = 0;
 }
@@ -83,6 +88,7 @@ MenuItem &MenuItem::operator = (MenuItem &&other)
 	hidden = other.hidden;
 	submenu = other.submenu;
 	other.submenu = 0;
+	valid_foo = std::forward <Query <bool> > (other.valid_foo);
 	return *this;
 }
 #endif
@@ -108,33 +114,23 @@ MenuItem &Menu::add ()
 	return item_list.back ();
 }
 
-MenuItem &Menu::add (const std::wstring &text, const Signal &sig)
+MenuItem &Menu::add (const wchar_t *text, const Signal &sig)
 {
 	item_list.push_back (MenuItem (text, sig));
 	return item_list.back ();
 }
 
-MenuItem &Menu::add (const wchar_t *text, const Signal &sig)
-{
-	return add (std::wstring (text), sig);
-}
-
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-MenuItem &Menu::add (const std::wstring &text, Signal &&sig)
+MenuItem &Menu::add (const wchar_t *text, Signal &&sig)
 {
 	item_list.push_back (MenuItem (text, std::forward<Signal> (sig)));
 	return item_list.back ();
 }
-
-MenuItem &Menu::add (const wchar_t *text, Signal &&sig)
-{
-	return add (std::wstring (text), std::forward<Signal> (sig));
-}
 #endif
 
-Menu &Menu::add_submenu (const std::wstring &text)
+Menu &Menu::add_submenu (const wchar_t *text)
 {
-	return add (text, Signal ()).get_submenu ();
+	return add (text).get_submenu ();
 }
 
 namespace {
@@ -145,7 +141,7 @@ class MenuWindow;
 class ItemControl : public Control
 {
 public:
-	ItemControl (MenuWindow &, const MenuItem &);
+	ItemControl (MenuWindow &, const MenuItem &, bool);
 	~ItemControl ();
 
 	bool on_focus ();
@@ -159,6 +155,7 @@ public:
 private:
 	const MenuItem &item;
 	UIStringOne text;
+	bool valid;
 
 	friend class MenuWindow;
 };
@@ -185,14 +182,16 @@ private:
 	friend class ItemControl;
 };
 
-ItemControl::ItemControl (MenuWindow &dlg, const MenuItem &item_)
+ItemControl::ItemControl (MenuWindow &dlg, const MenuItem &item_, bool valid_)
 	: Control (dlg)
 	, item (item_)
 	, text (item_.text)
+	, valid (valid_)
 {
 	set_cursor_visibility (false);
-	if (wchar_t c = text.get_hotkey ())
-		dlg.register_hotkey (c, Signal (this, &ItemControl::slot_trigger));
+	if (valid_)
+		if (wchar_t c = text.get_hotkey ())
+			dlg.register_hotkey (c, Signal (this, &ItemControl::slot_trigger));
 }
 
 ItemControl::~ItemControl ()
@@ -201,7 +200,7 @@ ItemControl::~ItemControl ()
 
 bool ItemControl::on_focus ()
 {
-	if (item.text.empty ())
+	if (!valid || item.text.empty ())
 		return false;
 	else {
 		ItemControl::redraw ();
@@ -235,6 +234,8 @@ bool ItemControl::on_key (wchar_t c)
 
 bool ItemControl::on_mouse (MouseEvent me)
 {
+	if (!valid || item.text.empty ())
+		return false;
 	if (me.m & MOUSE_ALL_BUTTON)
 		slot_trigger ();
 	else
@@ -252,7 +253,15 @@ void ItemControl::redraw ()
 
 	} else {
 
-		choose_palette (dlg.get_focus () == this ? PALETTE_ID_MENU_SELECT : PALETTE_ID_MENU);
+		PaletteID id;
+
+		if (!valid)
+			id = PALETTE_ID_MENU_INVALID;
+		else if (dlg.get_focus () == this)
+			id = PALETTE_ID_MENU_SELECT;
+		else
+			id = PALETTE_ID_MENU;
+		choose_palette (id);
 		clear ();
 		text.output (*this, make_size (), get_size ().x);
 		if (item.submenu)
@@ -294,11 +303,11 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	unsigned maxwid = 0;
 	for (Menu::const_iterator it = menu_.begin (); it != menu_.end (); ++it) {
 		if (!it->hidden) {
-			ItemControl *p = *pi++ = new ItemControl (*this, *it);
-			if (!p->text.get_text ().empty ()) {
+			bool validity = it->valid_foo.call (true);
+			ItemControl *p = *pi++ = new ItemControl (*this, *it, validity);
+			if (validity && !p->text.get_text ().empty ())
 				*pv++ = p;
-				maxwid = maxU (maxwid, p->text.get_width ());
-			}
+			maxwid = maxU (maxwid, p->text.get_width ());
 		}
 	}
 
