@@ -21,7 +21,7 @@
 #include "ui/button.h"
 #include "ui/window.h"
 #include "ui/fixed_dialog.h"
-#include "ui/checkbox.h"
+#include "ui/checkbox_label.h"
 #include "ui/button_default.h"
 #include "ui/dialog_message.h"
 #include "ui/dialog_select.h"
@@ -50,8 +50,7 @@ class DialogFilter : public FixedWindow, private ButtonDefault
 	TextBox txt_title;
 	Layout layout_title;
 #ifdef TIARY_USE_PCRE
-	CheckBox chk_title_regex;
-	Label lbl_title_regex;
+	CheckBoxLabel chk_title_regex;
 	Layout layout_title_regex;
 #endif
 
@@ -59,8 +58,7 @@ class DialogFilter : public FixedWindow, private ButtonDefault
 	TextBox txt_text;
 	Layout layout_text;
 #ifdef TIARY_USE_PCRE
-	CheckBox chk_text_regex;
-	Label lbl_text_regex;
+	CheckBoxLabel chk_text_regex;
 	Layout layout_text_regex;
 #endif
 
@@ -94,16 +92,14 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 	, txt_title (*this)
 	, layout_title (HORIZONTAL)
 #ifdef TIARY_USE_PCRE
-	, chk_title_regex (*this)
-	, lbl_title_regex (*this, L"&Regular expression")
+	, chk_title_regex (*this, L"&Regular expression", false)
 	, layout_title_regex (HORIZONTAL)
 #endif
 	, lbl_text (*this, L"&Content:")
 	, txt_text (*this)
 	, layout_text (HORIZONTAL)
 #ifdef TIARY_USE_PCRE
-	, chk_text_regex (*this)
-	, lbl_text_regex (*this, L"Regular e&xpression")
+	, chk_text_regex (*this, L"Regular e&xpression", false)
 	, layout_text_regex (HORIZONTAL)
 #endif
 	, btn_ok (*this, L"&OK")
@@ -118,12 +114,12 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 		} else if (FilterByTitle *filter_title = dynamic_cast <FilterByTitle *> (*it)) {
 			txt_title.set_text (filter_title->get_pattern (), false, filter_title->get_pattern ().length ());
 #ifdef TIARY_USE_PCRE
-			chk_title_regex.set_status (filter_title->get_use_regex ());
+			chk_title_regex.checkbox.set_status (filter_title->get_use_regex ());
 #endif
 		} else if (FilterByText *filter_text = dynamic_cast <FilterByText *> (*it)) {
 			txt_text.set_text (filter_text->get_pattern (), false, filter_text->get_pattern ().length ());
 #ifdef TIARY_USE_PCRE
-			chk_text_regex.set_status (filter_text->get_use_regex ());
+			chk_text_regex.checkbox.set_status (filter_text->get_use_regex ());
 #endif
 		}
 	}
@@ -144,9 +140,7 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 #ifdef TIARY_USE_PCRE
 	layout_title_regex.add
 		(11, 11)
-		(chk_title_regex, 3, 3)
-		(1, 1)
-		(lbl_title_regex, 1, Layout::UNLIMITED)
+		(chk_title_regex, 3, Layout::UNLIMITED)
 		;
 #endif
 	layout_text.add
@@ -157,9 +151,7 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 #ifdef TIARY_USE_PCRE
 	layout_text_regex.add
 		(11, 11)
-		(chk_text_regex, 3, 3)
-		(1, 1)
-		(lbl_text_regex, 1, Layout::UNLIMITED)
+		(chk_text_regex, 3, Layout::UNLIMITED)
 		;
 #endif
 	layout_buttons.add
@@ -189,11 +181,11 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 		(txt_label)
 		(txt_title)
 #ifdef TIARY_USE_PCRE
-		(chk_title_regex)
+		(chk_title_regex.checkbox)
 #endif
 		(txt_text)
 #ifdef TIARY_USE_PCRE
-		(chk_text_regex)
+		(chk_text_regex.checkbox)
 #endif
 		(btn_ok);
 	ChainControlsHorizontal () (txt_label) (btn_label);
@@ -206,22 +198,6 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 
 	// Setting up signals
 	btn_label.sig_clicked.connect (this, &DialogFilter::slot_choose_label);
-#ifdef TIARY_USE_PCRE
-	lbl_title_regex.sig_hotkey.connect (
-				TIARY_LIST_OF (Signal)
-					Signal (chk_title_regex, &CheckBox::toggle, false),
-					Signal (this, &Window::set_focus_ptr, &chk_title_regex, 0)
-				TIARY_LIST_OF_END
-			);
-	lbl_title_regex.sig_clicked = lbl_title_regex.sig_hotkey;
-	lbl_text_regex.sig_hotkey.connect (
-				TIARY_LIST_OF(Signal)
-					Signal (chk_text_regex, &CheckBox::toggle, false),
-					Signal (this, &Window::set_focus_ptr, &chk_text_regex, 0)
-				TIARY_LIST_OF_END
-			);
-	lbl_text_regex.sig_clicked = lbl_text_regex.sig_hotkey;
-#endif
 	btn_ok.sig_clicked.connect (this, &DialogFilter::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 	set_default_button (btn_ok);
