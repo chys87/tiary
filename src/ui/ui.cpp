@@ -23,7 +23,10 @@ namespace ui {
 
 namespace {
 
-bool is_initialized;
+bool is_initialized = false;
+#ifdef TIARY_USE_MOUSE
+bool is_mouse_supported = false;
+#endif
 
 void init_color_pairs ()
 {
@@ -55,10 +58,6 @@ bool init ()
 			ESCDELAY = 50;
 		start_color ();
 		init_color_pairs ();
-#ifdef TIARY_USE_MOUSE
-		mmask_t m = mousemask_to_internal (MOUSE_ALL_BUTTON);
-		mousemask (m, 0);
-#endif
 		set_palettes ();
 		static bool ever_registered = false;
 		if (!ever_registered) {
@@ -73,6 +72,33 @@ bool init ()
 bool initialized ()
 {
 	return is_initialized;
+}
+
+bool get_mouse_status ()
+{
+#ifdef TIARY_USE_MOUSE
+	return is_mouse_supported;
+#else
+	return false;
+#endif
+}
+
+void set_mouse_status (bool status)
+{
+#ifdef TIARY_USE_MOUSE
+	mmask_t m = status ? mousemask_to_internal (MOUSE_ALL_BUTTON) : 0;
+	mousemask (m, 0);
+	is_mouse_supported = status;
+#else
+	(void) status;
+#endif
+}
+
+void toggle_mouse_status ()
+{
+#ifdef TIARY_USE_MOUSE
+	set_mouse_status (!get_mouse_status ());
+#endif
 }
 
 void finalize ()

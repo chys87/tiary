@@ -45,6 +45,7 @@ int main (int argc, char **argv)
 	}
 
 	tiary::ui::init ();
+	tiary::ui::set_mouse_status (true);
 
 	std::wstring filename;
 	if (argc >= 2)

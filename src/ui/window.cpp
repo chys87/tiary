@@ -591,14 +591,20 @@ void Window::unget (MouseEvent mouse_event)
 	unget_input (MOUSE, mouse_event);
 }
 
+namespace {
+bool suspend_mouse_status;
+} // anonymous namespace
+
 void Window::suspend ()
 {
+	suspend_mouse_status = get_mouse_status ();
 	finalize ();
 }
 
 bool Window::resume ()
 {
 	if (init ()) {
+		set_mouse_status (suspend_mouse_status);
 		unget (WINCH);
 		touch_screen ();
 		return true;
@@ -778,6 +784,10 @@ bool Window::on_key (wchar_t c)
 				// Fall into ...
 			case CTRL_L:
 				Window::touch_screen ();
+				processed = true;
+				break;
+			case F12:
+				toggle_mouse_status ();
 				processed = true;
 				break;
 		}

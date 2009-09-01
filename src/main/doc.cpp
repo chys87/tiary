@@ -63,6 +63,9 @@ const ui::RichTextLineC info[] = {
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    r                    Edit per-file preferences" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    R                    Edit global preferences" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+L               Refresh the screen" },
+#ifdef TIARY_USE_MOUSE
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    F12                  Enable/disable mouse" },
+#endif
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    h H F1               View this help info" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+N               New file" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+O               Open file" },

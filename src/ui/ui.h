@@ -96,6 +96,20 @@ bool init ();
  */
 bool initialized ();
 /**
+ * @brief	Get the current mouse supporting status
+ */
+bool get_mouse_status ();
+/**
+ * @brief	Enable or disable mouse supporting
+ */
+void set_mouse_status (bool);
+/**
+ * @brief	Enable or disable mouse supporting
+ *
+ * This function reverts the supporting status for mouse
+ */
+void toggle_mouse_status ();
+/**
  * @brief	Closes the UI system
  *
  * If the programmer fails to explicitly call this function before the program
