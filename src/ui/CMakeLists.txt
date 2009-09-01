@@ -6,6 +6,8 @@ add_library(tiary_ui
 	chain.h
 	checkbox.h
 	checkbox.cpp
+	checkbox_label.h
+	checkbox_label.cpp
 	control.h
 	control.cpp
 	dialog_input.h

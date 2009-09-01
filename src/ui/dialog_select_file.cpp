@@ -25,7 +25,7 @@
 #include "ui/dialog_message.h"
 #include "common/format.h"
 #include "common/algorithm.h"
-#include "ui/checkbox.h"
+#include "ui/checkbox_label.h"
 #include "common/container_of.h"
 #include <list>
 
@@ -54,8 +54,7 @@ public:
 private:
 	TextBox text_input;
 	ListBox list_files;
-	CheckBox check_hidden_files;
-	Label lbl_hidden_files;
+	CheckBoxLabel check_hidden_files;
 	Button btn_ok;
 	Button btn_cancel;
 	Layout layout_main;
@@ -81,8 +80,7 @@ WindowSelectFile::WindowSelectFile (const std::wstring &hint, const std::wstring
 	, ButtonDefault ()
 	, text_input (*this)
 	, list_files (*this)
-	, check_hidden_files (*this, true)
-	, lbl_hidden_files (*this, string_show_hidden_files)
+	, check_hidden_files (*this, string_show_hidden_files, true)
 	, btn_ok (*this, L"&OK")
 	, btn_cancel (*this, L"&Cancel")
 	, layout_main (VERTICAL)
@@ -91,13 +89,13 @@ WindowSelectFile::WindowSelectFile (const std::wstring &hint, const std::wstring
 	, list_dir ()
 	, options (options_)
 {
-	ChainControlsHorizontal () (check_hidden_files) (btn_ok) (btn_cancel);
+	ChainControlsHorizontal () (check_hidden_files.checkbox) (btn_ok) (btn_cancel);
 	ChainControlsVerticalNC () (text_input) (list_files) (btn_ok);
-	check_hidden_files.ctrl_up = btn_cancel.ctrl_up = &list_files;
-	check_hidden_files.ctrl_down = btn_cancel.ctrl_down = &text_input;
+	check_hidden_files.checkbox.ctrl_up = btn_cancel.ctrl_up = &list_files;
+	check_hidden_files.checkbox.ctrl_down = btn_cancel.ctrl_down = &text_input;
 
 	text_input.sig_changed.connect (this, &WindowSelectFile::slot_input);
-	check_hidden_files.sig_toggled.connect (this, &WindowSelectFile::slot_refresh);
+	check_hidden_files.checkbox.sig_toggled.connect (this, &WindowSelectFile::slot_refresh);
 	list_files.sig_focus.connect (this, &WindowSelectFile::slot_select);
 	list_files.sig_select_changed.connect (this, &WindowSelectFile::slot_select);
 	list_files.sig_double_clicked.connect (this, &WindowSelectFile::slot_ok);
@@ -107,18 +105,10 @@ WindowSelectFile::WindowSelectFile (const std::wstring &hint, const std::wstring
 	set_default_button (btn_ok);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
 
-	lbl_hidden_files.sig_hotkey.connect (
-			TIARY_LIST_OF(Signal)
-				Signal (check_hidden_files, &CheckBox::toggle, true),
-				Signal (this, &Window::set_focus_ptr, &check_hidden_files, 0)
-			TIARY_LIST_OF_END
-			);
-	lbl_hidden_files.sig_clicked.connect (lbl_hidden_files.sig_hotkey);
 //	register_hotkey (F5, Signal (this, &WindowSelectFile::slot_refresh));
 
 	layout_buttons.add
-		(check_hidden_files, 3, 3, 1, 0)
-		(lbl_hidden_files, len_show_hidden_files, len_show_hidden_files, 1, 0)
+		(check_hidden_files, 4+len_show_hidden_files, 4+len_show_hidden_files, 1, 0)
 		(0, 3)
 		(btn_ok, 10, 10, 3)
 		(0, 2)
