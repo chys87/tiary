@@ -15,7 +15,7 @@
 #ifndef TIARY_UI_WINDOW_H
 #define TIARY_UI_WINDOW_H
 
-#include "ui/object.h"
+#include "ui/movable_object.h"
 #include "ui/ui.h"
 #include "ui/hotkeys.h"
 #include "ui/uistring.h"
@@ -30,7 +30,7 @@ class Control;
 /**
  * @brief	Window: An object-oriented event-driven portion of the screen
  */
-class Window : public Object, public Hotkeys
+class Window : public MovableObject, public Hotkeys
 {
 public:
 	/*
@@ -85,9 +85,6 @@ public:
 	// Cursor is positioned where the focus control wants it to be
 	Size get_cursor_pos () const;
 	bool get_cursor_visibility () const;
-
-	Size get_pos () const { return pos; }
-	Size get_size () const { return size; }
 
 	void move_resize (Size, Size); // Move and resize window, NOT preserving content
 
@@ -146,7 +143,6 @@ public:
 private:
 	unsigned requests;
 
-	Size pos, size; // Position and size
 	ColorAttr cur_attr; // Current attribute
 
 	// Remember the character and attribute at every point

@@ -195,11 +195,12 @@ void ListBox::on_defocus ()
 	ListBox::redraw ();
 }
 
-void ListBox::on_move_resize (Size old_pos, Size old_size)
+void ListBox::move_resize (Size new_pos, Size new_size)
 {
-	unsigned newheight = get_size ().y;
-	if (newheight != old_size.y)
-		Scroll::modify_height (newheight);
+	unsigned oldheight = get_size ().y;
+	Control::move_resize (new_pos, new_size);
+	if (oldheight != new_size.y)
+		Scroll::modify_height (new_size.y);
 }
 
 void ListBox::redraw ()

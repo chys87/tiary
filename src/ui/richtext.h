@@ -57,7 +57,6 @@ public:
 
 	void redraw ();
 	bool on_mouse (MouseEvent); // For scroll bar only
-	void on_move_resize (Size, Size);
 	bool on_key (wchar_t);
 
 	const LineList &get_list () const { return line_list; }

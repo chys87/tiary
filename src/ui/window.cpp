@@ -276,11 +276,9 @@ wchar_t get_input (MouseEvent *pmouse_event, bool block = true)
 
 
 Window::Window (unsigned options_, const std::wstring &title_)
-	: Object ()
+	: MovableObject ()
 	, Hotkeys ()
 	, requests (0)
-	, pos (make_size ())
-	, size (make_size ())
 	, cur_attr (ColorAttr::make_default ())
 	, char_table (0)
 	, options (options_)

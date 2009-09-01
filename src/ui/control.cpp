@@ -21,9 +21,9 @@ namespace ui {
 
 
 Control::Control (Window &dlg_)
-	: dlg (dlg_)
-	, pos (make_size ())
-	, size (make_size ())
+	: MovableObject ()
+	, Hotkeys ()
+	, dlg (dlg_)
 	, curpos (make_size ())
 	, cursor_visible (true)
 	, ctrl_left (0)
@@ -42,12 +42,9 @@ void Control::move_resize (Size newpos, Size newsize)
 {
 	if ((pos != newpos) || (size != newsize)) {
 		dlg.choose_palette (PALETTE_ID_BACKGROUND);
-		Size oldpos = pos;
-		Size oldsize = size;
-		dlg.clear (oldpos, oldsize);
+		dlg.clear (pos, size);
 		pos = newpos;
 		size = newsize;
-		on_move_resize (oldpos, oldsize);
 	}
 }
 
@@ -73,10 +70,6 @@ bool Control::on_focus ()
 }
 
 void Control::on_focus_changed ()
-{
-}
-
-void Control::on_move_resize (Size, Size)
 {
 }
 

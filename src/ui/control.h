@@ -16,7 +16,7 @@
 #define TIARY_UI_CONTROL_H
 
 #include "common/signal.h"
-#include "ui/object.h"
+#include "ui/movable_object.h"
 #include "ui/size.h"
 #include "ui/ui.h"
 #include "ui/hotkeys.h"
@@ -27,7 +27,7 @@ namespace ui {
 
 class Window;
 
-class Control : public Object, public Hotkeys
+class Control : public MovableObject, public Hotkeys
 {
 public:
 	explicit Control (Window &);
@@ -36,16 +36,12 @@ public:
 	// move_resize does not imply redraw
 	void move_resize (Size pos, Size size);
 
-	Size get_pos () const { return pos; }
-	Size get_size () const { return size; }
-
 	// Never receives WINCH (should be handled by dialog); mouse position relative to control
 	virtual bool on_mouse (MouseEvent);
 	virtual bool on_key (wchar_t);
 	virtual void on_defocus (); // Cannot refuse defocusing
 	virtual bool on_focus ();   // Can refuse defocusing (default is acceptance)
 	virtual void on_focus_changed (); // Focus changed (called even if not related to this control)
-	virtual void on_move_resize (Size oldpos, Size oldsize); // Called by Control::move_resize
 
 	bool is_focus () const;
 	void focus (); ///< Make this Control the focus of the Window
@@ -87,8 +83,6 @@ public:
 	Window &dlg; // The dialog containing the control
 
 private:
-	Size pos; ///< Position of the control. Relative to dialog
-	Size size;///< Size of the control
 	Size curpos; ///< Cursor position
 	bool cursor_visible; ///< Whether the cursor should be visible
 

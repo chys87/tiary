@@ -34,7 +34,7 @@ Layout::~Layout ()
 {
 }
 
-void Layout::add (Object *obj, unsigned min, unsigned max, unsigned other, int align_other)
+void Layout::add_impl (MovableObject *obj, unsigned min, unsigned max, unsigned other, int align_other)
 {
 	min_sum += min;
 	if (mid_sum != UNLIMITED) {
@@ -92,10 +92,7 @@ Size move_resize_one (Layout::Item &item, Size pos, unsigned this_size, unsigned
 			other_size = item.other;
 		}
 		Size obj_size = combine_size (this_size, other_size, direction);
-		if (Control *ctrl = dynamic_cast <Control *> (item.obj))
-			ctrl->move_resize (obj_pos, obj_size);
-		else
-			static_cast<Layout *>(item.obj)->move_resize (obj_pos, obj_size);
+		item.obj->move_resize (obj_pos, obj_size);
 	}
 	if (direction == VERTICAL)
 		pos.y += this_size;
@@ -124,6 +121,9 @@ struct SelectMinMax : public std::unary_function <const Layout::Item &, unsigned
 
 void Layout::move_resize (Size pos, Size size)
 {
+	this->pos = pos;
+	this->size = size;
+
 	unsigned total_this, total_other;
 	if (direction == VERTICAL) {
 		total_this = size.y;

@@ -98,11 +98,6 @@ bool RichText::on_mouse (MouseEvent mouse_event)
 	return true;
 }
 
-void RichText::on_move_resize (Size oldpos, Size oldsize)
-{
-	RichText::redraw ();
-}
-
 bool RichText::on_key (wchar_t key)
 {
 	switch (key) {

@@ -97,11 +97,12 @@ bool TextBox::on_mouse (MouseEvent mouse_event)
 	return true;
 }
 
-void TextBox::on_move_resize (Size, Size oldsize)
+void TextBox::move_resize (Size new_pos, Size new_size)
 {
-	unsigned newwid = get_size ().x;
-	if (newwid != oldsize.x)
-		Scroll::modify_width (newwid);
+	unsigned old_width = get_size ().x;
+	Control::move_resize (new_pos, new_size);
+	if (old_width != new_size.x)
+		Scroll::modify_width (new_size.x);
 }
 
 void TextBox::redraw ()

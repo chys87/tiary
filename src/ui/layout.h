@@ -17,6 +17,7 @@
 
 #include "ui/object.h"
 #include "ui/direction.h"
+#include "ui/movable_object.h"
 #include <list>
 
 /**
@@ -40,14 +41,14 @@ class Control;
 struct Size;
 
 
-class Layout : public Object // It's not a real "object", but this will simplify our implementation
+class Layout : public MovableObject
 {
 public:
 	static const unsigned UNLIMITED = unsigned(-1);
 
 	struct Item
 	{
-		Object *obj;     // Must be Control or Layout<true> or Layout<false>
+		MovableObject *obj;
 		unsigned min, max;
 		unsigned other;  // Max width on the other direction (UNLIMITED = full)
 		int align_other; // Alignment on the other direction: -1/0/1 = left/center/right
@@ -57,7 +58,7 @@ public:
 	~Layout ();
 
 private:
-	void add (Object *obj, unsigned min, unsigned max, unsigned other, int align_other);
+	void add_impl (MovableObject *obj, unsigned min, unsigned max, unsigned other, int align_other);
 
 public:
 
@@ -67,30 +68,20 @@ public:
 		Adder (const Adder &other) : p (other.p) {}
 		Adder & operator = (const Adder &other) { p = other.p; return *this; }
 
-		Adder operator () (Control *ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
+		Adder operator () (MovableObject *ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
 		{
-			p->add ((Object *)ctrl, min, max, other, align_other);
+			p->add_impl (ctrl, min, max, other, align_other);
 			return *this;
 		}
-		Adder operator () (Control &ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
+		Adder operator () (MovableObject &ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
 		{
-			p->add ((Object *)&ctrl, min, max, other, align_other);
-			return *this;
-		}
-		Adder operator () (Layout *layout, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
-		{
-			p->add ((Object *)layout, min, max, other, align_other);
-			return *this;
-		}
-		Adder operator () (Layout &layout, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
-		{
-			p->add ((Object *)&layout, min, max, other, align_other);
+			p->add_impl (&ctrl, min, max, other, align_other);
 			return *this;
 		}
 		/** Add spacing */
 		Adder operator () (unsigned min, unsigned max)
 		{
-			p->add ((Object *)0, min, max, UNLIMITED, -1);
+			p->add_impl (0, min, max, UNLIMITED, -1);
 			return *this;
 		}
 	private:
@@ -101,30 +92,20 @@ public:
 	{
 		return Adder (this);
 	}
-	Adder add (Control *ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
+	Adder add (MovableObject *ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
 	{
-		add ((Object *)ctrl, min, max, other, align_other);
+		add_impl (ctrl, min, max, other, align_other);
 		return Adder (this);
 	}
-	Adder add (Control &ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
+	Adder add (MovableObject &ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
 	{
-		add ((Object *)&ctrl, min, max, other, align_other);
-		return Adder (this);
-	}
-	Adder add (Layout *layout, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
-	{
-		add ((Object *)layout, min, max, other, align_other);
-		return Adder (this);
-	}
-	Adder add (Layout &layout, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
-	{
-		add ((Object *)&layout, min, max, other, align_other);
+		add_impl (&ctrl, min, max, other, align_other);
 		return Adder (this);
 	}
 	/** Add spacing */
 	Adder add (unsigned min, unsigned max)
 	{
-		add ((Object *)0, min, max, UNLIMITED, -1);
+		add_impl (0, min, max, UNLIMITED, -1);
 		return Adder (this);
 	}
 

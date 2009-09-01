@@ -35,7 +35,7 @@ public:
 
 	bool on_key (wchar_t);
 	bool on_mouse (MouseEvent);
-	void on_move_resize (Size, Size);
+	void move_resize (Size, Size);
 	void redraw ();
 	unsigned get_item_screen_size (unsigned) const; // Overload an interface in Scroll
 

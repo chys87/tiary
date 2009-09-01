@@ -37,6 +37,7 @@ add_library(tiary_ui
 	menu.cpp
 	menubar.h
 	menubar.cpp
+	movable_object.h
 	ncurses_common.h
 	ncurses_common.cpp
 	object.h
