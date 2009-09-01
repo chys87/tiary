@@ -17,6 +17,7 @@
 
 #include "common/pcre.h"
 #include <string>
+#include <vector>
 #include <memory> // std::auto_ptr
 
 namespace tiary {
