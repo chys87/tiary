@@ -17,6 +17,7 @@
 #include "ui/menu.h"
 #include "ui/paletteid.h"
 #include <algorithm>
+#include <wctype.h>
 
 
 namespace tiary {
@@ -73,13 +74,18 @@ bool DropList::on_key (wchar_t key)
 			return true;
 
 		default:
+			key = towlower (key);
+			// Convert items[k] to const to that it is guaranteed
+			// that items[k][0] is meaningful.
+			// (In case of an empty string; Per C++ Standard)
+			// Convert key to wint_t to suppress a warning
 			for (size_t k = select+1; k<items.size(); ++k)
-				if (items[k][0] == key) {
+				if (towlower (c(items[k])[0]) == wint_t(key)) {
 					set_select (k);
 					return true;
 				}
 			for (size_t k = 0; k <= select; ++k)
-				if (items[k][0] == key) {
+				if (towlower (c(items[k])[0]) == wint_t(key)) {
 					set_select (k);
 					return true;
 				}
