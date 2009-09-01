@@ -39,7 +39,7 @@ class DialogSelect : public FixedWindow, private ButtonDefault
 	size_t result;
 
 public:
-	DialogSelect (const std::wstring &, const std::vector <std::wstring> &);
+	DialogSelect (const std::wstring &, const std::vector <std::wstring> &, size_t);
 	~DialogSelect ();
 
 	void redraw ();
@@ -48,7 +48,8 @@ public:
 	size_t get_result () const { return result; }
 };
 
-DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::wstring> &items)
+DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::wstring> &items,
+		size_t pre_select)
 	: Window (0, title)
 	, FixedWindow ()
 	, ButtonDefault ()
@@ -60,7 +61,7 @@ DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::w
 	, max_text_width (0)
 	, result (size_t (-1))
 {
-	lst_items.set_items (items, size_t (-1), false);
+	lst_items.set_items (items, pre_select, false);
 
 	for (std::vector <std::wstring>::const_iterator it = items.begin (); it != items.end (); ++it)
 		max_text_width = maxU (max_text_width, ucs_width (*it));
@@ -80,6 +81,7 @@ DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::w
 	ChainControlsVertical () (lst_items) (btn_ok);
 	btn_cancel.ctrl_up = btn_cancel.ctrl_down = &lst_items;
 
+	lst_items.sig_double_clicked.connect (this, &DialogSelect::slot_ok);
 	btn_ok.sig_clicked.connect (this, &DialogSelect::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 
@@ -117,11 +119,12 @@ void DialogSelect::slot_ok ()
 
 
 size_t dialog_select (const std::wstring &title,
-		const std::vector <std::wstring> &selections)
+		const std::vector <std::wstring> &selections,
+		size_t pre_select)
 {
 	if (selections.empty ())
 		return size_t (-1);
-	DialogSelect win (title, selections);
+	DialogSelect win (title, selections, pre_select);
 	win.event_loop ();
 	return win.get_result ();
 }

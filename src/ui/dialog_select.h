@@ -26,7 +26,8 @@ namespace ui {
  * @result	The subscript of the selected item; or size_t(-1) on error
  */
 size_t dialog_select (const std::wstring &title,
-		const std::vector <std::wstring> &selections);
+		const std::vector <std::wstring> &selections,
+		size_t pre_select = size_t (-1));
 
 
 } // namespace tiary::ui

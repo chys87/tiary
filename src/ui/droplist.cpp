@@ -16,6 +16,7 @@
 #include "ui/uistring.h"
 #include "ui/menu.h"
 #include "ui/paletteid.h"
+#include "ui/dialog_select.h"
 #include <algorithm>
 #include <wctype.h>
 
@@ -54,6 +55,17 @@ void DropList::set_select (size_t new_select, bool emit_signal)
 	}
 }
 
+namespace {
+
+void dialog_select_set (DropList *drp)
+{
+	size_t sel = dialog_select (L"Select", drp->get_items (), drp->get_select ());
+	if (sel < drp->get_items ().size ())
+		drp->set_select (sel);
+}
+
+} // anonymous namespace
+
 bool DropList::on_key (wchar_t key)
 {
 	switch (key) {
@@ -71,6 +83,10 @@ bool DropList::on_key (wchar_t key)
 
 		case END:
 			set_select (items.size () - 1);
+			return true;
+
+		case L' ':
+			dialog_select_set (this);
 			return true;
 
 		default:
@@ -95,7 +111,10 @@ bool DropList::on_key (wchar_t key)
 
 bool DropList::on_mouse (MouseEvent mouse_event)
 {
-	// TODO
+	if (mouse_event.m & MOUSE_ALL_BUTTON) {
+		dialog_select_set (this);
+		return true;
+	}
 	return false;
 }
 

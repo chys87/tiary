@@ -43,7 +43,6 @@ public:
 	bool on_mouse (MouseEvent);
 	bool on_focus ();
 	void on_defocus ();
-//	void on_move_resize (Size, Size);
 	void redraw ();
 
 	Signal sig_select_changed;
