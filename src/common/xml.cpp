@@ -59,17 +59,22 @@ using namespace tiary;
 XMLNode *shallow_copy (xmlNodePtr iptr)
 {
 	if (xmlNodeIsText (iptr)) { // Text node
-		const char *text = (const char *)xmlNodeGetContent (iptr);
+		char *text = (char *)xmlNodeGetContent (iptr);
 		// If a text node is empty or completely consists of space (tab, newline) etc.
 		// Eliminate it!
-		if (strspn (text, " \t\r\n\v")[text] == '\0')
-			return 0;
-		return new XMLNodeText (text);
+		XMLNodeText *optr = 0;
+		if (strspn (text, " \t\r\n\v")[text] != '\0')
+			optr = new XMLNodeText (text);
+		xmlFree (text);
+		return optr;
 	} else { // Normal node
 		XMLNodeTree *optr = new XMLNodeTree ((const char *)iptr->name);
 		// Attributes. Not ordered.
-		for (xmlAttrPtr aptr=iptr->properties; aptr; aptr=aptr->next)
-			optr->properties[(const char *)aptr->name] = (const char *)xmlNodeGetContent (aptr->children);
+		for (xmlAttrPtr aptr=iptr->properties; aptr; aptr=aptr->next) {
+			char *text = (char *)xmlNodeGetContent (aptr->children);
+			optr->properties[(const char *)aptr->name] = text;
+			xmlFree (text);
+		}
 		return optr;
 	}
 }
