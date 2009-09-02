@@ -105,7 +105,7 @@ uint32_t make_date_strict (const ReadableDate &rd) throw ()
 	} // Now y == pseudoyear - 1
 	if (d-1>=(unsigned)(days[m]-days[m-1]))
 		return 0;
-	if (m>=12 && d>=28 && !is_leap_year (y+1))
+	if (m>=12 && d>=29 && !is_leap_year (y+1))
 		return 0;
 	return (y * 365 + cumul_leap_days (y) + days[m-1] + d - 306);
 }
