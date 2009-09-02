@@ -41,6 +41,9 @@ const PaletteID PALETTE_ID_MENUBAR              = 11;
 const PaletteID PALETTE_ID_MENUBAR_SELECT       = 12;
 const PaletteID PALETTE_ID_DROPLIST             = 13;
 const PaletteID PALETTE_ID_RICHTEXT             = 14;
+const PaletteID PALETTE_ID_GRID                 = 15;
+const PaletteID PALETTE_ID_GRID_INVALID         = 16;
+const PaletteID PALETTE_ID_GRID_SELECT          = 17;
 
 const PaletteID PALETTE_ID_ENTRY                = 50;
 const PaletteID PALETTE_ID_ENTRY_TEXT           = 51;

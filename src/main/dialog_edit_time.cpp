@@ -21,6 +21,7 @@
 #include "ui/button_default.h"
 #include "ui/chain.h"
 #include "ui/layout.h"
+#include "ui/date_select.h"
 #include "common/datetime.h"
 #include "common/format.h"
 
@@ -33,11 +34,7 @@ using namespace ui;
 class WindowTime : public FixedWindow, private ButtonDefault
 {
 
-	Label lbl_weekday;
-	DropList drp_month;
-	DropList drp_day;
-	Label lbl_comma;
-	DropList drp_year;
+	DateSelect date_select;
 
 	DropList drp_hour;
 	Label lbl_colon1;
@@ -49,7 +46,6 @@ class WindowTime : public FixedWindow, private ButtonDefault
 	Button btn_ok;
 
 	Layout layout_main;
-	Layout layout_date;
 	Layout layout_time;
 	Layout layout_buttons;
 
@@ -66,7 +62,6 @@ private:
 
 	void slot_now ();
 	void slot_ok ();
-	void slot_date_changed ();
 };
 
 const wchar_t month_names [][4] = {
@@ -103,11 +98,7 @@ const wchar_t num_names [][3] = {
 WindowTime::WindowTime (ReadableDateTime date_time)
 	: Window ()
 	, FixedWindow ()
-	, lbl_weekday (*this, std::wstring ())
-	, drp_month (*this, std::vector<std::wstring>(month_names, array_end(month_names)), date_time.m-1)
-	, drp_day (*this, std::vector<std::wstring>(day_names, array_end(day_names)), date_time.d-1)
-	, lbl_comma (*this, L",")
-	, drp_year (*this, make_year_names (), date_time.y - first_year)
+	, date_select (*this)
 	, drp_hour (*this, std::vector<std::wstring>(num_names, num_names+24), date_time.H)
 	, lbl_colon1 (*this, L":")
 	, drp_minute (*this, std::vector<std::wstring>(num_names, num_names+60), date_time.M)
@@ -116,29 +107,22 @@ WindowTime::WindowTime (ReadableDateTime date_time)
 	, btn_now (*this, L"&Now")
 	, btn_ok (*this, L"&OK")
 	, layout_main (VERTICAL)
-	, layout_date (HORIZONTAL)
 	, layout_time (HORIZONTAL)
 	, layout_buttons (HORIZONTAL)
 	, canceled (true)
 {
-	ChainControlsHorizontal () (drp_month) (drp_day) (drp_year) (drp_hour) (drp_minute) (drp_second)
+	date_select.set_date (Date (date_time));
+
+	ChainControlsHorizontal () (date_select.year) (date_select.month) (date_select.day)
+		(drp_hour) (drp_minute) (drp_second)
 		(btn_now) (btn_ok);
 
 	btn_now.ctrl_up = btn_ok.ctrl_up = &drp_hour;
 
 	set_default_button (btn_ok);
 
-	FixedWindow::resize (make_size (26, 9));
+	FixedWindow::resize (make_size (33, 15));
 
-	layout_date.add
-		(lbl_weekday, 3, 3)
-		(1, 1)
-		(drp_month, 3, 3)
-		(1, 1)
-		(drp_day, 2, 2)
-		(lbl_comma, 2, 2)
-		(drp_year, 4, 4)
-		;
 	layout_time.add
 		(drp_hour, 2, 2)
 		(lbl_colon1, 1, 1)
@@ -152,23 +136,18 @@ WindowTime::WindowTime (ReadableDateTime date_time)
 		(btn_ok, 10, 10)
 		;
 	layout_main.add
-		(layout_date, 1, 1)
+		(date_select, 7, 7)
 		(1, 1)
 		(layout_time, 1, 1)
 		(1, 1)
 		(layout_buttons, 3, 3)
 		;
 
-	layout_main.move_resize (make_size (2, 1), make_size (22, 7));
+	layout_main.move_resize (make_size (2, 1), make_size (29, 13));
 
-	drp_month.sig_select_changed.connect (this, &WindowTime::slot_date_changed);
-	drp_day.sig_select_changed.connect (this, &WindowTime::slot_date_changed);
-	drp_year.sig_select_changed.connect (this, &WindowTime::slot_date_changed);
 	btn_now.sig_clicked.connect (this, &WindowTime::slot_now);
 	btn_ok.sig_clicked.connect (this, &WindowTime::slot_ok);
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
-
-	slot_date_changed ();
 
 	WindowTime::redraw ();
 }
@@ -179,45 +158,26 @@ WindowTime::~WindowTime ()
 
 DateTime WindowTime::get_result () const
 {
-	ReadableDateTime rdt;
-	rdt.y = drp_year.get_select () + first_year;
-	rdt.m = drp_month.get_select () + 1;
-	rdt.d = drp_day.get_select () + 1;
-	rdt.H = drp_hour.get_select ();
-	rdt.M = drp_minute.get_select ();
-	rdt.S = drp_second.get_select ();
-	return DateTime (rdt);
+	return DateTime (date_select.get_date (), Time (
+			drp_hour.get_select (), drp_minute.get_select (), drp_second.get_select ())
+			);
 }
 
 void WindowTime::slot_now ()
 {
-	ReadableDateTime dt = DateTime (DateTime::LOCAL).extract ();
-	drp_year.set_select (dt.y - first_year, false);
-	drp_month.set_select (dt.m - 1, false);
-	drp_day.set_select (dt.d - 1, false);
-	drp_hour.set_select (dt.H, false);
-	drp_minute.set_select (dt.M, false);
-	drp_second.set_select (dt.S, false);
+	DateTime now (DateTime::LOCAL);
+	date_select.set_date (now, false);
+
+	ReadableTime rt = Time (now).extract ();
+	drp_hour.set_select (rt.H, false);
+	drp_minute.set_select (rt.M, false);
+	drp_second.set_select (rt.S, false);
 }
 
 void WindowTime::slot_ok ()
 {
 	canceled = false;
 	request_close ();
-}
-
-void WindowTime::slot_date_changed ()
-{
-	DateTime dt = get_result ();
-	ReadableDateTime rdt = dt.extract ();
-	if (rdt.d != drp_day.get_select () + 1) {
-		drp_month.set_select (rdt.m - 1, false);
-		drp_day.set_select (rdt.d - 1, false);
-		drp_year.set_select (rdt.y - first_year, false);
-	}
-	static const wchar_t weekday_name[] = L"SunMonTueWedThuFriSat";
-	unsigned w = rdt.w;
-	lbl_weekday.set_text (std::wstring (weekday_name+w*3, weekday_name+(w+1)*3));
 }
 
 } // anonymous namespace

@@ -59,8 +59,16 @@ const signed char revdays[366] = {
 	REPEAT_29(2)   // Feb
 };
 
+// Cumulative leap days from Year 1 to Year y-1 (either true/pseudo cal)
+inline unsigned cumul_leap_days (unsigned y) throw ()
+{
+	return y/4 - y/100 + y/100/4;
+}
+
+} // anonymous namespace
+
 // Checks whether a year is leap; either true/pseudo cal
-inline bool is_leap (unsigned y) throw ()
+bool is_leap_year (unsigned y) throw ()
 {
 	if (y % 4)
 		return false;
@@ -69,13 +77,20 @@ inline bool is_leap (unsigned y) throw ()
 	return true;
 }
 
-// Cumulative leap days from Year 1 to Year y-1 (either true/pseudo cal)
-inline unsigned cumul_leap_days (unsigned y) throw ()
+unsigned day_of_month (unsigned y, unsigned m) throw ()
 {
-	return y/4 - y/100 + y/100/4;
+	--m;
+	if (m >= 12)
+		return 0;
+	static const unsigned char mdays [12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	if (m != 1)
+		return mdays[m];
+	else if (is_leap_year (y))
+		return 29;
+	else
+		return 28;
 }
 
-} // anonymous namespace
 
 uint32_t make_date_strict (const ReadableDate &rd) throw ()
 {
@@ -90,7 +105,7 @@ uint32_t make_date_strict (const ReadableDate &rd) throw ()
 	} // Now y == pseudoyear - 1
 	if (d-1>=(unsigned)(days[m]-days[m-1]))
 		return 0;
-	if (m>=12 && d>=28 && !is_leap(y+1))
+	if (m>=12 && d>=28 && !is_leap_year (y+1))
 		return 0;
 	return (y * 365 + cumul_leap_days (y) + days[m-1] + d - 306);
 }

@@ -10,6 +10,8 @@ add_library(tiary_ui
 	checkbox_label.cpp
 	control.h
 	control.cpp
+	date_select.h
+	date_select.cpp
 	dialog_input.h
 	dialog_input.cpp
 	dialog_message.h
@@ -27,6 +29,8 @@ add_library(tiary_ui
 	droplist.cpp
 	fixed_dialog.h
 	fixed_dialog.cpp
+	grid_select.h
+	grid_select.cpp
 	hotkeys.h
 	hotkeys.cpp
 	label.h

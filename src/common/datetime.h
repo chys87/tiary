@@ -22,6 +22,15 @@
 
 namespace tiary {
 
+/**
+ * @brief	Returns whether a year is leap under the Gregorian calendar
+ */
+bool is_leap_year (unsigned) throw ();
+/**
+ * @brief	Returns the number of days in a given month under the Gregorian calendar
+ */
+unsigned day_of_month (unsigned y, unsigned m) throw ();
+
 /*
  * Date is represented in a 32-bit unsigned integer number
  *
@@ -122,6 +131,11 @@ struct Date
 	uint32_t v;
 
 	Date () : v (0) {}
+	Date (unsigned y, unsigned m, unsigned d, bool strict = false)
+	{
+		ReadableDate rd = { y, m, d };
+		v = strict ? make_date_strict (rd) : make_date (rd);
+	}
 	Date (const ReadableDate &rd, bool strict = false) : v (strict ? make_date_strict (rd) : make_date (rd)) {}
 	explicit Date (uint32_t x) : v(x) {}
 	ReadableDate extract () const { return extract_date (v); }
@@ -131,6 +145,11 @@ struct Time
 {
 	uint32_t v;
 	Time () : v (0) {}
+	Time (unsigned H, unsigned M, unsigned S)
+	{
+		ReadableTime rt = { H, M, S };
+		v = make_time (rt);
+	}
 	Time (const ReadableTime &rd) : v (make_time (rd)) {}
 	explicit Time (uint32_t x) : v(x) {}
 	ReadableTime extract () const { return extract_time (v); }
@@ -153,6 +172,9 @@ struct DateTime
 	DateTime (UTCLocal ul, time_t tv = ::time (0)) : v (ul==UTC ? make_datetime_utc (tv) : make_datetime_local (tv)) {}
 
 	ReadableDateTime extract () const { return extract_datetime (v); }
+
+	operator Date () const { return Date (extract_date_from_datetime (v)); }
+	operator Time () const { return Time (extract_time_from_datetime (v)); }
 
 	std::string format (const char *format) const { return format_time (v, format); }
 	std::wstring format (const wchar_t *format) const { return format_time (v, format); }
