@@ -77,15 +77,14 @@ inline unsigned cumul_leap_days (unsigned y) throw ()
 
 } // anonymous namespace
 
-
-uint64_t make_time_strict (unsigned y, unsigned m, unsigned d, unsigned H, unsigned M, unsigned S) throw ()
+uint32_t make_date_strict (const ReadableDate &rd) throw ()
 {
-	if (H>=24 || M>=60 || S>=60)
-		return 0;
-	unsigned time_v = (H * 60 + M) * 60 + S;
+	unsigned y = rd.y;
+	unsigned m = rd.m;
+	unsigned d = rd.d;
 	--d;
 	if (m-1>=12 || !y)
-		return 0;
+		return INVALID_DATE;
 	if ((int)(m -= 2) <= 0) {
 		m += 12;
 		--y;
@@ -94,18 +93,14 @@ uint64_t make_time_strict (unsigned y, unsigned m, unsigned d, unsigned H, unsig
 		return 0;
 	if (m>=12 && d>=28 && !is_leap(y+1))
 		return 0;
-	unsigned date_v = y * 365 + cumul_leap_days (y) + days[m-1] + d - 306;
-	return date_v * uint64_t(SECONDS_PER_DAY) + time_v;
+	return (y * 365 + cumul_leap_days (y) + days[m-1] + d - 306);
 }
 
-uint64_t make_time_strict (const ReadableDateTime &rdt) throw ()
+uint32_t make_date (const ReadableDate &rd) throw ()
 {
-	return make_time_strict (rdt.y, rdt.m, rdt.d, rdt.H, rdt.M, rdt.S);
-}
-
-uint64_t make_time (unsigned y, unsigned m, unsigned d, unsigned H, unsigned M, unsigned S) throw ()
-{
-	unsigned time_v = (H * 60 + M) * 60 + S;
+	unsigned y = rd.y;
+	unsigned m = rd.m;
+	unsigned d = rd.d;
 	--d;
 	if (m-1 >= 12) { // Adjust year/month if month not in [1,12]
 		// Division of negative integers has implementation-defined results
@@ -122,16 +117,46 @@ uint64_t make_time (unsigned y, unsigned m, unsigned d, unsigned H, unsigned M, 
 		m += 12;
 		--y;
 	} // Now y == pseudoyear - 1
-	unsigned date_v = y * 365 + cumul_leap_days (y) + days[m-1] + d - 306;
-	return date_v * uint64_t(SECONDS_PER_DAY) + time_v;
+	return (y * 365 + cumul_leap_days (y) + days[m-1] + d - 306);
 }
 
-uint64_t make_time (const ReadableDateTime &rdt) throw ()
+uint32_t make_time (const ReadableTime &rt) throw ()
 {
-	return make_time (rdt.y, rdt.m, rdt.d, rdt.H, rdt.M, rdt.S);
+	return ((rt.H*60 + rt.M)*60 + rt.S);
 }
 
-uint64_t make_time_local (time_t t) throw ()
+uint64_t make_datetime (uint32_t date, uint32_t time)
+{
+	return (date * uint64_t (SECONDS_PER_DAY) + time);
+}
+
+uint64_t make_datetime_strict (const ReadableDate &rd, const ReadableTime &rt) throw ()
+{
+	if (rt.H>=24 || rt.M>=60 || rt.S>=60)
+		return INVALID_DATETIME;
+	uint32_t time_v = make_time (rt);
+	uint32_t date_v = make_date_strict (rd);
+	if (date_v == INVALID_DATE)
+		return INVALID_DATETIME;
+	return make_datetime (date_v, time_v);
+}
+
+uint64_t make_datetime_strict (const ReadableDateTime &rdt) throw ()
+{
+	return make_datetime_strict (rdt, rdt);
+}
+
+uint64_t make_datetime (const ReadableDate &rd, const ReadableTime &rt) throw ()
+{
+	return make_datetime (make_date (rd), make_time (rt));
+}
+
+uint64_t make_datetime (const ReadableDateTime &rdt) throw ()
+{
+	return make_datetime (rdt, rdt);
+}
+
+uint64_t make_datetime_local (time_t t) throw ()
 {
 #if 0 //def TIARY_HAVE_LOCALTIME_R_AND_GMTIME_R
 	struct tm tmbuf;
@@ -139,10 +164,12 @@ uint64_t make_time_local (time_t t) throw ()
 #else
 	struct tm *T = localtime (&t);
 #endif
-	return make_time (T->tm_year+1900, T->tm_mon+1, T->tm_mday, T->tm_hour, T->tm_min, T->tm_sec);
+	struct ReadableDate rd = { T->tm_year+1900, T->tm_mon+1, T->tm_mday };
+	struct ReadableTime rt = { T->tm_hour, T->tm_min, T->tm_sec };
+	return make_datetime (rd, rt);
 }
 
-uint64_t make_time_utc (time_t t) throw ()
+uint64_t make_datetime_utc (time_t t) throw ()
 {
 #if 0 //def TIARY_HAVE_LOCALTIME_R_AND_GMTIME_R
 	struct tm tmbuf;
@@ -150,16 +177,18 @@ uint64_t make_time_utc (time_t t) throw ()
 #else
 	struct tm *T = gmtime (&t);
 #endif
-	return make_time (T->tm_year+1900, T->tm_mon+1, T->tm_mday, T->tm_hour, T->tm_min, T->tm_sec);
+	struct ReadableDate rd = { T->tm_year+1900, T->tm_mon+1, T->tm_mday };
+	struct ReadableTime rt = { T->tm_hour, T->tm_min, T->tm_sec };
+	return make_datetime (rd, rt);
 }
 
 
-namespace {
-
-void extract_date_ (unsigned v, unsigned *year, unsigned *month, unsigned *day) throw ()
+ReadableDate extract_date (uint32_t v) throw ()
 {
-	unsigned y, m, d;
+	unsigned y, m, d, w;
 	unsigned tmp;
+
+	w = (v + 1) % 7;
 
 	v += 306; // To Pseudodate; 306 = days from Mar to Dec
 	y = v/(365*400+97)*400;
@@ -181,61 +210,40 @@ void extract_date_ (unsigned v, unsigned *year, unsigned *month, unsigned *day) 
 		--y;
 	}
 
-	if (year)
-		*year = y;
-	if (month)
-		*month = m;
-	if (day)
-		*day = d;
+	ReadableDate rd = { y, m, d, w };
+	return rd;
 }
 
-unsigned extract_weekday_ (unsigned v) throw ()
+ReadableTime extract_time (uint32_t v) throw ()
 {
-	return (v + 1) % 7;
-}
+	ReadableTime rt;
 
-void extract_time_ (unsigned v, unsigned *pH, unsigned *pM, unsigned *pS) throw ()
-{
-	unsigned H, M, S;
-	S = v % 60;
+	rt.S = v % 60;
 	unsigned t = v/60;
-	M = t % 60;
-	H = t / 60;
-	if (pH)
-		*pH = H;
-	if (pM)
-		*pM = M;
-	if (pS)
-		*pS = S;
+	rt.M = t % 60;
+	rt.H = t / 60;
+	return rt;
 }
 
-} // anonymous namespace
+uint32_t extract_date_from_datetime (uint64_t v) throw ()
+{
+	return uint32_t (v / SECONDS_PER_DAY);
+}
 
+uint32_t extract_time_from_datetime (uint64_t v) throw ()
+{
+	return uint32_t (v % SECONDS_PER_DAY);
+}
 
-ReadableDateTime extract_time (uint64_t v) throw ()
+ReadableDateTime extract_datetime (uint64_t v) throw ()
 {
 	ReadableDateTime ret;
 
-	unsigned date_v = unsigned(v / SECONDS_PER_DAY);
-	unsigned time_v = unsigned(v % SECONDS_PER_DAY);
-	ret.w = extract_weekday_ (date_v);
-	extract_date_ (date_v, &ret.y, &ret.m, &ret.d);
-	extract_time_ (time_v, &ret.H, &ret.M, &ret.S);
+	uint32_t date_v = extract_date_from_datetime (v);
+	uint32_t time_v = extract_time_from_datetime (v);
+	(ReadableDate &)ret = extract_date (date_v);
+	(ReadableTime &)ret = extract_time (time_v);
 	return ret;
 }
 
-void extract_time (uint64_t v, unsigned *y, unsigned *m, unsigned *d, unsigned *H, unsigned *M, unsigned *S, unsigned *w) throw ()
-{
-	unsigned date_v = unsigned(v / SECONDS_PER_DAY);
-	unsigned time_v = unsigned(v % SECONDS_PER_DAY);
-	if (w)
-		*w = extract_weekday_ (date_v);
-	extract_date_ (date_v, y, m, d);
-	extract_time_ (time_v, H, M, S);
-}
-
-unsigned extract_time_weekday (uint64_t v) throw ()
-{
-	return extract_weekday_ (unsigned (v / SECONDS_PER_DAY));
-}
 } // namespace tiary

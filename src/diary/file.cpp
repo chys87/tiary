@@ -85,7 +85,7 @@ uint64_t parse_time (const char *s)
 	// strptime is not in standard C or C++
 	if (sscanf (s, "%u-%u-%u%u:%u:%u", &t.y, &t.m, &t.d, &t.H, &t.M, &t.S) != 6)
 		return 0;
-	return make_time_strict (t);
+	return make_datetime_strict (t);
 }
 
 /**
@@ -97,9 +97,9 @@ std::string format_time (const DateTime &date_time)
 	// strftime is not used because we dislike the "tm" struct. It sucks.
 	// stringstream is not used because it sucks more.
 	// (C++ stream's format control is extremely disgusting)
-	unsigned y, m, d, H, M, S;
-	date_time.extract (&y, &m, &d, &H, &M, &S);
-	return format_utf8("%04a-%02b-%02c %02d:%02e:%02f"), y, m, d, H, M, S;
+	ReadableDateTime t = date_time.extract ();
+	return format_utf8("%04a-%02b-%02c %02d:%02e:%02f")
+		<< t.y << t.m << t.d << t.H << t.M << t.S;
 }
 
 /**
@@ -185,7 +185,7 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 
 	// Finally successful
 	DiaryEntry *entry = new DiaryEntry;
-	entry->local_time = local_time;
+	entry->local_time = DateTime (local_time);
 //	entry->utc_time.assign (utc_time);
 	utf8_to_wstring (title).swap (entry->title);
 	utf8_to_wstring (text).swap (entry->text);

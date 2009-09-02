@@ -179,13 +179,14 @@ WindowTime::~WindowTime ()
 
 DateTime WindowTime::get_result () const
 {
-	unsigned y = drp_year.get_select () + first_year;
-	unsigned m = drp_month.get_select () + 1;
-	unsigned d = drp_day.get_select () + 1;
-	unsigned H = drp_hour.get_select ();
-	unsigned M = drp_minute.get_select ();
-	unsigned S = drp_second.get_select ();
-	return DateTime (y, m, d, H, M, S);
+	ReadableDateTime rdt;
+	rdt.y = drp_year.get_select () + first_year;
+	rdt.m = drp_month.get_select () + 1;
+	rdt.d = drp_day.get_select () + 1;
+	rdt.H = drp_hour.get_select ();
+	rdt.M = drp_minute.get_select ();
+	rdt.S = drp_second.get_select ();
+	return DateTime (rdt);
 }
 
 void WindowTime::slot_now ()

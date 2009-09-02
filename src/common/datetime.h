@@ -23,36 +23,76 @@
 namespace tiary {
 
 /*
- * Time is represented in a 64-bit unsigned integer number
+ * Date is represented in a 32-bit unsigned integer number
  *
- * 0 = 00:00:00 Jan 1, AD 1 (Always assuming Gregorian; either local or UTC time)
+ * 1 = Jan 1, AD 1 (Always assuming Gregorian)
+ *
+ * Time is represented in a 32-bit unsigned integer number, the number of
+ * seconds elapsed since midnight
+ *
+ * DateTime is represented in a 64-bit unsigned integer number:
+ * (Date*SECONDS_PER_DAY + Time)
  */
 
-struct ReadableDateTime
+const uint32_t INVALID_DATE = 0;
+const uint64_t INVALID_DATETIME = 0;
+
+struct ReadableDate
 {
 	unsigned y, m, d;
-	unsigned H, M, S;
 	unsigned w; // 0 = Sun, 1 = Mon, ...
+};
+struct ReadableTime
+{
+	unsigned H, M, S;
+};
+struct ReadableDateTime : ReadableDate, ReadableTime
+{
 };
 
 /**
- * @brief	Make a 64-bit unsigned integer representing the specified time.
- * @result	0 = Error
+ * @brief	Make a 32-bit unsigned integer representing the specified date
+ * @result	INVALID_DATE = Error
  *
- * This function performs strict checking. Disallowing representations like 1989-5-35
+ * This function allows "loose representations" like 1989-5-35
  */
-uint64_t make_time_strict (unsigned y, unsigned m, unsigned d, unsigned H, unsigned M, unsigned S) throw ();
-uint64_t make_time_strict (const ReadableDateTime &);
+uint32_t make_date (const ReadableDate &) throw ();
+/**
+ * This function disallows "loose representations" like 1989-5-35
+ */
+uint32_t make_date_strict (const ReadableDate &) throw ();
+
+/**
+ * @brief	Make a 32-bit unsigned integer representing the specified time
+ *
+ * There is no make_time_strict counterpart. Always allow substandard times
+ * like 25:00:00
+ */
+uint32_t make_time (const ReadableTime &) throw ();
+
+/**
+ * @brief	Make a 64-bit unsigned integer representing the specified date and time.
+ * @result	INVALID_DATETIME = Error
+ */
+uint64_t make_datetime_strict (const ReadableDate &, const ReadableTime &) throw ();
+uint64_t make_datetime_strict (const ReadableDateTime &) throw ();
 /**
  * This function allows representations like 1989-5-35
  */
-uint64_t make_time (unsigned y, unsigned m, unsigned d, unsigned H, unsigned M, unsigned S) throw ();
-uint64_t make_time (const ReadableDateTime &);
-uint64_t make_time_utc (time_t = ::time (0)) throw ();
-uint64_t make_time_local (time_t = ::time (0)) throw ();
-ReadableDateTime extract_time (uint64_t) throw ();
-void extract_time (uint64_t v, unsigned *y, unsigned *m, unsigned *d, unsigned *H, unsigned *M, unsigned *S, unsigned *w) throw ();
-unsigned extract_time_weekday (uint64_t) throw ();
+uint64_t make_datetime (const ReadableDate &, const ReadableTime &) throw ();
+uint64_t make_datetime (const ReadableDateTime &) throw ();
+uint64_t make_datetime (uint32_t date, uint32_t time) throw ();
+uint64_t make_datetime_utc (time_t = ::time (0)) throw ();
+uint64_t make_datetime_local (time_t = ::time (0)) throw ();
+
+
+ReadableDate extract_date (uint32_t) throw ();
+ReadableTime extract_time (uint32_t) throw ();
+
+uint32_t extract_date_from_datetime (uint64_t) throw ();
+uint32_t extract_time_from_datetime (uint64_t) throw ();
+
+ReadableDateTime extract_datetime (uint64_t) throw ();
 
 /*
  * %Y	4-digit year (1989)
@@ -73,11 +113,29 @@ unsigned extract_time_weekday (uint64_t) throw ();
 std::string format_time (uint64_t, const char *format);
 std::wstring format_time (uint64_t, const wchar_t *format);
 
+struct Date;
+struct Time;
+struct DateTime;
 
-/**
- * @brief	A OO wrapper of date-time
- *
- */
+struct Date
+{
+	uint32_t v;
+
+	Date () : v (0) {}
+	Date (const ReadableDate &rd, bool strict = false) : v (strict ? make_date_strict (rd) : make_date (rd)) {}
+	explicit Date (uint32_t x) : v(x) {}
+	ReadableDate extract () const { return extract_date (v); }
+};
+
+struct Time
+{
+	uint32_t v;
+	Time () : v (0) {}
+	Time (const ReadableTime &rd) : v (make_time (rd)) {}
+	explicit Time (uint32_t x) : v(x) {}
+	ReadableTime extract () const { return extract_time (v); }
+};
+
 struct DateTime
 {
 
@@ -86,25 +144,15 @@ struct DateTime
 	enum UTCLocal { UTC, LOCAL };
 
 	DateTime () : v(0) {}
+	DateTime (const Date &date, const Time &time) : v (make_datetime (date.v, time.v)) {}
+	DateTime (const ReadableDate &rd, const ReadableTime &rt, bool strict = false)
+		: v(strict ? make_datetime_strict (rd, rt) : make_datetime (rd, rt)) {}
+	DateTime (const ReadableDateTime &rdt, bool strict = false)
+		: v(strict ? make_datetime_strict (rdt) : make_datetime (rdt)) {}
 	explicit DateTime (uint64_t val) : v(val) {}
-	DateTime (unsigned y, unsigned m, unsigned d, unsigned H, unsigned M, unsigned S, bool strict = false)
-		: v (strict ? make_time_strict (y, m, d, H, M, S) : make_time (y, m, d, H, M, S)) {}
-	DateTime (const ReadableDateTime &rdt, bool strict = false) : v (strict ? make_time_strict (rdt) : make_time (rdt)) {}
-	DateTime (const DateTime &other) : v(other.v) {}
-	DateTime (UTCLocal ul, time_t tv = ::time (0)) : v (ul==UTC ? make_time_utc (tv) : make_time_local (tv)) {}
-	DateTime &operator = (const DateTime &other) { v = other.v; return *this; }
-	DateTime &operator = (uint64_t val) { v = val; return *this; }
-	DateTime &operator = (const ReadableDateTime &other) { v = make_time (other); return *this; }
+	DateTime (UTCLocal ul, time_t tv = ::time (0)) : v (ul==UTC ? make_datetime_utc (tv) : make_datetime_local (tv)) {}
 
-	ReadableDateTime extract () const
-	{
-		return extract_time (v);
-	}
-	void extract (unsigned *y, unsigned *m, unsigned *d, unsigned *H = 0, unsigned *M = 0, unsigned *S = 0, unsigned *w = 0) const
-	{
-		extract_time (v, y, m, d, H, M, S, w);
-	}
-	unsigned extract_weekday () const /* 0 = Sun, 1 = Mon, ... */ { return extract_time_weekday (v); }
+	ReadableDateTime extract () const { return extract_datetime (v); }
 
 	std::string format (const char *format) const { return format_time (v, format); }
 	std::wstring format (const wchar_t *format) const { return format_time (v, format); }

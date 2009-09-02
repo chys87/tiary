@@ -106,7 +106,7 @@ void fill_full_month_name (std::basic_string <T> &dst, unsigned m)
 template <typename T> inline
 std::basic_string<T> format_time_impl (uint64_t v, const T *fmt)
 {
-	ReadableDateTime rdt = extract_time (v);
+	ReadableDateTime rdt = extract_datetime (v);
 	std::basic_string<T> ret;
 	ret.reserve (strlen (fmt)*2);
 	while (const T *p = strchr (fmt, T('%'))) {
@@ -150,7 +150,7 @@ std::basic_string<T> format_time_impl (uint64_t v, const T *fmt)
 				to_string_2 (ret, (rdt.H+11)%12+1);
 				break;
 			case T('M'):
-				to_string_2 (ret, rdt.S);
+				to_string_2 (ret, rdt.M);
 				break;
 			case T('S'):
 				to_string_2 (ret, rdt.S);
