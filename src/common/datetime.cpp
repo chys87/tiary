@@ -82,14 +82,13 @@ uint32_t make_date_strict (const ReadableDate &rd) throw ()
 	unsigned y = rd.y;
 	unsigned m = rd.m;
 	unsigned d = rd.d;
-	--d;
 	if (m-1>=12 || !y)
 		return INVALID_DATE;
 	if ((int)(m -= 2) <= 0) {
 		m += 12;
 		--y;
 	} // Now y == pseudoyear - 1
-	if (d>=(unsigned)(days[m]-days[m-1]))
+	if (d-1>=(unsigned)(days[m]-days[m-1]))
 		return 0;
 	if (m>=12 && d>=28 && !is_leap(y+1))
 		return 0;
@@ -101,7 +100,6 @@ uint32_t make_date (const ReadableDate &rd) throw ()
 	unsigned y = rd.y;
 	unsigned m = rd.m;
 	unsigned d = rd.d;
-	--d;
 	if (m-1 >= 12) { // Adjust year/month if month not in [1,12]
 		// Division of negative integers has implementation-defined results
 		// Avoid it!
@@ -188,9 +186,10 @@ ReadableDate extract_date (uint32_t v) throw ()
 	unsigned y, m, d, w;
 	unsigned tmp;
 
-	w = (v + 1) % 7;
+	w = v % 7;
 
 	v += 306; // To Pseudodate; 306 = days from Mar to Dec
+	--v; // Starting 0
 	y = v/(365*400+97)*400;
 	v %= 365*400+97; // Now the date is within 400 years
 	if ((tmp = v/(365*100+24)) > 3) // Which century ?
