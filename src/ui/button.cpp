@@ -21,14 +21,14 @@
 namespace tiary {
 namespace ui {
 
-Button::Button (Window &dlg, const std::wstring &str)
-	: Control (dlg)
+Button::Button (Window &win, const std::wstring &str)
+	: Control (win)
 	, text (str)
 	, attributes (0)
 {
 	// Register hotkey
 	if (wchar_t c = text.get_hotkey ())
-		dlg.register_hotkey (c, Signal (sig_clicked, 0)); // Connecting to, not copying from sig_clicked
+		win.register_hotkey (c, Signal (sig_clicked, 0)); // Connecting to, not copying from sig_clicked
 }
 
 Button::~Button ()
@@ -51,7 +51,7 @@ void Button::on_focus_changed ()
 
 void Button::redraw ()
 {
-	Control *focus_ctrl = dlg.get_focus ();
+	Control *focus_ctrl = win.get_focus ();
 	choose_palette (focus_ctrl == this ? PALETTE_ID_BUTTON_FOCUS : PALETTE_ID_BUTTON_UNFOCUS);
 	unsigned y = (get_size().y - 1) / 2;
 	unsigned w = minU (get_size().x, text.get_width () + 4);
@@ -60,7 +60,7 @@ void Button::redraw ()
 	bool display_as_if_focus; // Whether display the "><" characters
 	if (focus_ctrl == this)
 		display_as_if_focus = true;
-	else if (ButtonDefault *def_chooser = dynamic_cast <ButtonDefault *> (&dlg))
+	else if (ButtonDefault *def_chooser = dynamic_cast <ButtonDefault *> (&win))
 		display_as_if_focus = (def_chooser->get_current_default_button () == this);
 	else
 		display_as_if_focus = false;

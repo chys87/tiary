@@ -281,7 +281,7 @@ void encrypt (void *dst, const char *src, size_t datalen, const void *pass, size
 		dstbyte[i] ^= xor_byte2[i];
 }
 
-void decrypt (void *dst, const char *src, size_t datalen, const void *pass, size_t passlen)
+inline void decrypt (void *dst, const char *src, size_t datalen, const void *pass, size_t passlen)
 {
 	// The same
 	encrypt (dst, src, datalen, pass, passlen);

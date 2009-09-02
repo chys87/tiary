@@ -80,7 +80,7 @@ public:
 	void clear (Size, Size);
 	void fill (Size, Size, wchar_t);
 
-	Window &dlg; // The dialog containing the control
+	Window &win; // The window containing the control
 
 private:
 	Size curpos; ///< Cursor position
@@ -103,7 +103,7 @@ public:
 class UnfocusableControl : public virtual Control
 {
 public:
-	UnfocusableControl (Window &dlg) : Control (dlg) {}
+	UnfocusableControl (Window &win) : Control (win) {}
 	~UnfocusableControl ();
 	bool on_focus ();
 };

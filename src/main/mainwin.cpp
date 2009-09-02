@@ -38,8 +38,8 @@
 
 namespace tiary {
 
-MainCtrl::MainCtrl (MainWin &dlg)
-	: ui::Control (dlg)
+MainCtrl::MainCtrl (MainWin &win)
+	: ui::Control (win)
 	, ui::Scroll (1 /* To be set later */, false)
 {
 	set_cursor_visibility (false);

@@ -13,8 +13,8 @@
 namespace tiary {
 namespace ui {
 
-RichText::RichText (Window &dlg, const LineList &lst)
-	: Control (dlg)
+RichText::RichText (Window &win, const LineList &lst)
+	: Control (win)
 	, line_list (lst)
 	, top_line (0)
 	, highlight_list ()
@@ -24,8 +24,8 @@ RichText::RichText (Window &dlg, const LineList &lst)
 }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-RichText::RichText (Window &dlg, LineList &&lst)
-	: Control (dlg)
+RichText::RichText (Window &win, LineList &&lst)
+	: Control (win)
 	, line_list (std::forward <LineList> (lst))
 	, top_line (0)
 	, highlight_list ()

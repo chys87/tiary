@@ -119,8 +119,8 @@ ReadableDateTime extract_datetime (uint64_t) throw ();
  * %P	2-character AM/PM (AM)
  * %p	2-character am/pm (am)
  */
-std::string format_time (uint64_t, const char *format);
-std::wstring format_time (uint64_t, const wchar_t *format);
+std::string format_datetime (uint64_t, const char *format);
+std::wstring format_datetime (uint64_t, const wchar_t *format);
 
 struct Date;
 struct Time;
@@ -176,10 +176,10 @@ struct DateTime
 	operator Date () const { return Date (extract_date_from_datetime (v)); }
 	operator Time () const { return Time (extract_time_from_datetime (v)); }
 
-	std::string format (const char *format) const { return format_time (v, format); }
-	std::wstring format (const wchar_t *format) const { return format_time (v, format); }
-	std::string format (const std::string &format) const { return format_time (v, format.c_str ()); }
-	std::wstring format (const std::wstring &format) const { return format_time (v, format.c_str ()); }
+	std::string format (const char *format) const { return format_datetime (v, format); }
+	std::wstring format (const wchar_t *format) const { return format_datetime (v, format); }
+	std::string format (const std::string &format) const { return format_datetime (v, format.c_str ()); }
+	std::wstring format (const std::wstring &format) const { return format_datetime (v, format.c_str ()); }
 };
 
 inline bool operator == (const DateTime &a, const DateTime &b) { return a.v == b.v; }

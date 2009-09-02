@@ -23,8 +23,8 @@
 namespace tiary {
 namespace ui {
 
-ListBox::ListBox (Window &dlg)
-	: Control (dlg)
+ListBox::ListBox (Window &win)
+	: Control (win)
 	, Scroll (0, false)
 	, items ()
 	, select_any (false)

@@ -182,8 +182,8 @@ private:
 	friend class ItemControl;
 };
 
-ItemControl::ItemControl (MenuWindow &dlg, const MenuItem &item_, bool valid_)
-	: Control (dlg)
+ItemControl::ItemControl (MenuWindow &win, const MenuItem &item_, bool valid_)
+	: Control (win)
 	, item (item_)
 	, text (item_.text)
 	, valid (valid_)
@@ -191,7 +191,7 @@ ItemControl::ItemControl (MenuWindow &dlg, const MenuItem &item_, bool valid_)
 	set_cursor_visibility (false);
 	if (valid_)
 		if (wchar_t c = text.get_hotkey ())
-			dlg.register_hotkey (c, Signal (this, &ItemControl::slot_trigger));
+			win.register_hotkey (c, Signal (this, &ItemControl::slot_trigger));
 }
 
 ItemControl::~ItemControl ()
@@ -257,7 +257,7 @@ void ItemControl::redraw ()
 
 		if (!valid)
 			id = PALETTE_ID_MENU_INVALID;
-		else if (dlg.get_focus () == this)
+		else if (win.get_focus () == this)
 			id = PALETTE_ID_MENU_SELECT;
 		else
 			id = PALETTE_ID_MENU;
@@ -275,17 +275,17 @@ void ItemControl::slot_trigger ()
 	focus ();
 	if (item.submenu == 0) {
 		// No submenu
-		static_cast <MenuWindow &>(dlg).result = const_cast <MenuItem *>(&item);
-		dlg.request_close ();
+		static_cast <MenuWindow &>(win).result = const_cast <MenuItem *>(&item);
+		win.request_close ();
 	} else {
 		// Has submenu
-		Size right = dlg.get_pos () + get_pos ();
+		Size right = win.get_pos () + get_pos ();
 		Size left = right + make_size (get_size ().x, 0);
 		MenuWindow subwin (*item.submenu, left, right, false);
 		subwin.event_loop ();
 		if (MenuItem *subret = subwin.get_result ()) {
-			static_cast<MenuWindow&>(dlg).result = subret;
-			dlg.request_close ();
+			static_cast<MenuWindow&>(win).result = subret;
+			win.request_close ();
 		}
 	}
 }

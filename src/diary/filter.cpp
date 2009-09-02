@@ -21,12 +21,13 @@ namespace tiary {
 
 DiaryEntryList Filter::filter (const DiaryEntryList &lst) const
 {
-	DiaryEntryList new_lst;
-	new_lst.reserve (lst.size ());
+	DiaryEntryList new_lst (lst.size ());
+	DiaryEntryList::iterator iw = new_lst.begin ();
 	for (DiaryEntryList::const_iterator it = lst.begin ();
 			it != lst.end (); ++it)
 		if ((*this)(**it))
-			new_lst.push_back (*it);
+			*iw++ = *it;
+	new_lst.erase (iw, new_lst.end ());
 	return new_lst;
 }
 

@@ -25,16 +25,16 @@ namespace tiary {
 namespace ui {
 
 
-DropList::DropList (Window &dlg, const ItemList &items_, size_t default_select)
-	: Control (dlg)
+DropList::DropList (Window &win, const ItemList &items_, size_t default_select)
+	: Control (win)
 	, items (items_.empty () ? ItemList (1) : items_)
 	, select (default_select < items_.size () ? default_select : 0)
 {
 }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-DropList::DropList (Window &dlg, ItemList &&items_, size_t default_select)
-	: Control (dlg)
+DropList::DropList (Window &win, ItemList &&items_, size_t default_select)
+	: Control (win)
 	, items (items_.empty () ? ItemList (1) : std::forward<ItemList> (items_))
 	, select (default_select < items.size () ? default_select : 0)
 {

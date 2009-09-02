@@ -623,7 +623,7 @@ void Window::request_close ()
 
 void Window::add_control (Control *ctrl)
 {
-	assert (&ctrl->dlg == this);
+	assert (&ctrl->win == this);
 
 	control_list.push_back (ctrl);
 }

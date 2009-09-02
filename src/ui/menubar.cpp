@@ -29,9 +29,9 @@ namespace ui {
 
 
 
-MenuBar::MenuBar (Window &dlg)
-	: Control (dlg)
-	, UnfocusableControl (dlg)
+MenuBar::MenuBar (Window &win)
+	: Control (win)
+	, UnfocusableControl (win)
 {
 }
 
@@ -53,7 +53,7 @@ Menu &MenuBar::add (const std::wstring &text)
 		item.w = it->w + it->text.get_width () + 2 /* Space */;
 	}
 	if (wchar_t c = item.text.get_hotkey ())
-		dlg.register_hotkey (c, Signal (this, &MenuBar::slot_clicked, n-1));
+		win.register_hotkey (c, Signal (this, &MenuBar::slot_clicked, n-1));
 
 	return item.menu;
 }
@@ -103,7 +103,7 @@ void MenuBar::slot_clicked (size_t k)
 		choose_palette (PALETTE_ID_MENUBAR_SELECT);
 		item.text.output (*this, make_size (item.w, 0), item.text.get_width ());
 
-		Size left = dlg.get_pos () + get_pos () + make_size (item.w, 1);
+		Size left = win.get_pos () + get_pos () + make_size (item.w, 1);
 		Size right = make_size (get_screen_size ().x, left.y);
 
 		// Pop out sub menu
@@ -121,7 +121,7 @@ void MenuBar::slot_clicked (size_t k)
 
 		// LEFT/RIGHT key?
 		MouseEvent me_buf;
-		wchar_t c = dlg.get_noblock (&me_buf);
+		wchar_t c = win.get_noblock (&me_buf);
 		if (c == LEFT) {
 			k = (k + item_list.size () - 1) % item_list.size ();
 		} else if (c == RIGHT) {
@@ -129,9 +129,9 @@ void MenuBar::slot_clicked (size_t k)
 		} else {
 			if (c) {
 				if (c == MOUSE)
-					dlg.unget (me_buf);
+					win.unget (me_buf);
 				else
-					dlg.unget (c);
+					win.unget (c);
 			}
 			break;
 		}

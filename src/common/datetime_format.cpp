@@ -104,7 +104,7 @@ void fill_full_month_name (std::basic_string <T> &dst, unsigned m)
 }
 
 template <typename T> inline
-std::basic_string<T> format_time_impl (uint64_t v, const T *fmt)
+std::basic_string<T> format_datetime_impl (uint64_t v, const T *fmt)
 {
 	ReadableDateTime rdt = extract_datetime (v);
 	std::basic_string<T> ret;
@@ -172,14 +172,14 @@ std::basic_string<T> format_time_impl (uint64_t v, const T *fmt)
 
 } // anonymous namespace
 
-std::string format_time (uint64_t val, const char *fmtstr)
+std::string format_datetime (uint64_t val, const char *fmtstr)
 {
-	return format_time_impl (val, fmtstr);
+	return format_datetime_impl (val, fmtstr);
 }
 
-std::wstring format_time (uint64_t val, const wchar_t *fmtstr)
+std::wstring format_datetime (uint64_t val, const wchar_t *fmtstr)
 {
-	return format_time_impl (val, fmtstr);
+	return format_datetime_impl (val, fmtstr);
 }
 
 

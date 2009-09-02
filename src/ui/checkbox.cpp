@@ -19,8 +19,8 @@
 namespace tiary {
 namespace ui {
 
-CheckBox::CheckBox (Window &dlg, bool initial_status)
-	: Control (dlg)
+CheckBox::CheckBox (Window &win, bool initial_status)
+	: Control (win)
 	, status (initial_status)
 {
 }

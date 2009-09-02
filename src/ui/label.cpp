@@ -23,15 +23,15 @@ namespace tiary {
 namespace ui {
 
 
-Label::Label (Window &dlg, const std::wstring &str, unsigned options)
-	: Control (dlg)
-	, UnfocusableControl (dlg)
+Label::Label (Window &win, const std::wstring &str, unsigned options)
+	: Control (win)
+	, UnfocusableControl (win)
 	, text (str, options)
 {
 	// Register hotkey
 	if (wchar_t c = text.get_hotkey ()) {
-		dlg.register_hotkey (c, Signal (sig_hotkey, 0));
-		sig_hotkey.connect (dlg, &Window::set_focus_ptr, this, 1);
+		win.register_hotkey (c, Signal (sig_hotkey, 0));
+		sig_hotkey.connect (win, &Window::set_focus_ptr, this, 1);
 	}
 }
 

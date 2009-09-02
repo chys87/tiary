@@ -20,10 +20,10 @@ namespace tiary {
 namespace ui {
 
 
-Control::Control (Window &dlg_)
+Control::Control (Window &win_)
 	: MovableObject ()
 	, Hotkeys ()
-	, dlg (dlg_)
+	, win (win_)
 	, curpos (make_size ())
 	, cursor_visible (true)
 	, ctrl_left (0)
@@ -31,7 +31,7 @@ Control::Control (Window &dlg_)
 	, ctrl_up (0)
 	, ctrl_down (0)
 {
-	dlg_.add_control (this);
+	win_.add_control (this);
 }
 
 Control::~Control ()
@@ -41,8 +41,8 @@ Control::~Control ()
 void Control::move_resize (Size newpos, Size newsize)
 {
 	if ((pos != newpos) || (size != newsize)) {
-		dlg.choose_palette (PALETTE_ID_BACKGROUND);
-		dlg.clear (pos, size);
+		win.choose_palette (PALETTE_ID_BACKGROUND);
+		win.clear (pos, size);
 		pos = newpos;
 		size = newsize;
 	}
@@ -75,12 +75,12 @@ void Control::on_focus_changed ()
 
 bool Control::is_focus () const
 {
-	return (dlg.get_focus () == this);
+	return (win.get_focus () == this);
 }
 
 void Control::focus ()
 {
-	dlg.set_focus (this, 0);
+	win.set_focus (this, 0);
 }
 
 void Control::move_cursor (Size newpos)
@@ -90,67 +90,67 @@ void Control::move_cursor (Size newpos)
 
 void Control::choose_palette (PaletteID id)
 {
-	dlg.choose_palette (id);
+	win.choose_palette (id);
 }
 
 void Control::choose_fore_color (Color fore)
 {
-	dlg.choose_fore_color (fore);
+	win.choose_fore_color (fore);
 }
 
 void Control::choose_back_color (Color back)
 {
-	dlg.choose_back_color (back);
+	win.choose_back_color (back);
 }
 
 void Control::choose_color (Color fore, Color back)
 {
-	dlg.choose_color (fore, back);
+	win.choose_color (fore, back);
 }
 
 void Control::attribute_on (Attr attr)
 {
-	dlg.attribute_on (attr);
+	win.attribute_on (attr);
 }
 
 void Control::attribute_off (Attr attr)
 {
-	dlg.attribute_off (attr);
+	win.attribute_off (attr);
 }
 
 ColorAttr Control::get_attr () const
 {
-	return dlg.get_attr ();
+	return win.get_attr ();
 }
 
 void Control::set_attr (ColorAttr at)
 {
-	dlg.set_attr (at);
+	win.set_attr (at);
 }
 
 Size Control::put (Size xy, wchar_t c)
 {
-	return dlg.put (pos, size, xy, c);
+	return win.put (pos, size, xy, c);
 }
 
 Size Control::put (Size xy, const wchar_t *s)
 {
-	return dlg.put (pos, size, xy, s);
+	return win.put (pos, size, xy, s);
 }
 
 Size Control::put (Size xy, const wchar_t *s, size_t n)
 {
-	return dlg.put (pos, size, xy, s, n);
+	return win.put (pos, size, xy, s, n);
 }
 
 Size Control::put (Size xy, const std::wstring &s)
 {
-	return dlg.put (pos, size, xy, s);
+	return win.put (pos, size, xy, s);
 }
 
 void Control::clear ()
 {
-	dlg.clear (pos, size);
+	win.clear (pos, size);
 }
 
 void Control::clear (Size fill_pos, Size fill_size)
@@ -162,7 +162,7 @@ void Control::fill (Size fill_pos, Size fill_size, wchar_t ch)
 {
 	fill_pos &= size;
 	fill_size &= size - fill_pos;
-	dlg.fill (fill_pos + pos, fill_size, ch);
+	win.fill (fill_pos + pos, fill_size, ch);
 }
 
 
