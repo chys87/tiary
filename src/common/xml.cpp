@@ -94,8 +94,8 @@ xmlNodePtr shallow_copy (const XMLNode *iptr)
 		return 0;
 }
 
-void generic_error_silent (void *, const char *, ...) {}
-void structured_error_silent (void *, xmlErrorPtr) {}
+extern "C" void generic_error_silent (void *, const char *, ...) {}
+extern "C" void structured_error_silent (void *, xmlErrorPtr) {}
 
 void libxml2_init ()
 {
