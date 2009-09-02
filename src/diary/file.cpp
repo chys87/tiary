@@ -94,12 +94,7 @@ uint64_t parse_time (const char *s)
  */
 std::string format_time (const DateTime &date_time)
 {
-	// strftime is not used because we dislike the "tm" struct. It sucks.
-	// stringstream is not used because it sucks more.
-	// (C++ stream's format control is extremely disgusting)
-	ReadableDateTime t = date_time.extract ();
-	return format_utf8("%04a-%02b-%02c %02d:%02e:%02f")
-		<< t.y << t.m << t.d << t.H << t.M << t.S;
+	return wstring_to_utf8 (date_time.format (L"%Y-%m-%d %H:%M:%S"));
 }
 
 /**

@@ -21,10 +21,10 @@ namespace tiary {
 
 DiaryEntryList Filter::filter (const DiaryEntryList &lst) const
 {
-	DiaryEntryList new_lst (lst.size ());
+	DiaryEntryList new_lst (lst);
 	DiaryEntryList::iterator iw = new_lst.begin ();
-	for (DiaryEntryList::const_iterator it = lst.begin ();
-			it != lst.end (); ++it)
+	for (DiaryEntryList::const_iterator it = new_lst.begin ();
+			it != new_lst.end (); ++it)
 		if ((*this)(**it))
 			*iw++ = *it;
 	new_lst.erase (iw, new_lst.end ());

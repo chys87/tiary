@@ -23,8 +23,6 @@
  *
  * std::wstring s = format (L"I am %a. I am %b years old now.") << "chys" << 22;
  *
- * std::string s = format_utf8 ("%b %a") << "world" << "Hello";
- *
  * For efficiency, I suppose the pointer passed to Format/WFormat is always valid
  * in the lifetime of the class.
  *
@@ -52,159 +50,47 @@
 
 namespace tiary {
 
-namespace detail {
-
 struct HexTag
 {
 	unsigned val;
 };
 
-template <typename T>
-struct UTF8Tag
+inline HexTag hex (unsigned v)
 {
-	T val;
-};
-
-} // namespace detail
-
-inline detail::HexTag hex (unsigned v)
-{
-	detail::HexTag ret = { v };
-	return ret;
-}
-
-inline detail::UTF8Tag<char> utf8 (char c)
-{
-	detail::UTF8Tag<char> ret = { c };
-	return ret;
-}
-
-inline detail::UTF8Tag<const char *> utf8 (const char *s)
-{
-	detail::UTF8Tag<const char *> ret = { s };
-	return ret;
-}
-
-inline detail::UTF8Tag<const std::string *> utf8 (const std::string &s)
-{
-	detail::UTF8Tag<const std::string *> ret = { &s };
+	HexTag ret = { v };
 	return ret;
 }
 
 
-namespace detail {
-class FormatArgs {
+class Format {
 public:
 	static const unsigned MAX_ARGS = 26;
 
-protected:
-	std::wstring args;          // The concatenation of all args, always Unicode
-	unsigned nargs;             // Current number of args
-	unsigned offset[MAX_ARGS+1];// Offset in args
+	explicit Format (const wchar_t *fmt) : format (fmt), args(), nargs (0) { offset[0] = 0; }
+	~Format ();
 
-	FormatArgs () : args(), nargs (0) { offset[0] = 0; }
-	~FormatArgs ();
-
-	// wide (Unicode)
-	void add (wchar_t);
-	void add (const wchar_t *);
-	void add (const std::wstring &);
-	// Narrow (multi-byte)
-	void add (char);
-	void add (const char *);
-	void add (const std::string &);
-	// Narrow (UTF8)
-	void add (UTF8Tag<char>);
-	void add (UTF8Tag<const char *>);
-	void add (UTF8Tag<const std::string *>);
+	Format &operator << (wchar_t);
+	Format &operator << (const wchar_t *);
+	Format &operator << (const std::wstring &);
 
 	// Decimal
-	void add (unsigned);
+	Format &operator << (unsigned);
 	// Hexidecimal
-	void add (HexTag);
+	Format &operator << (HexTag);
 
-	std::string output (const char *) const;
-	std::string output (UTF8Tag<const char *>) const;
-	std::wstring output (const wchar_t *) const;
-};
-
-// Argument is one of the following:
-// const char *
-// UTF8Tag <const char *>
-// const wchar_t *
-template <typename Type>
-struct FormatTypeInfo
-{
-	typedef void char_type;
-};
-
-template <>
-struct FormatTypeInfo <UTF8Tag <const char *> >
-{
-	typedef char char_type;
-};
-
-template <typename T>
-struct FormatTypeInfo <const T *>
-{
-	typedef T char_type;
-};
-
-template <typename FormatStringType>
-class FormatBase : private detail::FormatArgs
-{
-public:
-
-	// Constructor
-	explicit FormatBase (FormatStringType fmt) : FormatArgs (), format (fmt) {}
-
-	// Output
-	operator typename std::basic_string <typename FormatTypeInfo<FormatStringType>::char_type> () const { return FormatArgs::output (format); }
-	// Identical, but more explicit
-	typename std::basic_string <typename FormatTypeInfo<FormatStringType>::char_type> operator () () const { return FormatArgs::output (format); }
-
-#define TIARY_FORMATBASE_FORWARD(type)									\
-	FormatBase & operator << (type x) { add (x); return *this; }	\
-	FormatBase & operator ,  (type x) { add (x); return *this; }
-
-TIARY_FORMATBASE_FORWARD(wchar_t)
-TIARY_FORMATBASE_FORWARD(const wchar_t *)
-TIARY_FORMATBASE_FORWARD(const std::wstring &)
-TIARY_FORMATBASE_FORWARD(char)
-TIARY_FORMATBASE_FORWARD(const char *)
-TIARY_FORMATBASE_FORWARD(const std::string &)
-TIARY_FORMATBASE_FORWARD(UTF8Tag<char>)
-TIARY_FORMATBASE_FORWARD(UTF8Tag<const char *>)
-TIARY_FORMATBASE_FORWARD(UTF8Tag<const std::string *>)
-TIARY_FORMATBASE_FORWARD(unsigned)
-TIARY_FORMATBASE_FORWARD(HexTag)
-
-#undef TIARY_FORMATBASE_FORWARD
+	operator std::wstring () const;
 
 private:
-	FormatStringType const format; // Format string
+	const wchar_t *format;      ///< Format string
+	std::wstring args;          ///< The concatenation of all args
+	unsigned nargs;             ///< Current number of args
+	unsigned offset[MAX_ARGS+1];///< Offset in args
+
 };
 
-} // namespace detail
-
-inline detail::FormatBase<const wchar_t *> format (const wchar_t *fmt)
+inline Format format (const wchar_t *fmt)
 {
-	return detail::FormatBase<const wchar_t *> (fmt);
-}
-
-inline detail::FormatBase<const char *> format (const char *fmt)
-{
-	return detail::FormatBase<const char *> (fmt);
-}
-
-inline detail::FormatBase<detail::UTF8Tag<const char *> > format (detail::UTF8Tag<const char *> fmt)
-{
-	return detail::FormatBase<detail::UTF8Tag<const char *> > (fmt);
-}
-
-inline detail::FormatBase<detail::UTF8Tag<const char *> > format_utf8 (const char *fmt)
-{
-	return format (utf8 (fmt));
+	return Format (fmt);
 }
 
 } // namespace tiary

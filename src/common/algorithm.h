@@ -323,7 +323,7 @@ void remove_all (Container &container, const T &value, typename Container::itera
 template <typename Iter, typename F>
 typename F::result_type sum (Iter first, Iter last, F foo, typename F::result_type initial_value = typename F::result_type ())
 {
-	typename F::result_type r = initial_value;
+	typename F::result_type r (initial_value);
 	while (first != last)
 		r += foo (*first++);
 	return r;
@@ -335,7 +335,7 @@ typename F::result_type sum (Iter first, Iter last, F foo, typename F::result_ty
 template <typename Iter>
 typename Iter::value_type sum (Iter first, Iter last, typename Iter::value_type initial_value = typename Iter::value_type ())
 {
-	typename Iter::value_type r = initial_value;
+	typename Iter::value_type r (initial_value);
 	while (first != last)
 		r += *first++;
 	return r;
@@ -347,7 +347,7 @@ typename Iter::value_type sum (Iter first, Iter last, typename Iter::value_type 
 template <typename Iter, typename F>
 typename F::result_type sum (Iter first, size_t n, F foo, typename F::result_type initial_value = typename F::result_type ())
 {
-	typename F::result_type r = initial_value;
+	typename F::result_type r (initial_value);
 	for (; n; --n)
 		r += foo (*first++);
 	return r;
@@ -356,7 +356,7 @@ template <typename Iter>
 typename std::iterator_traits<Iter>::value_type sum (Iter first, size_t n,
 		typename std::iterator_traits<Iter>::value_type initial_value = typename std::iterator_traits<Iter>::value_type ())
 {
-	typename std::iterator_traits<Iter>::value_type r = initial_value;
+	typename std::iterator_traits<Iter>::value_type r (initial_value);
 	for (; n; --n)
 		r += *first++;
 	return r;

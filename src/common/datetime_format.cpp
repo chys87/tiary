@@ -20,166 +20,112 @@ namespace tiary {
 
 namespace {
 
-template <typename T>
-void to_string_2 (std::basic_string <T> &dst, unsigned x)
+void to_string_2 (std::wstring &dst, unsigned x)
 {
-	dst += T('0') + (x/10)%10;
-	dst += T('0') + (x%10);
+	wchar_t buffer[2] = { L'0' + (x/10)%10, L'0' + (x%10) };
+	dst.append (buffer, 2);
 }
 
-template <typename T>
-void to_string_4 (std::basic_string <T> &dst, unsigned x)
+void to_string_4 (std::wstring &dst, unsigned x)
 {
 	to_string_2 (dst, x/100);
 	to_string_2 (dst, x);
 }
 
-const char weekday_name[] = "SunMonTueWedThuFriSat";
+const wchar_t weekday_name[] = L"SunMonTueWedThuFriSat";
 
-template <typename T> inline
-void fill_weekday_name (std::basic_string <T> &dst, unsigned n)
-{
-	const char *p = &weekday_name[n*3];
-	dst += T(*p++);
-	dst += T(*p++);
-	dst += T(*p++);
-}
-
-void append_str (std::string &dst, const char *str)
-{
-	dst += str;
-}
-
-void append_str (std::wstring &dst, const char *str)
-{
-	dst.append (str, strend (str));
-}
-
-const char full_weekday_name[][10] = {
-	"Sunday",
-	"Monday",
-	"Tuesday",
-	"Wednesday",
-	"Thursday",
-	"Friday",
-	"Saturday"
+const wchar_t full_weekday_name[][10] = {
+	L"Sunday",
+	L"Monday",
+	L"Tuesday",
+	L"Wednesday",
+	L"Thursday",
+	L"Friday",
+	L"Saturday"
 };
 
-template <typename T> inline
-void fill_full_weekday_name (std::basic_string <T> &dst, unsigned n)
-{
-	append_str (dst, full_weekday_name[n]);
-}
+const wchar_t month_name[] = L"JanFebMarAprMayJunJulAugSepOctNovDec";
 
-const char month_name[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
-
-template <typename T> inline
-void fill_month_name (std::basic_string <T> &dst, unsigned m)
-{
-	const char *p = &month_name[m*3-3];
-	dst += T(*p++);
-	dst += T(*p++);
-	dst += T(*p++);
-}
-
-const char full_month_name[][10] = {
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December"
+const wchar_t full_month_name[][10] = {
+	L"January",
+	L"February",
+	L"March",
+	L"April",
+	L"May",
+	L"June",
+	L"July",
+	L"August",
+	L"September",
+	L"October",
+	L"November",
+	L"December"
 };
 
-template <typename T> inline
-void fill_full_month_name (std::basic_string <T> &dst, unsigned m)
-{
-	append_str (dst, full_month_name[m-1]);
-}
+} // anonymous namespace
 
-template <typename T> inline
-std::basic_string<T> format_datetime_impl (uint64_t v, const T *fmt)
+std::wstring format_datetime (uint64_t v, const wchar_t *fmt)
 {
 	ReadableDateTime rdt = extract_datetime (v);
-	std::basic_string<T> ret;
+	std::wstring ret;
 	ret.reserve (strlen (fmt)*2);
-	while (const T *p = strchr (fmt, T('%'))) {
-		if (p[1] == T('\0'))
+	while (const wchar_t *p = wcschr (fmt, L'%')) {
+		if (p[1] == L'\0')
 			break;
 		ret.append (fmt, p);
 		fmt = p+2;
 		switch (p[1]) {
 			default:
-			case T('%'):
+			case L'%':
 				ret += p[1];
 				break;
-			case T('Y'):
+			case L'Y':
 				to_string_4 (ret, rdt.y);
 				break;
-			case T('y'):
+			case L'y':
 				to_string_2 (ret, rdt.y);
 				break;
-			case T('m'):
+			case L'm':
 				to_string_2 (ret, rdt.m);
 				break;
-			case T('d'):
+			case L'd':
 				to_string_2 (ret, rdt.d);
 				break;
-			case T('b'):
-				fill_month_name (ret, rdt.m);
+			case L'b':
+				ret.append (month_name+(rdt.m-1)*3, 3);
 				break;
-			case T('w'):
-				fill_weekday_name (ret, rdt.w);
+			case L'w':
+				ret.append (weekday_name+rdt.w*3, 3);
 				break;
-			case T('B'):
-				fill_full_month_name (ret, rdt.m);
+			case L'B':
+				ret += full_month_name [rdt.m-1];
 				break;
-			case T('W'):
-				fill_full_weekday_name (ret, rdt.w);
+			case L'W':
+				ret += full_weekday_name [rdt.w];
 				break;
-			case T('H'):
+			case L'H':
 				to_string_2 (ret, rdt.H);
 				break;
-			case T('h'):
+			case L'h':
 				to_string_2 (ret, (rdt.H+11)%12+1);
 				break;
-			case T('M'):
+			case L'M':
 				to_string_2 (ret, rdt.M);
 				break;
-			case T('S'):
+			case L'S':
 				to_string_2 (ret, rdt.S);
 				break;
-			case T('P'):
-				ret += (rdt.H < 12) ? T('A') : T('P');
-				ret += T('M');
+			case L'P':
+				ret += (rdt.H < 12) ? L'A' : L'P';
+				ret += L'M';
 				break;
-			case T('p'):
-				ret += (rdt.H < 12) ? T('a') : T('p');
-				ret += T('m');
+			case L'p':
+				ret += (rdt.H < 12) ? L'a' : 'p';
+				ret += L'm';
 				break;
 		}
 	}
 	ret += fmt;
 	return ret;
-}
-
-
-} // anonymous namespace
-
-std::string format_datetime (uint64_t val, const char *fmtstr)
-{
-	return format_datetime_impl (val, fmtstr);
-}
-
-std::wstring format_datetime (uint64_t val, const wchar_t *fmtstr)
-{
-	return format_datetime_impl (val, fmtstr);
 }
 
 
