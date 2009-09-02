@@ -19,6 +19,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+tiary::XMLNodeTree::~XMLNodeTree ()
+{
+}
+
+tiary::XMLNodeText::~XMLNodeText ()
+{
+}
+
 void tiary::xml_free (XMLNode *root)
 {
 	if (root == 0)
@@ -129,14 +137,14 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 	std::stack<std::pair<XMLNodeTree *, xmlNodePtr> > stk;
 
 	XMLNode *root = shallow_copy (iptr);
-	if (!dynamic_cast<XMLNodeTree *>(root)) {
+	XMLNodeTree *optr = dynamic_cast<XMLNodeTree *>(root);
+				// Current working output node
+				// Current working input node is iptr
+	if (!optr) {
 		// Root is a text node. Error.
 		delete root;
 		return 0;
 	}
-	XMLNodeTree *optr = static_cast<XMLNodeTree *>(root);
-				// Current working output node
-				// Current working input node is iptr
 	XMLNode virtual_node;
 	for (;;) {
 		// Shallow copy all children of current node

@@ -47,6 +47,7 @@ public:
 struct XMLNodeTree : XMLNode
 {
 	explicit XMLNodeTree (const char *name_) : children (0), name (name_) {}
+	~XMLNodeTree ();
 
 	XMLNode *children; // Pointer to first child
 	const std::string name;
@@ -62,6 +63,7 @@ struct XMLNodeText : XMLNode
 	explicit XMLNodeText (const std::string &text_) : text(text_) {}
 	explicit XMLNodeText (const std::wstring &text_) : text(wstring_to_utf8(text_)) {}
 	XMLNodeText () {}
+	~XMLNodeText ();
 
 	std::string text;
 };
