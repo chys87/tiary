@@ -307,9 +307,25 @@ IF(HAVE_INITIALIZER_LIST)
 	ADD_DEFINITIONS("-DTIARY_HAVE_INITIALIZER_LIST=1")
 ENDIF(HAVE_INITIALIZER_LIST)
 
+# Variadic templates and tuples (>= gcc 4.3)
+CHECK_CXX_SOURCE_COMPILES("#include <tuple> \n
+	using namespace std;
+	template <typename... Args>
+	size_t mysizeof (Args... args)
+	{
+		return sizeof...(Args);
+	}
+	template <typename... Args>
+	typename tuple_element<0, tuple<Args...> >::type first (tuple<Args...>&tp)
+	{
+		return tp.get<0>();
+	}
+	int main () {}" HAVE_TUPLES)
+IF(HAVE_TUPLES)
+	ADD_DEFINITIONS("-DTIARY_HAVE_TUPLES=1")
+ENDIF(HAVE_TUPLES)
 
 # decltype (>= gcc 4.3)
-
 CHECK_CXX_SOURCE_COMPILES("#include <iostream> \n
 #include <cstdlib> \n
 
