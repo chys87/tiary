@@ -11,10 +11,16 @@
  *
  **************************************************************************/
 
+/**
+ * @file	main/dialog_edit_time.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements a window to allow the user to edit date & time
+ */
+
 
 #include "main/dialog_edit_time.h"
 #include "diary/diary.h"
-#include "ui/fixed_dialog.h"
+#include "ui/fixed_window.h"
 #include "ui/droplist.h"
 #include "ui/label.h"
 #include "ui/button.h"
@@ -23,7 +29,6 @@
 #include "ui/layout.h"
 #include "ui/date_select.h"
 #include "common/datetime.h"
-#include "common/format.h"
 
 namespace tiary {
 
@@ -63,28 +68,6 @@ private:
 	void slot_now ();
 	void slot_ok ();
 };
-
-const wchar_t month_names [][4] = {
-	L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
-	L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
-};
-const wchar_t day_names [][3] = {
-	L"1", L"2", L"3", L"4", L"5", L"6", L"7", L"8", L"9", L"10",
-	L"11", L"12", L"13", L"14", L"15", L"16", L"17", L"18", L"19", L"20",
-	L"21", L"22", L"23", L"24", L"25", L"26", L"27", L"28", L"29", L"30",
-	L"31"
-};
-
-const unsigned first_year = 1900;
-const unsigned last_year = 2100;
-
-std::vector<std::wstring> make_year_names ()
-{
-	std::vector<std::wstring> r (last_year - first_year + 1);
-	for (unsigned k=0; k<last_year-first_year+1; ++k)
-		r[k] = format (L"%a") << (k + first_year);
-	return r;
-}
 
 const wchar_t num_names [][3] = {
 	L"00", L"01", L"02", L"03", L"04", L"05", L"06", L"07", L"08", L"09",

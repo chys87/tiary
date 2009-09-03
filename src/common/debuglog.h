@@ -12,8 +12,16 @@
  **************************************************************************/
 
 
+/**
+ * @file	common/debuglog.h
+ * @author	chys <admin@chys.info>
+ * @brief	Defines utilities helpful to debugging
+ */
+
 #ifndef TIARY_UI_DEBUGLOG_H
 #define TIARY_UI_DEBUGLOG_H
+
+#ifndef NDEBUG
 
 #include <stdarg.h>
 
@@ -27,7 +35,6 @@ void debug_log2 (const char *format, ...);
 } // namespace tiary::debug
 } // namespace tiary
 
-#if !defined NDEBUG
 # ifdef __GNUC__
 #  define DEBUG_LOG(s...) ::tiary::debug::debug_log(__FILE__,__LINE__,__func__,s)
 # elif __STDC_VERSION >= 199901L
@@ -35,8 +42,8 @@ void debug_log2 (const char *format, ...);
 # else
 #  define DEBUG_LOG ::tiary::debug::debug_log2
 # endif
-#else
+#else // NDEBUG
 inline void DEBUG_LOG(...) {}
-#endif
+#endif // !NDEBUG
 
 #endif // Include guard

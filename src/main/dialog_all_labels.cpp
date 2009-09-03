@@ -3,7 +3,7 @@
 #include "ui/button_default.h"
 #include "ui/window.h"
 #include "ui/listbox.h"
-#include "ui/fixed_dialog.h"
+#include "ui/fixed_window.h"
 #include "ui/label.h"
 #include "ui/layout.h"
 #include "ui/chain.h"
@@ -12,6 +12,12 @@
 #include "diary/diary.h"
 #include "common/format.h"
 #include "common/containers.h"
+
+/**
+ * @file	main/dialog_all_labels.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements the dialog allowing the user to control all labels
+ */
 
 namespace tiary {
 

@@ -231,7 +231,10 @@ wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 	}
 }
 
-typedef std::stack <std::pair <wchar_t, MouseEvent> > UnGetStack;
+// There is usually no or just one element in the stack.
+// Not necessary to use the complicated deque.
+// Vector is enough
+typedef std::stack <std::pair <wchar_t, MouseEvent>, std::vector <std::pair <wchar_t, MouseEvent> > > UnGetStack;
 UnGetStack stk_unget;
 
 void unget_input (wchar_t c, MouseEvent mouse_event)
@@ -493,8 +496,6 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 	if (either (relpos >= blksize))
 		return relpos;
 
-//	unsigned left = pos.x + blkpos.x;
-	unsigned top  = pos.y + blkpos.y;
 	unsigned x = relpos.x;
 	unsigned y = relpos.y;
 
@@ -502,33 +503,41 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 	unsigned winx = blkpos.x + x;
 	unsigned winy = blkpos.y + y;
 
-	touch_line (top + y);
-	CharColorAttr *line = char_table[winy];
+	touch_line (pos.y + winy);
+	CharColorAttr *ptr = char_table[winy] + winx;
 
-	if (winx && line[winx].c == L'\0')
-		line[winx-1].c = L' ';
+#if 0 // Caller's responsibility
+	if (winx && ptr->c == L'\0')
+		ptr[-1].c = L' ';
+#endif
+
+	unsigned left_width = blksize.x - x;
 
 	for (; n; --n) {
 
 		wchar_t ch = *s++;
 		unsigned w = ucs_width (ch);
 
-		if (x + w > blksize.x)
+		if (int (left_width -= w) < 0)
 			break;
 
-		line[winx].c = ch;
-		line[winx].a = cur_attr;
+		ptr->c = ch;
+		ptr->a = cur_attr;
+		++ptr;
 		++x;
 		++winx;
 		if (w == 2) {
-			line[winx].c = L'\0';
-			line[winx].a = cur_attr;
+			ptr->c = L'\0';
+			ptr->a = cur_attr;
+			++ptr;
 			++x;
 			++winx;
 		}
 	}
-	if (winx<size.x && line[winx].c==L'\0')
-		line[winx].c = L' ';
+#if 0 // Caller's responsibility
+	if (winx<size.x && ptr->c==L'\0')
+		ptr->c = L' ';
+#endif
 	return make_size (x, y);
 }
 

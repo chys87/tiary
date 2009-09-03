@@ -20,6 +20,30 @@
 
 namespace tiary {
 
+std::wstring format_dec (unsigned x)
+{
+	const size_t BUFFER_SIZE = 3 * sizeof (unsigned);
+	wchar_t buffer [BUFFER_SIZE];
+	wchar_t *p = buffer + BUFFER_SIZE;
+	do {
+		*--p = L'0' + (x % 10);
+	} while (x /= 10);
+	return std::wstring (p, buffer + BUFFER_SIZE);
+}
+
+std::wstring format_hex (unsigned x)
+{
+	const size_t BUFFER_SIZE = 2 * sizeof (unsigned);
+	wchar_t buffer [BUFFER_SIZE];
+	wchar_t *p = buffer + BUFFER_SIZE;
+	do {
+		unsigned tmp = x % 16;
+		x /= 16;
+		*--p = (tmp < 10) ? (L'0'+tmp) : (L'a'-10+tmp);
+	} while (x);
+	return std::wstring (p, buffer + BUFFER_SIZE);
+}
+
 Format::~Format ()
 {
 }
@@ -53,14 +77,8 @@ Format &Format::operator << (const std::wstring &s)
 
 Format &Format::operator << (unsigned x)
 {
-	const size_t BUFFER_SIZE = 3 * sizeof (unsigned);
 	if (nargs < MAX_ARGS) {
-		wchar_t buffer [BUFFER_SIZE];
-		wchar_t *p = buffer + BUFFER_SIZE;
-		do {
-			*--p = L'0' + (x % 10);
-		} while (x /= 10);
-		args.append (p, buffer + BUFFER_SIZE);
+		args += format_dec (x);
 		offset[++nargs] = args.size ();
 	}
 	return *this;
@@ -68,17 +86,8 @@ Format &Format::operator << (unsigned x)
 
 Format &Format::operator << (HexTag a)
 {
-	unsigned x = a.val;
-	const size_t BUFFER_SIZE = 2 * sizeof (unsigned);
 	if (nargs < MAX_ARGS) {
-		wchar_t buffer [BUFFER_SIZE];
-		wchar_t *p = buffer + BUFFER_SIZE;
-		do {
-			unsigned tmp = x % 16;
-			x /= 16;
-			*--p = (tmp < 10) ? (L'0'+tmp) : (L'a'-10+tmp);
-		} while (x);
-		args.append (p, buffer + BUFFER_SIZE);
+		args += format_hex (a.val);
 		offset[++nargs] = args.size ();
 	}
 	return *this;

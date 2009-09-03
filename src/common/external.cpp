@@ -12,6 +12,12 @@
  **************************************************************************/
 
 
+/**
+ * @file	common/external.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements functions declared in common/external.h
+ */
+
 #include "common/external.h"
 #include "common/misc.h"
 #include "common/dir.h"

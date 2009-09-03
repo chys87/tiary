@@ -11,6 +11,13 @@
  *
  **************************************************************************/
 
+/**
+ * @file	common/debuglog.h
+ * @author	chys <admin@chys.info>
+ * @brief	Implements utilities helpful to debugging
+ */
+
+#ifndef NDEBUG
 
 #include "common/debuglog.h"
 #include <stdarg.h>
@@ -50,3 +57,5 @@ void debug_log2 (const char *format, ...)
 
 } // namespace tiary::debug
 } // namespace tiary
+
+#endif // !NDEBUG

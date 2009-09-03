@@ -11,13 +11,18 @@
  *
  **************************************************************************/
 
+/**
+ * @file	ui/dialog_input.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements tiary::ui::dialog_input and tiary::ui::dialog_input2
+ */
 
 #include "ui/dialog_input.h"
 #include "ui/label.h"
 #include "ui/textbox.h"
 #include "ui/button.h"
 #include "ui/button_default.h"
-#include "ui/fixed_dialog.h"
+#include "ui/fixed_window.h"
 #include "ui/chain.h"
 #include "common/algorithm.h"
 

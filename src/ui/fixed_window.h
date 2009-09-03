@@ -15,6 +15,11 @@
 #ifndef TIARY_UI_FIXED_DIALOG_H
 #define TIARY_UI_FIXED_DIALOG_H
 
+/**
+ * @file	ui/fixed_window.h
+ * @author	chys <admin@chys.info>
+ * @brief	Declares class tiary::ui::FixedWindow
+ */
 
 #include "ui/window.h"
 #include <string>
@@ -23,7 +28,7 @@ namespace tiary {
 namespace ui {
 
 /*
- * Fixed-size dialog.
+ * Fixed-size window.
  * Automatically positioned in the middle of the screen
  */
 

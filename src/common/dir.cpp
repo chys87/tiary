@@ -11,6 +11,12 @@
  *
  **************************************************************************/
 
+/**
+ * @file	common/dir.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements functions declared in common/dir.h
+ */
+
 
 #include "common/dir.h"
 #include "common/unicode.h"
@@ -330,7 +336,7 @@ std::basic_string <ChT> optional_canonicalize (const std::basic_string<ChT> &nam
 {
 	std::basic_string <ChT> tmp (name, 0, len);
 	if (canonicalize)
-		get_full_pathname (tmp).swap (tmp);
+		tmp = get_full_pathname (tmp);
 	return tmp;
 }
 
@@ -465,7 +471,7 @@ std::string find_executable (const std::string &exe)
 	} else if (memchr (exe.data (), '/', exe.length ())) {
 		// exe is a full/relative pathname
 		if (exe[0] == '~')
-			home_expand_pathname (exe).swap (result);
+			result = home_expand_pathname (exe);
 		else
 			result = exe;
 		if (access (result.c_str (), X_OK) != 0)

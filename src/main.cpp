@@ -12,6 +12,12 @@
  **************************************************************************/
 
 
+/**
+ * @file	main.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements the main function of this program
+ */
+
 #include "ui/ui.h"
 #include "common/unicode.h"
 #include "main/mainui.h"

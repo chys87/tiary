@@ -27,8 +27,8 @@ add_library(tiary_ui
 	direction.h
 	droplist.h
 	droplist.cpp
-	fixed_dialog.h
-	fixed_dialog.cpp
+	fixed_window.h
+	fixed_window.cpp
 	grid_select.h
 	grid_select.cpp
 	hotkeys.h

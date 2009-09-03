@@ -12,8 +12,14 @@
  **************************************************************************/
 
 
+/**
+ * @file	ui/dialog_search.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements tiary::ui::search, displaying a typical "Search" window
+ */
+
 #include "ui/dialog_search.h"
-#include "ui/fixed_dialog.h"
+#include "ui/fixed_window.h"
 #include "ui/textbox.h"
 #include "ui/button.h"
 #include "ui/button_default.h"

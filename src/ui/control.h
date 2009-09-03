@@ -36,7 +36,7 @@ public:
 	// move_resize does not imply redraw
 	void move_resize (Size pos, Size size);
 
-	// Never receives WINCH (should be handled by dialog); mouse position relative to control
+	// Never receives WINCH (should be handled by window); mouse position relative to control
 	virtual bool on_mouse (MouseEvent);
 	virtual bool on_key (wchar_t);
 	virtual void on_defocus (); // Cannot refuse defocusing

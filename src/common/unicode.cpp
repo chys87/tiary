@@ -284,7 +284,7 @@ std::string wstring_to_mbs (const std::wstring &src, char substitute)
 unsigned ucs_width (wchar_t c)
 {
 #ifdef TIARY_HAVE_WCWIDTH
-	if (wcwidth (c) == 2)
+	if (wcwidth (c) > 1)
 		return 2;
 	else
 		return 1;

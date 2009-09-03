@@ -11,6 +11,11 @@
  *
  **************************************************************************/
 
+/**
+ * @file	common/external.h
+ * @author	chys <admin@chys.info>
+ * @brief	Declares functions related to calling external programs
+ */
 
 #ifndef TIARY_COMMON_EXTERNAL_H
 #define TIARY_COMMON_EXTERNAL_H

@@ -223,8 +223,8 @@ typedef unsigned MouseMask;
  * Define this class even if TIARY_USE_MOUSE is not defined.
  */
 struct MouseEvent {
-	MouseMask m; ///< @brief Bitwise OR'd of LEFT_PRESS, MOUSE_ALT, etc.
 	Size p; ///< @brief Position of the mouse event
+	MouseMask m; ///< @brief Bitwise OR'd of LEFT_PRESS, MOUSE_ALT, etc.
 };
 
 const MouseMask LEFT_PRESS       = 0x0001;
@@ -278,6 +278,7 @@ struct ColorAttr
 {
 	Color fore, back;
 	Attr attr;
+	unsigned char padding___;
 
 	static ColorAttr make_default ();
 };

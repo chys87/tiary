@@ -12,9 +12,15 @@
  **************************************************************************/
 
 
+/**
+ * @file	ui/dialog_select.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements tiary::ui::dialog_select, displaying a list from which one can be selected
+ */
+
 
 #include "ui/dialog_select.h"
-#include "ui/fixed_dialog.h"
+#include "ui/fixed_window.h"
 #include "ui/listbox.h"
 #include "ui/button.h"
 #include "ui/button_default.h"

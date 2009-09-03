@@ -133,12 +133,10 @@ inline Size operator | (const Size &a, const Size &b)
  *
  * The result of == or != is a single boolean value, whose meaning is clear
  *
- * The result of a comparison between two Size strucutres has type
+ * Otherwise, the result of a comparison between two Size strucutres has type
  * tiary::ui::SizeCompareResult. The comparison is respectively
- * carried our for the x and y components, and the result is
- * in tiary::ui::SizeCompareResult::x and tiary::ui::SizeCompareResult::y.
- * The member functions of tiary::ui::SizeCompareResult
- * helps simplify the process of checking the result.
+ * carried our for the x and y components.
+ * Use @c both, @c either and @c neither to analyze the results
  *
  * @{
  *
@@ -154,36 +152,58 @@ inline bool operator != (Size a, Size b)
 	return !(a == b);
 }
 
+namespace detail {
+
+struct Greater { bool operator () (unsigned a, unsigned b) const { return (a > b); } };
+struct Less { bool operator () (unsigned a, unsigned b) const { return (a < b); } };
+struct GreaterEqual { bool operator () (unsigned a, unsigned b) const { return (a >= b); } };
+struct LessEqual { bool operator () (unsigned a, unsigned b) const { return (a <= b); } };
+
 /**
  * @brief	The result of the comparison between to Size strucutres
  */
+template <typename Comp>
 struct SizeCompareResult
 {
-	bool x, y;
+	Size a, b;
 
-	bool both () const { return (x && y); }
-	bool either () const { return (x || y); }
-	bool neither () const { return (!x && !y); }
+	SizeCompareResult (Size a_, Size b_) : a(a_), b(b_) {}
+
+	bool both () const { return Comp () (a.x, b.x) && Comp () (a.y, b.y); }
+	bool either () const { return Comp () (a.x, b.x) || Comp () (a.y, b.y); }
+	bool neither () const { return !Comp () (a.x, b.x) && !Comp () (a.y, b.y); }
 };
 
-inline bool both (SizeCompareResult r) { return r.both (); }
-inline bool either (SizeCompareResult r) { return r.either (); }
-inline bool neither (SizeCompareResult r) { return r.neither (); }
+} // namespace detail
 
-#define TIARY_UI_SIZE_DEF_COMP(op) \
-	inline SizeCompareResult operator op (Size a, Size b) {	\
-		SizeCompareResult ret;								\
-		ret.x = (a.x op b.x);								\
-		ret.y = (a.y op b.y);								\
-		return ret;											\
-	}
+template <typename Comp>
+inline bool both (const detail::SizeCompareResult <Comp> &r) { return r.both (); }
 
-TIARY_UI_SIZE_DEF_COMP(<)
-TIARY_UI_SIZE_DEF_COMP(>)
-TIARY_UI_SIZE_DEF_COMP(<=)
-TIARY_UI_SIZE_DEF_COMP(>=)
+template <typename Comp>
+inline bool either (const detail::SizeCompareResult <Comp> &r) { return r.either (); }
 
-#undef TIARY_UI_SIZE_DEF_COMP
+template <typename Comp>
+inline bool neither (const detail::SizeCompareResult <Comp> &r) { return r.neither (); }
+
+inline detail::SizeCompareResult <detail::Greater> operator > (Size a, Size b)
+{
+	return detail::SizeCompareResult <detail::Greater> (a, b);
+}
+
+inline detail::SizeCompareResult <detail::Less> operator < (Size a, Size b)
+{
+	return detail::SizeCompareResult <detail::Less> (a, b);
+}
+
+inline detail::SizeCompareResult <detail::GreaterEqual> operator >= (Size a, Size b)
+{
+	return detail::SizeCompareResult <detail::GreaterEqual> (a, b);
+}
+
+inline detail::SizeCompareResult <detail::LessEqual> operator <= (Size a, Size b)
+{
+	return detail::SizeCompareResult <detail::LessEqual> (a, b);
+}
 
 /// @}
 

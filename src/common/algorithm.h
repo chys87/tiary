@@ -12,6 +12,12 @@
  **************************************************************************/
 
 
+/**
+ * @file	common/algorithm.h
+ * @author	chys <admin@chys.info>
+ * @brief	Extensions to <algorithm>, <functional> and some useful utilities
+ */
+
 #ifndef TIARY_COMMON_ALGORITHM_H
 #define TIARY_COMMON_ALGORITHM_H
 
@@ -102,14 +108,6 @@ template <typename T> inline DeleteFunctor<T> delete_fun ()
 {
 	return DeleteFunctor<T>();
 }
-template <typename T> inline DeleteFunctor<T> delete_fun (T *)
-{
-	return DeleteFunctor<T>();
-}
-template <typename T> inline DeleteFunctor<T> delete_fun (T &)
-{
-	return DeleteFunctor<T>();
-}
 
 /*
  * A "cast functor" class
@@ -117,7 +115,7 @@ template <typename T> inline DeleteFunctor<T> delete_fun (T &)
 template <typename TO, typename TI>
 struct CastFunctor : public std::unary_function <TI, TO>
 {
-	TO operator () (TI a)
+	TO operator () (TI a) const
 	{
 		return a;
 	}
@@ -137,10 +135,6 @@ struct IdentityFunctor : public CastFunctor <T,T>
 };
 
 template <typename T> inline IdentityFunctor<T> identity_fun ()
-{
-	return IdentityFunctor<T> ();
-}
-template <typename T> inline IdentityFunctor<T> identity_fun (const T &)
 {
 	return IdentityFunctor<T> ();
 }
@@ -180,6 +174,17 @@ GetMemberFunctor<Class,Member> get_member_fun (Member Class::*ptr)
 #endif
 
 
+template <typename A, typename B> inline
+int compare_helper (const A &x, const B &y)
+{
+	if (x < y)
+		return -1;
+	else if (x == y)
+		return 0;
+	else
+		return 1;
+}
+
 // Performs a binary search.
 // Returns pointer (or 0 if not found)
 template <typename T, typename T2, typename K>
@@ -187,19 +192,16 @@ T *binary_search_null (T *lo, T *hi, T2 v, K key)
 {
 	while (lo < hi) {
 		T *m = lo + size_t(hi-lo)/2;
-#ifdef TIARY_HAVE_DECLTYPE
-		decltype(key(*m)) keym (key (*m));
-		if (keym < v)
-			lo = m + 1;
-		else if (keym == v)
-#else
-		if (key (*m) < v)
-			lo = m + 1;
-		else if (key (*m) == v)
-#endif
-			return m;
-		else
-			hi = m;
+		switch (compare_helper (key (*m), v)) {
+			case -1:
+				lo = m + 1;
+				break;
+			case 0:
+				return m;
+			case 1:
+				hi = m;
+				break;
+		}
 	}
 	return 0;
 }
@@ -324,8 +326,10 @@ template <typename Iter, typename F>
 typename F::result_type sum (Iter first, Iter last, F foo, typename F::result_type initial_value = typename F::result_type ())
 {
 	typename F::result_type r (initial_value);
-	while (first != last)
-		r += foo (*first++);
+	while (first != last) {
+		r += foo (*first);
+		++first;
+	}
 	return r;
 }
 
@@ -336,8 +340,10 @@ template <typename Iter>
 typename Iter::value_type sum (Iter first, Iter last, typename Iter::value_type initial_value = typename Iter::value_type ())
 {
 	typename Iter::value_type r (initial_value);
-	while (first != last)
-		r += *first++;
+	while (first != last) {
+		r += *first;
+		++first;
+	}
 	return r;
 }
 
@@ -348,8 +354,10 @@ template <typename Iter, typename F>
 typename F::result_type sum (Iter first, size_t n, F foo, typename F::result_type initial_value = typename F::result_type ())
 {
 	typename F::result_type r (initial_value);
-	for (; n; --n)
-		r += foo (*first++);
+	for (; n; --n) {
+		r += foo (*first);
+		++first;
+	}
 	return r;
 }
 template <typename Iter>
@@ -357,8 +365,10 @@ typename std::iterator_traits<Iter>::value_type sum (Iter first, size_t n,
 		typename std::iterator_traits<Iter>::value_type initial_value = typename std::iterator_traits<Iter>::value_type ())
 {
 	typename std::iterator_traits<Iter>::value_type r (initial_value);
-	for (; n; --n)
-		r += *first++;
+	for (; n; --n) {
+		r += *first;
+		++first;
+	}
 	return r;
 }
 

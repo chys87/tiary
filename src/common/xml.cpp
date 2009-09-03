@@ -14,6 +14,7 @@
 
 #include "common/xml.h"
 #include <stack>
+#include <vector>
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 #include <stdlib.h>
@@ -32,7 +33,8 @@ void tiary::xml_free (XMLNode *root)
 	if (root == 0)
 		return;
 
-	std::stack<XMLNode *> stk;
+	// deque is too complicated; vector is fine
+	std::stack<XMLNode *, std::vector <XMLNode *> > stk;
 
 	XMLNode *p = root; // Current node
 
@@ -134,7 +136,7 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 	// Successfully parsed. Now we need to construct our own XML tree
 
 	// "(a,b) in stk" means "b's children should be copied as a's children"
-	std::stack<std::pair<XMLNodeTree *, xmlNodePtr> > stk;
+	std::stack<std::pair<XMLNodeTree *, xmlNodePtr>, std::vector<std::pair<XMLNodeTree *, xmlNodePtr> > > stk;
 
 	XMLNode *root = shallow_copy (iptr);
 	XMLNodeTree *optr = dynamic_cast<XMLNodeTree *>(root);
@@ -190,7 +192,7 @@ std::string tiary::xml_make (const XMLNode *root)
 		xmlDocSetRootElement(doc, oroot);
 
 		// "(a,b) in stk" means "a's children should be copied as b's children"
-		std::stack<std::pair<const XMLNodeTree *, xmlNodePtr> > stk;
+		std::stack<std::pair<const XMLNodeTree *, xmlNodePtr>, std::vector<std::pair<const XMLNodeTree *, xmlNodePtr> > > stk;
 		xmlNodePtr optr = oroot;         // Current working output node
 		const XMLNodeTree *iptr = iroot; // Current working input node
 

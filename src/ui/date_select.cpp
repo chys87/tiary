@@ -28,7 +28,7 @@ std::vector<std::wstring> make_year_names ()
 {
 	std::vector<std::wstring> r (last_year - first_year + 1);
 	for (unsigned k=0; k<last_year-first_year+1; ++k)
-		r[k] = format (L"%a") << (k + first_year);
+		r[k] = format_dec (k + first_year);
 	return r;
 }
 

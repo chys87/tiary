@@ -11,6 +11,11 @@
  *
  **************************************************************************/
 
+/**
+ * @file	common/bzip2.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements the wrappers of libbz2 declared in common/bzip2.h
+ */
 
 #include "common/bzip2.h"
 #include <bzlib.h>

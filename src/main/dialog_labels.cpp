@@ -34,7 +34,7 @@ using namespace ui;
 /**
  * @brief	Class for the Label editing dialog
  */
-class WindowLabels : public virtual Window, private ButtonDefault
+class WindowLabels : public virtual Window, private ButtonDefaultExtended
 {
 
 	WStringLocaleOrderedSet &labels;
@@ -65,7 +65,7 @@ public:
 
 WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_)
 	: ui::Window (0, L"Labels")
-	, ButtonDefault ()
+	, ButtonDefaultExtended ()
 	, labels (labels_)
 	, all_labels (all_labels_)
 	, lbl_selected (*this, L"&Labels for this entry:")

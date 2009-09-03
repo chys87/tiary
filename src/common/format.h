@@ -21,10 +21,7 @@
  *
  * Example:
  *
- * std::wstring s = format (L"I am %a. I am %b years old now.") << "chys" << 22;
- *
- * For efficiency, I suppose the pointer passed to Format/WFormat is always valid
- * in the lifetime of the class.
+ * std::wstring s = format (L"I am %a. I am %b years old now.") << L"chys" << 22;
  *
  * The maximal number of arguments is 26, from %a to %z (case sensitive)
  *
@@ -60,6 +57,12 @@ inline HexTag hex (unsigned v)
 	HexTag ret = { v };
 	return ret;
 }
+
+
+// Format one decimal number
+std::wstring format_dec (unsigned x);
+// Format one hexadecimal number
+std::wstring format_hex (unsigned x);
 
 
 class Format {

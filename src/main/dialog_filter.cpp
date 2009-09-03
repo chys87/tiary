@@ -12,6 +12,13 @@
  **************************************************************************/
 
 
+
+/**
+ * @file	main/dialog_filter.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements a dialog allowing the user to edit filters
+ */
+
 #include "main/dialog_filter.h"
 #include "diary/diary.h"
 #include "diary/filter.h"
@@ -20,7 +27,7 @@
 #include "ui/textbox.h"
 #include "ui/button.h"
 #include "ui/window.h"
-#include "ui/fixed_dialog.h"
+#include "ui/fixed_window.h"
 #include "ui/checkbox_label.h"
 #include "ui/button_default.h"
 #include "ui/dialog_message.h"

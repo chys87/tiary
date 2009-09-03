@@ -11,6 +11,11 @@
  *
  **************************************************************************/
 
+/**
+ * @file	common/dir.h
+ * @author	chys <admin@chys.info>
+ * @brief	Declares some functions related to file and directory operations
+ */
 
 #ifndef TIARY_COMMON_DIR_H
 #define TIARY_COMMON_DIR_H

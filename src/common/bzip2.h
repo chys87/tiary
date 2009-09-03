@@ -12,6 +12,12 @@
  **************************************************************************/
 
 
+/**
+ * @file	common/bzip2.h
+ * @author	chys <admin@chys.info>
+ * @brief	Declares two simple wrappers for libbz2
+ */
+
 #ifndef TIARY_COMMON_BZIP2_H
 #define TIARY_COMMON_BZIP2_H
 

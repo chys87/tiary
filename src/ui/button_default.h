@@ -29,19 +29,43 @@ class Button;
  * A "default button" is the one triggered when Enter is pressed, regardless
  * of focus.
  *
- * The default button may change depending on the current focus control
+ * A focused button is always the current default button.
  */
 
 class ButtonDefault : public virtual Window
 {
 public:
 	ButtonDefault ();
+	~ButtonDefault ();
 
 	/**
 	 * @brief	Set the default "default button"
 	 */
 	void set_default_button (Button * = 0);
 	void set_default_button (Button &btn) { set_default_button (&btn); }
+
+	virtual Button *get_current_default_button () const;
+
+private:
+	Button *default_default;
+
+	void slot_default_button ();
+
+	friend class ButtonDefaultExtended;
+};
+
+
+/**
+ * @brief	An "extended" version of tiary::ui::ButtonDefault
+ *
+ * This class allows the default button to change depending on the current focus control
+ */
+class ButtonDefaultExtended : public ButtonDefault
+{
+public:
+	ButtonDefaultExtended ();
+	~ButtonDefaultExtended ();
+
 	/**
 	 * @brief	Set a pair of focus-default controls
 	 */
@@ -53,14 +77,10 @@ public:
 	Button *get_current_default_button () const;
 
 private:
-	Button *default_default;
 
 	typedef /* No std:: here */unordered_map <Control *, Button *> SpecialMap;
 
 	SpecialMap special_map;
-
-
-	void slot_default_button ();
 };
 
 

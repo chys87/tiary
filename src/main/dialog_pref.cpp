@@ -12,8 +12,14 @@
  **************************************************************************/
 
 
+/**
+ * @file	main/dialog_pref.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements a dialog to edit preferences
+ */
+
 #include "main/dialog_pref.h"
-#include "ui/fixed_dialog.h"
+#include "ui/fixed_window.h"
 #include "ui/layout.h"
 #include "ui/chain.h"
 #include "ui/label.h"

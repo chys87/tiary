@@ -11,6 +11,11 @@
  *
  **************************************************************************/
 
+/**
+ * @file	common/algorithm.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements non-template non-inline functions declared in common/algorithm.h
+ */
 
 #include "common/algorithm.h"
 #include "common/types.h"

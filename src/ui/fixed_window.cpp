@@ -11,9 +11,14 @@
  *
  **************************************************************************/
 
+/**
+ * @file	ui/fixed_window.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements class tiary::ui::FixedWindow
+ */
 
 #include "ui/ui.h"
-#include "ui/fixed_dialog.h"
+#include "ui/fixed_window.h"
 
 
 namespace tiary {

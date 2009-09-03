@@ -84,7 +84,7 @@ void OptionGroupBase::set (const std::string &name, const std::wstring &value)
 
 void OptionGroupBase::set (const std::string &name, unsigned value)
 {
-	set (name, format(L"%a") << value);
+	set (name, format_dec (value));
 }
 
 void OptionGroupBase::set (const std::string &name, bool value)
