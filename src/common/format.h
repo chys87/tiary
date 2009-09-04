@@ -61,8 +61,10 @@ inline HexTag hex (unsigned v)
 
 // Format one decimal number
 std::wstring format_dec (unsigned x);
+std::string format_dec_narrow (unsigned x);
 // Format one hexadecimal number
 std::wstring format_hex (unsigned x);
+std::string format_hex_narrow (unsigned x);
 
 
 class Format {

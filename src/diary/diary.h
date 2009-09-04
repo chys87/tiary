@@ -19,6 +19,7 @@
 #include "common/containers.h"
 #include <string>
 #include <vector>
+#include <list>
 
 
 namespace tiary {
@@ -39,6 +40,19 @@ struct DiaryEntry
 
 
 
+struct RecentFile
+{
+	std::wstring filename;
+	unsigned focus_entry;
+
+	bool operator == (const std::wstring &name)
+	{
+		return (filename == name);
+	}
+};
+
+// New files are in the front
+typedef std::list <RecentFile> RecentFileList;
 
 
 } // namespace tiary

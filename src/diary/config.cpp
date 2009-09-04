@@ -28,6 +28,7 @@ extern const OptionDescription g_global_option_descriptions[] = {
 	{ GLOBAL_OPTION_EDITOR            , "$EDITOR|rvim|vim|emacs -nw|nano|gedit|kwrite" },
 	{ GLOBAL_OPTION_DATETIME_FORMAT   , "%m/%d/%Y" },
 	{ GLOBAL_OPTION_LONGTIME_FORMAT   , "%W %B %d, %Y  %h:%M:%S %P" },
+	{ GLOBAL_OPTION_RECENT_FILES      , "4" },
 	{ 0, 0 }
 };
 
@@ -84,7 +85,7 @@ void OptionGroupBase::set (const std::string &name, const std::wstring &value)
 
 void OptionGroupBase::set (const std::string &name, unsigned value)
 {
-	set (name, format_dec (value));
+	set (name, format_dec_narrow (value));
 }
 
 void OptionGroupBase::set (const std::string &name, bool value)

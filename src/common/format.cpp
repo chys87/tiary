@@ -31,6 +31,17 @@ std::wstring format_dec (unsigned x)
 	return std::wstring (p, buffer + BUFFER_SIZE);
 }
 
+std::string format_dec_narrow (unsigned x)
+{
+	const size_t BUFFER_SIZE = 3 * sizeof (unsigned);
+	char buffer [BUFFER_SIZE];
+	char *p = buffer + BUFFER_SIZE;
+	do {
+		*--p = '0' + (x % 10);
+	} while (x /= 10);
+	return std::string (p, buffer + BUFFER_SIZE);
+}
+
 std::wstring format_hex (unsigned x)
 {
 	const size_t BUFFER_SIZE = 2 * sizeof (unsigned);
@@ -42,6 +53,19 @@ std::wstring format_hex (unsigned x)
 		*--p = (tmp < 10) ? (L'0'+tmp) : (L'a'-10+tmp);
 	} while (x);
 	return std::wstring (p, buffer + BUFFER_SIZE);
+}
+
+std::string format_hex_narrow (unsigned x)
+{
+	const size_t BUFFER_SIZE = 2 * sizeof (unsigned);
+	char buffer [BUFFER_SIZE];
+	char *p = buffer + BUFFER_SIZE;
+	do {
+		unsigned tmp = x % 16;
+		x /= 16;
+		*--p = (tmp < 10) ? ('0'+tmp) : ('a'-10+tmp);
+	} while (x);
+	return std::string (p, buffer + BUFFER_SIZE);
 }
 
 Format::~Format ()

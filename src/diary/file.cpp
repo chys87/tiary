@@ -193,7 +193,7 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
  * Assuming we have successfully parsed the XML, analyzes the XML and extracts useful info.
  * Applicable for both ~/.tiary and diary files
  */
-bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntryList *entries = 0)
+bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntryList *entries, RecentFileList *recent_files)
 {
 	const XMLNodeTree *root_diary = dynamic_cast<const XMLNodeTree *>(root);
 	if (root_diary == 0)
@@ -202,6 +202,8 @@ bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntry
 		return false;
 	if (entries)
 		entries->clear ();
+	if (recent_files)
+		recent_files->clear ();
 	// OK. Now loop thru its children
 	for (const XMLNode *main_childx = root_diary->children; main_childx; main_childx = main_childx->next) {
 		if (const XMLNodeTree *main_child = dynamic_cast <const XMLNodeTree *>(main_childx)) {
@@ -217,6 +219,14 @@ bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntry
 					return false;
 				entries->push_back (entry);
 				
+			} else if (recent_files && main_child->name == "recent") {
+				if (const char *file_name = map_query (main_child->properties, "file"))
+					if (const char *line_number = map_query (main_child->properties, "line")) {
+						recent_files->push_back ();
+						RecentFile &item = recent_files->back ();
+						item.filename = utf8_to_wstring (file_name);
+						item.focus_entry = strtoul (line_number, 0, 10);
+					}
 			} // else: Ignored for forward compatibility
 		} else {
 			// It must be an error - wild text directly within <tiary>
@@ -285,7 +295,7 @@ inline void decrypt (void *dst, const char *src, size_t datalen, const void *pas
 
 } // Anonymous namespace
 
-LoadFileRet load_global_options (GlobalOptionGroup &options)
+LoadFileRet load_global_options (GlobalOptionGroup &options, RecentFileList &recent_files)
 {
 	FILE *fp = fopen (make_home_dirname (GLOBAL_OPTION_FILE).c_str(), "r");
 	if (fp == NULL)
@@ -299,7 +309,7 @@ LoadFileRet load_global_options (GlobalOptionGroup &options)
 	std::vector<char>().swap(data);
 	if (root == 0)
 		return LOAD_FILE_XML;
-	ret = general_analyze_xml (root, options);
+	ret = general_analyze_xml (root, options, 0, &recent_files);
 	xml_free (root);
 	if (!ret)
 		return LOAD_FILE_CONTENT;
@@ -368,7 +378,7 @@ LoadFileRet load_file (
 	if (root == 0)
 		return LOAD_FILE_XML;
 	options.reset ();
-	bool_ret = general_analyze_xml (root, options, &entries);
+	bool_ret = general_analyze_xml (root, options, &entries, 0);
 	xml_free (root);
 	if (!bool_ret)
 		return LOAD_FILE_CONTENT;
@@ -410,10 +420,36 @@ XMLNodeTree *make_xml_tree_from_options (const OptionGroupBase &opts, const Opti
 } // anonymous namespace
 
 
-bool save_global_options (const GlobalOptionGroup &options)
+bool save_global_options (const GlobalOptionGroup &options, const RecentFileList &recent_files)
 {
 	// First create the XML tree
 	XMLNodeTree *root = make_xml_tree_from_options (options, GlobalOptionGroup ());
+
+	// Find the last child of root node <tiary>
+	XMLNode *ptr = root->children;
+	// ptr is never null. Let's loop until we find the last entry
+	while (ptr->next)
+		ptr = ptr->next;
+
+	// Loop thru recent files
+	for (RecentFileList::const_iterator it = recent_files.begin (); it != recent_files.end (); ++it) {
+		// Insert a text node "\n\t" before each <recent>
+		// At the first loop, ptr should point to a text node "\n"
+		// Change that!
+		if (XMLNodeText *text_node = dynamic_cast <XMLNodeText *>(ptr))
+			text_node->text = "\n\t";
+		else
+			ptr = ptr->next = new XMLNodeText ("\n\t");
+
+		XMLNodeTree *recent_node = new XMLNodeTree ("recent");
+		ptr = ptr->next = recent_node;
+		recent_node->properties["file"] = wstring_to_utf8 (it->filename);
+		recent_node->properties["line"] = format_dec_narrow (it->focus_entry);
+	}
+	// Insert a node "\n" at the end
+	if (dynamic_cast <XMLNodeText *> (ptr) == 0)
+		ptr = ptr->next = new XMLNodeText ("\n");
+
 	std::string xml = xml_make (root);
 	xml_free (root);
 
@@ -471,14 +507,14 @@ bool save_file (const char *filename,
 		sub_ptr = sub_ptr->next = new XMLNodeText ("\n\t\t");
 		XMLNodeTree *title_tag_node = new XMLNodeTree ("title");
 		sub_ptr = sub_ptr->next = title_tag_node;
-		XMLNodeText *diary_title_node = new XMLNodeText (entry->title);
+		XMLNodeText *diary_title_node = new XMLNodeText (wstring_to_utf8 (entry->title));
 		title_tag_node->children = diary_title_node;
 
 		// Text
 		sub_ptr = sub_ptr->next = new XMLNodeText ("\n\t\t");
 		XMLNodeTree *text_tag_node = new XMLNodeTree ("text");
 		sub_ptr = sub_ptr->next = text_tag_node;
-		XMLNodeText *diary_text_node = new XMLNodeText (entry->text);
+		XMLNodeText *diary_text_node = new XMLNodeText (wstring_to_utf8 (entry->text));
 		text_tag_node->children = diary_text_node;
 
 		// Insert a text node "\n\t" before closing tag </entry>

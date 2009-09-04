@@ -27,6 +27,7 @@
 #include "diary/filter.h"
 #include "common/datetime.h"
 #include "common/algorithm.h"
+#include "common/dir.h"
 #include "main/doc.h"
 #include "main/dialog_filter.h"
 #include "main/dialog_pref.h"
@@ -119,22 +120,22 @@ bool MainCtrl::on_key (wchar_t key)
 
 		case L'k':
 		case ui::UP:
-			set_focus (current_focus () - 1);
+			set_focus (get_current_focus () - 1);
 			return true;
 
 		case L'j':
 		case ui::DOWN:
-			set_focus (current_focus () + 1);
+			set_focus (get_current_focus () + 1);
 			return true;
 
 		case L'b':
 		case ui::PAGEUP:
-			set_focus (current_focus () - ui::Scroll::get_height () + 1);
+			set_focus (get_current_focus () - ui::Scroll::get_height () + 1);
 			return true;
 
 		case L'f':
 		case ui::PAGEDOWN:
-			set_focus (current_focus () + ui::Scroll::get_height () - 1);
+			set_focus (get_current_focus () + ui::Scroll::get_height () - 1);
 			return true;
 
 		case L'^':
@@ -442,7 +443,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		;
 	MainWin::redraw ();
 
-	switch (load_global_options (global_options)) {
+	switch (load_global_options (global_options, recent_files)) {
 		case LOAD_FILE_SUCCESS:
 			break;
 		case LOAD_FILE_NOT_FOUND: // No file. Just use the defaults
@@ -523,16 +524,23 @@ void MainWin::load (const std::wstring &filename)
 	// Clear everything that's been loaded.
 	reset_file ();
 
+	std::wstring full_filename = get_full_pathname (filename);
 	std::wstring error_info;
-	switch (load_file (wstring_to_mbs (filename).c_str (),
+	switch (load_file (wstring_to_mbs (full_filename).c_str (),
 				EnterPassword (filename),
 				entries,
 				per_file_options,
 				password)) {
 		case LOAD_FILE_SUCCESS:
-			current_filename = filename;
+			current_filename = full_filename;
 			main_ctrl.touch ();
 			saved = true;
+			{
+				RecentFileList::const_iterator it = std::find (recent_files.begin (),
+						recent_files.end (), current_filename);
+				if (it != recent_files.end ())
+					main_ctrl.set_focus (it->focus_entry);
+			}
 			return;
 
 		case LOAD_FILE_NOT_FOUND: // Not found. Warning
@@ -586,8 +594,11 @@ void MainWin::save_as ()
 			L"Save as",
 			current_filename,
 			ui::SELECT_FILE_WRITE | ui::SELECT_FILE_WARN_OVERWRITE);
-	if (!filename.empty ())
+	if (!filename.empty ()) {
+		filename = get_full_pathname (filename);
 		save (filename);
+		update_recent_files ();
+	}
 }
 
 void MainWin::append ()
@@ -631,7 +642,7 @@ DiaryEntry *MainWin::get_current ()
 	if (lst.empty ())
 		return 0;
 	else
-		return lst[main_ctrl.current_focus ()];
+		return lst[main_ctrl.get_current_focus ()];
 }
 
 void MainWin::edit_current ()
@@ -669,7 +680,7 @@ void MainWin::remove_current ()
 		return;
 	if (entries.empty ())
 		return;
-	size_t k = main_ctrl.current_focus ();
+	size_t k = main_ctrl.get_current_focus ();
 	if (ui::dialog_message (
 				L"Are you sure to remove the currently selected entry?",
 				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_DEFAULT_NO) == ui::MESSAGE_YES) {
@@ -685,7 +696,7 @@ void MainWin::move_up_current ()
 		return;
 	if (entries.size () < 2)
 		return;
-	size_t k = main_ctrl.current_focus ();
+	size_t k = main_ctrl.get_current_focus ();
 	if (k == 0)
 		return;
 	std::swap (entries[k-1], entries[k]);
@@ -699,7 +710,7 @@ void MainWin::move_down_current ()
 		return;
 	if (entries.size () < 2)
 		return;
-	size_t k = main_ctrl.current_focus ();
+	size_t k = main_ctrl.get_current_focus ();
 	if (k+1 >= entries.size ())
 		return;
 	std::swap (entries[k+1], entries[k]);
@@ -753,6 +764,7 @@ void MainWin::view_all ()
  */
 bool MainWin::check_save ()
 {
+	update_recent_files ();
 	if (saved)
 		return true;
 	switch (ui::dialog_message (
@@ -769,6 +781,25 @@ bool MainWin::check_save ()
 		default:
 			return false;
 	}
+}
+
+void MainWin::update_recent_files ()
+{
+	if (current_filename.empty ())
+		return;
+	RecentFileList::iterator it = std::find (recent_files.begin (), recent_files.end (),
+			current_filename);
+	if (it == recent_files.end ()) {
+		recent_files.push_front ();
+		it = recent_files.begin ();
+		it->filename = current_filename;
+	}
+	it->focus_entry = main_ctrl.get_current_focus ();
+
+	unsigned n_files = global_options.get_num (GLOBAL_OPTION_RECENT_FILES);
+	while (recent_files.size () > n_files)
+		recent_files.pop_back ();
+	save_global_options (global_options, recent_files);
 }
 
 void MainWin::new_file ()
@@ -834,7 +865,7 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 		return;
 	if (!last_search)
 		return;
-	unsigned k = main_ctrl.current_focus ();
+	unsigned k = main_ctrl.get_current_focus ();
 	int inc = (!bkwd == !last_search.get_backward ()) ? 1 : -1;
 	if (!include_current_entry)
 		k += inc;
@@ -907,7 +938,7 @@ void MainWin::edit_all_labels ()
 void MainWin::edit_global_options ()
 {
 	edit_options (global_options);
-	save_global_options (global_options);
+	save_global_options (global_options, recent_files);
 	main_ctrl.MainCtrl::redraw ();
 }
 

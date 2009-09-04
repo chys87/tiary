@@ -20,7 +20,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+tiary::XMLNodeTree::XMLNodeTree (const char *name_)
+	: children (0)
+	, name (name_)
+	, properties ()
+{
+}
+
 tiary::XMLNodeTree::~XMLNodeTree ()
+{
+}
+
+tiary::XMLNodeText::XMLNodeText (const char *text_)
+	: text(text_)
+{
+}
+
+tiary::XMLNodeText::XMLNodeText (const std::string &text_)
+	: text(text_)
 {
 }
 

@@ -27,6 +27,7 @@ namespace tiary {
 #define GLOBAL_OPTION_EDITOR           "editor"
 #define GLOBAL_OPTION_DATETIME_FORMAT  "time_format"
 #define GLOBAL_OPTION_LONGTIME_FORMAT  "long_time_format"
+#define GLOBAL_OPTION_RECENT_FILES     "recent_files"
 
 
 

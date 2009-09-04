@@ -21,6 +21,7 @@
 #include "ui/menubar.h"
 #include "ui/search_info.h"
 #include "diary/config.h"
+#include "diary/diary.h"
 #include <vector>
 #include <string>
 #include <memory> // std::auto_ptr
@@ -55,7 +56,7 @@ private:
 
 	friend class MainWin;
 
-	inline unsigned current_focus () const { return ui::Scroll::get_focus (); }
+	inline unsigned get_current_focus () const { return ui::Scroll::get_focus (); }
 
 	void set_focus (unsigned); ///< Change focus
 	void touch (); ///< Call this when any entry is modified
@@ -85,6 +86,7 @@ private:
 	std::wstring current_filename; ///< Currently working filename. Empty = none
 	std::wstring password; ///< Password. Empty = none
 	std::vector<DiaryEntry *> entries; ///< Diary entries
+	RecentFileList recent_files; ///< Recent files
 	bool saved; ///< Whether all modifications have been saved
 
 	std::auto_ptr<FilterGroup> filter; ///< Current filter
@@ -144,6 +146,8 @@ private:
 	 * If the user instructs to save, do it.
 	 */
 	bool check_save ();
+
+	void update_recent_files ();
 
 	bool query_normal_mode () const;
 	bool query_nonempty () const;

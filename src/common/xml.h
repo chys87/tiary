@@ -16,7 +16,6 @@
 #define TIARY_COMMON_XML_H
 
 #include "common/noncopyable.h"
-#include "common/unicode.h"
 #include <stddef.h>
 #include <string>
 #include <map>
@@ -46,7 +45,7 @@ public:
 
 struct XMLNodeTree : XMLNode
 {
-	explicit XMLNodeTree (const char *name_) : children (0), name (name_) {}
+	explicit XMLNodeTree (const char *name_);
 	~XMLNodeTree ();
 
 	XMLNode *children; // Pointer to first child
@@ -59,9 +58,8 @@ struct XMLNodeTree : XMLNode
 
 struct XMLNodeText : XMLNode
 {
-	explicit XMLNodeText (const char *text_) : text(text_) {}
-	explicit XMLNodeText (const std::string &text_) : text(text_) {}
-	explicit XMLNodeText (const std::wstring &text_) : text(wstring_to_utf8(text_)) {}
+	explicit XMLNodeText (const char *text_);
+	explicit XMLNodeText (const std::string &text_);
 	XMLNodeText () {}
 	~XMLNodeText ();
 

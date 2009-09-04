@@ -19,10 +19,12 @@
 #include "diary/config.h"
 #include <string>
 #include <vector>
+#include <list>
 
 namespace tiary {
 
 struct DiaryEntry; // Defined in diary.h
+struct RecentFile; // Defined in diary.h
 
 enum LoadFileRet {
 	// We put the commas in the beginning of a line to make diff happy.
@@ -37,7 +39,7 @@ enum LoadFileRet {
 
 
 // Read global options from ~/.tiary
-LoadFileRet load_global_options (GlobalOptionGroup &);
+LoadFileRet load_global_options (GlobalOptionGroup &, std::list <RecentFile> &);
 
 /**
  * @brief	Load tiary file
@@ -61,7 +63,7 @@ LoadFileRet load_file (
 
 
 
-bool save_global_options (const GlobalOptionGroup &);
+bool save_global_options (const GlobalOptionGroup &, const std::list <RecentFile> &);
 
 bool save_file (const char *filename, const std::vector<DiaryEntry *> &entries, const PerFileOptionGroup &, const std::wstring &password);
 
