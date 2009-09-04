@@ -514,14 +514,24 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 		ptr[-1].c = L' ';
 #endif
 
-	unsigned left_width = blksize.x - x;
-
 	for (; n; --n) {
 
 		wchar_t ch = *s++;
+		// Only handle one special character: '\t'
+		if (ch == L'\t') {
+			unsigned w = minU ((x + 8) & ~7u, blksize.x) - x;
+			x += w;
+			winx += w;
+			for (; w; --w) {
+				ptr->c = L' ';
+				ptr->a = cur_attr;
+				++ptr;
+			}
+			continue;
+		}
 		unsigned w = ucs_width (ch);
 
-		if (int (left_width -= w) < 0)
+		if (x + w > blksize.x)
 			break;
 
 		ptr->c = ch;
