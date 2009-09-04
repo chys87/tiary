@@ -41,10 +41,9 @@ public:
 
 	const std::wstring & get_text () const { return text; }
 
-	void set_text (const std::wstring &, bool emit_sig_changed = true, unsigned new_focus = unsigned(-1));
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	void set_text (std::wstring &&, bool emit_sig_changed = true, unsigned new_focus = unsigned(-1));
-#endif
+	// Does not change cursor_position
+	void set_text (const std::wstring &, bool emit_sig_changed = true);
+	void set_text (const std::wstring &, bool emit_sig_changed, unsigned new_cursor_pos);
 
 	Signal sig_changed;
 

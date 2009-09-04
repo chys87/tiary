@@ -127,34 +127,24 @@ unsigned TextBox::get_item_screen_size (unsigned j) const
 		return ucs_width (text[j]);
 }
 
-void TextBox::set_text (const std::wstring &s, bool emit_sig_changed, unsigned new_focus)
+void TextBox::set_text (const std::wstring &s, bool emit_sig_changed)
+{
+	set_text (s, emit_sig_changed, Scroll::get_focus ());
+}
+
+void TextBox::set_text (const std::wstring &s, bool emit_sig_changed, unsigned new_cursor_pos)
 {
 	if (text == s)
 		return;
 	text = s;
 	Scroll::modify_number (s.length ());
-	if (new_focus <= s.length ())
-		Scroll::modify_focus (new_focus);
+	new_cursor_pos = minU (new_cursor_pos, s.length ());
+	if (new_cursor_pos != Scroll::get_focus ())
+		Scroll::modify_focus (new_cursor_pos);
 	if (emit_sig_changed)
 		sig_changed.emit ();
 	TextBox::redraw ();
 }
-
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-void TextBox::set_text (std::wstring &&s, bool emit_sig_changed, unsigned new_focus)
-{
-	if (text == s)
-		return;
-	text.swap (s); // operator = (std::string &&) not available (GCC)
-	size_t len = text.length ();
-	Scroll::modify_number (len);
-	if (new_focus <= len)
-		Scroll::modify_focus (new_focus);
-	if (emit_sig_changed)
-		sig_changed.emit ();
-	TextBox::redraw ();
-}
-#endif
 
 
 } // namespace tiary::ui
