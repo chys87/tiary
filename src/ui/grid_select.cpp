@@ -157,6 +157,20 @@ bool GridSelect::on_key (wchar_t key)
 				return true;
 			}
 			return false;
+		case HOME:
+			new_select = select_direction (-1u, cols, rows, items, RIGHT);
+			if (new_select != select) {
+				set_select (new_select);
+				return true;
+			}
+			return false;
+		case END:
+			new_select = select_direction (-1u, cols, rows, items, LEFT);
+			if (new_select != select) {
+				set_select (new_select);
+				return true;
+			}
+			return false;
 		default:
 			return false;
 	}
