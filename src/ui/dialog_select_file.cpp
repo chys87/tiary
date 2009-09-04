@@ -178,7 +178,7 @@ void WindowSelectFile::slot_ok ()
 		if (!(attr & FILE_ATTR_NONEXIST) && (options & SELECT_FILE_WARN_OVERWRITE)) {
 			// Warn
 			if (dialog_message (format (L"File \"%a\" already exists. Overwrite it?") << text_input.get_text(),
-						MESSAGE_YES|MESSAGE_NO) != MESSAGE_YES)
+						MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO) != MESSAGE_YES)
 				return;
 		}
 	} else {

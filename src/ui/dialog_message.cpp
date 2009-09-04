@@ -16,7 +16,6 @@
 #include "ui/window.h"
 #include "ui/label.h"
 #include "ui/button.h"
-#include "ui/button_default.h"
 #include "common/algorithm.h"
 #include "ui/chain.h"
 
@@ -25,7 +24,7 @@ namespace ui {
 
 namespace {
 
-class WindowMessage : public virtual Window, private ButtonDefault
+class WindowMessage : public Window
 {
 
 	Label lbl_text;
@@ -50,7 +49,6 @@ public:
 WindowMessage::WindowMessage (const std::wstring &text, const std::wstring &title,
 		WindowMessageButton mask)
 	: Window (0, title)
-	, ButtonDefault ()
 	, lbl_text (*this, text)
 	, button_mask (mask)
 	, result (0)
@@ -88,20 +86,24 @@ WindowMessage::WindowMessage (const std::wstring &text, const std::wstring &titl
 	if (n_buttons >= 2)
 		ChainControlsHorizontal (p_buttons, n_buttons);
 
-	// Map Enter and Esc
-	Button *btn_enter;
+	// Map Esc
 	Button *btn_escape;
-	if (!(btn_enter = btn_ok))
-		if (!(btn_enter = btn_yes))
-			if (!(btn_enter = btn_no))
-				btn_enter = btn_cancel;
-	set_default_button (btn_enter);
 
 	if (!(btn_escape = btn_cancel))
 		if (!(btn_escape = btn_no))
 			if (!(btn_escape = btn_yes))
 				btn_escape = btn_ok;
 	register_hotkey (ESCAPE, btn_escape->sig_clicked);
+
+	// Focus the default button
+	if ((mask & (MESSAGE_OK|MESSAGE_DEFAULT_OK)) == (MESSAGE_OK|MESSAGE_DEFAULT_OK))
+		set_focus_ptr (btn_ok);
+	else if ((mask & (MESSAGE_YES|MESSAGE_DEFAULT_YES)) == (MESSAGE_YES|MESSAGE_DEFAULT_YES))
+		set_focus_ptr (btn_yes);
+	else if ((mask & (MESSAGE_NO|MESSAGE_DEFAULT_NO)) == (MESSAGE_NO|MESSAGE_DEFAULT_NO))
+		set_focus_ptr (btn_no);
+	else if ((mask & (MESSAGE_CANCEL|MESSAGE_DEFAULT_CANCEL)) == (MESSAGE_CANCEL|MESSAGE_DEFAULT_CANCEL))
+		set_focus_ptr (btn_cancel);
 
 	WindowMessage::redraw ();
 }

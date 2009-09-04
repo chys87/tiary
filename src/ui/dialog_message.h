@@ -29,6 +29,13 @@ const WindowMessageButton MESSAGE_NO     = 0x04;
 const WindowMessageButton MESSAGE_CANCEL = 0x08;
 const WindowMessageButton MESSAGE_ALL    = 0x0f;
 
+// The following options control the focus button when the dialog is displayed
+// If not set, it's the leftmost one
+const WindowMessageButton MESSAGE_DEFAULT_OK     = 0x10;
+const WindowMessageButton MESSAGE_DEFAULT_YES    = 0x20;
+const WindowMessageButton MESSAGE_DEFAULT_NO     = 0x40;
+const WindowMessageButton MESSAGE_DEFAULT_CANCEL = 0x80;
+
 WindowMessageButton dialog_message (const std::wstring &text, WindowMessageButton buttons = MESSAGE_OK);
 WindowMessageButton dialog_message (const wchar_t *text, WindowMessageButton buttons = MESSAGE_OK);
 WindowMessageButton dialog_message (const std::wstring &text, const std::wstring &title,

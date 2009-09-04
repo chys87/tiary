@@ -671,7 +671,7 @@ void MainWin::remove_current ()
 	size_t k = main_ctrl.current_focus ();
 	if (ui::dialog_message (
 				L"Are you sure to remove the currently selected entry?",
-				ui::MESSAGE_YES|ui::MESSAGE_NO) == ui::MESSAGE_YES) {
+				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_DEFAULT_NO) == ui::MESSAGE_YES) {
 		delete entries[k];
 		entries.erase (entries.begin () + k);
 		main_ctrl.touch ();
@@ -723,7 +723,7 @@ void MainWin::sort_all ()
 	if (!unavailable_filtered ())
 		return;
 	if (ui::dialog_message (L"Are you sure you want to sort all entries by time? This operation cannot be undone.",
-				ui::MESSAGE_YES|ui::MESSAGE_NO) == ui::MESSAGE_YES) {
+				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_DEFAULT_NO) == ui::MESSAGE_YES) {
 		std::stable_sort (entries.begin (), entries.end (), compare_entry);
 		main_ctrl.touch ();
 	}

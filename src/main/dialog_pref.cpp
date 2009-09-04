@@ -259,7 +259,7 @@ void WindowGlobalOptions::slot_ok ()
 void WindowGlobalOptions::slot_reset ()
 {
 	if (ui::dialog_message (L"Do you really want to reset all settings to default?",
-				MESSAGE_YES|MESSAGE_NO) == MESSAGE_YES) {
+				MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO) == MESSAGE_YES) {
 		// Use a new GlobalOptionGroup object
 		// Do not clobber options in this function
 		copy_options_to_controls (GlobalOptionGroup ());

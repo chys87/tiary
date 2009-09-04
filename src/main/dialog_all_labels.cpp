@@ -128,15 +128,19 @@ void WindowAllLabels::slot_rename ()
 			return;
 
 		const wchar_t *warning_template;
+		WindowMessageButton msg_buttons;
 
-		if (all_labels.find (new_name) != all_labels.end ()) // This label already exists
+		if (all_labels.find (new_name) != all_labels.end ()) { // This label already exists
 			warning_template = L"Label \"%b\" already exists. Are you sure you want to merge \"%a\" into \"%b\"?\n"
 						L"This operation cannot be undone!";
-		else
+			msg_buttons = MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO;
+		} else {
 			warning_template = L"Are you sure you want to rename \"%a\" to \"%b\"?";
+			msg_buttons = MESSAGE_YES|MESSAGE_NO;
+		}
 
 		if (dialog_message (format (warning_template) << old_name << new_name,
-					L"Rename label", MESSAGE_YES|MESSAGE_NO) == MESSAGE_YES) {
+					L"Rename label", msg_buttons) == MESSAGE_YES) {
 
 			all_labels.erase (old_name);
 			all_labels.insert (new_name);
