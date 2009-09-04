@@ -21,6 +21,7 @@ namespace ui {
 
 CheckBox::CheckBox (Window &win, bool initial_status)
 	: Control (win)
+	, FocusColorControl (win)
 	, status (initial_status)
 {
 }
@@ -64,7 +65,7 @@ bool CheckBox::on_mouse (MouseEvent event)
 
 void CheckBox::redraw ()
 {
-	choose_palette (PALETTE_ID_CHECKBOX);
+	choose_palette (is_focus () ? PALETTE_ID_CHECKBOX_FOCUS : PALETTE_ID_CHECKBOX);
 	clear ();
 	unsigned wid = get_size().x;
 	Size pos = make_size ();

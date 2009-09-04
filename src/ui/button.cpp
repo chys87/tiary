@@ -51,27 +51,29 @@ void Button::on_focus_changed ()
 
 void Button::redraw ()
 {
-	Control *focus_ctrl = win.get_focus ();
-	choose_palette (focus_ctrl == this ? PALETTE_ID_BUTTON_FOCUS : PALETTE_ID_BUTTON_UNFOCUS);
 	unsigned y = (get_size().y - 1) / 2;
 	unsigned w = minU (get_size().x, text.get_width () + 4);
 	unsigned x = (get_size().x - w) / 2;
 
-	bool display_as_if_focus; // Whether display the "><" characters
-	if (focus_ctrl == this)
-		display_as_if_focus = true;
-	else if (ButtonDefault *def_chooser = dynamic_cast <ButtonDefault *> (&win))
-		display_as_if_focus = (def_chooser->get_current_default_button () == this);
-	else
-		display_as_if_focus = false;
+	PaletteID id;
+	if (is_focus ())
+		id = PALETTE_ID_BUTTON_FOCUS;
+	else if (ButtonDefault *def_chooser = dynamic_cast <ButtonDefault *> (&win)) {
+		if (def_chooser->get_current_default_button () == this)
+			id = PALETTE_ID_BUTTON_DEFAULT;
+		else
+			id = PALETTE_ID_BUTTON_NORMAL;
+	} else
+		id = PALETTE_ID_BUTTON_NORMAL;
 
+	choose_palette (id);
 	Size pos = make_size (x,y);
 	clear ();
 	move_cursor (pos);
-	pos = put (pos, display_as_if_focus ? L"> " : L"  ");
+	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL) ? L"> " : L"  ");
 	pos = text.output (*this, pos, w-4);
 	pos = make_size (x+w-2, y);
-	pos = put (pos, display_as_if_focus ? L" <" : L"  ");
+	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL) ? L" <" : L"  ");
 }
 
 } // namespace tiary::ui

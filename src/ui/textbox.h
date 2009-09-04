@@ -26,7 +26,7 @@ namespace ui {
 /*
  * Single-line text editor.
  */
-class TextBox : public Control, private Scroll
+class TextBox : public virtual Control, public FocusColorControl, private Scroll
 {
 public:
 

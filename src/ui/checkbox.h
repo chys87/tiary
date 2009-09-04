@@ -20,7 +20,7 @@
 namespace tiary {
 namespace ui {
 
-class CheckBox : public Control
+class CheckBox : public virtual Control, public FocusColorControl
 {
 public:
 	explicit CheckBox (Window &, bool = false);

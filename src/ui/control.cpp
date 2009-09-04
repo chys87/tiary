@@ -175,6 +175,20 @@ bool UnfocusableControl::on_focus ()
 	return false;
 }
 
+FocusColorControl::~FocusColorControl ()
+{
+}
+
+bool FocusColorControl::on_focus ()
+{
+	redraw ();
+	return true;
+}
+
+void FocusColorControl::on_defocus ()
+{
+	redraw ();
+}
 
 } // namespace tiary::ui
 } // namespace tiary

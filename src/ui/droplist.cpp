@@ -27,6 +27,7 @@ namespace ui {
 
 DropList::DropList (Window &win, const ItemList &items_, size_t default_select)
 	: Control (win)
+	, FocusColorControl (win)
 	, items (items_.empty () ? ItemList (1) : items_)
 	, select (default_select < items_.size () ? default_select : 0)
 {
@@ -35,6 +36,7 @@ DropList::DropList (Window &win, const ItemList &items_, size_t default_select)
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 DropList::DropList (Window &win, ItemList &&items_, size_t default_select)
 	: Control (win)
+	, FocusColorControl (win)
 	, items (items_.empty () ? ItemList (1) : std::forward<ItemList> (items_))
 	, select (default_select < items.size () ? default_select : 0)
 {
@@ -118,20 +120,9 @@ bool DropList::on_mouse (MouseEvent mouse_event)
 	return false;
 }
 
-bool DropList::on_focus ()
-{
-//	DropList::redraw ();
-	return true;
-}
-
-void DropList::on_defocus ()
-{
-//	DropList::redraw ();
-}
-
 void DropList::redraw ()
 {
-	choose_palette (PALETTE_ID_DROPLIST);
+	choose_palette (is_focus () ? PALETTE_ID_DROPLIST_FOCUS : PALETTE_ID_DROPLIST);
 	clear ();
 	UIStringOne (items[select]).output (*this, make_size (), get_size ().x);
 }

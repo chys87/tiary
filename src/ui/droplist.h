@@ -21,7 +21,7 @@
 namespace tiary {
 namespace ui {
 
-class DropList : public Control
+class DropList : public virtual Control, public FocusColorControl
 {
 public:
 
@@ -41,8 +41,6 @@ public:
 	// Implement virtual functions
 	bool on_key (wchar_t);
 	bool on_mouse (MouseEvent);
-	bool on_focus ();
-	void on_defocus ();
 	void redraw ();
 
 	Signal sig_select_changed;

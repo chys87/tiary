@@ -25,6 +25,7 @@ namespace ui {
 
 TextBox::TextBox (Window &win, unsigned attr)
 	: Control (win)
+	, FocusColorControl (win)
 	, Scroll (0, true)
 	, text ()
 	, attributes (attr)
@@ -107,7 +108,7 @@ void TextBox::move_resize (Size new_pos, Size new_size)
 
 void TextBox::redraw ()
 {
-	choose_palette (PALETTE_ID_TEXTBOX);
+	choose_palette (is_focus () ? PALETTE_ID_TEXTBOX_FOCUS : PALETTE_ID_TEXTBOX);
 	clear ();
 	Scroll::Info scroll_info = Scroll::get_info ();
 	if (attributes & PASSWORD_BOX)

@@ -108,6 +108,17 @@ public:
 	bool on_focus ();
 };
 
+// Some controls look different when focused or not.
+// So for them, on_focus and on_defocus should be forwarded to redraw
+class FocusColorControl : public virtual Control
+{
+public:
+	FocusColorControl (Window &win) : Control (win) {}
+	~FocusColorControl ();
+	bool on_focus ();
+	void on_defocus ();
+};
+
 } // namespace tiary::ui
 } // namespace tiary
 
