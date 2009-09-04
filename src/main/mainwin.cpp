@@ -790,7 +790,7 @@ void MainWin::update_recent_files ()
 	RecentFileList::iterator it = std::find (recent_files.begin (), recent_files.end (),
 			current_filename);
 	if (it == recent_files.end ()) {
-		recent_files.push_front ();
+		recent_files.push_front (RecentFile ());
 		it = recent_files.begin ();
 		it->filename = current_filename;
 	}

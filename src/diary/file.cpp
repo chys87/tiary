@@ -222,10 +222,10 @@ bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntry
 			} else if (recent_files && main_child->name == "recent") {
 				if (const char *file_name = map_query (main_child->properties, "file"))
 					if (const char *line_number = map_query (main_child->properties, "line")) {
-						recent_files->push_back ();
-						RecentFile &item = recent_files->back ();
+						RecentFile item;
 						item.filename = utf8_to_wstring (file_name);
 						item.focus_entry = strtoul (line_number, 0, 10);
+						recent_files->push_back (item);
 					}
 			} // else: Ignored for forward compatibility
 		} else {
