@@ -131,9 +131,7 @@ public:
 	const CharColorAttr * const* get_char_table () const { return char_table; }
 	const CharColorAttr * get_char_table (unsigned line) const { return char_table[line]; }
 
-	static const unsigned REQUEST_CLOSE = 1;
-	void request (unsigned);
-	void request_close (); ///< Equivalent to request (REQUEST_CLOSE)
+	void request_close (); ///< Request the window be closed
 
 
 	typedef std::vector<Control *> ControlList;

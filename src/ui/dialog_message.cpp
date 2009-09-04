@@ -117,7 +117,7 @@ WindowMessage::~WindowMessage ()
 void WindowMessage::slot_click (WindowMessageButton button)
 {
 	result = button;
-	request (REQUEST_CLOSE);
+	request_close ();
 }
 
 void WindowMessage::redraw ()

@@ -275,7 +275,10 @@ wchar_t get_input (MouseEvent *pmouse_event, bool block = true)
 	return c;
 }
 
-}
+
+const unsigned REQUEST_CLOSE = 1;
+
+} // anonymous namespace
 
 
 Window::Window (unsigned options_, const std::wstring &title_)
@@ -598,20 +601,26 @@ void Window::unget (MouseEvent mouse_event)
 	unget_input (MOUSE, mouse_event);
 }
 
+#ifdef TIARY_USE_MOUSE
 namespace {
 bool suspend_mouse_status;
 } // anonymous namespace
+#endif
 
 void Window::suspend ()
 {
+#ifdef TIARY_USE_MOUSE
 	suspend_mouse_status = get_mouse_status ();
+#endif
 	finalize ();
 }
 
 bool Window::resume ()
 {
 	if (init ()) {
+#ifdef TIARY_USE_MOUSE
 		set_mouse_status (suspend_mouse_status);
+#endif
 		unget (WINCH);
 		touch_screen ();
 		return true;
@@ -620,14 +629,9 @@ bool Window::resume ()
 	}
 }
 
-void Window::request (unsigned req)
-{
-	requests |= req;
-}
-
 void Window::request_close ()
 {
-	request (REQUEST_CLOSE);
+	requests |= REQUEST_CLOSE;
 }
 
 void Window::add_control (Control *ctrl)
