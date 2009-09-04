@@ -17,6 +17,7 @@
 #include "ui/dialog_message.h"
 #include "ui/dialog_select_file.h"
 #include "ui/dialog_input.h"
+#include "ui/dialog_select.h"
 #include "ui/search_info.h"
 #include "common/unicode.h"
 #include "common/format.h"
@@ -394,6 +395,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	menu_bar.add (L"&File")
 		(L"&New              Ctrl+N", Signal (this, &MainWin::new_file))
 		(L"&Open...          Ctrl+O", Signal (this, &MainWin::open_file))
+		(L"Open &recent file..."    , Signal (this, &MainWin::open_recent_file))
 		()
 		(L"&Save           w Ctrl+S", Signal (this, &MainWin::default_save))
 		(L"Save &as...     W",        Signal (this, &MainWin::save_as))
@@ -564,6 +566,9 @@ void MainWin::load (const std::wstring &filename)
 			break;
 	}
 	reset_file ();
+	main_ctrl.touch ();
+	saved = true;
+	ui::Window::touch_windows ();
 	if (!error_info.empty ())
 		ui::dialog_message (error_info);
 }
@@ -820,6 +825,25 @@ void MainWin::open_file ()
 				ui::SELECT_FILE_READ);
 		if (!new_filename.empty ())
 			load (new_filename);
+	}
+}
+
+void MainWin::open_recent_file ()
+{
+	if (check_save ()) {
+		if (recent_files.empty ()) {
+			ui::dialog_message (L"No recent file");
+			return;
+		}
+		std::vector <std::wstring> choices;
+		std::transform (recent_files.begin (), recent_files.end (),
+				std::back_inserter (choices),
+				get_member_fun (&RecentFile::filename));
+		size_t choice = ui::dialog_select (
+				L"Recent files",
+				choices);
+		if (choice < choices.size ())
+			load (choices [choice]);
 	}
 }
 
