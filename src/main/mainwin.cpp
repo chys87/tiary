@@ -600,7 +600,8 @@ void MainWin::append ()
 	ent->local_time = DateTime (DateTime::LOCAL, cur_time);
 	ent->title = L"Your title goes here.";
 	ent->text = L"Your contents go here.";
-	if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str()) && !ent->text.empty ()) {
+	if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str())
+			&& (!ent->title.empty () || !ent->text.empty ())) {
 		entries.push_back (ent);
 		main_ctrl.touch ();
 		main_ctrl.set_focus (std::numeric_limits<int>::max ());
