@@ -122,16 +122,13 @@ std::wstring make_home_dirname (const wchar_t *file)
 
 template <> std::basic_string<char> get_current_dir <char> ()
 {
-#if defined TIARY_HAVE_EXTENDED_GETCWD
-	char *dir = getcwd (NULL, 0);
-	std::string r = dir;
-	free (dir);
-	return r;
-#elif defined TIARY_HAVE_EXTENDED_REALPATH
-	char *dir = realpath (".", NULL);
-	std::string r = dir;
-	free (dir);
-	return r;
+#ifdef TIARY_HAVE_GET_CURRENT_DIR_NAME
+	if (char *dir = get_current_dir_name ()) {
+		std::string r = dir;
+		free (dir);
+		return r;
+	} else
+		return std::string ();
 #else
 	char buffer[PATH_MAX];
 	if (getcwd (buffer, sizeof buffer) == buffer)
@@ -149,8 +146,8 @@ template <> std::basic_string<wchar_t> get_current_dir <wchar_t> ()
 std::string get_full_pathname (const char *name)
 {
 	std::string ret;
-#ifdef TIARY_HAVE_EXTENDED_REALPATH
-	if (char *full = realpath (name, 0)) {
+#ifdef TIARY_HAVE_CANONICALIZE_FILE_NAME
+	if (char *full = canonicalize_file_name (name)) {
 		ret = full;
 		free (full);
 	}

@@ -123,43 +123,17 @@ FOREACH(FOO ${UNLOCKED_STDIO})
 	ENDIF(NOT HAVE_${FOO}_unlocked)
 ENDFOREACH(FOO)
 
-# Check for optional extended "getcwd" function
-CHECK_C_SOURCE_RUNS("
-	#include <unistd.h> \n
-	#include <stdlib.h> \n
-	#include <string.h> \n
-	
-	int main ()
-	{
-		char *ptr;
-		chdir (\"/\");
-		ptr = getcwd (NULL, 0);
-		if (ptr == NULL)
-			exit (1);
-		exit (strcmp (ptr, \"/\"));
-	}" HAVE_EXTENDED_GETCWD)
-IF(HAVE_EXTENDED_GETCWD)
-	ADD_DEFINITIONS("-DTIARY_HAVE_EXTENDED_GETCWD=1")
-ENDIF(HAVE_EXTENDED_GETCWD)
+# Check for optional "get_current_dir_name" function
+CHECK_FUNCTION_EXISTS(get_current_dir_name HAVE_GET_CURRENT_DIR_NAME)
+IF(HAVE_GET_CURRENT_DIR_NAME)
+	ADD_DEFINITIONS("-DTIARY_HAVE_GET_CURRENT_DIR_NAME=1")
+ENDIF(HAVE_GET_CURRENT_DIR_NAME)
 
-# Check for optional extended "realpath" function
-CHECK_C_SOURCE_RUNS("
-	#include <unistd.h> \n
-	#include <stdlib.h> \n
-	#include <string.h> \n
-	
-	int main ()
-	{
-		char *ptr;
-		chdir (\"/\");
-		ptr = realpath (\".\", NULL);
-		if (ptr == NULL)
-			exit (1);
-		exit (strcmp (ptr, \"/\"));
-	}" HAVE_EXTENDED_REALPATH)
-IF(HAVE_EXTENDED_REALPATH)
-	ADD_DEFINITIONS("-DTIARY_HAVE_EXTENDED_REALPATH=1")
-ENDIF(HAVE_EXTENDED_REALPATH)
+# Check for optional "canonicalize_file_name" function
+CHECK_FUNCTION_EXISTS(canonicalize_file_name HAVE_CANONICALIZE_FILE_NAME)
+IF(HAVE_CANONICALIZE_FILE_NAME)
+	ADD_DEFINITIONS("-DTIARY_HAVE_CANONICALIZE_FILE_NAME=1")
+ENDIF(HAVE_CANONICALIZE_FILE_NAME)
 
 # Check for and sizeof(int) (Must be 4)
 CHECK_TYPE_SIZE(int SIZEOF_INT)
