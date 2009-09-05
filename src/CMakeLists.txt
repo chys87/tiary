@@ -8,8 +8,6 @@ INCLUDE(FindBZip2)
 INCLUDE(FindLibXml2)
 INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckCXXSourceCompiles)
-INCLUDE(CheckCXXSourceRuns)
-INCLUDE(CheckCSourceRuns)
 
 # Check for required wchar_t functions
 CHECK_FUNCTION_EXISTS(wmemchr HAVE_WMEMCHR)
@@ -216,10 +214,7 @@ IF(HAVE_DEFAULT_DELETE_FUNCTIONS)
 ENDIF(HAVE_DEFAULT_DELETE_FUNCTIONS)
 
 # unordered_set/unordered_map (>= gcc 4.3)
-# For new stuff related to libraries, compiling
-# is not enough (e.g. Headers for regex are ready in gcc 4.3,
-# but no library support)
-CHECK_CXX_SOURCE_RUNS("
+CHECK_CXX_SOURCE_COMPILES("
 	#include <unordered_set> \n
 	#include <unordered_map> \n
 	#include <string> \n
@@ -243,7 +238,7 @@ IF(HAVE_UNORDERED_SET_MAP)
 	ADD_DEFINITIONS("-DTIARY_HAVE_STD_UNORDERED_SET_MAP=1")
 ELSE(HAVE_UNORDERED_SET_MAP)
 	# tr1/unordered_{set,map} (>= gcc 4)
-	CHECK_CXX_SOURCE_RUNS("
+	CHECK_CXX_SOURCE_COMPILES("
 		#include <tr1/unordered_set> \n
 		#include <tr1/unordered_map> \n
 		#include <string> \n
@@ -270,7 +265,7 @@ ENDIF(HAVE_UNORDERED_SET_MAP)
 
 
 # initializer list (>= gcc 4.4)
-CHECK_CXX_SOURCE_RUNS("
+CHECK_CXX_SOURCE_COMPILES("
 	#include <list> \n
 	using namespace std;
 	int main()
