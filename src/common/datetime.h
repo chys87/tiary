@@ -162,7 +162,7 @@ struct DateTime
 	enum UTCLocal { UTC, LOCAL };
 
 	DateTime () : v(0) {}
-	DateTime (const Date &date, const Time &time) : v (make_datetime (date.v, time.v)) {}
+	DateTime (Date date, Time time) : v (make_datetime (date.v, time.v)) {}
 	DateTime (const ReadableDate &rd, const ReadableTime &rt, bool strict = false)
 		: v(strict ? make_datetime_strict (rd, rt) : make_datetime (rd, rt)) {}
 	DateTime (const ReadableDateTime &rdt, bool strict = false)

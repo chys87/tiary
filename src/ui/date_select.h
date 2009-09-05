@@ -45,14 +45,14 @@ public:
 	DateSelect (Window &);
 	~DateSelect ();
 
-	void set_date (const Date &, bool emit_signal = true);
+	void set_date (Date, bool emit_signal = true);
 	/**
 	 * The second arguments provides a list specifying all the selectable dates.
 	 * If empty, all dates are selectable.
 	 */
-	void set_date (const Date &, const SelectableDates &, bool emit_signal = true);
+	void set_date (Date, const SelectableDates &, bool emit_signal = true);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	void set_date (const Date &, SelectableDates &&, bool emit_signal = true);
+	void set_date (Date, SelectableDates &&, bool emit_signal = true);
 #endif
 	Date get_date () const;
 

@@ -69,7 +69,7 @@ DateSelect::~DateSelect ()
 {
 }
 
-void DateSelect::set_date (const Date &date, bool emit_signal)
+void DateSelect::set_date (Date date, bool emit_signal)
 {
 	ReadableDate rd = date.extract ();
 	unsigned y = minU (maxU (rd.y, first_year), last_year);
@@ -83,14 +83,14 @@ void DateSelect::set_date (const Date &date, bool emit_signal)
 	DateSelect::redraw ();
 }
 
-void DateSelect::set_date (const Date &date, const SelectableDates &selectable, bool emit_signal)
+void DateSelect::set_date (Date date, const SelectableDates &selectable, bool emit_signal)
 {
 	selectable_dates = selectable;
 	set_date (date, emit_signal);
 }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-void DateSelect::set_date (const Date &date, SelectableDates &&selectable, bool emit_signal)
+void DateSelect::set_date (Date date, SelectableDates &&selectable, bool emit_signal)
 {
 	selectable_dates = std::forward <SelectableDates> (selectable);
 	set_date (date, emit_signal);
