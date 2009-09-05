@@ -18,7 +18,7 @@
  * @brief		An implementation of MD5
  *
  * This file is modified from Deutsch's implementation, which
- * is free software, licensed under a BSD-style license, and is
+ * is free software, licensed under a BSD license, and is
  * available at http://sourceforge.net/projects/libmd5-rfc/
  */
 
@@ -52,17 +52,7 @@
 #include <string.h>
 
 namespace tiary {
-namespace detail {
 namespace {
-
-/* Initialize the algorithm. */
-void md5_init(md5_state_t *pms);
-
-/* Append a string to the message. */
-void md5_append(md5_state_t *pms, const uint8_t *data, size_t nbytes);
-
-/* Finish the message and return the digest. */
-uint8_t *md5_finish(md5_state_t *pms);
 
 #define T_MASK ((uint32_t)~0)
 #define T1 /* 0xd76aa478 */ (T_MASK ^ 0x28955b87)
@@ -132,11 +122,13 @@ uint8_t *md5_finish(md5_state_t *pms);
 
 
 void
-md5_process(md5_state_t *pms, const uint8_t *data /*[64]*/)
+md5_process(MD5Context *pms, const uint8_t *data /*[64]*/)
 {
-	uint32_t
-		a = pms->abcd[0], b = pms->abcd[1],
-		c = pms->abcd[2], d = pms->abcd[3];
+	uint32_t a = pms->abcd[0];
+	uint32_t b = pms->abcd[1];
+	uint32_t c = pms->abcd[2];
+	uint32_t d = pms->abcd[3];
+
 	uint32_t t;
 #ifdef TIARY_BIG_ENDIAN /* Define storage only for big-endian CPUs. */
 	uint32_t X[16];
@@ -161,13 +153,12 @@ md5_process(md5_state_t *pms, const uint8_t *data /*[64]*/)
 	 * On little-endian machines, we can process properly aligned
 	 * data without copying it.
 	 */
-	if (!((data - (const uint8_t *)0) & 3)) {
+	if ((uintptr_t (data) & 3) == 0) {
 		/* data are properly aligned */
-		X = (const uint32_t *)data;
+		X = reinterpret_cast <const uint32_t *> (data);
 	} else {
 		/* not aligned */
-		memcpy(xbuf, data, 64);
-		X = xbuf;
+		X = reinterpret_cast <const uint32_t *> (memcpy (xbuf, data, 64));
 	}
 #endif
 
@@ -176,7 +167,8 @@ md5_process(md5_state_t *pms, const uint8_t *data /*[64]*/)
 	/* Round 1. */
 	/* Let [abcd k s i] denote the operation
 	   a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s). */
-#define F(x, y, z) (((x) & (y)) | (~(x) & (z)))
+//#define F(x, y, z) (((x) & (y)) | (~(x) & (z)))
+#define F(x, y, z) ((z) ^ ((x) & ((y)^(z))))
 #define SET(a, b, c, d, k, s, Ti)\
   t = a + F(b,c,d) + X[k] + Ti;\
   a = ROTATE_LEFT(t, s) + b
@@ -202,7 +194,8 @@ md5_process(md5_state_t *pms, const uint8_t *data /*[64]*/)
 	 /* Round 2. */
 	 /* Let [abcd k s i] denote the operation
 		  a = b + ((a + G(b,c,d) + X[k] + T[i]) <<< s). */
-#define G(x, y, z) (((x) & (z)) | ((y) & ~(z)))
+//#define G(x, y, z) (((x) & (z)) | ((y) & ~(z)))
+#define G(x, y, z) ((y) ^ ((z) & ((x)^(y))))
 #define SET(a, b, c, d, k, s, Ti)\
   t = a + G(b,c,d) + X[k] + Ti;\
   a = ROTATE_LEFT(t, s) + b
@@ -286,8 +279,10 @@ md5_process(md5_state_t *pms, const uint8_t *data /*[64]*/)
 	pms->abcd[3] += d;
 }
 
+} // anonymous namespace
+
 void
-md5_init(md5_state_t *pms)
+md5_init(MD5Context *pms)
 {
 	pms->count = 0;
 	pms->abcd[0] = 0x67452301;
@@ -297,12 +292,12 @@ md5_init(md5_state_t *pms)
 }
 
 void
-md5_append(md5_state_t *pms, const uint8_t *data, size_t nbytes)
+md5_append(MD5Context *pms, const void *data, size_t nbytes)
 {
 	if (nbytes == 0)
 		return;
 
-	const uint8_t *p = data;
+	const uint8_t *p = reinterpret_cast <const uint8_t *> (data);
 	size_t left = nbytes;
 	size_t offset = (size_t(pms->count) / 8) % 64;
 
@@ -330,8 +325,8 @@ md5_append(md5_state_t *pms, const uint8_t *data, size_t nbytes)
 		memcpy(pms->buf, p, left);
 }
 
-uint8_t *
-md5_finish(md5_state_t *pms)
+void
+md5_finish(MD5Context *pms)
 {
 	static const uint8_t pad[64] = { 0x80, 0, /* 0, 0, ... */ };
 
@@ -358,50 +353,6 @@ md5_finish(md5_state_t *pms)
 	for (int i=0; i<4; ++i)
 		pms->abcd[i] = bswap32 (pms->abcd[i]);
 #endif
-	return reinterpret_cast<uint8_t *>(pms->abcd);
-}
-
-} // anonymous namespace
-} // namespace tiary::detail
-
-
-MD5::MD5 ()
-{
-	detail::md5_init (&context);
-}
-
-MD5::MD5 (const std::string &s)
-{
-	detail::md5_init (&context);
-	append (s.data(), s.length());
-}
-
-MD5::MD5 (const void *data, size_t datalen)
-{
-	detail::md5_init (&context);
-	append (data, datalen);
-}
-
-MD5 &MD5::append (const std::string &s)
-{
-	return append (s.data(), s.length ());
-	return *this;
-}
-
-MD5 &MD5::append (const void *data, size_t datalen)
-{
-	detail::md5_append (&context, (const uint8_t *)data, datalen);
-	return *this;
-}
-
-const void *MD5::result ()
-{
-	return detail::md5_finish (&context);
-}
-
-void MD5::result (void *ret)
-{
-	memcpy (ret, detail::md5_finish (&context), 16);
 }
 
 } // namespace tiary

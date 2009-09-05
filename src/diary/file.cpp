@@ -254,12 +254,12 @@ void encrypt (void *dst, const char *src, size_t datalen, const void *pass, size
 		uint64_t xor_data2[32];
 		uint8_t xor_byte2[255]; // 255: Not a mistake
 	};
-	MD5 (pass, passlen).append (password_salt2, sizeof password_salt2).result (xor_data+30);
+	MD5 (pass, passlen) (password_salt2, sizeof password_salt2).result (xor_data+30);
 	for (int i=28; i>=0; i-=2)
-		MD5 (xor_data+i+2, (30-i)*8).append (password_salt2, sizeof password_salt2).result (xor_data+i);
-	MD5 (pass, passlen).append (password_salt3, sizeof password_salt3).result (xor_data2+30);
+		MD5 (xor_data+i+2, (30-i)*8) (password_salt2, sizeof password_salt2).result (xor_data+i);
+	MD5 (pass, passlen) (password_salt3, sizeof password_salt3).result (xor_data2+30);
 	for (int i=28; i>=0; i-=2)
-		MD5 (xor_data2+i+2, (30-i)*8).append (password_salt3, sizeof password_salt3).result (xor_data2+i);
+		MD5 (xor_data2+i+2, (30-i)*8) (password_salt3, sizeof password_salt3).result (xor_data2+i);
 
 	// In our program, data should be well-aligned, but it seems there's no guarantee.
 	// Hopefully there will be better solutions.
@@ -362,7 +362,7 @@ LoadFileRet load_file (
 		if (password.empty ()) { // User cancelation
 			return LOAD_FILE_PASSWORD;
 		}
-		if (memcmp (MD5 (wstring_to_mbs (password)).append (password_salt1, sizeof password_salt1).result (),
+		if (memcmp (MD5 (wstring_to_mbs (password)) (password_salt1, sizeof password_salt1).result (),
 					&everything[16], 16) != 0) { // Password incorrect
 			password.clear ();
 			return LOAD_FILE_PASSWORD;
@@ -541,7 +541,7 @@ bool save_file (const char *filename,
 	} else { // Password. Encrypt first
 
 		everything.resize (32 + xml_text.length());
-		MD5 (wstring_to_mbs (password)).append (password_salt1, sizeof password_salt1).result (&everything[16]);
+		MD5 (wstring_to_mbs (password)) (password_salt1, sizeof password_salt1).result (&everything[16]);
 		encrypt (&everything[32], xml_text.data(), xml_text.length(), password.data(), password.length());
 		bzip2 (&everything[0], everything.size ()).swap (everything); // everything = bzip2 (everything)
 	}
