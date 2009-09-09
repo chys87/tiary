@@ -46,12 +46,15 @@ class WindowGlobalOptions : public FixedWindow, private ButtonDefault
 {
 
 	GlobalOptionGroup &options;
+	const std::wstring &current_filename;
 
 	// GLOBAL_OPTION_DEFAULT_FILE
 	Label lbl_default_file;
-	Button btn_default_file;
 	Label lbl_default_file_name;
 	Layout layout_default_file;
+	Button btn_default_file;
+	Button btn_default_file_current;
+	Layout layout_default_file_buttons;
 
 	// GLOBAL_OPTION_EXPAND_LINES
 	Label lbl_expand_lines;
@@ -85,24 +88,28 @@ class WindowGlobalOptions : public FixedWindow, private ButtonDefault
 	void copy_options_to_controls (const GlobalOptionGroup &);
 
 	void slot_default_file ();
+	void slot_default_file_current ();
 	void slot_ok ();
 	void slot_reset ();
 	void slot_help ();
 
 public:
-	WindowGlobalOptions (GlobalOptionGroup &options_);
+	WindowGlobalOptions (GlobalOptionGroup &options_, const std::wstring &current_filename_);
 	~WindowGlobalOptions ();
 };
 
 const wchar_t expand_lines_array[][2] = { L"1", L"2", L"3", L"4", L"5", L"6", L"7", L"8" };
-WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_)
+WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std::wstring &current_filename_)
 	: Window (0, L"Preferences")
 	, FixedWindow ()
 	, options (options_)
+	, current_filename (current_filename_)
 	, lbl_default_file (*this, L"Default &file:")
-	, btn_default_file (*this, L"Choose...")
 	, lbl_default_file_name (*this, std::wstring ())
 	, layout_default_file (HORIZONTAL)
+	, btn_default_file (*this, L"Choose...")
+	, btn_default_file_current (*this, L"Use current file")
+	, layout_default_file_buttons (HORIZONTAL)
 	, lbl_expand_lines (*this, L"Expand &lines:")
 	, drp_expand_lines (*this, std::vector<std::wstring>(expand_lines_array, array_end (expand_lines_array)),
 			options_.get_num(GLOBAL_OPTION_EXPAND_LINES)-1)
@@ -123,16 +130,22 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_)
 	, layout_buttons (HORIZONTAL)
 	, layout_main (VERTICAL)
 {
-	FixedWindow::resize (get_screen_size () & make_size (80, 15));
+	FixedWindow::resize (get_screen_size () & make_size (80, 18));
 
 	// Set up layout
 
 	layout_default_file.add
 		(lbl_default_file, 20, 20)
 		(1, 1)
+		(lbl_default_file_name, 2, Layout::UNLIMITED)
+		;
+
+	layout_default_file_buttons.add
+		(21, 21)
 		(btn_default_file, 10, 10)
 		(1, 1)
-		(lbl_default_file_name, 2, Layout::UNLIMITED)
+		(btn_default_file_current, 20, 20)
+		(0, Layout::UNLIMITED)
 		;
 
 	layout_expand_lines.add
@@ -172,6 +185,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_)
 
 	layout_main.add
 		(layout_default_file, 1, 1)
+		(layout_default_file_buttons, 1, 1)
 		(1, 1)
 		(layout_expand_lines, 1, 1)
 		(1, 1)
@@ -188,6 +202,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_)
 
 	// Chain
 
+	ChainControlsHorizontal () (btn_default_file) (btn_default_file_current);
 	ChainControlsHorizontal () (btn_ok) (btn_cancel) (btn_reset) (btn_help);
 	ChainControlsVerticalNC ()
 		(btn_default_file)
@@ -196,6 +211,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_)
 		(txt_datetime_format)
 		(txt_longtime_format)
 		(btn_ok);
+	btn_default_file_current.ctrl_down = btn_default_file.ctrl_down;
 	btn_reset.ctrl_up = btn_cancel.ctrl_up = btn_help.ctrl_up = btn_ok.ctrl_up;
 
 
@@ -208,6 +224,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_)
 			TIARY_LIST_OF_END
 			);
 	btn_default_file.sig_clicked.connect (this, &WindowGlobalOptions::slot_default_file);
+	btn_default_file_current.sig_clicked.connect (this, &WindowGlobalOptions::slot_default_file_current);
 	btn_ok.sig_clicked.connect (this, &WindowGlobalOptions::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 	btn_reset.sig_clicked.connect (this, &WindowGlobalOptions::slot_reset);
@@ -243,6 +260,13 @@ void WindowGlobalOptions::slot_default_file ()
 				dialog_select_file (L"Default file",
 					lbl_default_file_name.get_text (),
 					SELECT_FILE_READ)),
+			UIString::NO_HOTKEY);
+}
+
+void WindowGlobalOptions::slot_default_file_current ()
+{
+	lbl_default_file_name.set_text (
+			get_full_pathname (current_filename),
 			UIString::NO_HOTKEY);
 }
 
@@ -297,9 +321,9 @@ void WindowGlobalOptions::slot_help ()
 
 
 
-void edit_options (GlobalOptionGroup &options)
+void edit_global_options (GlobalOptionGroup &options, const std::wstring &current_filename)
 {
-	WindowGlobalOptions (options).event_loop ();
+	WindowGlobalOptions (options, current_filename).event_loop ();
 }
 
 void edit_options (PerFileOptionGroup &)

@@ -16,10 +16,11 @@
 #define TIARY_MAIN_DIALOG_PREF_H
 
 #include "diary/config.h"
+#include <string>
 
 namespace tiary {
 
-void edit_options (GlobalOptionGroup &);
+void edit_global_options (GlobalOptionGroup &, const std::wstring &current_filename);
 void edit_options (PerFileOptionGroup &);
 
 } //namespace tiary

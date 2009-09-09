@@ -961,7 +961,7 @@ void MainWin::edit_all_labels ()
 
 void MainWin::edit_global_options ()
 {
-	edit_options (global_options);
+	tiary::edit_global_options (global_options, current_filename);
 	save_global_options (global_options, recent_files);
 	main_ctrl.MainCtrl::redraw ();
 }
