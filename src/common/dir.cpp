@@ -143,37 +143,21 @@ template <> std::basic_string<wchar_t> get_current_dir <wchar_t> ()
 	return mbs_to_wstring (get_current_dir<char>());
 }
 
-std::string get_full_pathname (const char *name)
-{
-	std::string ret;
-#ifdef TIARY_HAVE_CANONICALIZE_FILE_NAME
-	if (char *full = canonicalize_file_name (name)) {
-		ret = full;
-		free (full);
-	}
-#else
-	char buffer[PATH_MAX];
-	if (realpath (name, buffer) == buffer)
-		ret = buffer;
-#endif
-	if (*name && name[strlen(name)-1]=='/' && *c(ret).rbegin()!='/')
-		ret += '/';
-	return ret;
-}
-
 std::wstring get_full_pathname (const wchar_t *name)
 {
-	return mbs_to_wstring (get_full_pathname (wstring_to_mbs (name).c_str ()));
-}
-
-std::string get_full_pathname (const std::string &name)
-{
-	return get_full_pathname (name.c_str ());
+	return get_full_pathname (std::wstring (name));
 }
 
 std::wstring get_full_pathname (const std::wstring &name)
 {
-	return mbs_to_wstring (get_full_pathname (wstring_to_mbs (name).c_str ()));
+	if (name[0] != L'/') {
+		std::wstring ret = get_current_dir <wchar_t> ();
+		if (*c(ret).rbegin () != L'/')
+			ret += L'/';
+		ret += name;
+		return ret;
+	} else
+		return name;
 }
 
 namespace {
@@ -234,14 +218,11 @@ std::wstring home_expand_pathname (const std::wstring &name)
 	return home_expand_pathname_impl (name);
 }
 
-namespace {
-
-template <typename ChT> inline
-std::basic_string<ChT> get_nice_pathname_impl (const std::basic_string <ChT> &name)
+std::wstring get_nice_pathname (const std::wstring &name)
 {
-	std::basic_string<ChT> fullname = get_full_pathname (name);
-	std::basic_string<ChT> homefold = home_fold_pathname (fullname);
-	std::basic_string<ChT> curdir = get_current_dir<ChT>();
+	std::wstring fullname = get_full_pathname (name);
+	std::wstring homefold = home_fold_pathname (fullname);
+	std::wstring curdir = get_current_dir<wchar_t>();
 	// Special case: curdir == '/'
 	if (curdir.length () < 2) {
 		fullname.swap (homefold);
@@ -249,11 +230,11 @@ std::basic_string<ChT> get_nice_pathname_impl (const std::basic_string <ChT> &na
 	}
 	// Special case: curdir == filename
 	if (curdir == fullname) {
-		fullname = ChT('.');
+		fullname = L'.';
 		return fullname;
 	}
-	curdir += ChT('/');
-	fullname += ChT('/'); // In case fullname is an ancestor dir of curdir
+	curdir += L'/';
+	fullname += L'/'; // In case fullname is an ancestor dir of curdir
 	/*
 	 * curdir:     ............/b_1/.../b_y/
 	 * fullname:   ............/c_1/.../c_z/
@@ -262,46 +243,34 @@ std::basic_string<ChT> get_nice_pathname_impl (const std::basic_string <ChT> &na
 	 */
 	unsigned y;
 	size_t ox;
-	typename std::basic_string<ChT>::const_iterator ox_it = std::mismatch (
+	std::wstring::const_iterator ox_it = std::mismatch (
 			c(fullname).begin (), c(fullname).end (),
 			curdir.c_str () // Not to be replaced by begin() (Not all implementations always maintain a null at the end!)
 			).first;
-	while (*(ox_it-1) != ChT('/'))
+	while (*(ox_it-1) != L'/')
 		--ox_it;
 	ox = ox_it - c(fullname).begin ();
 
-	y = std::count (c(curdir).begin () + ox, c(curdir).end (), ChT('/'));
+	y = std::count (c(curdir).begin () + ox, c(curdir).end (), L'/');
 	// Use either dot-dots or fullnames. These codes also apply to things under current directory
 	unsigned dotdotlen = y*3;
 	if ((y<3 && dotdotlen<ox) || (y==3 && dotdotlen*2<ox) || dotdotlen*4<ox) {
 		// Use dot-dots iff 
 		// (1) No more than two levels, and shorter; or
 		// (2) More than two levels, and MUCH shorter
-		fullname.replace (0, ox, dotdotlen, ChT('.'));
+		fullname.replace (0, ox, dotdotlen, L'.');
 		// Fill y dot-dots
-		typename std::basic_string<ChT>::iterator it = fullname.begin ();
-		typename std::basic_string<ChT>::iterator end = it + dotdotlen;
+		std::wstring::iterator it = fullname.begin ();
+		std::wstring::iterator end = it + dotdotlen;
 		while (it < end) {
 			it += 2;
-			*it++ = ChT('/');
+			*it++ = L'/';
 		}
 	}
 	fullname.resize (fullname.length () - 1);
 	if (homefold.length () < fullname.length ())
 		fullname.swap (homefold);
 	return fullname;
-}
-
-} // anonymous namespace
-
-std::string get_nice_pathname (const std::string &name)
-{
-	return get_nice_pathname_impl (name);
-}
-
-std::wstring get_nice_pathname (const std::wstring &name)
-{
-	return get_nice_pathname_impl (name);
 }
 
 unsigned get_file_attr (const char *name)
@@ -326,66 +295,36 @@ unsigned get_file_attr (const wchar_t *name)
 	return get_file_attr (wstring_to_mbs (name).c_str ());
 }
 
-namespace {
-
-template <typename ChT> inline
-std::basic_string <ChT> optional_canonicalize (const std::basic_string<ChT> &name, size_t len, bool canonicalize)
+inline
+std::wstring optional_canonicalize (const std::wstring &name, size_t len, bool canonicalize)
 {
-	std::basic_string <ChT> tmp (name, 0, len);
+	std::wstring tmp (name, 0, len);
 	if (canonicalize)
 		tmp = get_full_pathname (tmp);
 	return tmp;
 }
 
-template <typename ChT> inline
-std::pair<std::basic_string<ChT>,std::basic_string<ChT> > split_pathname_impl (const std::basic_string<ChT> &name, bool canonicalize)
-{
-	typename std::basic_string<ChT>::size_type last_split = name.rfind (ChT ('/'));
-	return std::pair<std::basic_string<ChT>,std::basic_string<ChT> > (
-			last_split == std::basic_string<ChT>::npos ?
-				(canonicalize ? get_current_dir<ChT> () : std::basic_string<ChT>(1, ChT('.'))) :
-				optional_canonicalize (name, last_split ? last_split : 1, canonicalize),
-			std::basic_string<ChT> (name, last_split+1) // Standard guarantees npos == -1
-		);
-}
-
-} // anonymous namespace
-
-std::pair<std::string,std::string> split_pathname (const std::string &name, bool canonicalize)
-{
-	return split_pathname_impl (name, canonicalize);
-}
-
 std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &name, bool canonicalize)
 {
-	return split_pathname_impl (name, canonicalize);
-}
-
-namespace {
-
-template <typename ChT> inline
-std::basic_string<ChT> combine_pathname_impl (const std::basic_string<ChT> &path, const std::basic_string<ChT> &basename)
-{
-	std::basic_string<ChT> ret;
-	if (path.length() != 1 || path[0] != ChT('.')) {
-		ret = path;
-		if (ret.empty() || *c(ret).rbegin()!=ChT('/'))
-			ret += ChT('/');
-	}
-	ret += basename;
-	return ret;
-}
-
-} // anonymous namespace
-
-std::string combine_pathname (const std::string &path, const std::string &basename)
-{
-	return combine_pathname_impl (path, basename);
+	std::wstring::size_type last_split = name.rfind (L'/');
+	return std::pair<std::wstring,std::wstring> (
+			last_split == std::wstring::npos ?
+				(canonicalize ? get_current_dir<wchar_t> () : std::wstring(1, L'.')) :
+				optional_canonicalize (name, last_split ? last_split : 1, canonicalize),
+			std::wstring (name, last_split+1) // Standard guarantees npos == -1
+		);
 }
 
 std::wstring combine_pathname (const std::wstring &path, const std::wstring &basename)
 {
-	return combine_pathname_impl (path, basename);
+	std::wstring ret;
+	if (path.length() != 1 || path[0] != L'.') {
+		ret = path;
+		if (ret.empty() || *c(ret).rbegin()!=L'/')
+			ret += L'/';
+	}
+	ret += basename;
+	return ret;
 }
 
 

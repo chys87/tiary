@@ -59,11 +59,11 @@ std::wstring make_home_dirname (const wchar_t *);
 template <typename ChT> std::basic_string<ChT> get_current_dir ();
 
 /**
- * @brief	Returns the full path
+ * @brief	Returns the absolute path
+ *
+ * This function does not resolve symbolic links
  */
-std::string get_full_pathname (const char *);
 std::wstring get_full_pathname (const wchar_t *);
-std::string get_full_pathname (const std::string &);
 std::wstring get_full_pathname (const std::wstring &);
 
 /**
@@ -84,7 +84,6 @@ std::wstring home_expand_pathname (const std::wstring &);
  * It may be absolute or starting with "~" or relative,
  * whichever is "nicer" (shorter and/or easier to read)
  */
-std::string get_nice_pathname (const std::string &);
 std::wstring get_nice_pathname (const std::wstring &);
 
 
@@ -106,13 +105,11 @@ inline unsigned get_file_attr (const std::wstring &s) { return get_file_attr (s.
 /**
  * @brief	Split a full pathname to directory name and basename
  */
-std::pair<std::string,std::string> split_pathname (const std::string &, bool canonicalize = false);
 std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &, bool canonicalize = false);
 
 /**
  * @brief	Combine a directory name and basename to a full name
  */
-std::string combine_pathname (const std::string &, const std::string &);
 std::wstring combine_pathname (const std::wstring &, const std::wstring &);
 
 struct DirEnt
