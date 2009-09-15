@@ -143,21 +143,38 @@ template <> std::basic_string<wchar_t> get_current_dir <wchar_t> ()
 	return mbs_to_wstring (get_current_dir<char>());
 }
 
-std::wstring get_full_pathname (const wchar_t *name)
-{
-	return get_full_pathname (std::wstring (name));
-}
-
 std::wstring get_full_pathname (const std::wstring &name)
 {
-	if (name[0] != L'/') {
-		std::wstring ret = get_current_dir <wchar_t> ();
-		if (*c(ret).rbegin () != L'/')
-			ret += L'/';
-		ret += name;
-		return ret;
-	} else
-		return name;
+	std::list <std::wstring> splitted = split_string (
+			(name[0] != L'/' ? get_current_dir <wchar_t> () + L'/' + name : name),
+			L'/', true);
+	// By setting the 3rd paremter to split_string to true,
+	// "//" is replaced by "/"
+
+	// Eliminate single dots and double dots
+	for (std::list <std::wstring>::iterator it = splitted.begin (); it != splitted.end (); ) {
+		if (*it == L".") {
+			it = splitted.erase (it);
+		} else if (*it == L"..") {
+			if (it != splitted.begin ()) {
+				--it;
+				it = splitted.erase (it);
+			}
+			it = splitted.erase (it);
+		} else {
+			++it;
+		}
+	}
+
+	if (splitted.empty ())
+		splitted.push_back (std::wstring ());
+
+	std::wstring ret;
+	for (std::list <std::wstring>::const_iterator it = splitted.begin (); it != splitted.end (); ++it) {
+		ret += L'/';
+		ret += *it;
+	}
+	return ret;
 }
 
 namespace {

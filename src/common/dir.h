@@ -63,7 +63,6 @@ template <typename ChT> std::basic_string<ChT> get_current_dir ();
  *
  * This function does not resolve symbolic links
  */
-std::wstring get_full_pathname (const wchar_t *);
 std::wstring get_full_pathname (const std::wstring &);
 
 /**
