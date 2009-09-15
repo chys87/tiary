@@ -30,6 +30,7 @@ namespace tiary {
 #define GLOBAL_OPTION_RECENT_FILES     "recent_files"
 
 
+#define PERFILE_OPTION_MODTIME         "use_mtime"
 
 
 struct OptionDescription {
@@ -42,12 +43,17 @@ extern const OptionDescription g_perfile_option_descriptions[];
 
 class OptionGroupBase
 {
-	typedef StringUnorderedMap DataType;
-	DataType data;
-
 protected:
 
+	typedef StringUnorderedMap DataType;
+
 	void reset (const OptionDescription *); // Does not affect unknown options
+
+	const DataType &get_data () const { return data; }
+
+private:
+
+	DataType data;
 
 public:
 	void set (const char *, const char *);
@@ -97,6 +103,22 @@ public:
 	void reset ()
 	{
 		OptionGroupBase::reset (Descriptions);
+	}
+
+	bool operator == (const OptionGroup &other) const
+	{
+#if defined TIARY_HAVE_STD_UNORDERED_SET_MAP || defined TIARY_HAVE_TR1_UNORDERED_SET_MAP
+		// Unordered_map does not define operator == ...
+		if (get_data ().size () != other.get_data ().size ())
+			return false;
+		return std::equal (get_data ().begin (), get_data ().end (), other.get_data ().begin ());
+#else
+		return (get_data () == other.get_data ());
+#endif
+	}
+	bool operator != (const OptionGroup &other) const
+	{
+		return !(*this == other);
 	}
 };
 

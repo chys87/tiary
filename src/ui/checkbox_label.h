@@ -33,6 +33,7 @@ public:
 
 	void move_resize (Size, Size);
 
+	void set_status (bool status, bool emit_signal = true) { checkbox.set_status (status, emit_signal); }
 	bool get_status () const { return checkbox.get_status (); }
 };
 

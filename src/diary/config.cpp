@@ -33,6 +33,7 @@ extern const OptionDescription g_global_option_descriptions[] = {
 };
 
 extern const OptionDescription g_perfile_option_descriptions[] = {
+	{ PERFILE_OPTION_MODTIME          , "0" },
 	{ 0, 0 }
 };
 

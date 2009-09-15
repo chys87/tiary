@@ -13,12 +13,12 @@
 
 
 /**
- * @file	main/dialog_pref.cpp
+ * @file	main/dialog_global_pref.cpp
  * @author	chys <admin@chys.info>
  * @brief	Implements a dialog to edit preferences
  */
 
-#include "main/dialog_pref.h"
+#include "main/dialog_global_pref.h"
 #include "ui/fixed_window.h"
 #include "ui/layout.h"
 #include "ui/chain.h"
@@ -102,6 +102,7 @@ const wchar_t expand_lines_array[][2] = { L"1", L"2", L"3", L"4", L"5", L"6", L"
 WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std::wstring &current_filename_)
 	: Window (0, L"Preferences")
 	, FixedWindow ()
+	, ButtonDefault ()
 	, options (options_)
 	, current_filename (current_filename_)
 	, lbl_default_file (*this, L"Default &file:")
@@ -132,7 +133,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 {
 	FixedWindow::resize (get_screen_size () & make_size (80, 18));
 
-	// Set up layout
+	// Set up layouts
 
 	layout_default_file.add
 		(lbl_default_file, 20, 20)
@@ -324,15 +325,6 @@ void WindowGlobalOptions::slot_help ()
 void edit_global_options (GlobalOptionGroup &options, const std::wstring &current_filename)
 {
 	WindowGlobalOptions (options, current_filename).event_loop ();
-}
-
-void edit_options (PerFileOptionGroup &)
-{
-	ui::dialog_message (
-			L"Nothing here yet.\n"
-			L"\n"
-			L"Something may be added in a future version :)"
-			);
 }
 
 

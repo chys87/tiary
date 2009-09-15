@@ -31,7 +31,8 @@
 #include "common/dir.h"
 #include "main/doc.h"
 #include "main/dialog_filter.h"
-#include "main/dialog_pref.h"
+#include "main/dialog_global_pref.h"
+#include "main/dialog_perfile_pref.h"
 #include "main/dialog_labels.h"
 #include "main/dialog_all_labels.h"
 #include "main/dialog_edit_time.h"
@@ -435,7 +436,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		(L"&Labels...      L",        Signal (this, &MainWin::edit_all_labels), q_nonempty)
 		()
 		(L"&Preferences... R",        Signal (this, &MainWin::edit_global_options))
-//		(L"&File perferences...",   Signal (this, &MainWin::edit_perfile_options))
+		(L"&File perferences...",     Signal (this, &MainWin::edit_perfile_options))
 		;
 	menu_bar.add (L"&Help")
 		(L"&Help             F1",     Signal (show_doc))
@@ -653,7 +654,11 @@ DiaryEntry *MainWin::get_current ()
 void MainWin::edit_current ()
 {
 	if (DiaryEntry *ent = get_current ()) {
+		DateTime edit_time = DateTime (DateTime::LOCAL);
 		if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str())) {
+			if (per_file_options.get_bool (PERFILE_OPTION_MODTIME)) {
+				ent->local_time = edit_time;
+			}
 			updated_filter ();
 			main_ctrl.touch ();
 		}
@@ -968,8 +973,9 @@ void MainWin::edit_global_options ()
 
 void MainWin::edit_perfile_options ()
 {
-	edit_options (per_file_options);
-	// TODO: If modified, mark saved=false (or call main_ctrl.touch ())
+	if (tiary::edit_perfile_options (per_file_options)) {
+		main_ctrl.touch ();
+	}
 }
 
 void MainWin::quit ()

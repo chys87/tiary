@@ -5,10 +5,12 @@ add_library(tiary_main
 	dialog_edit_time.cpp
 	dialog_filter.h
 	dialog_filter.cpp
+	dialog_global_pref.h
+	dialog_global_pref.cpp
 	dialog_labels.h
 	dialog_labels.cpp
-	dialog_pref.h
-	dialog_pref.cpp
+	dialog_perfile_pref.h
+	dialog_perfile_pref.cpp
 	dialog_view_edit.h
 	dialog_view_edit.cpp
 	doc.h
