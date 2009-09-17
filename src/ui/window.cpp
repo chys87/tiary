@@ -377,8 +377,9 @@ bool Window::on_mouse_outside (MouseEvent)
 
 void Window::event_loop ()
 {
-	if (size_t (focus_id) >= control_list.size ())
+	if (size_t (focus_id) >= control_list.size ()) {
 		set_focus_id (0, 1);
+	}
 
 	while (!(requests & REQUEST_CLOSE)) {
 		MouseEvent mouse_event;
@@ -391,17 +392,22 @@ void Window::event_loop ()
 		if (c == WINCH) {
 			touch_lines ();
 			// Signal every window. So that background windows can also redraw themselves.
-			for (WindowList::iterator it = window_list.begin (); it != window_list.end (); ++it)
+			for (WindowList::iterator it = window_list.begin (); it != window_list.end (); ++it) {
 				(*it)->on_winch ();
-		} else if (c == MOUSE) {
+			}
+		}
+		else if (c == MOUSE) {
 			// Is the position within this window?
 			MouseEvent mouse_event_relative = mouse_event;
 			mouse_event_relative.p -= pos;
-			if (both (mouse_event_relative.p < size))
+			if (both (mouse_event_relative.p < size)) {
 				on_mouse (mouse_event_relative);
-			else
+			}
+			else {
 				on_mouse_outside (mouse_event);
-		} else { // Normal keyboard inputs
+			}
+		}
+		else { // Normal keyboard inputs
 			on_key (c);
 		}
 
@@ -416,20 +422,23 @@ void Window::event_loop ()
 
 void Window::choose_palette (PaletteID id)
 {
-	if (id < NUMBER_PALETTES)
+	if (id < NUMBER_PALETTES) {
 		cur_attr = get_palette (id);
+	}
 }
 
 void Window::choose_fore_color (Color fore)
 {
-	if (fore < NOCOLOR)
+	if (fore < NOCOLOR) {
 		cur_attr.fore = fore;
+	}
 }
 
 void Window::choose_back_color (Color back)
 {
-	if (back < NOCOLOR)
+	if (back < NOCOLOR) {
 		cur_attr.back = back;
+	}
 }
 
 void Window::choose_color (Color fore, Color back)
@@ -493,8 +502,9 @@ void Window::fill (Size top_left, Size fill_size, wchar_t ch)
 	unsigned width = size.x;
 	unsigned height = size.y;
 
-	if (fill_left>=width || fill_top>=height)
+	if (fill_left>=width || fill_top>=height) {
 		return;
+	}
 
 	fill_width = minU (fill_width, width - fill_left);
 	fill_height = minU (fill_height, height - fill_top);
@@ -518,12 +528,15 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s)
 
 Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size_t n)
 {
-	if (either (blkpos >= size))
+	if (either (blkpos >= size)) {
 		return relpos;
-	if (either (blkpos + blksize > size))
+	}
+	if (either (blkpos + blksize > size)) {
 		return relpos;
-	if (either (relpos >= blksize))
+	}
+	if (either (relpos >= blksize)) {
 		return relpos;
+	}
 
 	unsigned x = relpos.x;
 	unsigned y = relpos.y;
@@ -536,8 +549,9 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 	CharColorAttr *ptr = char_table[winy] + winx;
 
 #if 0 // Caller's responsibility
-	if (winx && ptr->c == L'\0')
+	if (winx && ptr->c == L'\0') {
 		ptr[-1].c = L' ';
+	}
 #endif
 
 	for (; n; --n) {
@@ -557,8 +571,9 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 		}
 		unsigned w = ucs_width (ch);
 
-		if (x + w > blksize.x)
+		if (x + w > blksize.x) {
 			break;
+		}
 
 		ptr->c = ch;
 		ptr->a = cur_attr;
@@ -574,8 +589,9 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 		}
 	}
 #if 0 // Caller's responsibility
-	if (winx<size.x && ptr->c==L'\0')
+	if (winx<size.x && ptr->c==L'\0') {
 		ptr->c = L' ';
+	}
 #endif
 	return make_size (x, y);
 }
@@ -613,8 +629,9 @@ void Window::touch_screen ()
 
 void Window::touch_windows ()
 {
-	for (WindowList::iterator it = window_list.begin (); it != window_list.end (); ++it)
+	for (WindowList::iterator it = window_list.begin (); it != window_list.end (); ++it) {
 		(*it)->redraw ();
+	}
 }
 
 wchar_t Window::get (MouseEvent *pmouse_event)
@@ -660,7 +677,8 @@ bool Window::resume ()
 		unget (WINCH);
 		touch_screen ();
 		return true;
-	} else {
+	}
+	else {
 		return false;
 	}
 }
@@ -679,11 +697,13 @@ void Window::add_control (Control *ctrl)
 
 bool Window::set_focus_id (unsigned id, int fall_direction)
 {
-	if (id >= control_list.size ())
+	if (id >= control_list.size ()) {
 		return false;
+	}
 	int old_focus = focus_id;
-	if (old_focus == int (id))
+	if (old_focus == int (id)) {
 		return true;
+	}
 	if (old_focus >= 0) {
 		focus_id = -1;
 		control_list[old_focus]->on_defocus ();
@@ -697,11 +717,13 @@ bool Window::set_focus_id (unsigned id, int fall_direction)
 		if (try_ctrl->on_focus ()) {
 			// Notify every control
 			for (ControlList::iterator it = control_list.begin ();
-					it != control_list.end (); ++it)
+					it != control_list.end (); ++it) {
 				(*it)->on_focus_changed ();
+			}
 			// Emit two signals
-			if (old_focus >= 0)
+			if (old_focus >= 0) {
 				control_list[old_focus]->sig_defocus.emit ();
+			}
 			try_ctrl->sig_focus.emit ();
 			return true;
 		}
@@ -709,8 +731,9 @@ bool Window::set_focus_id (unsigned id, int fall_direction)
 		if (try_id == id) {
 			// Completely failed. Try refocusing the old focus
 			focus_id = old_focus;
-			if (old_focus >= 0)
+			if (old_focus >= 0) {
 				control_list[old_focus]->on_focus ();
+			}
 			return false;
 		}
 	}
@@ -719,24 +742,27 @@ bool Window::set_focus_id (unsigned id, int fall_direction)
 bool Window::set_focus_ptr (Control *ctrl, int fall_direction)
 {
 	ControlList::iterator it = std::find (control_list.begin (), control_list.end (), ctrl);
-	if (it == control_list.end ())
+	if (it == control_list.end ()) {
 		return false;
+	}
 	return set_focus_id (it - control_list.begin (), fall_direction);
 }
 
 bool Window::set_focus_next (bool keep_trying)
 {
 	unsigned id = focus_id + 1;
-	if (id>=control_list.size())
+	if (id>=control_list.size()) {
 		id = 0;
+	}
 	return set_focus_id (id, keep_trying ? 1 : 0);
 }
 
 bool Window::set_focus_prev (bool keep_trying)
 {
 	unsigned id = focus_id - 1;
-	if (id >= control_list.size())
+	if (id >= control_list.size()) {
 		id = control_list.size() - 1;
+	}
 	return set_focus_id (id, keep_trying ? -1 : 0);
 }
 
@@ -744,8 +770,9 @@ bool Window::set_focus_direction (Control *Control::*dir)
 {
 	unsigned id = focus_id;
 	if (id < control_list.size ()) {
-		if (Control *new_focus = control_list[id]->*dir)
+		if (Control *new_focus = control_list[id]->*dir) {
 			return set_focus_ptr (new_focus, 0);
+		}
 	}
 	return false;
 }
@@ -765,8 +792,9 @@ bool Window::on_mouse (MouseEvent mouse_event)
 		if (both (mouse_event.p - (*it)->pos < (*it)->size)) {
 			// If it's any mouse key event, we should first try to focus it
 			// Otherwise, we do not.
-			if (mouse_event.m & MOUSE_ALL_BUTTON)
+			if (mouse_event.m & MOUSE_ALL_BUTTON) {
 				set_focus (it - control_list.begin (), 0); // Regardless whether it's successful or not
+			}
 			mouse_event.p -= (*it)->pos;
 			bool processed = (*it)->on_mouse (mouse_event);
 			if (!processed) {
@@ -782,8 +810,9 @@ bool Window::on_mouse (MouseEvent mouse_event)
 	// Clicked close button?
 	if (!processed) {
 		if ((mouse_event.m & LEFT_CLICK) && (mouse_event.p.y == 0) &&
-				(get_size ().x - 2 - mouse_event.p.x < 3))
+				(get_size ().x - 2 - mouse_event.p.x < 3)) {
 			processed = on_key (ESCAPE);
+		}
 	}
 
 	return processed;
@@ -796,12 +825,14 @@ bool Window::on_key (wchar_t c)
 	if (unsigned (focus_id) < control_list.size ()) {
 		processed = control_list[focus_id]->on_key (c);
 		// Not processed? How about local hotkeys?
-		if (!processed)
+		if (!processed) {
 			processed = control_list[focus_id]->emit_hotkey (c);
+		}
 	}
 	// Not processed? How about dialog hotkeys?
-	if (!processed)
+	if (!processed) {
 		processed = emit_hotkey (c);
+	}
 	// Still not processed? Interpret it ourselves
 	if (!processed) {
 		// Currently supports '\t', BACKTAB and arrow keys
@@ -879,21 +910,24 @@ void Window::redraw ()
 	}
 
 	for (ControlList::iterator it = control_list.begin ();
-			it != control_list.end (); ++it)
+			it != control_list.end (); ++it) {
 		(*it)->redraw ();
+	}
 }
 
 Size Window::get_cursor_pos () const
 {
-	if (Control *ctrl = get_focus ())
+	if (Control *ctrl = get_focus ()) {
 		return ctrl->get_cursor_pos () + ctrl->get_pos ();
+	}
 	return make_size ();
 }
 
 bool Window::get_cursor_visibility () const
 {
-	if (Control *ctrl = get_focus ())
+	if (Control *ctrl = get_focus ()) {
 		return ctrl->get_cursor_visibility ();
+	}
 	return false;
 }
 

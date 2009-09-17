@@ -241,8 +241,9 @@ void view_entry (DiaryEntry &ent, const std::wstring &longtime_format)
 
 void view_all_entries (const DiaryEntryList &entries, const std::wstring &longtime_format)
 {
-	if (entries.empty ())
+	if (entries.empty ()) {
 		return;
+	}
 	ui::RichTextList text_list;
 	DiaryEntryList::const_iterator it = entries.begin ();
 	for (;;) {

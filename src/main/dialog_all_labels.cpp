@@ -86,8 +86,9 @@ WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
 	, all_labels ()
 	, modified (false)
 {
-	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it)
+	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {
 		all_labels.insert ((*it)->labels.begin (), (*it)->labels.end ());
+	}
 	refresh_list ();
 
 	layout_right.add

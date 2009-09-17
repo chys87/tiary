@@ -51,10 +51,12 @@ struct Size
 	 */
 	Size & operator &= (const Size &other)
 	{
-		if (x > other.x)
+		if (x > other.x) {
 			x = other.x;
-		if (y > other.y)
+		}
+		if (y > other.y) {
 			y = other.y;
+		}
 		return *this;
 	}
 	/**
@@ -68,10 +70,12 @@ struct Size
 	 */
 	Size & operator |= (const Size &other)
 	{
-		if (x < other.x)
+		if (x < other.x) {
 			x = other.x;
-		if (y < other.y)
+		}
+		if (y < other.y) {
 			y = other.y;
+		}
 		return *this;
 	}
 };

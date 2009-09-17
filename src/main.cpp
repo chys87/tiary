@@ -54,8 +54,9 @@ int main (int argc, char **argv)
 	tiary::ui::set_mouse_status (true);
 
 	std::wstring filename;
-	if (argc >= 2)
+	if (argc >= 2) {
 		filename = mbs_to_wstring (argv[1]);
+	}
 	return main_body (filename);
 }
 
@@ -114,13 +115,17 @@ void parse_options (int &pargc, char **&pargv)
 		}
 		if (arg[1] == '-') { // Long option
 			arg += 2;
-			if (!strcmp (arg, "version"))
+			if (!strcmp (arg, "version")) {
 				option_version ();
-			else if (!strcmp (arg, "help"))
+			}
+			else if (!strcmp (arg, "help")) {
 				option_help ();
-			else
+			}
+			else {
 				option_unknown_long (arg);
-		} else { // Short options
+			}
+		}
+		else { // Short options
 			while (int c = *++arg) {
 				switch (c) {
 					case 'v':

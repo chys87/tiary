@@ -66,8 +66,9 @@ void ListBox::set_select (size_t new_select, bool emit_signal, bool scroll_to_to
 	if (new_select < items.size ()) {
 		select_any = true;
 		Scroll::modify_focus (new_select);
-		if (scroll_to_top)
+		if (scroll_to_top) {
 			Scroll::scroll_focus_to_first ();
+		}
 	}
 	else {
 		select_any = false;

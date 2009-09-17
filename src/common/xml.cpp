@@ -230,13 +230,14 @@ std::string tiary::xml_make (const XMLNode *root)
 
 		for (;;) {
 			// Shallow copy all children of current node
-			for (XMLNode *child_ptr = iptr->children; child_ptr; child_ptr = child_ptr->next)
+			for (XMLNode *child_ptr = iptr->children; child_ptr; child_ptr = child_ptr->next) {
 				if (xmlNodePtr nptr = shallow_copy (child_ptr)) {
 					xmlAddChild (optr, nptr);
 					if (const XMLNodeTree *ip = dynamic_cast <const XMLNodeTree *> (child_ptr)) {
 						stk.push (std::make_pair (ip, nptr));
 					}
 				}
+			}
 			if (stk.empty ()) {
 				break;
 			}

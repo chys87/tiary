@@ -84,8 +84,9 @@ bool safe_write_file (const char *filename, const void *ptr, size_t len)
 			&& info.st_nlink == 1) { // And has only one link
 		backup_name = filename;
 		backup_name += ".tiary.bak";
-		if (rename (filename, backup_name.c_str ()) != 0) // Back up old file: failed
+		if (rename (filename, backup_name.c_str ()) != 0) { // Back up old file: failed
 			backup_name.clear ();
+		}
 	}
 
 	// Now write content to new file

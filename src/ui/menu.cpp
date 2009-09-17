@@ -190,9 +190,11 @@ ItemControl::ItemControl (MenuWindow &win, const MenuItem &item_, bool valid_)
 	, valid (valid_)
 {
 	set_cursor_visibility (false);
-	if (valid_)
-		if (wchar_t c = text.get_hotkey ())
+	if (valid_) {
+		if (wchar_t c = text.get_hotkey ()) {
 			win.register_hotkey (c, Signal (this, &ItemControl::slot_trigger));
+		}
+	}
 }
 
 ItemControl::~ItemControl ()
@@ -343,8 +345,9 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	move_resize (pos, size);
 	// Position controls
 	size = make_size (size.x-1, 1); // Control size
-	for (size_t i=0; i<actual_size; ++i)
+	for (size_t i=0; i<actual_size; ++i) {
 		ctrls[i]->move_resize (make_size (1, i+1), make_size (size.x-1, 1));
+	}
 	delete [] ctrls;
 	MenuWindow::redraw ();
 }
@@ -353,8 +356,9 @@ MenuWindow::~MenuWindow ()
 {
 	// Delete objects new'd in ctor
 	const Window::ControlList &lst = get_control_list ();
-	for (Window::ControlList::const_iterator it = lst.begin (); it != lst.end (); ++it)
+	for (Window::ControlList::const_iterator it = lst.begin (); it != lst.end (); ++it) {
 		delete dynamic_cast <ItemControl *>(*it);
+	}
 }
 
 bool MenuWindow::on_key (wchar_t c)

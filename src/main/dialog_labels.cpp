@@ -162,8 +162,9 @@ bool edit_labels (WStringLocaleOrderedSet &labels, const std::vector<DiaryEntry 
 {
 	WStringLocaleOrderedSet old_labels = labels;
 	WStringLocaleOrderedSet all_labels; // The union of all label lists
-	for (std::vector<DiaryEntry *>::const_iterator it = entries.begin (); it != entries.end (); ++it)
+	for (std::vector<DiaryEntry *>::const_iterator it = entries.begin (); it != entries.end (); ++it) {
 		all_labels.insert ((*it)->labels.begin (), (*it)->labels.end ());
+	}
 	WindowLabels (labels, all_labels).event_loop ();
 	return (labels != old_labels);
 }

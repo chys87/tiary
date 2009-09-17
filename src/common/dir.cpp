@@ -81,8 +81,9 @@ std::string get_home_dir (const char *user)
 			result = data->pw_dir;
 		}
 	}
-	if (result == 0 || *result != '/')
+	if (result == 0 || *result != '/') {
 		result = "/";
+	}
 	return result;
 }
 
@@ -199,8 +200,9 @@ std::basic_string<ChT> home_fold_pathname_impl (const std::basic_string<ChT> &na
 	size_t homelen = homedir.length ();
 	if (fullname.length () >= homelen) {
 		if (fullname.length() == homelen || c(fullname)[homelen] == ChT('/')) {
-			if (fullname.compare (0, homelen, homedir) == 0)
+			if (fullname.compare (0, homelen, homedir) == 0) {
 				fullname.replace (0, homelen, 1, ChT('~'));
+			}
 		}
 	}
 	return fullname;

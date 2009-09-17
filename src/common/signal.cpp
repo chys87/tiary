@@ -40,8 +40,9 @@ SignalGroup::~SignalGroup ()
 
 void SignalGroup::emit ()
 {
-	for (std::list<Signal>::iterator it = obj.begin ();  it != obj.end (); ++it)
+	for (std::list<Signal>::iterator it = obj.begin ();  it != obj.end (); ++it) {
 		it->emit ();
+	}
 }
 
 SignalGroup *SignalGroup::copy () const
@@ -59,13 +60,16 @@ Signal::~Signal ()
 bool Signal::is_really_connected () const
 {
 	detail::SignalBase *p = info;
-	while (detail::SignalRecursive *rec = dynamic_cast <detail::SignalRecursive *> (p))
+	while (detail::SignalRecursive *rec = dynamic_cast <detail::SignalRecursive *> (p)) {
 		p = rec->obj.info;
+	}
 	if (detail::SignalGroup *grp = dynamic_cast <detail::SignalGroup *> (p)) {
 		for (std::list<Signal>::const_iterator it = grp->obj.begin ();
-				it != grp->obj.end (); ++it)
-			if (it->is_really_connected ())
+				it != grp->obj.end (); ++it) {
+			if (it->is_really_connected ()) {
 				return true;
+			}
+		}
 		return false;
 	}
 	return p;
