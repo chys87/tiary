@@ -45,15 +45,17 @@ Menu &MenuBar::add (const std::wstring &text)
 	Item &item = item_list.back ();
 	item.text.set_text (text);
 	size_t n = item_list.size ();
-	if (n == 1)
+	if (n == 1) {
 		item.w = 0;
+	}
 	else {
 		ItemList::const_reverse_iterator it = item_list.rbegin ();
 		++it;
 		item.w = it->w + it->text.get_width () + 2 /* Space */;
 	}
-	if (wchar_t c = item.text.get_hotkey ())
+	if (wchar_t c = item.text.get_hotkey ()) {
 		win.register_hotkey (c, Signal (this, &MenuBar::slot_clicked, n-1));
+	}
 
 	return item.menu;
 }
@@ -85,8 +87,9 @@ void MenuBar::redraw ()
 {
 	choose_palette (PALETTE_ID_MENUBAR);
 	clear ();
-	for (ItemList::iterator it=item_list.begin(); it!=item_list.end(); ++it)
+	for (ItemList::iterator it=item_list.begin(); it!=item_list.end(); ++it) {
 		it->text.output (*this, make_size (it->w, 0), it->text.get_width ());
+	}
 }
 
 void MenuBar::slot_clicked (size_t k)
@@ -124,14 +127,18 @@ void MenuBar::slot_clicked (size_t k)
 		wchar_t c = win.get_noblock (&me_buf);
 		if (c == LEFT) {
 			k = (k + item_list.size () - 1) % item_list.size ();
-		} else if (c == RIGHT) {
+		}
+		else if (c == RIGHT) {
 			k = (k + 1) % item_list.size ();
-		} else {
+		}
+		else {
 			if (c) {
-				if (c == MOUSE)
+				if (c == MOUSE) {
 					win.unget (me_buf);
-				else
+				}
+				else {
 					win.unget (c);
+				}
 			}
 			break;
 		}

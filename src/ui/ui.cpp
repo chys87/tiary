@@ -31,9 +31,11 @@ bool is_mouse_supported = false;
 void init_color_pairs ()
 {
 	use_default_colors ();
-	for (unsigned back=0; back<8; ++back)
-		for (unsigned fore=0; fore<8; ++fore)
+	for (unsigned back=0; back<8; ++back) {
+		for (unsigned fore=0; fore<8; ++fore) {
 			init_pair (internal_color_pair (fore, back), fore, back ? int/*Supress warning*/(back) : -1);
+		}
+	}
 }
 
 } // anonymous namespace
@@ -51,11 +53,16 @@ bool init ()
 		nonl ();
 		keypad (stdscr, TRUE);
 		intrflush (stdscr, FALSE);
+
+#ifdef TIARY_HAVE_ESCDELAY
 		// ESCDELAY is an undocumented feature
 		// The default value set in ncurses is way too long
 		// VIM uses 25 milliseconds
-		if (getenv ("ESCDELAY") == 0)
+		if (getenv ("ESCDELAY") == 0) {
 			ESCDELAY = 50;
+		}
+#endif
+
 		start_color ();
 		init_color_pairs ();
 		set_palettes ();
@@ -135,16 +142,19 @@ Palettes palette_table;
 
 void set_palette (PaletteID id, ColorAttr attr)
 {
-	if (id < NUMBER_PALETTES)
+	if (id < NUMBER_PALETTES) {
 		palette_table[id] = attr;
+	}
 }
 
 ColorAttr get_palette (PaletteID id)
 {
-	if (id < NUMBER_PALETTES)
+	if (id < NUMBER_PALETTES) {
 		return palette_table[id];
-	else
+	}
+	else {
 		return ColorAttr::make_default ();
+	}
 }
 
 

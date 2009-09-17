@@ -123,12 +123,14 @@ Format::operator std::wstring () const
 	const wchar_t *p_scan = format;
 	while (const wchar_t *percentage = wcschr (p_scan, L'%')) {
 		wchar_t next = percentage[1];
-		if (next == L'\0')
+		if (next == L'\0') {
 			break;
+		}
 		else if (next == L'%') {
 			ret.append (p_scan, percentage+1);
 			p_scan = percentage + 2;
-		} else {
+		}
+		else {
 			ret.append (p_scan, percentage);
 			p_scan = percentage+1;
 
@@ -138,23 +140,28 @@ Format::operator std::wstring () const
 			if (next == L'-') {
 				opts |= OPTS_LEFT_ALIGN;
 				++p_scan;
-			} else if (next == L'0') {
+			}
+			else if (next == L'0') {
 				opts |= OPTS_FILL_ZERO;
 				++p_scan;
 			}
 			unsigned wid = 0;
-			while (unsigned (*p_scan - L'0') < 10)
+			while (unsigned (*p_scan - L'0') < 10) {
 				wid = wid * 10 + unsigned (*p_scan++ - L'0');
+			}
 			unsigned id = *p_scan++ - L'a';
 			if (id < nargs) {
 				unsigned scrwid = 0;
-				if (wid)
+				if (wid) {
 					scrwid = ucs_width (args.data () + offset[id], offset[id+1] - offset[id]);
-				if (!(opts&OPTS_LEFT_ALIGN) && wid>scrwid)
+				}
+				if (!(opts&OPTS_LEFT_ALIGN) && wid>scrwid) {
 					ret.append (wid - scrwid, (opts&OPTS_FILL_ZERO) ? L'0' : L' ');
+				}
 				ret.append (args.data() + offset[id], offset[id+1] - offset[id]);
-				if ((opts&OPTS_LEFT_ALIGN) && wid>scrwid)
+				if ((opts&OPTS_LEFT_ALIGN) && wid>scrwid) {
 					ret.append (wid - scrwid, (opts&OPTS_FILL_ZERO) ? L'0' : L' ');
+				}
 			}
 		}
 	}

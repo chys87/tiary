@@ -118,12 +118,14 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 	for (FilterGroup::const_iterator it = result_.begin (); it != result_.end (); ++it) {
 		if (FilterByLabel *filter_lbl = dynamic_cast <FilterByLabel *> (*it)) {
 			txt_label.set_text (filter_lbl->label, false, filter_lbl->label.length ());
-		} else if (FilterByTitle *filter_title = dynamic_cast <FilterByTitle *> (*it)) {
+		}
+		else if (FilterByTitle *filter_title = dynamic_cast <FilterByTitle *> (*it)) {
 			txt_title.set_text (filter_title->get_pattern (), false, filter_title->get_pattern ().length ());
 #ifdef TIARY_USE_PCRE
 			chk_title_regex.checkbox.set_status (filter_title->get_use_regex ());
 #endif
-		} else if (FilterByText *filter_text = dynamic_cast <FilterByText *> (*it)) {
+		}
+		else if (FilterByText *filter_text = dynamic_cast <FilterByText *> (*it)) {
 			txt_text.set_text (filter_text->get_pattern (), false, filter_text->get_pattern ().length ());
 #ifdef TIARY_USE_PCRE
 			chk_text_regex.checkbox.set_status (filter_text->get_use_regex ());
@@ -194,7 +196,8 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 #ifdef TIARY_USE_PCRE
 		(chk_text_regex.checkbox)
 #endif
-		(btn_ok);
+		(btn_ok)
+		;
 	ChainControlsHorizontal () (txt_label) (btn_label);
 	ChainControlsHorizontal () (btn_ok) (btn_cancel);
 
@@ -289,8 +292,9 @@ void DialogFilter::slot_choose_label ()
 void dialog_filter (const DiaryEntryList &entries, FilterGroup &filter)
 {
 	DiaryEntry::LabelList all_labels;
-	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it)
+	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {
 		all_labels.insert ((*it)->labels.begin (), (*it)->labels.end ());
+	}
 	DialogFilter (all_labels, filter).event_loop ();
 }
 

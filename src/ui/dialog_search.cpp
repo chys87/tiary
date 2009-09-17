@@ -87,7 +87,9 @@ WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 #endif
 	btn_ok.move_resize (make_size (28, 3), make_size (10, 3));
 
-	ChainControlsVertical () (box_input) (chk_backward.checkbox)
+	ChainControlsVertical ()
+		(box_input)
+		(chk_backward.checkbox)
 #ifdef TIARY_USE_PCRE
 		(chk_regex.checkbox)
 #endif

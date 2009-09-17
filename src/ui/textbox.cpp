@@ -91,8 +91,9 @@ bool TextBox::on_key (wchar_t key)
 
 bool TextBox::on_mouse (MouseEvent mouse_event)
 {
-	if ((mouse_event.m & (LEFT_CLICK | LEFT_PRESS)) == 0)
+	if ((mouse_event.m & (LEFT_CLICK | LEFT_PRESS)) == 0) {
 		return false;
+	}
 	Scroll::modify_focus_pos (mouse_event.p.x);
 	move_cursor (make_size (Scroll::get_info ().focus_pos, 0));
 	return true;
@@ -102,8 +103,9 @@ void TextBox::move_resize (Size new_pos, Size new_size)
 {
 	unsigned old_width = get_size ().x;
 	Control::move_resize (new_pos, new_size);
-	if (old_width != new_size.x)
+	if (old_width != new_size.x) {
 		Scroll::modify_width (new_size.x);
+	}
 }
 
 void TextBox::redraw ()
@@ -111,20 +113,24 @@ void TextBox::redraw ()
 	choose_palette (is_focus () ? PALETTE_ID_TEXTBOX_FOCUS : PALETTE_ID_TEXTBOX);
 	clear ();
 	Scroll::Info scroll_info = Scroll::get_info ();
-	if (attributes & PASSWORD_BOX)
+	if (attributes & PASSWORD_BOX) {
 		fill (make_size (), make_size(scroll_info.len,1), L'*');
-	else
+	}
+	else {
 		put (make_size (), text.data() + scroll_info.first, scroll_info.len);
+	}
 	move_cursor (make_size (scroll_info.focus_pos, 0));
 }
 
 unsigned TextBox::get_item_screen_size (unsigned j) const
 {
 	assert (j < text.length ());
-	if (attributes & PASSWORD_BOX)
+	if (attributes & PASSWORD_BOX) {
 		return 1;
-	else
+	}
+	else {
 		return ucs_width (text[j]);
+	}
 }
 
 void TextBox::set_text (const std::wstring &s, bool emit_sig_changed)
@@ -134,15 +140,18 @@ void TextBox::set_text (const std::wstring &s, bool emit_sig_changed)
 
 void TextBox::set_text (const std::wstring &s, bool emit_sig_changed, unsigned new_cursor_pos)
 {
-	if (text == s)
+	if (text == s) {
 		return;
+	}
 	text = s;
 	Scroll::modify_number (s.length ());
 	new_cursor_pos = minU (new_cursor_pos, s.length ());
-	if (new_cursor_pos != Scroll::get_focus ())
+	if (new_cursor_pos != Scroll::get_focus ()) {
 		Scroll::modify_focus (new_cursor_pos);
-	if (emit_sig_changed)
+	}
+	if (emit_sig_changed) {
 		sig_changed.emit ();
+	}
 	TextBox::redraw ();
 }
 

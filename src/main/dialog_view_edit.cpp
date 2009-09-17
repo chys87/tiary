@@ -102,8 +102,9 @@ void reformat_content (std::wstring &title, std::wstring &text, const char *s)
 		return;
 	}
 	s = firstnewline;
-	if (*s == '\n')
+	if (*s == '\n') {
 		++s;
+	}
 
 	text = mbs_to_wstring (s);
 	std::wstring::iterator iw = text.begin ();
@@ -113,26 +114,32 @@ void reformat_content (std::wstring &title, std::wstring &text, const char *s)
 	while (ir != end) {
 		cur = *ir++;
 		if (cur == L'\n' && (ir == end || (*ir != L' ' && *ir != L'\t'))) {
-			if (ir == end) // Drop newlines at the end
+			if (ir == end) { // Drop newlines at the end
 				break;
+			}
 			if (*ir == L'\n') {
 				// More than one contiguous newlines
 				int n = 1;
-				do
+				do {
 					++n;
-				while (++ir!=end && *ir == L'\n');
-				if (ir == end) // Drop newlines at the end
+				} while (++ir!=end && *ir == L'\n');
+				if (ir == end) { // Drop newlines at the end
 					break;
+				}
 				std::fill_n (iw, n, L'\n');
 				iw += n;
-			} else {
+			}
+			else {
 				// A single newline character.
 				// Drop it or replace it with a space character
-				if (iswgraph (last) && !ucs_iscjk (last) && iswgraph (*ir) && !ucs_iscjk (*ir))
+				if (iswgraph (last) && !ucs_iscjk (last) && iswgraph (*ir) && !ucs_iscjk (*ir)) {
 					*iw++ = L' ';
+				}
 			}
-		} else
+		}
+		else {
 			*iw++ = cur;
+		}
 		last = cur;
 	}
 	text.erase (iw, text.end ());
@@ -152,13 +159,15 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	// Then invoke an editor
 	char temp_file[] = "/tmp/tiary.temp.XXXXXXXXX";
 	int fd = mkstemp (temp_file);
-	if (fd < 0)
+	if (fd < 0) {
 		return error_false (L"Failed to create a temporary file in /tmp.");
+	}
 	fchmod (fd, S_IRUSR|S_IWUSR);
 #if defined F_GETFD && defined F_SETFD && defined FD_CLOEXEC
 	int fdflag = fcntl (fd, F_GETFD);
-	if (fdflag >= 0)
+	if (fdflag >= 0) {
 		fcntl (fd, F_SETFD, fdflag|FD_CLOEXEC);
+	}
 #endif
 
 	// There is no universal method to notify the editor of the encoding;
@@ -238,8 +247,9 @@ void view_all_entries (const DiaryEntryList &entries, const std::wstring &longti
 	DiaryEntryList::const_iterator it = entries.begin ();
 	for (;;) {
 		write_for_view (text_list, **it, longtime_format);
-		if (++it == entries.end ())
+		if (++it == entries.end ()) {
 			break;
+		}
 		text_list.insert (text_list.end (),
 				4, ui::RichTextLine (ui::PALETTE_ID_SHOW_NORMAL, std::wstring ()));
 	}

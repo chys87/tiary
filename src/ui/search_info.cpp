@@ -39,12 +39,14 @@ bool SearchInfo::dialog (bool default_backward)
 
 	ui::dialog_search (new_pattern, new_backward, new_regex,
 			get_pattern (), default_backward, get_use_regex ());
-	if (new_pattern.empty ())
+	if (new_pattern.empty ()) {
 		return false;
+	}
 	if (StringMatch::assign (new_pattern, new_regex)) {
 		backward = new_backward;
 		return true;
-	} else {
+	}
+	else {
 		dialog_message (L"Invalid regular expression", L"Error");
 		return false;
 	}

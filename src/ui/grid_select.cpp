@@ -44,8 +44,9 @@ void GridSelect::set_grid (unsigned grid_width, unsigned grid_cols,
 	items = grid_items;
 	items.resize (grid_cols * grid_rows);
 	select = size_t (-1);
-	if (new_select<items.size() && items[new_select].selectable)
+	if (new_select<items.size() && items[new_select].selectable) {
 		select = new_select;
+	}
 	GridSelect::redraw ();
 }
 
@@ -54,15 +55,17 @@ void GridSelect::set_select (size_t new_select, bool emit_signal)
 	if (new_select<items.size() && items[new_select].selectable) {
 		if (new_select != select) {
 			select = new_select;
-			if (emit_signal)
+			if (emit_signal) {
 				sig_select_changed.emit ();
+			}
 			GridSelect::redraw ();
 		}
 	} else {
 		if (select < items.size ()) {
 			select = size_t (-1);
-			if (emit_signal)
+			if (emit_signal) {
 				sig_select_changed.emit ();
+			}
 			GridSelect::redraw ();
 		}
 	}
@@ -80,8 +83,9 @@ void GridSelect::redraw ()
 			unsigned i = y * cols + x;
 			const Item &item = items[i];
 			PaletteID id = PALETTE_ID_GRID;
-			if (!item.selectable)
+			if (!item.selectable) {
 				id = PALETTE_ID_GRID_INVALID;
+			}
 			else if (i == select) {
 				move_cursor (pos);
 				id = PALETTE_ID_GRID_SELECT;
@@ -100,24 +104,30 @@ size_t get_next_by_direction (unsigned id, unsigned cols,
 	unsigned N = rows*cols;
 	switch (direction) {
 		case LEFT:
-			if (int (--id) < 0)
+			if (int (--id) < 0) {
 				id = N - 1;
+			}
 			break;
 		case RIGHT:
-			if (++id >= N)
+			if (++id >= N) {
 				id = 0;
+			}
 			break;
 		case UP:
-			if (id == 0)
+			if (id == 0) {
 				id = N - 1;
-			else if (int (id -= cols) < 0)
+			}
+			else if (int (id -= cols) < 0) {
 				id += N - 1;
+			}
 			break;
 		case DOWN:
-			if (id >= N - 1)
+			if (id >= N - 1) {
 				id = 0;
-			else if ((id += cols) >= N)
+			}
+			else if ((id += cols) >= N) {
 				id = id - N + 1;
+			}
 			break;
 	}
 	return id;
@@ -128,14 +138,19 @@ size_t select_direction (unsigned current_id, unsigned cols, unsigned rows,
 {
 	unsigned id = current_id;
 	if (id >= items.size ()) {
-		if (direction==UP || direction==LEFT)
+		if (direction==UP || direction==LEFT) {
 			id = items.size() - 1;
-		else
+		}
+		else {
 			id = 0;
-	} else
+		}
+	}
+	else {
 		id = get_next_by_direction (id, cols, rows, direction);
-	while ((id != current_id) && !items[id].selectable)
+	}
+	while ((id != current_id) && !items[id].selectable) {
 		id = get_next_by_direction (id, cols, rows, direction);
+	}
 	return id;
 }
 
@@ -143,8 +158,9 @@ size_t select_direction (unsigned current_id, unsigned cols, unsigned rows,
 
 bool GridSelect::on_key (wchar_t key)
 {
-	if (items.empty ())
+	if (items.empty ()) {
 		return false;
+	}
 	unsigned new_select;
 	switch (key) {
 		case LEFT:
@@ -178,19 +194,24 @@ bool GridSelect::on_key (wchar_t key)
 
 bool GridSelect::on_mouse (MouseEvent mouse_event)
 {
-	if (!(mouse_event.m & (LEFT_CLICK|LEFT_DCLICK)))
+	if (!(mouse_event.m & (LEFT_CLICK|LEFT_DCLICK))) {
 		return false;
+	}
 	unsigned click_row = mouse_event.p.y;
 	unsigned click_col = mouse_event.p.x / grid_width;
-	if (click_row>=rows || click_col>=cols)
+	if (click_row>=rows || click_col>=cols) {
 		return false;
+	}
 	unsigned id = click_row * cols + click_col;
-	if (!items[id].selectable)
+	if (!items[id].selectable) {
 		return false;
-	if (id != select)
+	}
+	if (id != select) {
 		set_select (id, true);
-	if (mouse_event.m & LEFT_CLICK)
+	}
+	if (mouse_event.m & LEFT_CLICK) {
 		sig_double_clicked.emit ();
+	}
 	return true;
 }
 

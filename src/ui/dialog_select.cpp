@@ -69,8 +69,9 @@ DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::w
 {
 	lst_items.set_items (items, pre_select, false);
 
-	for (std::vector <std::wstring>::const_iterator it = items.begin (); it != items.end (); ++it)
+	for (std::vector <std::wstring>::const_iterator it = items.begin (); it != items.end (); ++it) {
 		max_text_width = maxU (max_text_width, ucs_width (*it));
+	}
 
 	layout_buttons.add
 		(btn_ok, 10, 10)
@@ -128,8 +129,9 @@ size_t dialog_select (const std::wstring &title,
 		const std::vector <std::wstring> &selections,
 		size_t pre_select)
 {
-	if (selections.empty ())
+	if (selections.empty ()) {
 		return size_t (-1);
+	}
 	DialogSelect win (title, selections, pre_select);
 	win.event_loop ();
 	return win.get_result ();

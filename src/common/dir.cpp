@@ -46,11 +46,13 @@ std::string get_home_dir_base ()
 {
 	const char *result = getenv ("HOME");
 	if (result == 0 || *result != '/') {
-		if (struct passwd *data = getpwuid (getuid ()))
+		if (struct passwd *data = getpwuid (getuid ())) {
 			result = data->pw_dir;
+		}
 	}
-	if (result == 0 || *result != '/')
+	if (result == 0 || *result != '/') {
 		result = "/";
+	}
 	return result;
 }
 
@@ -71,11 +73,13 @@ template <> const std::basic_string<wchar_t> &get_home_dir <wchar_t> ()
 std::string get_home_dir (const char *user)
 {
 	const char *result = 0;
-	if (!user || !*user)
+	if (!user || !*user) {
 		result = get_home_dir <char> ().c_str ();
+	}
 	else {
-		if (struct passwd *data = getpwnam (user))
+		if (struct passwd *data = getpwnam (user)) {
 			result = data->pw_dir;
+		}
 	}
 	if (result == 0 || *result != '/')
 		result = "/";
@@ -101,8 +105,9 @@ std::string make_home_dirname (const char *file)
 {
 	std::string ret = get_home_dir <char> ();
 	if (file) {
-		if (file[0] != '/')
+		if (file[0] != '/') {
 			ret += '/';
+		}
 		ret += file;
 	}
 	return ret;
@@ -112,8 +117,9 @@ std::wstring make_home_dirname (const wchar_t *file)
 {
 	std::wstring ret = get_home_dir <wchar_t> ();
 	if (file) {
-		if (file[0] != L'/')
+		if (file[0] != L'/') {
 			ret += L'/';
+		}
 		ret += file;
 	}
 	return ret;
@@ -127,14 +133,17 @@ template <> std::basic_string<char> get_current_dir <char> ()
 		std::string r = dir;
 		free (dir);
 		return r;
-	} else
+	} else {
 		return std::string ();
+	}
 #else
 	char buffer[PATH_MAX];
-	if (getcwd (buffer, sizeof buffer) == buffer)
+	if (getcwd (buffer, sizeof buffer) == buffer) {
 		return buffer;
-	else
+	}
+	else {
 		return std::string ();
+	}
 #endif
 }
 
@@ -155,19 +164,22 @@ std::wstring get_full_pathname (const std::wstring &name)
 	for (std::list <std::wstring>::iterator it = splitted.begin (); it != splitted.end (); ) {
 		if (*it == L".") {
 			it = splitted.erase (it);
-		} else if (*it == L"..") {
+		}
+		else if (*it == L"..") {
 			if (it != splitted.begin ()) {
 				--it;
 				it = splitted.erase (it);
 			}
 			it = splitted.erase (it);
-		} else {
+		}
+		else {
 			++it;
 		}
 	}
 
-	if (splitted.empty ())
+	if (splitted.empty ()) {
 		splitted.push_back (std::wstring ());
+	}
 
 	std::wstring ret;
 	for (std::list <std::wstring>::const_iterator it = splitted.begin (); it != splitted.end (); ++it) {
@@ -264,8 +276,9 @@ std::wstring get_nice_pathname (const std::wstring &name)
 			c(fullname).begin (), c(fullname).end (),
 			curdir.c_str () // Not to be replaced by begin() (Not all implementations always maintain a null at the end!)
 			).first;
-	while (*(ox_it-1) != L'/')
+	while (*(ox_it-1) != L'/') {
 		--ox_it;
+	}
 	ox = ox_it - c(fullname).begin ();
 
 	y = std::count (c(curdir).begin () + ox, c(curdir).end (), L'/');
@@ -285,15 +298,16 @@ std::wstring get_nice_pathname (const std::wstring &name)
 		}
 	}
 	fullname.resize (fullname.length () - 1);
-	if (homefold.length () < fullname.length ())
+	if (homefold.length () < fullname.length ()) {
 		fullname.swap (homefold);
+	}
 	return fullname;
 }
 
 unsigned get_file_attr (const char *name)
 {
 	struct stat st_buf;
-	if (stat (name, &st_buf) == 0)
+	if (stat (name, &st_buf) == 0) {
 		return
 #ifdef S_ISDIR
 			S_ISDIR(st_buf.st_mode)
@@ -303,8 +317,10 @@ unsigned get_file_attr (const char *name)
 # error "Neither S_ISDIR nor S_IFDIR is defined???"
 #endif
 			? FILE_ATTR_DIRECTORY : 0;
-	else
+	}
+	else {
 		return FILE_ATTR_NONEXIST;
+	}
 }
 
 unsigned get_file_attr (const wchar_t *name)
@@ -312,24 +328,34 @@ unsigned get_file_attr (const wchar_t *name)
 	return get_file_attr (wstring_to_mbs (name).c_str ());
 }
 
-inline
-std::wstring optional_canonicalize (const std::wstring &name, size_t len, bool canonicalize)
-{
-	std::wstring tmp (name, 0, len);
-	if (canonicalize)
-		tmp = get_full_pathname (tmp);
-	return tmp;
-}
-
 std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &name, bool canonicalize)
 {
 	std::wstring::size_type last_split = name.rfind (L'/');
-	return std::pair<std::wstring,std::wstring> (
-			last_split == std::wstring::npos ?
-				(canonicalize ? get_current_dir<wchar_t> () : std::wstring(1, L'.')) :
-				optional_canonicalize (name, last_split ? last_split : 1, canonicalize),
-			std::wstring (name, last_split+1) // Standard guarantees npos == -1
-		);
+
+	// If a backslash exists in name, this is true;
+	// If not, last_split = npos = -1, this is also true;
+	std::wstring basename (name, last_split + 1);
+
+	std::wstring dirname;
+	if (last_split == std::wstring::npos) { // No backslash exist in name
+		if (canonicalize) {
+			dirname = get_current_dir <wchar_t> ();
+		}
+		else {
+			dirname.assign (1, L'.');
+		}
+	}
+	else {
+		if (last_split == 0) { // Dirname is root
+			++last_split;
+		}
+		dirname.assign (name, 0, last_split);
+		if (canonicalize) {
+			dirname = get_full_pathname (dirname);
+		}
+	}
+
+	return std::pair<std::wstring,std::wstring> (dirname, basename);
 }
 
 std::wstring combine_pathname (const std::wstring &path, const std::wstring &basename)
@@ -337,8 +363,9 @@ std::wstring combine_pathname (const std::wstring &path, const std::wstring &bas
 	std::wstring ret;
 	if (path.length() != 1 || path[0] != L'.') {
 		ret = path;
-		if (ret.empty() || *c(ret).rbegin()!=L'/')
+		if (ret.empty() || *c(ret).rbegin()!=L'/') {
 			ret += L'/';
+		}
 	}
 	ret += basename;
 	return ret;
@@ -350,8 +377,9 @@ std::wstring combine_pathname (const std::wstring &path, const std::wstring &bas
 bool DirEnt::DefaultComparator::operator () (const DirEnt &a, const DirEnt &b) const
 {
 	// Directory < Non-directory
-	if ((a.attr ^ b.attr) & FILE_ATTR_DIRECTORY)
+	if ((a.attr ^ b.attr) & FILE_ATTR_DIRECTORY) {
 		return (a.attr & FILE_ATTR_DIRECTORY);
+	}
 	// Otherwise, compare name
 	return loc (a.name, b.name);
 }
@@ -375,8 +403,9 @@ DirEntList list_dir (
 #ifdef TIARY_HAVE_AT_FILE
 		int dirfd = ::dirfd (dir);
 #else
-		if (*c(dirname).rbegin() != '/')
+		if (*c(dirname).rbegin() != '/') {
 			dirname += '/';
+		}
 #endif
 		while (struct dirent *ent = readdir (dir)) {
 			tmp_ent.name = mbs_to_wstring (ent->d_name);
@@ -394,10 +423,13 @@ DirEntList list_dir (
 #else
 # error "Neither S_ISDIR nor S_IFDIR is defined??"
 #endif
+				{
 					tmp_ent.attr = FILE_ATTR_DIRECTORY;
+				}
 			}
-			if (!filter (tmp_ent))
+			if (!filter (tmp_ent)) {
 				filelist.push_back (TIARY_STD_MOVE (tmp_ent));
+			}
 		}
 		closedir (dir);
 		// Sort them
@@ -421,26 +453,33 @@ std::string find_executable (const std::string &exe)
 	std::string result;
 	if (exe.empty ()) {
 		// Empty input. Return empty string
-	} else if (memchr (exe.data (), '/', exe.length ())) {
+	}
+	else if (memchr (exe.data (), '/', exe.length ())) {
 		// exe is a full/relative pathname
-		if (exe[0] == '~')
+		if (exe[0] == '~') {
 			result = home_expand_pathname (exe);
-		else
+		}
+		else {
 			result = exe;
-		if (access (result.c_str (), X_OK) != 0)
+		}
+		if (access (result.c_str (), X_OK) != 0) {
 			result.clear ();
+		}
 	} else if (const char *path = getenv ("PATH")) {
 		// exe is a "bare" filename
 		for (;;) {
 			const char *colon = strchrnul (path, ':');
-			if (path == colon)
+			if (path == colon) {
 				result = '.';
-			else
+			}
+			else {
 				result.assign (path, colon);
+			}
 			result += '/';
 			result += exe;
-			if (access (result.c_str (), X_OK) == 0)
+			if (access (result.c_str (), X_OK) == 0) {
 				break;
+			}
 			if (*colon != ':') {
 				result.clear ();
 				break;

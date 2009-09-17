@@ -43,8 +43,9 @@ void RichText::redraw ()
 {
 	unsigned wid = get_size ().x - 1;
 	unsigned hgt = get_size ().y - 1;
-	if (int (wid) < 0 || int (hgt) < 0)
+	if (int (wid) < 0 || int (hgt) < 0) {
 		return;
+	}
 	HighlightList *hllst = highlight_list.get ();
 	unsigned show_lines = minU (hgt, line_list.size () - top_line);
 
@@ -65,7 +66,8 @@ void RichText::redraw ()
 				offset = it->first + it->second;
 			}
 			pos = put (pos, text.data()+offset);
-		} else {
+		}
+		else {
 			// Nothing to highlight
 			put (pos, text);
 		}
@@ -91,8 +93,9 @@ void RichText::redraw ()
 bool RichText::on_mouse (MouseEvent mouse_event)
 {
 	if (!(mouse_event.m & (LEFT_CLICK|LEFT_PRESS|LEFT_DCLICK)) ||
-			(mouse_event.p.x+1 < get_size().x))
+			(mouse_event.p.x+1 < get_size().x)) {
 		return false;
+	}
 	top_line = mouse_event.p.y * line_list.size () / (get_size ().y - 1);
 	RichText::redraw ();
 	return true;
@@ -179,18 +182,21 @@ void RichText::slot_search (bool bkwd)
 		bkwd = search_info.get_backward ();
 		HighlightList *hllst = new HighlightList (line_list.size ());
 		highlight_list.reset (hllst);
-		for (size_t i=0, n=line_list.size(); i<n; ++i)
+		for (size_t i=0, n=line_list.size(); i<n; ++i) {
 			(*hllst)[i] = search_info.match (line_list[i].text);
+		}
 		do_search (false, true);
 	}
 }
 
 void RichText::slot_search_continue (bool previous)
 {
-	if (!search_info)
+	if (!search_info) {
 		slot_search (previous);
-	else
+	}
+	else {
 		do_search (previous, false);
+	}
 }
 
 void RichText::do_search (bool previous, bool include_current)
@@ -199,8 +205,9 @@ void RichText::do_search (bool previous, bool include_current)
 	unsigned num_ents = line_list.size ();
 	int inc = (!previous == !search_info.get_backward ()) ? 1 : -1;
 	HighlightList *hllst = highlight_list.get ();
-	if (!include_current)
+	if (!include_current) {
 		k += inc;
+	}
 	for (; k < num_ents; k += inc) {
 		if (!(*hllst)[k].empty ()) {
 			top_line = k;

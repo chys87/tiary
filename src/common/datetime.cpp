@@ -70,25 +70,31 @@ inline unsigned cumul_leap_days (unsigned y) throw ()
 // Checks whether a year is leap; either true/pseudo cal
 bool is_leap_year (unsigned y) throw ()
 {
-	if (y % 4)
+	if (y % 4) {
 		return false;
-	if (!(y%100) && (y/100%4))
+	}
+	if (!(y%100) && (y/100%4)) {
 		return false;
+	}
 	return true;
 }
 
 unsigned day_of_month (unsigned y, unsigned m) throw ()
 {
 	--m;
-	if (m >= 12)
+	if (m >= 12) {
 		return 0;
+	}
 	static const unsigned char mdays [12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-	if (m != 1)
+	if (m != 1) {
 		return mdays[m];
-	else if (is_leap_year (y))
+	}
+	else if (is_leap_year (y)) {
 		return 29;
-	else
+	}
+	else {
 		return 28;
+	}
 }
 
 
@@ -97,16 +103,19 @@ uint32_t make_date_strict (const ReadableDate &rd) throw ()
 	unsigned y = rd.y;
 	unsigned m = rd.m;
 	unsigned d = rd.d;
-	if (m-1>=12 || !y)
+	if (m-1>=12 || !y) {
 		return INVALID_DATE;
+	}
 	if ((int)(m -= 2) <= 0) {
 		m += 12;
 		--y;
 	} // Now y == pseudoyear - 1
-	if (d-1>=(unsigned)(days[m]-days[m-1]))
+	if (d-1>=(unsigned)(days[m]-days[m-1])) {
 		return 0;
-	if (m>=12 && d>=29 && !is_leap_year (y+1))
+	}
+	if (m>=12 && d>=29 && !is_leap_year (y+1)) {
 		return 0;
+	}
 	return (y * 365 + cumul_leap_days (y) + days[m-1] + d - 306);
 }
 
@@ -121,7 +130,8 @@ uint32_t make_date (const ReadableDate &rd) throw ()
 		if (int(m-1) >= 0) {
 			y += (m-1) / 12;
 			m = (m-1) % 12 + 1;
-		} else {
+		}
+		else {
 			y -= unsigned(-m) / 12;
 			m = 12 - unsigned(-m) % 12;
 		}
@@ -145,12 +155,14 @@ uint64_t make_datetime (uint32_t date, uint32_t time)
 
 uint64_t make_datetime_strict (const ReadableDate &rd, const ReadableTime &rt) throw ()
 {
-	if (rt.H>=24 || rt.M>=60 || rt.S>=60)
+	if (rt.H>=24 || rt.M>=60 || rt.S>=60) {
 		return INVALID_DATETIME;
+	}
 	uint32_t time_v = make_time (rt);
 	uint32_t date_v = make_date_strict (rd);
-	if (date_v == INVALID_DATE)
+	if (date_v == INVALID_DATE) {
 		return INVALID_DATETIME;
+	}
 	return make_datetime (date_v, time_v);
 }
 
@@ -207,13 +219,15 @@ ReadableDate extract_date (uint32_t v) throw ()
 	--v; // Starting 0
 	y = v/(365*400+97)*400;
 	v %= 365*400+97; // Now the date is within 400 years
-	if ((tmp = v/(365*100+24)) > 3) // Which century ?
+	if ((tmp = v/(365*100+24)) > 3) { // Which century ?
 		tmp = 3;
+	}
 	v -= tmp*(365*100+24); // Days elapsed since beginning of the century
 	y += tmp*100 + v/(365*4+1)*4;
 	v %= 365*4+1; // Days elapsed since beginning of the 4-year period
-	if ((tmp = v / 365) > 3)
+	if ((tmp = v / 365) > 3) {
 		tmp = 3;
+	}
 	v -= tmp * 365;
 	++v; // Now v = number of day in year; starting 1
 	y += tmp + 1; // +1: Convert to human-extractable year number

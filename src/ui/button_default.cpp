@@ -31,15 +31,17 @@ void ButtonDefault::set_default_button (Button *btn)
 Button *ButtonDefault::get_current_default_button () const
 {
 	Control *focus = Window::get_focus ();
-	if (Button *focus_button = dynamic_cast <Button *> (focus))
+	if (Button *focus_button = dynamic_cast <Button *> (focus)) {
 		return focus_button;
+	}
 	return default_default;
 }
 
 void ButtonDefault::slot_default_button ()
 {
-	if (Button *btn = get_current_default_button ())
+	if (Button *btn = get_current_default_button ()) {
 		btn->sig_clicked.emit ();
+	}
 }
 
 
@@ -62,15 +64,19 @@ void ButtonDefaultExtended::set_special_default_button (Control *focus, Button *
 Button *ButtonDefaultExtended::get_current_default_button () const
 {
 	Control *focus = Window::get_focus ();
-	if (focus == 0)
+	if (focus == 0) {
 		return default_default;
-	if (Button *focus_button = dynamic_cast <Button *> (focus))
+	}
+	if (Button *focus_button = dynamic_cast <Button *> (focus)) {
 		return focus_button;
+	}
 	SpecialMap::const_iterator it = special_map.find (focus);
-	if (it == special_map.end ())
+	if (it == special_map.end ()) {
 		return default_default;
-	else
+	}
+	else {
 		return it->second;
+	}
 }
 
 } // namespace tiary::ui

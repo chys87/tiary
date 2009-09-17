@@ -83,8 +83,9 @@ uint64_t parse_time (const char *s)
 {
 	ReadableDateTime t;
 	// strptime is not in standard C or C++
-	if (sscanf (s, "%u-%u-%u%u:%u:%u", &t.y, &t.m, &t.d, &t.H, &t.M, &t.S) != 6)
+	if (sscanf (s, "%u-%u-%u%u:%u:%u", &t.y, &t.m, &t.d, &t.H, &t.M, &t.S) != 6) {
 		return 0;
+	}
 	return make_datetime_strict (t);
 }
 
@@ -109,74 +110,94 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 	const char *text = 0;
 	DiaryEntry::LabelList labels;
 
-	for (const XMLNode *xptr = entry_node->children; xptr; xptr = xptr->next)
+	for (const XMLNode *xptr = entry_node->children; xptr; xptr = xptr->next) {
 		if (const XMLNodeTree *ptr = dynamic_cast <const XMLNodeTree *>(xptr)) {
 			if (ptr->name == "time") { // <time local="...." utc="...." />
 
-				if (local_time/* | utc_time*/) // More than one <time> tags.
+				if (local_time/* | utc_time*/) { // More than one <time> tags.
 					return 0;
+				}
 
 				const char *local = map_query (ptr->properties, "local");
 //				const char *utc = map_query (ptr->properties, "utc");
-				if (!local/* || !utc*/)
+				if (!local/* || !utc*/) {
 					return 0;
+				}
 
-				if (!(local_time = parse_time (local))/* || !(utc_time = parse_time (utc))*/)
+				if (!(local_time = parse_time (local))/* || !(utc_time = parse_time (utc))*/) {
 					return 0;
+				}
 
-			} else if (ptr->name == "tag" || ptr->name == "label") {
+			}
+			else if (ptr->name == "tag" || ptr->name == "label") {
 				// A "label" used to be called a "tag".
 				// Older formats use "tag" instead of "label"
 
 				const char *name = map_query (ptr->properties, "name");
-				if (!name)
+				if (!name) {
 					return 0;
+				}
 				// Convert name from UTF-8 to UCS-4
 				std::wstring wname = utf8_to_wstring (name);
-				if (wname.empty ()) // Labels cannot be empty
+				if (wname.empty ()) { // Labels cannot be empty
 					return 0;
+				}
 				labels.insert (wname);
 
-			} else if (ptr->name == "title") {
+			}
+			else if (ptr->name == "title") {
 
-				if (title != 0) // More than one <title> tags
+				if (title != 0) { // More than one <title> tags
 					return 0;
+				}
 
-				if (ptr->children == 0) // Empty
+				if (ptr->children == 0) { // Empty
 					title = "";
+				}
 				else if (const XMLNodeText *title_node = dynamic_cast<const XMLNodeText *>(ptr->children)) {
-					if (title_node->next != 0)
+					if (title_node->next != 0) {
 						return 0;
+					}
 					title = title_node->text.c_str ();
 				}
 
-			} else if (ptr->name == "text") {
+			}
+			else if (ptr->name == "text") {
 
-				if (text != 0) // More than one <text> tags
+				if (text != 0) { // More than one <text> tags
 					return 0;
+				}
 
-				if (ptr->children == 0) // Empty
+				if (ptr->children == 0) { // Empty
 					text = "";
+				}
 				else if (const XMLNodeText *text_node = dynamic_cast<const XMLNodeText *>(ptr->children)) {
-					if (text_node->next != 0)
+					if (text_node->next != 0) {
 						return 0;
+					}
 					text = text_node->text.c_str ();
-				} else
+				}
+				else {
 					return 0;
+				}
 
-			} else {
+			}
+			else {
 				// Unknown child tag within <entry>
 				return 0;
 			}
 
-		} else {
+		}
+		else {
 			// Error - wild text directly within <entry>
 			return 0;
 		}
+	}
 
 	// Almost finished! But are we missing any required tags?
-	if (local_time==0 || /*utc_time==0 ||*/ title==0 || text==0)
+	if (local_time==0 || /*utc_time==0 ||*/ title==0 || text==0) {
 		return 0;
+	}
 
 	// Finally successful
 	DiaryEntry *entry = new DiaryEntry;
@@ -196,39 +217,53 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntryList *entries, RecentFileList *recent_files)
 {
 	const XMLNodeTree *root_diary = dynamic_cast<const XMLNodeTree *>(root);
-	if (root_diary == 0)
+	if (root_diary == 0) {
 		return false;
-	if (root_diary->name != "tiary") // Root node must be <tiary>
+	}
+	if (root_diary->name != "tiary") { // Root node must be <tiary>
 		return false;
-	if (entries)
+	}
+	if (entries) {
 		entries->clear ();
-	if (recent_files)
+	}
+	if (recent_files) {
 		recent_files->clear ();
+	}
 	// OK. Now loop thru its children
 	for (const XMLNode *main_childx = root_diary->children; main_childx; main_childx = main_childx->next) {
 		if (const XMLNodeTree *main_child = dynamic_cast <const XMLNodeTree *>(main_childx)) {
 
 			if (main_child->name == "option") { // An option
-				if (const char *option_name = map_query (main_child->properties, "name"))
-					if (const char *option_value = map_query (main_child->properties, "value"))
+				if (const char *option_name = map_query (main_child->properties, "name")) {
+					if (const char *option_value = map_query (main_child->properties, "value")) {
 						opts.set (option_name, option_value);
-			} else if (entries && main_child->name == "entry") {
+					}
+				}
+			}
+			else if (entries && main_child->name == "entry") {
 
 				DiaryEntry *entry = analyze_entry_xml (main_child);
-				if (entry == 0)
+				if (entry == 0) {
 					return false;
+				}
 				entries->push_back (entry);
 				
-			} else if (recent_files && main_child->name == "recent") {
-				if (const char *file_name = map_query (main_child->properties, "file"))
+			}
+			else if (recent_files && main_child->name == "recent") {
+				if (const char *file_name = map_query (main_child->properties, "file")) {
 					if (const char *line_number = map_query (main_child->properties, "line")) {
 						RecentFile item;
 						item.filename = utf8_to_wstring (file_name);
 						item.focus_entry = strtoul (line_number, 0, 10);
 						recent_files->push_back (item);
 					}
-			} // else: Ignored for forward compatibility
-		} else {
+				}
+			}
+			else {
+				// Ignored for forward compatibility
+			}
+		}
+		else {
 			// It must be an error - wild text directly within <tiary>
 			return false;
 		}
@@ -255,11 +290,13 @@ void encrypt (void *dst, const char *src, size_t datalen, const void *pass, size
 		uint8_t xor_byte2[255]; // 255: Not a mistake
 	};
 	MD5 (pass, passlen) (password_salt2, sizeof password_salt2).result (xor_data+30);
-	for (int i=28; i>=0; i-=2)
+	for (int i=28; i>=0; i-=2) {
 		MD5 (xor_data+i+2, (30-i)*8) (password_salt2, sizeof password_salt2).result (xor_data+i);
+	}
 	MD5 (pass, passlen) (password_salt3, sizeof password_salt3).result (xor_data2+30);
-	for (int i=28; i>=0; i-=2)
+	for (int i=28; i>=0; i-=2) {
 		MD5 (xor_data2+i+2, (30-i)*8) (password_salt3, sizeof password_salt3).result (xor_data2+i);
+	}
 
 	// In our program, data should be well-aligned, but it seems there's no guarantee.
 	// Hopefully there will be better solutions.
@@ -268,22 +305,26 @@ void encrypt (void *dst, const char *src, size_t datalen, const void *pass, size
 	const uint8_t *srcbyte = reinterpret_cast<const uint8_t *>(src);
 
 	for (size_t i=0; i<datalen/256; ++i) {
-		for (int j=0; j<256; ++j)
+		for (int j=0; j<256; ++j) {
 			dstbyte[j] = srcbyte[j] ^ xor_byte[j];
+		}
 		dstbyte += 256;
 		srcbyte += 256;
 	}
-	for (size_t i=0; i<datalen%256; ++i)
+	for (size_t i=0; i<datalen%256; ++i) {
 		dstbyte[i] = srcbyte[i] ^ xor_byte[i];
+	}
 
 	dstbyte = reinterpret_cast<uint8_t *>(dst);
 	for (size_t i=0; i<datalen/255; ++i) {
-		for (int j=0; j<255; ++j)
+		for (int j=0; j<255; ++j) {
 			dstbyte[j] ^= xor_byte2[j];
+		}
 		dstbyte += 255;
 	}
-	for (size_t i=0; i<datalen%255; ++i)
+	for (size_t i=0; i<datalen%255; ++i) {
 		dstbyte[i] ^= xor_byte2[i];
+	}
 }
 
 inline void decrypt (void *dst, const char *src, size_t datalen, const void *pass, size_t passlen)
@@ -298,21 +339,25 @@ inline void decrypt (void *dst, const char *src, size_t datalen, const void *pas
 LoadFileRet load_global_options (GlobalOptionGroup &options, RecentFileList &recent_files)
 {
 	FILE *fp = fopen (make_home_dirname (GLOBAL_OPTION_FILE).c_str(), "r");
-	if (fp == NULL)
+	if (fp == 0) {
 		return LOAD_FILE_NOT_FOUND;
+	}
 	std::vector<char> data;
 	bool ret = read_whole_file (fp, data);
 	fclose (fp);
-	if (!ret)
+	if (!ret) {
 		return LOAD_FILE_READ_ERROR;
+	}
 	XMLNode *root = xml_parse (&data[0], data.size ());
 	std::vector<char>().swap(data);
-	if (root == 0)
+	if (root == 0) {
 		return LOAD_FILE_XML;
+	}
 	ret = general_analyze_xml (root, options, 0, &recent_files);
 	xml_free (root);
-	if (!ret)
+	if (!ret) {
 		return LOAD_FILE_CONTENT;
+	}
 	return LOAD_FILE_SUCCESS;
 }
 
@@ -324,21 +369,24 @@ LoadFileRet load_file (
 		std::wstring &password)
 {
 	FILE *fp = fopen (filename, "rb");
-	if (fp == 0)
+	if (fp == 0) {
 		return LOAD_FILE_NOT_FOUND;
+	}
 
 	std::vector<char> everything;
 
 	// Read everything out of file
 	bool bool_ret = read_whole_file (fp, everything);
 	fclose (fp);
-	if (!bool_ret)
+	if (!bool_ret) {
 		return LOAD_FILE_READ_ERROR;
+	}
 
 	// Decompress: everything = bunzip2 (everything)
 	bunzip2 (&everything[0], everything.size ()).swap (everything);
-	if (everything.empty ())
+	if (everything.empty ()) {
 		return LOAD_FILE_BUNZIP2;
+	}
 
 
 	size_t offset = 0; // For efficiency
@@ -348,14 +396,16 @@ LoadFileRet load_file (
 	// Is there a password?
 	if (everything[0] != '<') {
 		// We have a password.
-		if (everything.size () < 32)
+		if (everything.size () < 32) {
 			return LOAD_FILE_CONTENT;
+		}
 
 		uint64_t zerores[] = { 0, 0 };
 
 		// First 16 bytes must be zeroes
-		if (memcmp (&everything[0], zerores, 16) != 0)
+		if (memcmp (&everything[0], zerores, 16) != 0) {
 			return LOAD_FILE_CONTENT;
+		}
 
 		// Second 16 bytes: MD5(filename + salt1)
 		password = enter_password ();
@@ -375,13 +425,15 @@ LoadFileRet load_file (
 
 	// Parse XML
 	XMLNode *root = xml_parse (&everything[offset], everything.size() - offset);
-	if (root == 0)
+	if (root == 0) {
 		return LOAD_FILE_XML;
+	}
 	options.reset ();
 	bool_ret = general_analyze_xml (root, options, &entries, 0);
 	xml_free (root);
-	if (!bool_ret)
+	if (!bool_ret) {
 		return LOAD_FILE_CONTENT;
+	}
 	return LOAD_FILE_SUCCESS;
 }
 
@@ -396,8 +448,9 @@ XMLNodeTree *make_xml_tree_from_options (const OptionGroupBase &opts, const Opti
 	for (OptionGroupBase::const_iterator it=opts.begin (); it!=opts.end(); ++it) {
 		// If the option is the same as default, do not save it
 
-		if (default_options.get (it->first) == it->second)
+		if (default_options.get (it->first) == it->second) {
 			continue;
+		}
 
 		// For readability, insert "\n\t" before each option
 		p = p->next = new XMLNodeText ("\n\t");
@@ -428,18 +481,21 @@ bool save_global_options (const GlobalOptionGroup &options, const RecentFileList
 	// Find the last child of root node <tiary>
 	XMLNode *ptr = root->children;
 	// ptr is never null. Let's loop until we find the last entry
-	while (ptr->next)
+	while (ptr->next) {
 		ptr = ptr->next;
+	}
 
 	// Loop thru recent files
 	for (RecentFileList::const_iterator it = recent_files.begin (); it != recent_files.end (); ++it) {
 		// Insert a text node "\n\t" before each <recent>
 		// At the first loop, ptr should point to a text node "\n"
 		// Change that!
-		if (XMLNodeText *text_node = dynamic_cast <XMLNodeText *>(ptr))
+		if (XMLNodeText *text_node = dynamic_cast <XMLNodeText *>(ptr)) {
 			text_node->text = "\n\t";
-		else
+		}
+		else {
 			ptr = ptr->next = new XMLNodeText ("\n\t");
+		}
 
 		XMLNodeTree *recent_node = new XMLNodeTree ("recent");
 		ptr = ptr->next = recent_node;
@@ -447,8 +503,9 @@ bool save_global_options (const GlobalOptionGroup &options, const RecentFileList
 		recent_node->properties["line"] = format_dec_narrow (it->focus_entry);
 	}
 	// Insert a node "\n" at the end
-	if (dynamic_cast <XMLNodeText *> (ptr) == 0)
+	if (dynamic_cast <XMLNodeText *> (ptr) == 0) {
 		ptr = ptr->next = new XMLNodeText ("\n");
+	}
 
 	std::string xml = xml_make (root);
 	xml_free (root);
@@ -468,18 +525,21 @@ bool save_file (const char *filename,
 	// Find the last child of root node <tiary>
 	XMLNode *ptr = root->children;
 	// ptr is never null. Let's loop until we find the last entry
-	while (ptr->next)
+	while (ptr->next) {
 		ptr = ptr->next;
+	}
 
 	// Loop thru entries
 	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {
 		// Insert a text node "\n\t" before each <entry>
 		// At the first loop, ptr should point to a text node "\n"
 		// Change that!
-		if (XMLNodeText *text_node = dynamic_cast <XMLNodeText *>(ptr))
+		if (XMLNodeText *text_node = dynamic_cast <XMLNodeText *>(ptr)) {
 			text_node->text = "\n\t";
-		else
+		}
+		else {
 			ptr = ptr->next = new XMLNodeText ("\n\t");
+		}
 
 		DiaryEntry *entry = *it; // Never null
 		XMLNodeTree *entry_node = new XMLNodeTree ("entry");
@@ -538,7 +598,8 @@ bool save_file (const char *filename,
 
 		bzip2 (xml_text.data (), xml_text.length ()).swap (everything);
 
-	} else { // Password. Encrypt first
+	}
+	else { // Password. Encrypt first
 
 		everything.resize (32 + xml_text.length());
 		MD5 (wstring_to_mbs (password)) (password_salt1, sizeof password_salt1).result (&everything[16]);

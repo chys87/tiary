@@ -36,17 +36,20 @@ PcRe::PcRe (const std::wstring &regex)
 			0, &err, &erroffset, 0);
 	if (re) {
 		re_ex = pcre_study ((const pcre *)re, 0, &err);
-	} else {
+	}
+	else {
 		re_ex = 0;
 	}
 }
 
 PcRe::~PcRe ()
 {
-	if (re_ex)
+	if (re_ex) {
 		pcre_free (re_ex);
-	if (re)
+	}
+	if (re) {
 		pcre_free (re);
+	}
 }
 
 std::vector <std::pair <size_t, size_t> > PcRe::match (const std::wstring &str) const

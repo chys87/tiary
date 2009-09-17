@@ -146,8 +146,9 @@ md5_process(MD5Context *pms, const uint8_t *data /*[64]*/)
 	int i;
 
 #	define xbuf X
-	for (i = 0; i < 16; ++i, xp += 4)
+	for (i = 0; i < 16; ++i, xp += 4) {
 		xbuf[i] = xp[0] + (xp[1] << 8) + (xp[2] << 16) + (xp[3] << 24);
+	}
 #else // Little endian
 	/*
 	 * On little-endian machines, we can process properly aligned
@@ -294,8 +295,9 @@ md5_init(MD5Context *pms)
 void
 md5_append(MD5Context *pms, const void *data, size_t nbytes)
 {
-	if (nbytes == 0)
+	if (nbytes == 0) {
 		return;
+	}
 
 	const uint8_t *p = reinterpret_cast <const uint8_t *> (data);
 	size_t left = nbytes;
@@ -309,20 +311,23 @@ md5_append(MD5Context *pms, const void *data, size_t nbytes)
 		size_t copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
 
 		memcpy(pms->buf + offset, p, copy);
-		if (offset + copy < 64)
+		if (offset + copy < 64) {
 			return;
+		}
 		p += copy;
 		left -= copy;
 		md5_process(pms, pms->buf);
 	}
 
 	/* Process full blocks. */
-	for (; left >= 64; p += 64, left -= 64)
+	for (; left >= 64; p += 64, left -= 64) {
 		md5_process(pms, p);
+	}
 
 	/* Process a final partial block. */
-	if (left)
+	if (left) {
 		memcpy(pms->buf, p, left);
+	}
 }
 
 void
@@ -350,8 +355,9 @@ md5_finish(MD5Context *pms)
 	/* Return the data in abcd.
 	 * But if we have a big-endian machine, we need to reverse it first */
 #if TIARY_BIG_ENDIAN
-	for (int i=0; i<4; ++i)
+	for (int i=0; i<4; ++i) {
 		pms->abcd[i] = bswap32 (pms->abcd[i]);
+	}
 #endif
 }
 

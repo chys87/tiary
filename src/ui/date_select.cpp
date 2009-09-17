@@ -27,8 +27,9 @@ const unsigned last_year = 2100;
 std::vector<std::wstring> make_year_names ()
 {
 	std::vector<std::wstring> r (last_year - first_year + 1);
-	for (unsigned k=0; k<last_year-first_year+1; ++k)
+	for (unsigned k=0; k<last_year-first_year+1; ++k) {
 		r[k] = format_dec (k + first_year);
+	}
 	return r;
 }
 
@@ -78,8 +79,9 @@ void DateSelect::set_date (Date date, bool emit_signal)
 	month.set_select (m/6 + (m%6)*2, false);
 	update_day_list (false);
 	day.set_select (offset + rd.d - 1);
-	if (emit_signal)
+	if (emit_signal) {
 		sig_date_changed.emit ();
+	}
 	DateSelect::redraw ();
 }
 
@@ -100,8 +102,9 @@ void DateSelect::set_date (Date date, SelectableDates &&selectable, bool emit_si
 Date DateSelect::get_date () const
 {
 	unsigned d = day.get_select () - offset;
-	if (d >= dom)
+	if (d >= dom) {
 		return Date (INVALID_DATE);
+	}
 
 	ReadableDate rd;
 	rd.d = d + 1;
@@ -132,8 +135,9 @@ void DateSelect::redraw ()
 void DateSelect::update_day_list (bool emit_signal)
 {
 	unsigned current_select_day = day.get_select () - offset;
-	if (current_select_day >= dom)
+	if (current_select_day >= dom) {
 		current_select_day = unsigned (-1);
+	}
 
 	unsigned y = year.get_select () + first_year;
 	unsigned m = month.get_select ();
@@ -148,20 +152,23 @@ void DateSelect::update_day_list (bool emit_signal)
 	if (!selectable_dates.empty ()) {
 		uint32_t dtv = first_day_of_month.v;
 		for (unsigned i=0; i<dom; ++i) {
-			if (selectable_dates.find (dtv) == selectable_dates.end ())
+			if (selectable_dates.find (dtv) == selectable_dates.end ()) {
 				grid_items[i+offset].selectable = false;
+			}
 			++dtv;
 		}
 	}
 
 	size_t grid_select = size_t (-1);
-	if (current_select_day < 31)
+	if (current_select_day < 31) {
 		grid_select = minU (current_select_day, dom - 1) + offset;
+	}
 
 	day.set_grid (3, 7, 6, grid_items, grid_select);
 
-	if (emit_signal)
+	if (emit_signal) {
 		sig_date_changed.emit ();
+	}
 }
 
 } // namespace tiary::ui

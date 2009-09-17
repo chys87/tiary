@@ -34,8 +34,9 @@ void CheckBox::set_status (bool new_status, bool emit_signal)
 {
 	if (new_status != status) {
 		status = new_status;
-		if (emit_signal)
+		if (emit_signal) {
 			sig_toggled.emit ();
+		}
 		CheckBox::redraw ();
 	}
 }
@@ -69,8 +70,9 @@ void CheckBox::redraw ()
 	clear ();
 	unsigned wid = get_size().x;
 	Size pos = make_size ();
-	if (wid >= 3)
+	if (wid >= 3) {
 		pos = put (pos, L'[');
+	}
 	move_cursor (pos);
 	// U+00D7 is Multipilcation sign
 	pos = put (pos, status ? (

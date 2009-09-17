@@ -100,8 +100,9 @@ MenuItem::~MenuItem ()
 
 Menu &MenuItem::get_submenu ()
 {
-	if (submenu == 0)
+	if (submenu == 0) {
 		submenu = new Menu;
+	}
 	return *submenu;
 }
 
@@ -200,8 +201,9 @@ ItemControl::~ItemControl ()
 
 bool ItemControl::on_focus ()
 {
-	if (!valid || item.text.empty ())
+	if (!valid || item.text.empty ()) {
 		return false;
+	}
 	else {
 		ItemControl::redraw ();
 		return true;
@@ -234,12 +236,15 @@ bool ItemControl::on_key (wchar_t c)
 
 bool ItemControl::on_mouse (MouseEvent me)
 {
-	if (!valid || item.text.empty ())
+	if (!valid || item.text.empty ()) {
 		return false;
-	if (me.m & MOUSE_ALL_BUTTON)
+	}
+	if (me.m & MOUSE_ALL_BUTTON) {
 		slot_trigger ();
-	else
+	}
+	else {
 		focus ();
+	}
 	return true;
 }
 
@@ -251,21 +256,26 @@ void ItemControl::redraw ()
 		choose_palette (PALETTE_ID_MENU);
 		fill (make_size (), get_size (), BORDER_H);
 
-	} else {
+	}
+	else {
 
 		PaletteID id;
 
-		if (!valid)
+		if (!valid) {
 			id = PALETTE_ID_MENU_INVALID;
-		else if (win.get_focus () == this)
+		}
+		else if (win.get_focus () == this) {
 			id = PALETTE_ID_MENU_SELECT;
-		else
+		}
+		else {
 			id = PALETTE_ID_MENU;
+		}
 		choose_palette (id);
 		clear ();
 		text.output (*this, make_size (), get_size ().x);
-		if (item.submenu)
+		if (item.submenu) {
 			put (make_size (get_size ().x-1, 0), L'>');
+		}
 
 	}
 }
@@ -277,7 +287,8 @@ void ItemControl::slot_trigger ()
 		// No submenu
 		static_cast <MenuWindow &>(win).result = const_cast <MenuItem *>(&item);
 		win.request_close ();
-	} else {
+	}
+	else {
 		// Has submenu
 		Size right = win.get_pos () + get_pos ();
 		Size left = right + make_size (get_size ().x, 0);
@@ -305,8 +316,9 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 		if (!it->hidden) {
 			bool validity = it->valid_foo.call (true);
 			ItemControl *p = *pi++ = new ItemControl (*this, *it, validity);
-			if (validity && !p->text.get_text ().empty ())
+			if (validity && !p->text.get_text ().empty ()) {
 				*pv++ = p;
+			}
 			maxwid = maxU (maxwid, p->text.get_width ());
 		}
 	}
@@ -321,8 +333,9 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	Size size = make_size (maxwid+2/*Border*/+1/*>*/+3/*Space*/, actual_size + 2);
 	Size scrsize = get_screen_size ();
 	Size pos;
-	if (both (left + size <= scrsize))
+	if (both (left + size <= scrsize)) {
 		pos = left;
+	}
 	else {
 		pos = right;
 		pos.x = maxS (0, pos.x - size.x);
@@ -346,11 +359,13 @@ MenuWindow::~MenuWindow ()
 
 bool MenuWindow::on_key (wchar_t c)
 {
-	if (Window::on_key (c))
+	if (Window::on_key (c)) {
 		return true;
+	}
 
-	if ((unget_left || c!=LEFT) && c!=ESCAPE)
+	if ((unget_left || c!=LEFT) && c!=ESCAPE) {
 		unget (c);
+	}
 	request_close ();
 	return true;
 }
@@ -386,8 +401,9 @@ MenuItem *Menu::show (Size left, Size right, bool emit_signal)
 		sel = win.get_result ();
 	}
 	// Destruct the window before emitting the signal
-	if (emit_signal && sel)
+	if (emit_signal && sel) {
 		sel->sig.emit ();
+	}
 	return sel;
 }
 

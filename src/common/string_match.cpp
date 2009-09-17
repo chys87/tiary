@@ -34,8 +34,9 @@ StringMatch::~StringMatch ()
 
 bool StringMatch::assign (const std::wstring &pattern_, bool use_regex)
 {
-	if (pattern_.empty ())
+	if (pattern_.empty ()) {
 		return false;
+	}
 #ifdef TIARY_USE_PCRE
 	PcRe *new_pcre = 0;
 	if (use_regex) {
@@ -54,21 +55,27 @@ bool StringMatch::assign (const std::wstring &pattern_, bool use_regex)
 std::vector <std::pair <size_t, size_t> > StringMatch::match (const std::wstring &haystack) const
 {
 #ifdef TIARY_USE_PCRE
-	if (PcRe *rex = regex.get ())
+	if (PcRe *rex = regex.get ()) {
 		return rex->match (haystack);
+	}
 	else
 #endif
+	{
 		return find_all (strlower (haystack), strlower (pattern));
+	}
 }
 
 bool StringMatch::basic_match (const std::wstring &haystack) const
 {
 #ifdef TIARY_USE_PCRE
-	if (PcRe *rex = regex.get ())
+	if (PcRe *rex = regex.get ()) {
 		return rex->basic_match (haystack);
+	}
 	else
 #endif
+	{
 		return (strlower (haystack).find (strlower (pattern)) != std::wstring::npos);
+	}
 }
 
 

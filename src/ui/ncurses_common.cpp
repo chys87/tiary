@@ -65,14 +65,18 @@ namespace {
 inline int internal_attributes (Attr attr)
 {
 	int r = 0;
-	if (attr & UNDERLINE)
+	if (attr & UNDERLINE) {
 		r |= A_UNDERLINE;
-	if (attr & REVERSE)
+	}
+	if (attr & REVERSE) {
 		r |= A_REVERSE;
-	if (attr & HIGHLIGHT)
+	}
+	if (attr & HIGHLIGHT) {
 		r |= A_BOLD;
-	if (attr & BLINK)
+	}
+	if (attr & BLINK) {
 		r |= A_BLINK;
+	}
 	return r;
 }
 
@@ -82,8 +86,9 @@ inline int internal_attributes (Attr attr)
 // Map color pair to internal color pair
 unsigned internal_color_pair (Color f, Color b)
 {
-	if (f>=NOCOLOR || b>=NOCOLOR)
+	if (f>=NOCOLOR || b>=NOCOLOR) {
 		return 0;
+	}
 	// Pair 0 is reserved for (Fore,Back) = (WHITE,BLACK)
 	// So we need a simple formula that maps
 	// [0,7]x[0,7] to [0,64] while keeping (WHITE,BLACK) is mapped to 0

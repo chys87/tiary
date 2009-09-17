@@ -177,12 +177,15 @@ GetMemberFunctor<Class,Member> get_member_fun (Member Class::*ptr)
 template <typename A, typename B> inline
 int compare_helper (const A &x, const B &y)
 {
-	if (x < y)
+	if (x < y) {
 		return -1;
-	else if (x == y)
+	}
+	else if (x == y) {
 		return 0;
-	else
+	}
+	else {
 		return 1;
+	}
 }
 
 // Performs a binary search.
@@ -216,8 +219,9 @@ template <typename T, typename T2> T* binary_search_null (T *lo, T *hi, T2 v)
 template <typename T, typename T2, typename K> T* linear_search_null (T *lo, T *hi, T2 v, K key)
 {
 	while (lo < hi) {
-		if (key (*lo) == v)
+		if (key (*lo) == v) {
 			return lo;
+		}
 		++lo;
 	}
 	return 0;
@@ -251,8 +255,9 @@ template <typename A, typename B> struct MapStruct
 template <typename A, typename B>
 B binary_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from, B defto)
 {
-	if (const MapStruct<A,B> *p = binary_search_null (lo, hi, from, get_member_fun (&MapStruct<A,B>::from)))
+	if (const MapStruct<A,B> *p = binary_search_null (lo, hi, from, get_member_fun (&MapStruct<A,B>::from))) {
 		return p->to;
+	}
 	return defto;
 }
 
@@ -260,8 +265,9 @@ B binary_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from, 
 template <typename A, typename B>
 B linear_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from, B defto)
 {
-	if (const MapStruct<A,B> *p = linear_search_null (lo, hi, from, get_member_fun (&MapStruct<A,B>::from)))
+	if (const MapStruct<A,B> *p = linear_search_null (lo, hi, from, get_member_fun (&MapStruct<A,B>::from))) {
 		return p->to;
+	}
 	return defto;
 }
 
@@ -273,8 +279,9 @@ B bitwise_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from)
 {
 	B to = 0;
 	while (lo < hi) {
-		if (from & lo->from)
+		if (from & lo->from) {
 			to |= lo->to;
+		}
 		++lo;
 	}
 	return to;
@@ -286,8 +293,9 @@ A bitwise_reverse_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi,
 {
 	A from = 0;
 	while (lo < hi) {
-		if (to & lo->to)
+		if (to & lo->to) {
 			from |= lo->from;
+		}
 		++lo;
 	}
 	return from;
@@ -304,8 +312,9 @@ template <typename Container, typename T>
 void remove_first (Container &container, const T &value, typename Container::iterator = typename Container::iterator ())
 {
 	typename Container::iterator it = std::find (container.begin (), container.end (), value);
-	if (it != container.end ())
+	if (it != container.end ()) {
 		container.erase (it);
+	}
 }
 
 /*

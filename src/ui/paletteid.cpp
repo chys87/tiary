@@ -86,8 +86,9 @@ const PaletteMap mapping[] = {
 
 void set_palettes ()
 {
-	for (unsigned i=0; i<sizeof mapping/sizeof *mapping; ++i)
+	for (unsigned i=0; i<sizeof mapping/sizeof *mapping; ++i) {
 		set_palette (mapping[i].id, mapping[i].a);
+	}
 }
 
 } // namespace tiary::ui

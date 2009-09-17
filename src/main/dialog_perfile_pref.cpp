@@ -96,12 +96,15 @@ WindowPerFileOptions::WindowPerFileOptions (PerFileOptionGroup &options_)
 	layout_main.move_resize (make_size (2, 1), get_size () - make_size (4, 2));
 
 	// Set up chains
-	ChainControlsHorizontal () (btn_ok) (btn_cancel) (btn_reset) (btn_help);
 	ChainControlsVerticalNC ()
 		(chk_modtime.checkbox)
 		(btn_ok)
 		;
-	btn_reset.ctrl_up = btn_cancel.ctrl_up = btn_help.ctrl_up = btn_ok.ctrl_up;
+	ChainControlsHorizontalO ()
+		(btn_ok)
+		(btn_cancel)
+		(btn_reset)
+		(btn_help);
 
 	// Set up signals
 	btn_ok.sig_clicked.connect (this, &WindowPerFileOptions::slot_ok);

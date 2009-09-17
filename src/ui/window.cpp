@@ -58,16 +58,18 @@ void touch_lines ()
 void touch_lines (unsigned top, unsigned height)
 {
 	unsigned lines = touched_lines.size ();
-	if (top >= lines)
+	if (top >= lines) {
 		return;
+	}
 	height = minU (height, lines - top);
 	std::fill_n (touched_lines.begin () + top, height, '\1');
 }
 
 void touch_line (unsigned line)
 {
-	if (line < touched_lines.size ())
+	if (line < touched_lines.size ()) {
 		touched_lines[line] = '\1';
+	}
 }
 
 void commit_touched_lines ()
@@ -89,8 +91,9 @@ void commit_touched_lines ()
 	CharColorAttr def = { L' ', { DEFAULT_FORECOLOR, DEFAULT_BACKCOLOR, 0 } };
 
 	for (unsigned y = 0; y < height; ++y) {
-		if (!touched_lines[y])
+		if (!touched_lines[y]) {
 			continue;
+		}
 		touched_lines[y] = 0;
 
 		// Commit the y-th line
@@ -98,17 +101,21 @@ void commit_touched_lines ()
 
 		for (WindowList::const_iterator it = window_list.begin (); it != window_list.end (); ++it) {
 			const Window *win = *it;
-			if (y - win->get_pos().y >= win->get_size().y)
+			if (y - win->get_pos().y >= win->get_size().y) {
 				continue;
+			}
 			unsigned win_left = win->get_pos().x;
-			if (win_left >= width)
+			if (win_left >= width) {
 				continue;
+			}
 			unsigned win_right = minU (width, win->get_size().x + win_left);
 
-			if (win_left && line[win_left].c == L'\0')
+			if (win_left && line[win_left].c == L'\0') {
 				line[win_left-1].c = L' ';
-			if (win_right<width && line[win_right].c == L'\0')
+			}
+			if (win_right<width && line[win_right].c == L'\0') {
 				line[win_right].c = L' ';
+			}
 
 			memcpy (line+win_left, win->get_char_table (y - win->get_pos().y),
 					(win_right - win_left) * sizeof (*line));
@@ -119,44 +126,57 @@ void commit_touched_lines ()
 		// Now actually commit to ncurses
 		cchar_t *p = (cchar_t *)memset (cchar_line, 0, (width+1) * sizeof (cchar_t));
 		for (unsigned x = 0; x < width; ++x) {
-			if (line[x].c == L'\0')
+			if (line[x].c == L'\0') {
 				continue;
+			}
 			switch (line[x].c) {
 				case BORDER_V:
-					if (use_acs_border)
+					if (use_acs_border) {
 						*p = *WACS_VLINE;
-					else
+					}
+					else {
 						p->chars[0] = L'|';
+					}
 					break;
 				case BORDER_H:
-					if (use_acs_border)
+					if (use_acs_border) {
 						*p = *WACS_HLINE;
-					else
+					}
+					else {
 						p->chars[0] = L'-';
+					}
 					break;
 				case BORDER_1:
-					if (use_acs_border)
+					if (use_acs_border) {
 						*p = *WACS_ULCORNER;
-					else
+					}
+					else {
 						p->chars[0] = L'/';
+					}
 					break;
 				case BORDER_2:
-					if (use_acs_border)
+					if (use_acs_border) {
 						*p = *WACS_URCORNER;
-					else
+					}
+					else {
 						p->chars[0] = L'\\';
+					}
 					break;
 				case BORDER_3:
-					if (use_acs_border)
+					if (use_acs_border) {
 						*p = *WACS_LLCORNER;
-					else
+					}
+					else {
 						p->chars[0] = L'\\';
+					}
 					break;
 				case BORDER_4:
-					if (use_acs_border)
+					if (use_acs_border) {
 						*p = *WACS_LRCORNER;
-					else
+					}
+					else {
 						p->chars[0] = L'/';
+					}
 					break;
 				default:
 					p->chars[0] = line[x].c;
@@ -190,11 +210,13 @@ void commit_touched_lines ()
 wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 {
 	wint_t c;
-	if (!block)
+	if (!block) {
 		nodelay (stdscr, TRUE);
+	}
 	int getret = get_wch (&c);
-	if (!block)
+	if (!block) {
 		nodelay (stdscr, FALSE);
+	}
 	switch (getret) {
 		case OK: // Normal key
 			return c;
@@ -202,8 +224,9 @@ wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 #if defined TIARY_USE_MOUSE && defined KEY_MOUSE
 			if (c == KEY_MOUSE) {
 				MEVENT nc_mouse_event;
-				if (getmouse (&nc_mouse_event) != OK)
+				if (getmouse (&nc_mouse_event) != OK) {
 					return L'\0';
+				}
 				if (pmouse_event) {
 					pmouse_event->p.y = nc_mouse_event.y;
 					pmouse_event->p.x = nc_mouse_event.x;
@@ -253,8 +276,9 @@ wchar_t get_input (MouseEvent *pmouse_event, bool block = true)
 {
 	if (!stk_unget.empty ()) {
 		wchar_t c = stk_unget.top ().first;
-		if (c == MOUSE)
+		if (c == MOUSE) {
 			*pmouse_event = stk_unget.top ().second;
+		}
 		stk_unget.pop ();
 		return c;
 	}
@@ -263,12 +287,14 @@ wchar_t get_input (MouseEvent *pmouse_event, bool block = true)
 	if (c == ESCAPE) {
 		c = get_input_base (pmouse_event, false);
 		// If it's a letter, we interpret it as Alt + Letter
-		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26)
+		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26) {
 			c += ALT_BASE;
+		}
 		else {
 			// Otherwise, still returns ESCAPE. If we have read another key, unget it
-			if (c)
+			if (c) {
 				unget_input (c, *pmouse_event);
+			}
 			c = ESCAPE;
 		}
 	}

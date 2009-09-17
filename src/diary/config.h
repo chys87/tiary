@@ -12,6 +12,12 @@
  **************************************************************************/
 
 
+/**
+ * @file	diary/config.h
+ * @author	chys <admin@chys.info>
+ * @brief	Defines global and per-file preferences
+ */
+
 #ifndef TIARY_DIARY_CONFIG_H
 #define TIARY_DIARY_CONFIG_H
 
@@ -109,8 +115,9 @@ public:
 	{
 #if defined TIARY_HAVE_STD_UNORDERED_SET_MAP || defined TIARY_HAVE_TR1_UNORDERED_SET_MAP
 		// Unordered_map does not define operator == ...
-		if (get_data ().size () != other.get_data ().size ())
+		if (get_data ().size () != other.get_data ().size ()) {
 			return false;
+		}
 		return std::equal (get_data ().begin (), get_data ().end (), other.get_data ().begin ());
 #else
 		return (get_data () == other.get_data ());

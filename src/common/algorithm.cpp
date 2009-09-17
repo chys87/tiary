@@ -47,8 +47,9 @@ void min_max_programming (unsigned *result, const unsigned *min, const unsigned 
 	 * Although it seems everything here is in unsinged, we allow sum (max, n) to be larger than UINT_MAX
 	 * Actually this happens in our program.
 	 */
-	if (n == 0)
+	if (n == 0) {
 		return;
+	}
 
 	unsigned minsum = 0;
 	uint64_t maxsum = 0;
@@ -83,8 +84,9 @@ void min_max_programming (unsigned *result, const unsigned *min, const unsigned 
 	UIntInd *middle = &rem[S];
 	UIntInd *last = &rem[n];
 	std::partial_sort (first, middle, last, std::greater<UIntInd>());
-	for (UIntInd *p=first; p!=middle; ++p)
+	for (UIntInd *p=first; p!=middle; ++p) {
 		++*p->ptr;
+	}
 	delete [] rem;
 }
 

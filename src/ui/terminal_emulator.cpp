@@ -34,14 +34,18 @@ TerminalEmulator detect_terminal_emulator ()
 {
 	const char *term_env = getenv ("TERM");
 	if (term_env) {
-		if (strcmp (term_env, "rxvt-unicode") == 0)
+		if (strcmp (term_env, "rxvt-unicode") == 0) {
 			return RXVT_UNICODE;
-		if (strcmp (term_env, "linux") == 0)
+		}
+		if (strcmp (term_env, "linux") == 0) {
 			return LINUX_CONSOLE;
-		if (strcmp (term_env, "Eterm") == 0)
+		}
+		if (strcmp (term_env, "Eterm") == 0) {
 			return ETERM;
-		if (memcmp (term_env, "screen", 6) == 0)
+		}
+		if (memcmp (term_env, "screen", 6) == 0) {
 			return UNKNOWN_TERMINAL;
+		}
 	}
 
 	char bufa[256];
@@ -54,52 +58,67 @@ TerminalEmulator detect_terminal_emulator ()
 			// Cannot read /proc/pid/exe. Try cmdline
 			sprintf (bufa, "/proc/%u/cmdline", unsigned (pid));
 			int fd = open (bufa, O_RDONLY);
-			if (fd < 0) // Still failed. Return unknown
+			if (fd < 0) { // Still failed. Return unknown
 				break;
+			}
 			l = read (fd, bufb, sizeof bufb - 1);
 			close (fd);
-			if (l <= 0)
+			if (l <= 0) {
 				break;
+			}
 		}
 		bufb[l] = '\0';
 		const char *p = strrchr (bufb, '/');
-		if (p == 0)
+		if (p == 0) {
 			p = bufb;
-		else
+		}
+		else {
 			++p;
+		}
 
-		if (strcmp (p, "gnome-terminal") == 0)
+		if (strcmp (p, "gnome-terminal") == 0) {
 			return VTE;
-		if (strcmp (p, "konsole") == 0)
+		}
+		if (strcmp (p, "konsole") == 0) {
 			return KONSOLE;
-		if (memcmp (p, "kdeinit", 7) == 0)
+		}
+		// May be "kdeinit", "kdeinit4", etc..
+		if (memcmp (p, "kdeinit", 7) == 0) {
 			return KONSOLE;
-		if (strcmp (p, "xterm") == 0)
+		}
+		if (strcmp (p, "xterm") == 0) {
 			return TRUE_XTERM;
-		if (strcmp (p, "mlterm") == 0)
+		}
+		if (strcmp (p, "mlterm") == 0) {
 			return MLTERM;
+		}
 
 		// Attempt to get PPID of PID
 		sprintf (bufa, "/proc/%u/status", unsigned (pid));
 		int fd = open (bufa, O_RDONLY);
-		if (fd < 0)
+		if (fd < 0) {
 			break;
+		}
 		l = read (fd, bufa, sizeof bufa - 1);
 		close (fd);
-		if (l < 0)
+		if (l < 0) {
 			break;
+		}
 		bufa[l] = '\0';
 		p = strstr (bufa, "PPid:");
-		if (p == 0)
+		if (p == 0) {
 			break;
+		}
 		pid = (pid_t) strtoul (p+5, 0, 10);
 
 	} while (pid >= 2); // 0 = Nohting; 1 = init
 
-	if (term_env && strcmp (term_env, "xterm") == 0)
+	if (term_env && strcmp (term_env, "xterm") == 0) {
 		return GENERAL_XTERM;
-	else
+	}
+	else {
 		return UNKNOWN_TERMINAL;
+	}
 }
 
 } // anonymous namespace

@@ -53,16 +53,18 @@ const char *strchrnul (const char *str, int ch)
 {
 	size_t len = strlen (str);
 	const char *ptr = (const char *)memchr (str, len, ch);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		ptr = str + len;
+	}
 	return ptr;
 }
 #endif
 
 const wchar_t *strchrnul (const wchar_t *str, wchar_t ch)
 {
-	while (*str && *str!=ch)
+	while (*str && *str!=ch) {
 		++str;
+	}
 	return str;
 }
 
@@ -83,8 +85,9 @@ find_all (const std::wstring &haystack, const std::wstring &needle)
 	size_t offset = 0;
 	while (haylen - offset >= neelen) {
 		size_t found = haystack.find (needle, offset);
-		if (found == std::wstring::npos)
+		if (found == std::wstring::npos) {
 			break;
+		}
 		ret.push_back (std::make_pair (found, neelen));
 		offset = found + neelen;
 	}
@@ -100,7 +103,8 @@ void strip (std::basic_string<T> &str, const T *trim)
 	size_t startpos = str.find_first_not_of (trim);
 	if (startpos == std::basic_string<T>::npos) {
 		str.clear ();
-	} else {
+	}
+	else {
 		size_t endpos = str.find_last_not_of (trim);
 		// If any implementation of string does not handle
 		// the following alias, it should be thrown away
@@ -130,16 +134,19 @@ std::list <std::basic_string <T> > split_string_impl (const T *str, T delimiter,
 	std::list <std::basic_string <T> > ret_list;
 	for (;;) {
 		if (remove_empties) {
-			while (*str == delimiter)
+			while (*str == delimiter) {
 				++str;
+			}
 		}
-		if (*str == T ())
+		if (*str == T ()) {
 			break;
+		}
 		const T *del = strchrnul (str, delimiter);
 		ret_list.push_back (empty_string);
 		ret_list.back ().assign (str, del);
-		if (*del != delimiter)
+		if (*del != delimiter) {
 			break;
+		}
 		str = del + 1;
 	}
 	return ret_list;

@@ -24,9 +24,11 @@ DiaryEntryList Filter::filter (const DiaryEntryList &lst) const
 	DiaryEntryList new_lst (lst);
 	DiaryEntryList::iterator iw = new_lst.begin ();
 	for (DiaryEntryList::const_iterator it = new_lst.begin ();
-			it != new_lst.end (); ++it)
-		if ((*this)(**it))
+			it != new_lst.end (); ++it) {
+		if ((*this)(**it)) {
 			*iw++ = *it;
+		}
+	}
 	new_lst.erase (iw, new_lst.end ());
 	return new_lst;
 }
@@ -92,14 +94,17 @@ bool FilterGroup::operator () (const DiaryEntry &entry) const
 {
 	if (relation == AND) {
 		for (const_iterator it = FilterList::begin (); it != FilterList::end (); ++it) {
-			if (!(**it)(entry))
+			if (!(**it)(entry)) {
 				return false;
+			}
 		}
 		return true;
-	} else {
+	}
+	else {
 		for (const_iterator it = FilterList::begin (); it != FilterList::end (); ++it) {
-			if ((**it)(entry))
+			if ((**it)(entry)) {
 				return true;
+			}
 		}
 		return false;
 	}

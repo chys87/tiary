@@ -53,12 +53,15 @@ bool find (const WcharInterval *lo, const WcharInterval *hi, unsigned ch)
 {
 	while (lo < hi) {
 		const WcharInterval *mid = lo + size_t(hi-lo)/2;
-		if (ch < mid->first)
+		if (ch < mid->first) {
 			hi = mid;
-		else if (ch >= mid->lastnext)
+		}
+		else if (ch >= mid->lastnext) {
 			lo = mid + 1;
-		else
+		}
+		else {
 			return true;
+		}
 	}
 	return false;
 }
@@ -69,16 +72,22 @@ int utf8_len_by_wchar (wchar_t w)
 {
 	unsigned u = w;
 	if (u < 0x800) {
-		if (u < 0x80)
+		if (u < 0x80) {
 			return 1;
-		else
+		}
+		else {
 			return 2;
-	} else if (u < 0x10000)
+		}
+	}
+	else if (u < 0x10000) {
 		return 3;
-	else if (u < 0x110000)
+	}
+	else if (u < 0x110000) {
 		return 4;
-	else
+	}
+	else {
 		return 0;
+	}
 }
 
 int utf8_len_by_first_byte (unsigned char b)
@@ -114,28 +123,34 @@ wchar_t utf8_to_wchar (const char *p, const char **end)
 	u &= 0xffu >> len;
 	switch (len) {
 	default: /* case 4: */
-		if (((b = (uint8_t)*p++) & 0xc0) != 0x80)
+		if (((b = (uint8_t)*p++) & 0xc0) != 0x80) {
 			break;
+		}
 		u = (u<<6) | (b & 0x3f);
 	case 3:
-		if (((b = (uint8_t)*p++) & 0xc0) != 0x80)
+		if (((b = (uint8_t)*p++) & 0xc0) != 0x80) {
 			break;
+		}
 		u = (u<<6) | (b & 0x3f);
 	case 2:
-		if (((b = (uint8_t)*p++) & 0xc0) != 0x80)
+		if (((b = (uint8_t)*p++) & 0xc0) != 0x80) {
 			break;
+		}
 		u = (u<<6) | (b & 0x3f);
 	case 1:
-		if (end)
+		if (end) {
 			*end = p;
+		}
 		return u;
 	case 0:
-		if (end)
+		if (end) {
 			*end = p;
+		}
 		return L'\0';
 	}
-	if (end)
+	if (end) {
 		*end = p - 1;
+	}
 	return L'\0';
 }
 
@@ -150,10 +165,12 @@ std::wstring utf8_to_wstring (const char *s, wchar_t substitute)
 	while (*s) {
 		const char *next;
 		wchar_t c = utf8_to_wchar (s, &next);
-		if (c == 0)
+		if (c == 0) {
 			c = substitute;
-		if (c)
+		}
+		if (c) {
 			r += c;
+		}
 		s = next;
 	}
 	return r;
@@ -170,15 +187,18 @@ char *wchar_to_utf8 (char *dst, wchar_t w)
 	if (u < 0x800) {
 		if (u < 0x80) {
 			*dst++ = u;
-		} else {
+		}
+		else {
 			*dst++ = (u >> 6) | 0xc0u;
 			*dst++ = (u & 0x3fu) | 0x80u;
 		}
-	} else if (u < 0x10000) {
+	}
+	else if (u < 0x10000) {
 		*dst++ = ((u >> 12) | 0xe0u);
 		*dst++ = (((u >> 6) & 0x3fu) | 0x80u);
 		*dst++ = ((u & 0x3fu) | 0x80u);
-	} else if (u < 0x110000) {
+	}
+	else if (u < 0x110000) {
 		*dst++ = ((u >> 18) | 0xf0u);
 		*dst++ = (((u >> 12) & 0x3fu) | 0x80u);
 		*dst++ = (((u >> 6) & 0x3fu) | 0x80u);
@@ -189,23 +209,26 @@ char *wchar_to_utf8 (char *dst, wchar_t w)
 
 char *wchar_to_utf8 (char *d, const wchar_t *s)
 {
-	for (; *s; ++s)
+	for (; *s; ++s) {
 		d = wchar_to_utf8 (d, *s);
+	}
 	*d = 0;
 	return d;
 }
 
 char *wchar_to_utf8 (char *d, const wchar_t *s, const wchar_t *end)
 {
-	for (; s < end; ++s)
+	for (; s < end; ++s) {
 		d = wchar_to_utf8 (d, *s);
+	}
 	return d;
 }
 
 char *wchar_to_utf8 (char *d, const wchar_t *s, size_t n)
 {
-	for (; n; --n)
+	for (; n; --n) {
 		d = wchar_to_utf8 (d, *s++);
+	}
 	return d;
 }
 
@@ -227,8 +250,9 @@ std::wstring mbs_to_wstring (const char *src)
 	// needless to use mbsrtowcs here
 	size_t len = strlen (src);
 	wchar_t *buffer = new wchar_t[len+1];
-	if (mbstowcs (buffer, src, len+1) == size_t(-1))
+	if (mbstowcs (buffer, src, len+1) == size_t(-1)) {
 		buffer[0] = L'\0';
+	}
 	std::wstring ret = buffer;
 	delete [] buffer;
 	return ret;
@@ -238,8 +262,9 @@ std::wstring mbs_to_wstring (const std::string &src)
 {
 	size_t len = src.size ();
 	wchar_t *buffer = new wchar_t[len+1];
-	if (mbstowcs (buffer, src.c_str (), len+1) == size_t(-1))
+	if (mbstowcs (buffer, src.c_str (), len+1) == size_t(-1)) {
 		buffer[0] = L'\0';
+	}
 	std::wstring ret = buffer;
 	delete [] buffer;
 	return ret;
@@ -256,8 +281,9 @@ std::string wstring_to_mbs (const wchar_t *src, size_t srclen, char substitute)
 		size_t convret = wcrtomb (buffer, *src++, &state);
 		if (convret == size_t(-1)) {
 			memset (&state, 0, sizeof state);
-			if (substitute == '\0')
+			if (substitute == '\0') {
 				continue;
+			}
 			buffer[0] = substitute;
 			convret = 1;
 		}
@@ -284,10 +310,12 @@ std::string wstring_to_mbs (const std::wstring &src, char substitute)
 unsigned ucs_width (wchar_t c)
 {
 #ifdef TIARY_HAVE_WCWIDTH
-	if (wcwidth (c) > 1)
+	if (wcwidth (c) > 1) {
 		return 2;
-	else
+	}
+	else {
 		return 1;
+	}
 #else
 	static const WcharInterval table[] = {
 		{0x1100, 0x1160}, {0x2329, 0x232B}, {0x2E80, 0x2FFC}, {0x3000, 0x303F},
@@ -302,16 +330,18 @@ unsigned ucs_width (wchar_t c)
 unsigned ucs_width (const wchar_t *s)
 {
 	unsigned w = 0;
-	while (*s)
+	while (*s) {
 		w += ucs_width (*s++);
+	}
 	return w;
 }
 
 unsigned ucs_width (const wchar_t *s, size_t n)
 {
 	unsigned w = 0;
-	for (; n; --n)
+	for (; n; --n) {
 		w += ucs_width (*s++);
+	}
 	return w;
 }
 
@@ -331,8 +361,9 @@ size_t max_chars_in_width (const wchar_t *s, unsigned scrwid)
 	while (wchar_t c = *p) {
 		unsigned w = ucs_width (c);
 		if (int (scrwid -= w) <= 0) {
-			if (scrwid == 0)
+			if (scrwid == 0) {
 				++p;
+			}
 			break;
 		}
 		++p;
@@ -347,8 +378,9 @@ size_t max_chars_in_width (const wchar_t *s, size_t len, unsigned scrwid)
 	while (p < end) {
 		unsigned w = ucs_width (*p);
 		if (int (scrwid -= w) <= 0) {
-			if (scrwid == 0)
+			if (scrwid == 0) {
 				++p;
+			}
 			break;
 		}
 		++p;
@@ -359,12 +391,15 @@ size_t max_chars_in_width (const wchar_t *s, size_t len, unsigned scrwid)
 wchar_t ucs_reverse_case (wchar_t c)
 {
 	wchar_t d;
-	if ((d = towlower (c)) != c)
+	if ((d = towlower (c)) != c) {
 		return d;
-	else if ((d = towupper (c)) != c)
+	}
+	else if ((d = towupper (c)) != c) {
 		return d;
-	else
+	}
+	else {
 		return c;
+	}
 }
 
 namespace {
@@ -432,10 +467,12 @@ bool allow_line_end (wchar_t c)
 size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size_t slen, size_t offset, unsigned options)
 {
 	s += offset;
-	if (slen == size_t (-1))
+	if (slen == size_t (-1)) {
 		slen = wcslen (s);
-	else
+	}
+	else {
 		slen -= offset;
+	}
 
 	size_t cur = 0;     // Current position
 	unsigned curwid = 0;// Used screen width
@@ -454,8 +491,9 @@ size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size
 			return (offset + cur + 1); // Skip the newline character
 		}
 		unsigned w = ucs_width (s[cur]);
-		if (curwid + w > wid)
+		if (curwid + w > wid) {
 			break;
+		}
 		curwid += w;
 		++cur;
 	}
@@ -465,8 +503,9 @@ size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size
 	if (!(options & SPLIT_CUT_WORD)) {
 		unsigned xcur = cur;
 		for (;;) {
-			if (xcur == 0) // This means that a single word is longer than a line. We have to split it
+			if (xcur == 0) { // This means that a single word is longer than a line. We have to split it
 				break;
+			}
 			if ((!ucs_isalnum (s[xcur-1]) || !ucs_isalnum (s[xcur])) &&
 					allow_line_end (s[xcur-1]) &&
 					allow_line_beginning (s[xcur])) {
@@ -475,8 +514,9 @@ size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size
 			}
 			curwid -= ucs_width (s[--xcur]);
 		}
-		while (cur+extra_skip+1<slen && s[cur+extra_skip]==L' ')
+		while (cur+extra_skip+1<slen && s[cur+extra_skip]==L' ') {
 			++extra_skip;
+		}
 	}
 	result.begin = offset;
 	result.len = cur;
@@ -493,8 +533,9 @@ unsigned split_line (SplitStringLine *result, unsigned max_lines, unsigned wid, 
 {
 	unsigned offset = 0;
 	unsigned lines;
-	for (lines = 0; lines<max_lines && offset<slen; ++lines)
+	for (lines = 0; lines<max_lines && offset<slen; ++lines) {
 		offset = split_line (*result++, wid, s, slen, offset, 0);
+	}
 	return lines;
 }
 
@@ -519,7 +560,8 @@ SplitStringLineList split_line (unsigned wid, const wchar_t *s, size_t slen)
 			o.len = 1;
 			o.wid = ucs_width (s[k]);
 		}
-	} else {
+	}
+	else {
 		for (unsigned offset = 0; offset < slen; ) {
 			ret.push_back (SplitStringLine ());
 			offset = split_line (ret.back (), wid, s, slen, offset, 0);

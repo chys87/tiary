@@ -1,3 +1,18 @@
+// -*- mode:c++; tab-width:4; -*-
+// vim:ft=cpp ts=4
+
+/***************************************************************************
+ *
+ * Tiary, a terminal-based diary keeping system for Unix-like systems
+ * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ *
+ * This software is licensed under the 3-clause BSD license.
+ * See LICENSE in the source package and/or online info for details.
+ *
+ **************************************************************************/
+
+
+
 #include "ui/dialog_richtext.h"
 #include "ui/richtext.h"
 #include "ui/window.h"
@@ -50,9 +65,11 @@ void WindowRichText::ctor_finish ()
 	// Continue with the c'tor
 	max_text_width = 0;
 	for (RichTextList::const_iterator it = text.get_list ().begin ();
-			it != text.get_list ().end (); ++it)
-		if (max_text_width < it->screen_wid)
+			it != text.get_list ().end (); ++it) {
+		if (max_text_width < it->screen_wid) {
 			max_text_width = it->screen_wid;
+		}
+	}
 
 	Signal sig_close (this, &Window::request_close);
 	register_hotkey (RETURN, sig_close);
@@ -70,10 +87,12 @@ WindowRichText::~WindowRichText ()
 void WindowRichText::redraw ()
 {
 	Size ideal_size = size_hint;
-	if (ideal_size.x < max_text_width)
+	if (ideal_size.x < max_text_width) {
 		ideal_size.x = max_text_width + 12;
-	if (ideal_size.y < text.get_list ().size ())
+	}
+	if (ideal_size.y < text.get_list ().size ()) {
 		ideal_size.y = text.get_list ().size () + 3;
+	}
 	ideal_size += make_size (4, 2); // Border
 	Size scrsize = get_screen_size ();
 	ideal_size &= scrsize;

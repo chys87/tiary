@@ -25,24 +25,28 @@ UIStringBase::UIStringBase (const std::wstring &s, unsigned options)
 	: text (s)
 	, hotkey_pos (size_t(-1))
 {
-	if (!(options & NO_HOTKEY))
+	if (!(options & NO_HOTKEY)) {
 		update ();
+	}
 }
 
 void UIStringBase::set_text (const std::wstring &s, unsigned options)
 {
 	text = s;
 	hotkey_pos = size_t(-1);
-	if (!(options & NO_HOTKEY))
+	if (!(options & NO_HOTKEY)) {
 		update ();
+	}
 }
 
 wchar_t UIStringBase::get_hotkey () const
 {
-	if (hotkey_pos < text.length ())
+	if (hotkey_pos < text.length ()) {
 		return text[hotkey_pos];
-	else
+	}
+	else {
 		return L'\0';
+	}
 }
 
 void UIStringBase::update ()
@@ -53,8 +57,9 @@ void UIStringBase::update ()
 		wchar_t c;
 		if (++found<text.size() && iswprint (c = text.data()[found])) {
 			text.erase (--found, 1);
-			if (hotkey_pos==size_t(-1) && c!=L'&')
+			if (hotkey_pos==size_t(-1) && c!=L'&') {
 				hotkey_pos = found;
+			}
 			++found;
 		}
 	}
@@ -89,8 +94,10 @@ Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid)
 		pos = ctrl.put (pos, get_text().data()[get_hotkey_pos()]);
 		ctrl.set_attr (remember);
 		pos = ctrl.put (pos, get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
-	} else
+	}
+	else {
 		pos = ctrl.put (pos, get_text().data (), end);
+	}
 	return pos;
 }
 
@@ -109,8 +116,10 @@ Size UIStringOne::output (Window &win, Size pos, unsigned wid)
 		pos = win.put (pos, get_text().data()[get_hotkey_pos()]);
 		win.set_attr (remember);
 		pos = win.put (pos, get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
-	} else
+	}
+	else {
 		pos = win.put (pos, get_text().data (), end);
+	}
 	return pos;
 }
 
@@ -158,8 +167,10 @@ void UIString::output (Control &ctrl, Size pos, Size size)
 			next = ctrl.put (next, get_text().data()[get_hotkey_pos ()]);
 			ctrl.set_attr (remember);
 			next = ctrl.put (next, get_text().data()+get_hotkey_pos()+1, lst[i].len - (get_hotkey_pos () - lst[i].begin + 1));
-		} else
+		}
+		else {
 			ctrl.put (pos, get_text().data()+lst[i].begin, lst[i].len);
+		}
 		pos.y++;
 	}
 }
@@ -177,7 +188,8 @@ void UIString::update ()
 			max_width = maxU (max_width, cur_line_width);
 			cur_line_width = 0;
 			cls = s + 1;
-		} else {
+		}
+		else {
 			cur_line_width += ucs_width (*s);
 		}
 	}

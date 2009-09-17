@@ -1,3 +1,16 @@
+// -*- mode:c++; tab-width:4; -*-
+// vim:ft=cpp ts=4
+
+/***************************************************************************
+ *
+ * Tiary, a terminal-based diary keeping system for Unix-like systems
+ * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ *
+ * This software is licensed under the 3-clause BSD license.
+ * See LICENSE in the source package and/or online info for details.
+ *
+ **************************************************************************/
+
 #include "main/dialog_all_labels.h"
 #include "ui/button.h"
 #include "ui/button_default.h"
@@ -124,8 +137,9 @@ void WindowAllLabels::slot_rename ()
 				format (L"Enter the new name for \"%a\":") << old_name,
 				old_name,
 				32);
-		if (new_name.empty () || new_name == old_name)
+		if (new_name.empty () || new_name == old_name) {
 			return;
+		}
 
 		const wchar_t *warning_template;
 		WindowMessageButton msg_buttons;
@@ -134,7 +148,8 @@ void WindowAllLabels::slot_rename ()
 			warning_template = L"Label \"%b\" already exists. Are you sure you want to merge \"%a\" into \"%b\"?\n"
 						L"This operation cannot be undone!";
 			msg_buttons = MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO;
-		} else {
+		}
+		else {
 			warning_template = L"Are you sure you want to rename \"%a\" to \"%b\"?";
 			msg_buttons = MESSAGE_YES|MESSAGE_NO;
 		}
@@ -168,8 +183,9 @@ void WindowAllLabels::slot_delete ()
 		if (dialog_message (format (L"Are you sure you want to delete label \"%a\"?\nThis operation cannot be undone!")
 					<< old_name, L"Delete label", MESSAGE_YES|MESSAGE_NO) == MESSAGE_YES) {
 			all_labels.erase (old_name);
-			for (DiaryEntryList::iterator it = entries.begin (); it != entries.end (); ++it)
+			for (DiaryEntryList::iterator it = entries.begin (); it != entries.end (); ++it) {
 				(*it)->labels.erase (old_name);
+			}
 			modified = true;
 			refresh_list ();
 			touch_windows (); // Reflect changes in MainWin
@@ -186,10 +202,12 @@ void WindowAllLabels::refresh_list (const std::wstring &select_hint)
 {
 	size_t new_select;
 	WStringLocaleOrderedSet::const_iterator it = all_labels.find (select_hint);
-	if (it == all_labels.end ())
+	if (it == all_labels.end ()) {
 		new_select = size_t (-1);
-	else
+	}
+	else {
 		new_select = std::distance (all_labels.begin (), it);
+	}
 	lst_labels.set_items (std::vector<std::wstring> (all_labels.begin (), all_labels.end ()),
 			new_select, false);
 }

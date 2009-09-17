@@ -191,8 +191,10 @@ bool MainCtrl::on_key (wchar_t key)
 			if (w().filter.get ()) {
 				w().clear_filter ();
 				return true;
-			} else
+			}
+			else {
 				return false;
+			}
 
 		case ui::CTRL_N:
 			w().new_file ();
@@ -225,22 +227,27 @@ bool MainCtrl::on_key (wchar_t key)
 
 bool MainCtrl::on_mouse (ui::MouseEvent mouse_event)
 {
-	if (!(mouse_event.m & (ui::LEFT_CLICK | ui::RIGHT_CLICK)))
+	if (!(mouse_event.m & (ui::LEFT_CLICK | ui::RIGHT_CLICK))) {
 		return false;
+	}
 	ui::Scroll::Info info = ui::Scroll::get_info ();
 	unsigned k = mouse_event.p.y + info.first;
 	if (k >= info.focus) {
 		unsigned expand_lines = w().global_options.get_num (GLOBAL_OPTION_EXPAND_LINES);
-		if (k < info.focus + expand_lines)
+		if (k < info.focus + expand_lines) {
 			k = info.focus;
-		else
+		}
+		else {
 			k -= expand_lines - 1;
+		}
 	}
-	if (k >= w().get_current_list ().size ())
+	if (k >= w().get_current_list ().size ()) {
 		return false;
+	}
 	set_focus (k);
-	if (mouse_event.m & ui::RIGHT_CLICK)
+	if (mouse_event.m & ui::RIGHT_CLICK) {
 		w().context_menu->show (mouse_event.p + get_pos (), true);
+	}
 	return true;
 }
 
@@ -277,8 +284,9 @@ void MainCtrl::redraw ()
 
 	// Build a map to get entry ID from pointer
 	unordered_map <const DiaryEntry *, unsigned> id_map;
-	for (size_t i=0; i<w().entries.size (); ++i)
+	for (size_t i=0; i<w().entries.size (); ++i) {
 		id_map.insert (std::make_pair (w().entries[i], i+1));
+	}
 	// Is there a filter?
 	const DiaryEntryList &ent_lst = w().get_current_list ();
 
@@ -318,16 +326,18 @@ void MainCtrl::redraw ()
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_LABELS_SELECT : ui::PALETTE_ID_ENTRY_LABELS);
 		int left_wid = get_size().x - pos.x;
 		for (DiaryEntry::LabelList::const_iterator it=labels.begin(); it!=labels.end(); ) {
-			if (left_wid < 3)
+			if (left_wid < 3) {
 				break;
+			}
 			unsigned labelwid = ucs_width (*it);
 			if (labelwid + 2 > unsigned (left_wid)) {
 				pos = put (pos, L"...", 3);
 				break;
 			}
 			pos = put (pos, *it);
-			if (++it != labels.end ())
+			if (++it != labels.end ()) {
 				pos = put (pos, L',');
+			}
 		}
 		pos.x++;
 
@@ -347,7 +357,8 @@ void MainCtrl::redraw ()
 						disp_buffer, std::not1 (std::ptr_fun (iswprint)), L' ');
 				pos = put (pos, disp_buffer, bufend-disp_buffer);
 			}
-		} else {
+		}
+		else {
 			// Other entry
 			// [Date] [Title] [Labels] [...]
 			offset = split_line (split_info, maxS (0, get_size().x - pos.x), text, offset,
@@ -365,12 +376,15 @@ void MainCtrl::redraw ()
 void MainCtrl::set_focus (unsigned k)
 {
 	unsigned num_ent = w().get_current_list ().size ();
-	if (num_ent == 0)
+	if (num_ent == 0) {
 		return;
-	if (int (k) < 0)
+	}
+	if (int (k) < 0) {
 		k = 0;
-	if (k >= num_ent)
+	}
+	if (k >= num_ent) {
 		k = num_ent - 1;
+	}
 	ui::Scroll::modify_focus (k);
 	MainCtrl::redraw ();
 }
@@ -457,10 +471,12 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	}
 
 	std::wstring filename = initial_filename;
-	if (filename.empty ())
+	if (filename.empty ()) {
 		filename = utf8_to_wstring (global_options.get (GLOBAL_OPTION_DEFAULT_FILE));
-	if (!filename.empty ())
+	}
+	if (!filename.empty ()) {
 		load (filename);
+	}
 }
 
 MainWin::~MainWin ()
@@ -483,7 +499,8 @@ void MainWin::updated_filter ()
 	if (filter.get ()) {
 		filtered_entries.reset (new DiaryEntryList (filter->filter (entries)));
 		main_ctrl.ui::Scroll::modify_number (filtered_entries->size ());
-	} else {
+	}
+	else {
 		filtered_entries.reset ();
 		main_ctrl.ui::Scroll::modify_number (entries.size ());
 	}
@@ -541,8 +558,9 @@ void MainWin::load (const std::wstring &filename)
 			{
 				RecentFileList::const_iterator it = std::find (recent_files.begin (),
 						recent_files.end (), current_filename);
-				if (it != recent_files.end ())
+				if (it != recent_files.end ()) {
 					main_ctrl.set_focus (it->focus_entry);
+				}
 			}
 			return;
 
@@ -570,8 +588,9 @@ void MainWin::load (const std::wstring &filename)
 	main_ctrl.touch ();
 	saved = true;
 	ui::Window::touch_windows ();
-	if (!error_info.empty ())
+	if (!error_info.empty ()) {
 		ui::dialog_message (error_info);
+	}
 }
 
 void MainWin::save (const std::wstring &filename)
@@ -581,17 +600,21 @@ void MainWin::save (const std::wstring &filename)
 		current_filename = filename;
 		saved = true;
 		fmt = L"Successfully saved \"%a\".";
-	} else
+	}
+	else {
 		fmt = L"Cannot save file \"%a\".";
+	}
 	ui::dialog_message (format (fmt) << filename);
 }
 
 void MainWin::default_save ()
 {
-	if (current_filename.empty ())
+	if (current_filename.empty ()) {
 		save_as ();
-	else
+	}
+	else {
 		save (current_filename);
+	}
 }
 
 void MainWin::save_as ()
@@ -622,33 +645,41 @@ void MainWin::append ()
 		entries.push_back (ent);
 		main_ctrl.touch ();
 		main_ctrl.set_focus (std::numeric_limits<int>::max ());
-	} else
+	}
+	else {
 		delete ent;
+	}
 }
 
 DiaryEntryList &MainWin::get_current_list ()
 {
-	if (filtered_entries.get ())
+	if (filtered_entries.get ()) {
 		return *filtered_entries;
-	else
+	}
+	else {
 		return entries;
+	}
 }
 
 const DiaryEntryList &MainWin::get_current_list () const
 {
-	if (filtered_entries.get ())
+	if (filtered_entries.get ()) {
 		return *filtered_entries;
-	else
+	}
+	else {
 		return entries;
+	}
 }
 
 DiaryEntry *MainWin::get_current ()
 {
 	DiaryEntryList &lst = get_current_list ();
-	if (lst.empty ())
+	if (lst.empty ()) {
 		return 0;
-	else
+	}
+	else {
 		return lst[main_ctrl.get_current_focus ()];
+	}
 }
 
 void MainWin::edit_current ()
@@ -678,18 +709,21 @@ void MainWin::edit_labels_current ()
 void MainWin::edit_time_current ()
 {
 	if (DiaryEntry *ent = get_current ()) {
-		if (edit_entry_time (*ent))
+		if (edit_entry_time (*ent)) {
 			main_ctrl.touch ();
+		}
 	}
 }
 
 
 void MainWin::remove_current ()
 {
-	if (!unavailable_filtered ())
+	if (!unavailable_filtered ()) {
 		return;
-	if (entries.empty ())
+	}
+	if (entries.empty ()) {
 		return;
+	}
 	size_t k = main_ctrl.get_current_focus ();
 	if (ui::dialog_message (
 				L"Are you sure to remove the currently selected entry?",
@@ -702,13 +736,16 @@ void MainWin::remove_current ()
 
 void MainWin::move_up_current ()
 {
-	if (!unavailable_filtered ())
+	if (!unavailable_filtered ()) {
 		return;
-	if (entries.size () < 2)
+	}
+	if (entries.size () < 2) {
 		return;
+	}
 	size_t k = main_ctrl.get_current_focus ();
-	if (k == 0)
+	if (k == 0) {
 		return;
+	}
 	std::swap (entries[k-1], entries[k]);
 	main_ctrl.touch ();
 	main_ctrl.set_focus (k-1);
@@ -716,13 +753,16 @@ void MainWin::move_up_current ()
 
 void MainWin::move_down_current ()
 {
-	if (!unavailable_filtered ())
+	if (!unavailable_filtered ()) {
 		return;
-	if (entries.size () < 2)
+	}
+	if (entries.size () < 2) {
 		return;
+	}
 	size_t k = main_ctrl.get_current_focus ();
-	if (k+1 >= entries.size ())
+	if (k+1 >= entries.size ()) {
 		return;
+	}
 	std::swap (entries[k+1], entries[k]);
 	main_ctrl.touch ();
 	main_ctrl.set_focus (k+1);
@@ -732,18 +772,16 @@ namespace {
 
 bool compare_entry (const DiaryEntry *a, const DiaryEntry *b)
 {
-	if (a->local_time < b->local_time)
-		return true;
-	else
-		return false;
+	return (a->local_time < b->local_time);
 }
 
 } // anonymous namespace
 
 void MainWin::sort_all ()
 {
-	if (!unavailable_filtered ())
+	if (!unavailable_filtered ()) {
 		return;
+	}
 	if (ui::dialog_message (L"Are you sure you want to sort all entries by time? This operation cannot be undone.",
 				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_DEFAULT_NO) == ui::MESSAGE_YES) {
 		std::stable_sort (entries.begin (), entries.end (), compare_entry);
@@ -753,15 +791,17 @@ void MainWin::sort_all ()
 
 void MainWin::view_current ()
 {
-	if (DiaryEntry *ent = get_current ())
+	if (DiaryEntry *ent = get_current ()) {
 		view_entry (*ent, global_options.get_wstring (GLOBAL_OPTION_LONGTIME_FORMAT));
+	}
 }
 
 void MainWin::view_all ()
 {
 	DiaryEntryList &lst = get_current_list ();
-	if (!lst.empty ())
+	if (!lst.empty ()) {
 		view_all_entries (lst, global_options.get_wstring (GLOBAL_OPTION_LONGTIME_FORMAT));
+	}
 }
 
 /*
@@ -775,8 +815,9 @@ void MainWin::view_all ()
 bool MainWin::check_save ()
 {
 	update_recent_files ();
-	if (saved)
+	if (saved) {
 		return true;
+	}
 	switch (ui::dialog_message (
 				format (L"Save changes to \"%a\"?") << (
 					current_filename.empty () ? L"<Untitled>" : current_filename.c_str ()
@@ -807,8 +848,9 @@ void MainWin::update_recent_files ()
 	it->focus_entry = main_ctrl.get_current_focus ();
 
 	unsigned n_files = global_options.get_num (GLOBAL_OPTION_RECENT_FILES);
-	while (recent_files.size () > n_files)
+	while (recent_files.size () > n_files) {
 		recent_files.pop_back ();
+	}
 	save_global_options (global_options, recent_files);
 }
 
@@ -828,8 +870,9 @@ void MainWin::open_file ()
 				L"Open",
 				std::wstring (),
 				ui::SELECT_FILE_READ);
-		if (!new_filename.empty ())
+		if (!new_filename.empty ()) {
 			load (new_filename);
+		}
 	}
 }
 
@@ -847,20 +890,24 @@ void MainWin::open_recent_file ()
 		size_t choice = ui::dialog_select (
 				L"Recent files",
 				choices);
-		if (choice < choices.size ())
+		if (choice < choices.size ()) {
 			load (choices [choice]);
+		}
 	}
 }
 
 void MainWin::edit_filter ()
 {
-	if (entries.empty ())
+	if (entries.empty ()) {
 		return;
-	if (!filter.get ())
+	}
+	if (!filter.get ()) {
 		filter.reset (new FilterGroup);
+	}
 	dialog_filter (entries, *filter);
-	if (filter->empty ())
+	if (filter->empty ()) {
 		filter.reset ();
+	}
 	updated_filter ();
 }
 
@@ -872,32 +919,38 @@ void MainWin::clear_filter ()
 
 void MainWin::search (bool bkwd)
 {
-	if (get_current_list ().empty ())
+	if (get_current_list ().empty ()) {
 		return;
-	if (last_search.dialog (bkwd))
+	}
+	if (last_search.dialog (bkwd)) {
 		do_search (false, true);
+	}
 }
 
 void MainWin::search_continue (bool bkwd)
 {
-	if (!last_search)
+	if (!last_search) {
 		search (bkwd);
-	else
+	} else {
 		do_search (bkwd, false);
+	}
 }
 
 void MainWin::do_search (bool bkwd, bool include_current_entry)
 {
 	DiaryEntryList &entry_list = get_current_list ();
 	unsigned num_ents = entry_list.size ();
-	if (num_ents == 0)
+	if (num_ents == 0) {
 		return;
-	if (!last_search)
+	}
+	if (!last_search) {
 		return;
+	}
 	unsigned k = main_ctrl.get_current_focus ();
 	int inc = (!bkwd == !last_search.get_backward ()) ? 1 : -1;
-	if (!include_current_entry)
+	if (!include_current_entry) {
 		k += inc;
+	}
 	for (; k < num_ents; k += inc) {
 		if (last_search.basic_match (entry_list[k]->title) || last_search.basic_match (entry_list[k]->text)) {
 			main_ctrl.set_focus (k);
@@ -922,8 +975,9 @@ void MainWin::edit_password ()
 	if (!password.empty ()) {
 		std::wstring old_password = ui::dialog_input (L"Please enter your old password:",
 				std::wstring (), 35, ui::INPUT_PASSWORD, std::wstring ());
-		if (old_password.empty ())
+		if (old_password.empty ()) {
 			return;
+		}
 		if (old_password != password) {
 			ui::dialog_message (L"Incorrect password.");
 			return;
@@ -932,8 +986,9 @@ void MainWin::edit_password ()
 
 	std::wstring new_password1 = ui::dialog_input (L"Please enter your new password:",
 			std::wstring (), 35, ui::INPUT_PASSWORD, L"\n\r");
-	if (new_password1 == L"\n\r") // Canceled
+	if (new_password1 == L"\n\r") { // Canceled
 		return;
+	}
 
 	const wchar_t *info = 0;
 	if (new_password1.empty ()) {
@@ -943,25 +998,29 @@ void MainWin::edit_password ()
 			main_ctrl.touch ();
 			info = L"Password removed.";
 		}
-	} else {
+	}
+	else {
 		std::wstring new_password2 = ui::dialog_input (L"Please enter again:",
 				std::wstring (), 35, ui::INPUT_PASSWORD, std::wstring ());
 		if (new_password1 == new_password2) {
 			password.swap (new_password1);
 			main_ctrl.touch ();
 			info = L"Password changed.";
-		} else {
+		}
+		else {
 			info = L"Password _not_ changed.";
 		}
 	}
-	if (info)
+	if (info) {
 		ui::dialog_message (info);
+	}
 }
 
 void MainWin::edit_all_labels ()
 {
-	if (tiary::edit_all_labels (entries))
+	if (tiary::edit_all_labels (entries)) {
 		main_ctrl.touch ();
+	}
 }
 
 void MainWin::edit_global_options ()
@@ -980,8 +1039,9 @@ void MainWin::edit_perfile_options ()
 
 void MainWin::quit ()
 {
-	if (check_save ())
+	if (check_save ()) {
 		request_close ();
+	}
 }
 
 bool MainWin::query_normal_mode () const

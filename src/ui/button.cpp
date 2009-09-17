@@ -27,8 +27,9 @@ Button::Button (Window &win, const std::wstring &str)
 	, attributes (0)
 {
 	// Register hotkey
-	if (wchar_t c = text.get_hotkey ())
+	if (wchar_t c = text.get_hotkey ()) {
 		win.register_hotkey (c, Signal (sig_clicked, 0)); // Connecting to, not copying from sig_clicked
+	}
 }
 
 Button::~Button ()
@@ -56,15 +57,20 @@ void Button::redraw ()
 	unsigned x = (get_size().x - w) / 2;
 
 	PaletteID id;
-	if (is_focus ())
+	if (is_focus ()) {
 		id = PALETTE_ID_BUTTON_FOCUS;
+	}
 	else if (ButtonDefault *def_chooser = dynamic_cast <ButtonDefault *> (&win)) {
-		if (def_chooser->get_current_default_button () == this)
+		if (def_chooser->get_current_default_button () == this) {
 			id = PALETTE_ID_BUTTON_DEFAULT;
-		else
+		}
+		else {
 			id = PALETTE_ID_BUTTON_NORMAL;
-	} else
+		}
+	}
+	else {
 		id = PALETTE_ID_BUTTON_NORMAL;
+	}
 
 	choose_palette (id);
 	Size pos = make_size (x,y);

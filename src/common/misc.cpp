@@ -25,8 +25,9 @@ namespace tiary {
 
 bool read_whole_file (FILE *fp, std::vector<char> &ret, size_t estimated_size)
 {
-	if (estimated_size < 128)
+	if (estimated_size < 128) {
 		estimated_size = 128;
+	}
 	size_t used = 0;
 	std::vector<char> buf (estimated_size, '\0');
 	size_t l;
@@ -37,8 +38,9 @@ bool read_whole_file (FILE *fp, std::vector<char> &ret, size_t estimated_size)
 			buf.resize (estimated_size);
 		}
 	}
-	if (ferror_unlocked (fp))
+	if (ferror_unlocked (fp)) {
 		return false;
+	}
 	buf.resize (used);
 	buf.swap (ret);
 	return true;
@@ -49,10 +51,11 @@ template <typename MapT>
 	map_query (const MapT &map, const typename MapT::key_type::value_type *key)
 {
 	typename MapT::const_iterator it = map.find (key);
-	if (it != map.end ())
+	if (it != map.end ()) {
 		return it->second.c_str ();
-	else
+	} else {
 		return 0;
+	}
 }
 
 // Explicit instantiations (C++98 standard syntax)
@@ -90,8 +93,9 @@ bool safe_write_file (const char *filename, const void *ptr, size_t len)
 		size_t fwrite_return = fwrite_unlocked (ptr, 1, len, fp);
 		fclose (fp);
 		if (fwrite_return == len) { // Successful. Remove backup file
-			if (!backup_name.empty ())
+			if (!backup_name.empty ()) {
 				unlink (backup_name.c_str ());
+			}
 			return true;
 		}
 		// Failed. Remove partially written file
@@ -99,8 +103,9 @@ bool safe_write_file (const char *filename, const void *ptr, size_t len)
 	}
 
 	// Failed. Restore original file
-	if (!backup_name.empty ())
+	if (!backup_name.empty ()) {
 		rename (backup_name.c_str (), filename);
+	}
 	return false;
 }
 
@@ -108,12 +113,15 @@ template <typename T>
 unsigned hex_to_num (T c, unsigned error_return)
 {
 	unsigned a = c;
-	if ((a -= T('0')) < 10)
+	if ((a -= T('0')) < 10) {
 		return a;
-	if ((a -= T('A')-T('0')) < 6)
+	}
+	if ((a -= T('A')-T('0')) < 6) {
 		return (a + 10);
-	if ((a -= T('a')-T('A')) < 6)
+	}
+	if ((a -= T('a')-T('A')) < 6) {
 		return (a + 10);
+	}
 	return error_return;
 }
 
@@ -126,8 +134,9 @@ unsigned environment_expand (std::string &s)
 {
 	const char *src = s.c_str ();
 	const char *dollar = strchr (src, '$');
-	if (dollar == 0)
+	if (dollar == 0) {
 		return 0;
+	}
 	unsigned expansions = 0;
 	std::string r;
 	do {
@@ -147,8 +156,9 @@ unsigned environment_expand (std::string &s)
 			varname.assign (dollar+1, varnamelen);
 			src = dollar+1+varnamelen;
 		}
-		if (const char *varval = getenv (varname.c_str ()))
+		if (const char *varval = getenv (varname.c_str ())) {
 			r += varval;
+		}
 		++expansions;
 		dollar = strchrnul (src, '$');
 	} while (*dollar);

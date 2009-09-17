@@ -47,8 +47,9 @@ tiary::XMLNodeText::~XMLNodeText ()
 
 void tiary::xml_free (XMLNode *root)
 {
-	if (root == 0)
+	if (root == 0) {
 		return;
+	}
 
 	// deque is too complicated; vector is fine
 	std::stack<XMLNode *, std::vector <XMLNode *> > stk;
@@ -57,19 +58,24 @@ void tiary::xml_free (XMLNode *root)
 
 	for (;;) {
 		// Push right sibling into stack
-		if (p->next)
+		if (p->next) {
 			stk.push (p->next);
+		}
 		XMLNode *first_child = 0;
-		if (XMLNodeTree *q = dynamic_cast<XMLNodeTree *>(p))
+		if (XMLNodeTree *q = dynamic_cast<XMLNodeTree *>(p)) {
 			first_child = q->children;
+		}
 		delete p;
-		if (first_child)
+		if (first_child) {
 			p = first_child;
+		}
 		else if (!stk.empty ()) {
 			p = stk.top ();
 			stk.pop ();
-		} else
+		}
+		else {
 			break;
+		}
 	}
 }
 
@@ -90,8 +96,9 @@ XMLNode *shallow_copy (xmlNodePtr iptr)
 		// If a text node is empty or completely consists of space (tab, newline) etc.
 		// Eliminate it!
 		XMLNodeText *optr = 0;
-		if (strspn (text, " \t\r\n\v")[text] != '\0')
+		if (strspn (text, " \t\r\n\v")[text] != '\0') {
 			optr = new XMLNodeText (text);
+		}
 		xmlFree (text);
 		return optr;
 	} else { // Normal node
@@ -109,16 +116,20 @@ XMLNode *shallow_copy (xmlNodePtr iptr)
 // The other way
 xmlNodePtr shallow_copy (const XMLNode *iptr)
 {
-	if (const XMLNodeText *p = dynamic_cast<const XMLNodeText *>(iptr))
+	if (const XMLNodeText *p = dynamic_cast<const XMLNodeText *>(iptr)) {
 		return xmlNewText (BAD_CAST (p->text.c_str ()));
+	}
 	else if (const XMLNodeTree *p = dynamic_cast<const XMLNodeTree *>(iptr)) {
 		xmlNodePtr optr = xmlNewNode (0, BAD_CAST (p->name.c_str()));
 		// Copy attributes. Not ordered.
-		for (XMLNodeTree::PropertyList::const_iterator it=p->properties.begin(); it!=p->properties.end(); ++it)
+		for (XMLNodeTree::PropertyList::const_iterator it=p->properties.begin(); it!=p->properties.end(); ++it) {
 			xmlNewProp (optr, BAD_CAST(it->first.c_str()), BAD_CAST(it->second.c_str()));
+		}
 		return optr;
-	} else
+	}
+	else {
 		return 0;
+	}
 }
 
 extern "C" void generic_error_silent (void *, const char *, ...) {}
@@ -143,8 +154,9 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 
 	libxml2_init ();
 
-	if (!(doc = xmlReadMemory (str, len, 0, 0, 0)))
+	if (!(doc = xmlReadMemory (str, len, 0, 0, 0))) {
 		return 0;
+	}
 	if (!(iptr = xmlDocGetRootElement (doc))) {
 		xmlFreeDoc (doc);
 		return 0;
@@ -169,15 +181,18 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 		// Shallow copy all children of current node
 		virtual_node.next = 0;
 		XMLNode *last = &virtual_node;
-		for (xmlNodePtr child_ptr = iptr->xmlChildrenNode; child_ptr; child_ptr = child_ptr->next)
+		for (xmlNodePtr child_ptr = iptr->xmlChildrenNode; child_ptr; child_ptr = child_ptr->next) {
 			if (XMLNode *newnode = shallow_copy (child_ptr)) {
 				last = last->next = newnode;
-				if (child_ptr->xmlChildrenNode)
+				if (child_ptr->xmlChildrenNode) {
 					stk.push (std::make_pair (static_cast<XMLNodeTree *>(newnode), child_ptr));
+				}
 			}
+		}
 		optr->children = virtual_node.next;
-		if (stk.empty ())
+		if (stk.empty ()) {
 			break;
+		}
 		optr = stk.top().first;
 		iptr = stk.top().second;
 		stk.pop ();
@@ -218,11 +233,13 @@ std::string tiary::xml_make (const XMLNode *root)
 			for (XMLNode *child_ptr = iptr->children; child_ptr; child_ptr = child_ptr->next)
 				if (xmlNodePtr nptr = shallow_copy (child_ptr)) {
 					xmlAddChild (optr, nptr);
-					if (const XMLNodeTree *ip = dynamic_cast <const XMLNodeTree *> (child_ptr))
+					if (const XMLNodeTree *ip = dynamic_cast <const XMLNodeTree *> (child_ptr)) {
 						stk.push (std::make_pair (ip, nptr));
+					}
 				}
-			if (stk.empty ())
+			if (stk.empty ()) {
 				break;
+			}
 			iptr = stk.top().first;
 			optr = stk.top().second;
 			stk.pop ();

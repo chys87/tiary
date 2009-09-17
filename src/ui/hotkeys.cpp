@@ -59,14 +59,16 @@ void Hotkeys::register_hotkey (wchar_t c, const Signal &sig, int options)
 	wchar_t d = c;
 	if (!(options & CASE_SENSITIVE)) {
 		d = ucs_reverse_case (c);
-		if (d != c)
+		if (d != c) {
 			hotkey_list[d] = sig;
+		}
 	}
 	if (!(options & DISALLOW_ALT)) {
 		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26) {
 			hotkey_list[ALT_BASE + c] = sig;
-			if (d != c)
+			if (d != c) {
 				hotkey_list[ALT_BASE + d] = sig;
+			}
 		}
 	}
 	hotkey_list[c] = sig;
@@ -78,14 +80,16 @@ void Hotkeys::register_hotkey (wchar_t c, Signal &&sig, int options)
 	wchar_t d = c;
 	if (!(options & CASE_SENSITIVE)) {
 		d = ucs_reverse_case (c);
-		if (d != c)
+		if (d != c) {
 			hotkey_list[d] = sig; // Copy semantics
+		}
 	}
 	if (!(options & DISALLOW_ALT)) {
 		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26) {
 			hotkey_list[ALT_BASE + c] = sig; // Copy semantics
-			if (d != c)
+			if (d != c) {
 				hotkey_list[ALT_BASE + d] = sig; // Copy semantics
+			}
 		}
 	}
 	hotkey_list[c] = std::forward<Signal> (sig); // Move semantics
@@ -98,8 +102,10 @@ bool Hotkeys::emit_hotkey (wchar_t c)
 	if (it != hotkey_list.end ()) {
 		it->second.emit ();
 		return true;
-	} else
+	}
+	else {
 		return false;
+	}
 }
 
 } // namespace tiary::ui

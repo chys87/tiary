@@ -54,8 +54,9 @@ WindowMessage::WindowMessage (const std::wstring &text, const std::wstring &titl
 	, result (0)
 	, n_buttons (0)
 {
-	if (!(mask & MESSAGE_ALL))
+	if (!(mask & MESSAGE_ALL)) {
 		button_mask = mask = MESSAGE_OK;
+	}
 	Button *btn_ok = 0;
 	Button *btn_yes = 0;
 	Button *btn_no = 0;
@@ -83,35 +84,44 @@ WindowMessage::WindowMessage (const std::wstring &text, const std::wstring &titl
 	}
 	n_buttons = p - p_buttons;
 
-	if (n_buttons >= 2)
+	if (n_buttons >= 2) {
 		ChainControlsHorizontal (p_buttons, n_buttons);
+	}
 
 	// Map Esc
 	Button *btn_escape;
 
-	if (!(btn_escape = btn_cancel))
-		if (!(btn_escape = btn_no))
-			if (!(btn_escape = btn_yes))
+	if (!(btn_escape = btn_cancel)) {
+		if (!(btn_escape = btn_no)) {
+			if (!(btn_escape = btn_yes)) {
 				btn_escape = btn_ok;
+			}
+		}
+	}
 	register_hotkey (ESCAPE, btn_escape->sig_clicked);
 
 	// Focus the default button
-	if ((mask & (MESSAGE_OK|MESSAGE_DEFAULT_OK)) == (MESSAGE_OK|MESSAGE_DEFAULT_OK))
+	if ((mask & (MESSAGE_OK|MESSAGE_DEFAULT_OK)) == (MESSAGE_OK|MESSAGE_DEFAULT_OK)) {
 		set_focus_ptr (btn_ok);
-	else if ((mask & (MESSAGE_YES|MESSAGE_DEFAULT_YES)) == (MESSAGE_YES|MESSAGE_DEFAULT_YES))
+	}
+	else if ((mask & (MESSAGE_YES|MESSAGE_DEFAULT_YES)) == (MESSAGE_YES|MESSAGE_DEFAULT_YES)) {
 		set_focus_ptr (btn_yes);
-	else if ((mask & (MESSAGE_NO|MESSAGE_DEFAULT_NO)) == (MESSAGE_NO|MESSAGE_DEFAULT_NO))
+	}
+	else if ((mask & (MESSAGE_NO|MESSAGE_DEFAULT_NO)) == (MESSAGE_NO|MESSAGE_DEFAULT_NO)) {
 		set_focus_ptr (btn_no);
-	else if ((mask & (MESSAGE_CANCEL|MESSAGE_DEFAULT_CANCEL)) == (MESSAGE_CANCEL|MESSAGE_DEFAULT_CANCEL))
+	}
+	else if ((mask & (MESSAGE_CANCEL|MESSAGE_DEFAULT_CANCEL)) == (MESSAGE_CANCEL|MESSAGE_DEFAULT_CANCEL)) {
 		set_focus_ptr (btn_cancel);
+	}
 
 	WindowMessage::redraw ();
 }
 
 WindowMessage::~WindowMessage ()
 {
-	for (unsigned i=0; i<n_buttons; ++i)
+	for (unsigned i=0; i<n_buttons; ++i) {
 		delete p_buttons[i];
+	}
 }
 
 void WindowMessage::slot_click (WindowMessageButton button)
@@ -131,10 +141,12 @@ void WindowMessage::redraw ()
 	if (scr_size.x>ideal_width && lbl_text.get_max_text_width()>ideal_width &&
 		// First try not too wide.
 		// So that the box will seem better (if we only have a long single line)
-			lbl_text.split_line(ideal_width-4).size() + 6 <= scr_size.y / 2)
+			lbl_text.split_line(ideal_width-4).size() + 6 <= scr_size.y / 2) {
 		width = ideal_width;
-	else
+	}
+	else {
 		width = lbl_text.get_max_text_width () + 4;
+	}
 	width = minU (maxU (n_buttons * 12, width), scr_size.x);
 	unsigned height = minU (lbl_text.split_line (width - 4).size () + 6, scr_size.y);
 

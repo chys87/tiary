@@ -55,13 +55,15 @@ unsigned Scroll::get_item_screen_size (unsigned) const
 
 void Scroll::modify_focus (unsigned new_focus)
 {
-	if (new_focus > max_possible_focus ())
+	if (new_focus > max_possible_focus ()) {
 		return;
+	}
 	focus = new_focus;
 	if (new_focus - first >= len) {
 		if (new_focus < first) { // Scroll backward (upward)
 			first = new_focus;
-		} else { // Scroll forward (downward)
+		}
+		else { // Scroll forward (downward)
 			// Let's put the focus in the last line.
 			put_focus_last_line ();
 		}
@@ -73,23 +75,26 @@ void Scroll::modify_focus (unsigned new_focus)
 
 void Scroll::modify_focus_pos (unsigned new_focus_pos)
 {
-	if (new_focus_pos >= height)
+	if (new_focus_pos >= height) {
 		return;
+	}
 	// Find the maximal possible j, s.t.
 	// first <= k <= max_possible_focus ()
 	// accumulate_height[k] <= accumulate_height[first] + new_focus_pos
 	unsigned k = first;
 	unsigned max = max_possible_focus ();
 	unsigned limit = accumulate_height[first] + new_focus_pos;
-	while (k<max && accumulate_height[k+1]<=limit)
+	while (k<max && accumulate_height[k+1]<=limit) {
 		++k;
+	}
 	focus = k;
 }
 
 void Scroll::modify_height (unsigned new_height)
 {
-	if (new_height == 0)
+	if (new_height == 0) {
 		return;
+	}
 	unsigned old_height = height;
 	height = new_height;
 	if (new_height < old_height) {
@@ -100,7 +105,8 @@ void Scroll::modify_height (unsigned new_height)
 			// Let's put the focus in the last line.
 			put_focus_last_line ();
 		}
-	} else {
+	}
+	else {
 		// Became wider.
 		// If this will lead to space in the end, scroll backward (upward)
 		unsigned max = max_possible_focus ();
@@ -109,8 +115,9 @@ void Scroll::modify_height (unsigned new_height)
 			// accumulate_height[max+1] <= accumulate_height[first] + height
 			unsigned j = max;
 			unsigned tmp = accumulate_height[max+1];
-			while (j && tmp<=accumulate_height[j-1]+height)
+			while (j && tmp<=accumulate_height[j-1]+height) {
 				--j;
+			}
 			first = j;
 		}
 	}
@@ -125,7 +132,8 @@ void Scroll::modify_number (unsigned new_number)
 	if (first >= number) {
 		focus = max_focus;
 		put_focus_last_line ();
-	} else if (focus > max_possible_focus ()) {
+	}
+	else if (focus > max_possible_focus ()) {
 		focus = max_possible_focus ();
 		assert (focus >= first);
 	}
@@ -146,13 +154,15 @@ void Scroll::scroll_focus_to_last ()
 
 void Scroll::modify_number_delete ()
 {
-	if (focus >= number)
+	if (focus >= number) {
 		return; // Nothing to delete
+	}
 
 	// Only in one situation will the focus be moved
 	unsigned old_wid = accumulate_height[focus+1] - accumulate_height[focus];
-	for (unsigned i=focus; i<number; ++i)
+	for (unsigned i=focus; i<number; ++i) {
 		accumulate_height[i+1] = accumulate_height[i+2] - old_wid;
+	}
 	--number;
 	accumulate_height.resize (number + 2);
 	if (!allow_focus_end && number && focus>=number) {
@@ -164,8 +174,9 @@ void Scroll::modify_number_delete ()
 
 void Scroll::modify_number_backspace ()
 {
-	if (focus == 0)
+	if (focus == 0) {
 		return; // Nothing to remove
+	}
 	modify_focus (focus - 1);
 	modify_number_delete ();
 }
@@ -176,8 +187,9 @@ void Scroll::modify_number_insert ()
 	accumulate_height.resize (number + 2);
 	unsigned add_wid = get_item_screen_size (focus);
 	unsigned focus_next = focus + 1;
-	for (unsigned i=number+1; i>=focus_next; --i)
+	for (unsigned i=number+1; i>=focus_next; --i) {
 		accumulate_height[i] = accumulate_height[i-1] + add_wid;
+	}
 	modify_focus (focus_next);
 }
 
@@ -186,8 +198,9 @@ void Scroll::recalculate_accumulate_height ()
 	accumulate_height.resize (number + 2);
 	accumulate_height[0] = 0;
 	unsigned acc = 0;
-	for (unsigned i=0; i<number; ++i)
+	for (unsigned i=0; i<number; ++i) {
 		accumulate_height[i+1] = acc += get_item_screen_size(i);
+	}
 	accumulate_height[number+1] = acc += 1;
 }
 
@@ -197,17 +210,20 @@ unsigned Scroll::recalculate_len ()
 	// accumulate_height[first+len] <= accumulate_height[first] + height
 	unsigned j = first;
 	unsigned max = accumulate_height[first] + height;
-	while (j<number && accumulate_height[j+1]<=max)
+	while (j<number && accumulate_height[j+1]<=max) {
 		++j;
+	}
 	return (len = j-first);
 }
 
 unsigned Scroll::max_possible_focus () const
 {
-	if (allow_focus_end || number == 0)
+	if (allow_focus_end || number == 0) {
 		return number;
-	else
+	}
+	else {
 		return (number - 1);
+	}
 }
 
 void Scroll::put_focus_last_line ()
@@ -216,8 +232,9 @@ void Scroll::put_focus_last_line ()
 	// accumulate_height[focus+1] <= accumulate_height[first] + height
 	unsigned j = focus;
 	unsigned tmp = accumulate_height[focus+1];
-	while (j && tmp<=accumulate_height[j-1]+height)
+	while (j && tmp<=accumulate_height[j-1]+height) {
 		--j;
+	}
 	first = j;
 }
 

@@ -59,10 +59,12 @@ BZip2Result bzip2 (const void *data, size_t len)
 
 	unsigned newsize;
 
-	if (BZ2_bzBuffToBuffCompress (&ret[0], &destlen, (char *)data, len, 9, 0, 0) == BZ_OK)
+	if (BZ2_bzBuffToBuffCompress (&ret[0], &destlen, (char *)data, len, 9, 0, 0) == BZ_OK) {
 		newsize = destlen;
-	else
+	}
+	else {
 		newsize = 0;
+	}
 
 	ret.resize (newsize);
 	return ret;

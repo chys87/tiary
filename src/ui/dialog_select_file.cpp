@@ -153,8 +153,9 @@ void WindowSelectFile::slot_select ()
 	size_t select = list_files.get_select ();
 	if (select < list_files.get_items (). size()) {
 		std::wstring tmp = list_dir;
-		if (tmp.empty() || *c(tmp).rbegin () != L'/')
+		if (tmp.empty() || *c(tmp).rbegin () != L'/') {
 			tmp += L'/';
+		}
 		const std::wstring &file = list_files.get_items()[select];
 		tmp.append (file, 0,  file.length() - (*file.rbegin () == L'/'));
 		set_text (tmp);
@@ -168,8 +169,9 @@ void WindowSelectFile::slot_ok ()
 	if (attr & FILE_ATTR_DIRECTORY) {
 		// Selected a directory. Open it
 		set_text (expanded_name + L'/', true);
-		if (get_focus () == &list_files)
+		if (get_focus () == &list_files) {
 			slot_select ();
+		}
 		return;
 	}
 	if (options & SELECT_FILE_WRITE) {
@@ -178,8 +180,9 @@ void WindowSelectFile::slot_ok ()
 		if (!(attr & FILE_ATTR_NONEXIST) && (options & SELECT_FILE_WARN_OVERWRITE)) {
 			// Warn
 			if (dialog_message (format (L"File \"%a\" already exists. Overwrite it?") << text_input.get_text(),
-						MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO) != MESSAGE_YES)
+						MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO) != MESSAGE_YES) {
 				return;
+			}
 		}
 	} else {
 		// File selected for reading. Must exist
@@ -210,10 +213,12 @@ bool FilterDots::operator () (const DirEnt &ent) const
 {
 	const std::wstring &name = ent.name;
 	if (name[0] == L'.') {
-		if (name.length() == 1)
+		if (name.length() == 1) {
 			return true;
-		if (name.length() == 2 && name[1] == L'.')
+		}
+		if (name.length() == 2 && name[1] == L'.') {
 			return is_root;
+		}
 		return !show_hidden;
 	}
 	return false;
@@ -236,8 +241,9 @@ void WindowSelectFile::set_text (const std::wstring &newname, bool rewrite_input
 		for (DirEntList::iterator it = files.begin();
 				it != files.end();
 				++it) {
-			if (it->attr & FILE_ATTR_DIRECTORY)
+			if (it->attr & FILE_ATTR_DIRECTORY) {
 				it->name += L'/';
+			}
 			display_list.push_back (it->name);
 		}
 		list_files.set_items (TIARY_STD_MOVE (display_list), size_t(-1), false);
@@ -255,11 +261,13 @@ void WindowSelectFile::set_text (const std::wstring &newname, bool rewrite_input
 			break;
 		}
 		if (select==size_t(-1) &&
-				it->compare (0, split_fullname.second.length (), split_fullname.second) == 0)
+				it->compare (0, split_fullname.second.length (), split_fullname.second) == 0) {
 			select = it - list_files.get_items().begin();
+		}
 	}
-	if (select != list_files.get_select ())
+	if (select != list_files.get_select ()) {
 		list_files.set_select (select, false);
+	}
 }
 
 } // anonymous namespace

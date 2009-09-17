@@ -12,6 +12,12 @@
  **************************************************************************/
 
 
+/**
+ * @file	diary/config.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Defines default value for preferences and implements tiary::OptionGroupBase
+ */
+
 #include "diary/config.h"
 #include "common/misc.h"
 #include "common/format.h"
@@ -40,8 +46,9 @@ extern const OptionDescription g_perfile_option_descriptions[] = {
 
 void OptionGroupBase::reset (const OptionDescription *descriptions)
 {
-	for (const OptionDescription *desc = descriptions; desc->name; ++desc)
+	for (const OptionDescription *desc = descriptions; desc->name; ++desc) {
 		data[desc->name] = desc->default_value;
+	}
 }
 
 void OptionGroupBase::set (const char *name, const char *value)

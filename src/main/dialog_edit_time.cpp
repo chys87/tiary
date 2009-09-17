@@ -169,8 +169,9 @@ bool edit_entry_time (DiaryEntry &ent)
 {
 	WindowTime win (ent.local_time.extract ());
 	win.event_loop ();
-	if (win.get_canceled ())
+	if (win.get_canceled ()) {
 		return false;
+	}
 	DateTime old = ent.local_time;
 	ent.local_time = win.get_result ();
 	return (old != ent.local_time);
