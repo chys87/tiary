@@ -59,8 +59,13 @@ namespace detail {
  *
  * When variadic template (C++0x feature) is widely available, we can
  * make more comfortable interfaces.
+ *
+ * If circle = true, the last control is connected to the first.
+ *
+ * If other = true, the relative controls on the other direction are
+ * copied from the first control to all others.
  */
-template <Direction direction, bool circle = true>
+template <Direction direction, bool circle, bool other>
 class ChainControls : private noncopyable
 {
 public:
@@ -93,22 +98,31 @@ public:
 		, last_control (n ? lst[n-1] : 0)
 		, nonempty (n)
 	{
-		for (size_t i=1; i<n; ++i)
+		for (size_t i=1; i<n; ++i) {
 			chain (lst[i-1], lst[i]);
+			if (other) {
+				copy_other (lst[0], lst[i]);
+			}
+		}
 	}
 
 	~ChainControls ()
 	{
-		if (nonempty && circle)
+		if (circle && nonempty) {
 			chain (last_control, first_control);
+		}
 	}
 
 	ChainControls & operator () (Control *next)
 	{
-		if (nonempty)
+		if (nonempty) {
 			chain (last_control, next);
-		else
+			if (other) {
+				copy_other (first_control, next);
+			}
+		} else {
 			first_control = next;
+		}
 		last_control = next;
 		nonempty = true;
 		return *this;
@@ -122,8 +136,9 @@ public:
 	// T must be either Control or a derivative class of Control
 	template <typename T> ChainControls & operator () (T *const *lst, size_t n)
 	{
-		for (size_t i=0; i<n; ++i)
+		for (size_t i=0; i<n; ++i) {
 			operator () (lst[i]);
+		}
 		return *this;
 	}
 
@@ -142,14 +157,29 @@ private:
 			b->ctrl_left = a;
 		}
 	}
+
+	static void copy_other (Control *a, Control *b)
+	{
+		if (direction == VERTICAL) {
+			b->ctrl_left = a->ctrl_left;
+			b->ctrl_right = a->ctrl_right;
+		} else {
+			b->ctrl_up = a->ctrl_up;
+			b->ctrl_down = a->ctrl_down;
+		}
+	}
 };
 
 } // namespace detail
 
-typedef detail::ChainControls<VERTICAL,  true > ChainControlsVertical;
-typedef detail::ChainControls<HORIZONTAL,true > ChainControlsHorizontal;
-typedef detail::ChainControls<VERTICAL,  false> ChainControlsVerticalNC;
-typedef detail::ChainControls<HORIZONTAL,false> ChainControlsHorizontalNC;
+typedef detail::ChainControls<VERTICAL,  true,  false> ChainControlsVertical;
+typedef detail::ChainControls<HORIZONTAL,true,  false> ChainControlsHorizontal;
+typedef detail::ChainControls<VERTICAL,  false, false> ChainControlsVerticalNC;
+typedef detail::ChainControls<HORIZONTAL,false, false> ChainControlsHorizontalNC;
+typedef detail::ChainControls<VERTICAL,  true,  true > ChainControlsVerticalO;
+typedef detail::ChainControls<HORIZONTAL,true,  true > ChainControlsHorizontalO;
+typedef detail::ChainControls<VERTICAL,  false, true > ChainControlsVerticalNCO;
+typedef detail::ChainControls<HORIZONTAL,false, true > ChainControlsHorizontalNCO;
 
 
 

@@ -82,7 +82,7 @@ WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocal
 	lst_all.set_items (std::vector <std::wstring> (all_labels_.begin (), all_labels_.end ()), size_t(-1), false);
 
 	ChainControlsVertical () (txt_selected) (lst_all) (btn_ok);
-	ChainControlsHorizontal () (btn_ok) (btn_cancel);
+	ChainControlsHorizontalO () (btn_ok) (btn_cancel) (btn_add);
 
 	layout_buttons.add
 		(btn_add, 10, 10)
