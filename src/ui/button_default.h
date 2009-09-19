@@ -46,12 +46,15 @@ public:
 	void set_default_button (Button * = 0);
 	void set_default_button (Button &btn) { set_default_button (&btn); }
 
-	virtual Button *get_current_default_button () const;
+	Button *get_current_default_button () const { return current_default; }
 
 private:
 	Button *default_default;
 
+	Button *current_default; // Updated by on_focus_changed
+
 	void slot_default_button ();
+	void redraw_all_buttons ();
 
 	friend class ButtonDefaultExtended;
 };
@@ -76,7 +79,7 @@ public:
 	void set_special_default_button (Control &ctrl, Button *btn) { set_special_default_button (&ctrl, btn); }
 	void set_special_default_button (Control &ctrl, Button &btn) { set_special_default_button (&ctrl, &btn); }
 
-	Button *get_current_default_button () const;
+	void on_focus_changed ();
 
 private:
 

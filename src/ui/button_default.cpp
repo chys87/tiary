@@ -12,6 +12,7 @@ namespace ui {
 ButtonDefault::ButtonDefault ()
 	: Window ()
 	, default_default (0)
+	, current_default (0)
 {
 	Signal sig_tmp (this, &ButtonDefault::slot_default_button);
 	Window::register_hotkey (RETURN, sig_tmp, Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
@@ -25,6 +26,19 @@ ButtonDefault::~ButtonDefault ()
 
 void ButtonDefault::on_focus_changed ()
 {
+	Button *default_button = dynamic_cast <Button *> (Window::get_focus ());
+	if (default_button == 0) {
+		default_button = default_default;
+	}
+
+	if (default_button != current_default) {
+		current_default = default_button;
+		redraw_all_buttons ();
+	}
+}
+
+void ButtonDefault::redraw_all_buttons ()
+{
 	const ControlList &control_list = get_control_list ();
 	for (ControlList::const_iterator it = control_list.begin ();
 			it != control_list.end (); ++it) {
@@ -37,15 +51,6 @@ void ButtonDefault::on_focus_changed ()
 void ButtonDefault::set_default_button (Button *btn)
 {
 	default_default = btn;
-}
-
-Button *ButtonDefault::get_current_default_button () const
-{
-	Control *focus = Window::get_focus ();
-	if (Button *focus_button = dynamic_cast <Button *> (focus)) {
-		return focus_button;
-	}
-	return default_default;
 }
 
 void ButtonDefault::slot_default_button ()
@@ -72,21 +77,22 @@ void ButtonDefaultExtended::set_special_default_button (Control *focus, Button *
 	special_map.insert (std::make_pair (focus, btn));
 }
 
-Button *ButtonDefaultExtended::get_current_default_button () const
+void ButtonDefaultExtended::on_focus_changed ()
 {
-	Control *focus = Window::get_focus ();
-	if (focus == 0) {
-		return default_default;
+	Button *default_button = dynamic_cast <Button *> (Window::get_focus ());
+	if (default_button == 0) {
+		SpecialMap::const_iterator it = special_map.find (Window::get_focus ());
+		if (it == special_map.end ()) {
+			default_button = default_default;
+		}
+		else {
+			default_button = it->second;
+		}
 	}
-	if (Button *focus_button = dynamic_cast <Button *> (focus)) {
-		return focus_button;
-	}
-	SpecialMap::const_iterator it = special_map.find (focus);
-	if (it == special_map.end ()) {
-		return default_default;
-	}
-	else {
-		return it->second;
+
+	if (default_button != current_default) {
+		current_default = default_button;
+		redraw_all_buttons ();
 	}
 }
 

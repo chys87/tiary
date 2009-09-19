@@ -35,6 +35,8 @@ public:
 	bool on_key (wchar_t);
 //	bool on_mouse (MouseEvent); // Handled by Window
 	void redraw ();
+	bool on_focus ();
+	void on_defocus ();
 
 private:
 	UIStringOne text;

@@ -77,5 +77,16 @@ void Button::redraw ()
 	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL) ? L" <" : L"  ");
 }
 
+bool Button::on_focus ()
+{
+	Button::redraw ();
+	return true;
+}
+
+void Button::on_defocus ()
+{
+	Button::redraw ();
+}
+
 } // namespace tiary::ui
 } // namespace tiary
