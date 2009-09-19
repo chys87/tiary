@@ -430,7 +430,6 @@ DirEntList list_dir (
 
 	if (DIR *dir = ::opendir (dirname.c_str ())) {
 		DirEnt tmp_ent;
-		struct stat st_buf;
 		if (*c(dirname).rbegin() != '/') {
 			dirname += '/';
 		}
