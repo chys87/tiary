@@ -22,6 +22,7 @@ namespace ui {
 namespace {
 
 #define BACKGROUND         { BLACK, WHITE, 0 }
+#define BACKGROUND_HIGH    { WHITE, WHITE, HIGHLIGHT }
 #define BACKGROUND_GRAY    { YELLOW, WHITE, 0 }
 #define EDIT_AREA          { WHITE, BLACK, 0 }
 #define EDIT_AREA_SELECT   { BLACK, YELLOW, 0 }
@@ -44,6 +45,7 @@ struct PaletteMap
 const PaletteMap mapping[] = {
 	// Put the commas in the beginning of lines to make VCS happy
 	{ PALETTE_ID_BACKGROUND,           BACKGROUND }
+	, {PALETTE_ID_MOVING_BORDER,       BACKGROUND_HIGH }
 	, { PALETTE_ID_LABEL,              BACKGROUND }
 	, { PALETTE_ID_BUTTON_FOCUS,       EDIT_AREA_SELECT }
 	, { PALETTE_ID_BUTTON_NORMAL,      BACKGROUND }

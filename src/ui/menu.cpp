@@ -304,7 +304,7 @@ void ItemControl::slot_trigger ()
 }
 
 MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_left_)
-	: Window (Window::WINDOW_NO_CLOSE_BUTTON)
+	: Window (Window::WINDOW_NO_CLOSE_BUTTON|Window::WINDOW_NONMOVABLE)
 	, result (0)
 	, menu (menu_)
 	, unget_left (unget_left_)

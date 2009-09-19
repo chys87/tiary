@@ -42,6 +42,7 @@ public:
 
 	static const unsigned WINDOW_NO_BORDER = 1;
 	static const unsigned WINDOW_NO_CLOSE_BUTTON = 2;
+	static const unsigned WINDOW_NONMOVABLE = 4;
 
 	explicit Window (unsigned = 0, const std::wstring &title = std::wstring ());
 	virtual ~Window ();
@@ -88,7 +89,11 @@ public:
 	Size get_cursor_pos () const;
 	bool get_cursor_visibility () const;
 
-	void move_resize (Size, Size); // Move and resize window, NOT preserving content
+	// Move and resize window, NOT preserving content
+	// NOTE: If the size is unchanged, and the old position is still able to
+	// guarantee that the window fits on screen, the position is not modified.
+	// (In order to implement window moving)
+	void move_resize (Size, Size);
 
 	void clear (); // Fill the whole window with spaces and current attribute
 	void clear (Size fill_pos, Size fill_size);
@@ -156,6 +161,12 @@ private:
 	void deallocate_char_table ();
 
 
+	enum Status
+	{
+		STATUS_NORMAL
+		, STATUS_MOVING
+	};
+	Status status;
 	unsigned options;
 	UIStringOne title;
 

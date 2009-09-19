@@ -27,6 +27,7 @@ namespace tiary {
 namespace ui {
 
 const PaletteID PALETTE_ID_BACKGROUND           = 0;
+const PaletteID PALETTE_ID_MOVING_BORDER        = 22;
 const PaletteID PALETTE_ID_LABEL                = 1;
 const PaletteID PALETTE_ID_BUTTON_FOCUS         = 2;
 const PaletteID PALETTE_ID_BUTTON_NORMAL        = 3;

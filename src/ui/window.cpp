@@ -313,6 +313,7 @@ Window::Window (unsigned options_, const std::wstring &title_)
 	, requests (0)
 	, cur_attr (ColorAttr::make_default ())
 	, char_table (0)
+	, status (STATUS_NORMAL)
 	, options (options_)
 	, title (title_, UIStringBase::NO_HOTKEY)
 	, control_list ()
@@ -397,9 +398,40 @@ void Window::event_loop ()
 		wchar_t c;
 		c = get (&mouse_event);
 
-		// WINCH and MOUSE should be treated specially
-
-		if (c == WINCH) {
+		if (status == STATUS_MOVING) {
+			switch (c) {
+				case LEFT:
+					if (pos.x) {
+						pos.x--;
+						touch_windows ();
+					}
+					break;
+				case RIGHT:
+					if (pos.x + size.x < get_screen_size ().x) {
+						pos.x++;
+						touch_windows ();
+					}
+					break;
+				case UP:
+					if (pos.y) {
+						pos.y--;
+						touch_windows ();
+					}
+					break;
+				case DOWN:
+					if (pos.y + size.y < get_screen_size ().y) {
+						pos.y++;
+						touch_windows ();
+					}
+					break;
+				default:
+					status = STATUS_NORMAL;
+					redraw ();
+					break;
+			}
+		}
+		else if (c == WINCH) {
+			// WINCH and MOUSE should be treated specially
 			touch_lines ();
 			// Signal every window. So that background windows can also redraw themselves.
 			for (WindowList::iterator it = window_list.begin (); it != window_list.end (); ++it) {
@@ -480,6 +512,17 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, wchar_t ch)
 
 void Window::move_resize (Size newpos, Size newsize)
 {
+	if (newsize == size) {
+		if (newpos == pos) {
+			return;
+		}
+		// If the old position still makes the window fit on screen,
+		// do not move it.
+		// (This is in order to implement user-initiated window moving.)
+		if (both (pos + newsize <= get_screen_size ())) {
+			newpos = pos;
+		}
+	}
 	unsigned touch_begin = minU (pos.y, newpos.y);
 	unsigned touch_height = maxU (pos.y + size.y, newpos.y + newsize.y) - touch_begin;
 	pos = newpos;
@@ -813,11 +856,17 @@ bool Window::on_mouse (MouseEvent mouse_event)
 		}
 	}
 
-	// Clicked close button?
+	// Clicked on the top border (including close button)?
 	if (!processed) {
-		if ((mouse_event.m & LEFT_CLICK) && (mouse_event.p.y == 0) &&
-				(get_size ().x - 2 - mouse_event.p.x < 3)) {
-			processed = on_key (ESCAPE);
+		if ((mouse_event.m & LEFT_CLICK) && (mouse_event.p.y == 0)) {
+			if ((get_size ().x - 2 - mouse_event.p.x < 3)) {
+				processed = on_key (ESCAPE);
+			}
+			else if (!(options & WINDOW_NONMOVABLE)) {
+				status = STATUS_MOVING;
+				redraw ();
+				processed = true;
+			}
 		}
 	}
 
@@ -887,6 +936,10 @@ void Window::redraw ()
 	Size size = get_size ();
 	// Draw the border
 	if (!(options & WINDOW_NO_BORDER) && both (size >= make_size (2, 2))) {
+
+		if (status == STATUS_MOVING) {
+			choose_palette (PALETTE_ID_MOVING_BORDER);
+		}
 
 		put (make_size (), BORDER_1); // Top, left
 		fill (make_size (1, 0), make_size (size.x-2, 1), BORDER_H); // Up
