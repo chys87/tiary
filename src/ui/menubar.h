@@ -28,8 +28,9 @@ namespace ui {
  * @brief	Control for a menu bar
  *
  * tiary::ui::MenuBar is supposed to provide a more sophisticated than
- * tiary::ui::show_menu, so we do not use tiary::ui::LLMenuItem, which
- * is considered a "low level" interface.
+ * tiary::ui::show_menu.
+ *
+ * We also allows displaying some texts on the right side of the menubar.
  */
 class MenuBar : public UnfocusableControl
 {
@@ -46,6 +47,8 @@ public:
 
 	void slot_clicked (size_t k);
 
+	void set_text (const std::wstring &);
+
 private:
 	struct Item
 	{
@@ -60,6 +63,8 @@ private:
 	 */
 	typedef std::list<Item> ItemList;
 	ItemList item_list;
+
+	UIStringOne text;
 };
 
 

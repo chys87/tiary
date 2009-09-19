@@ -494,6 +494,26 @@ void MainWin::redraw ()
 	Window::redraw ();
 }
 
+void MainWin::on_ready ()
+{
+	// Update the status string on the right-hand side of the menubar
+	// [+] [Filtering] [Filename]
+	std::wstring status;
+	if (!saved) {
+		status = L"+ ";
+	}
+	if (filter.get ()) {
+		status += L"[Filter] ";
+	}
+	if (current_filename.empty ()) {
+		status += L"<New file>";
+	}
+	else {
+		status += current_filename;
+	}
+	menu_bar.set_text (status);
+}
+
 void MainWin::updated_filter ()
 {
 	if (filter.get ()) {

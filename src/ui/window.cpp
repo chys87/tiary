@@ -375,6 +375,17 @@ bool Window::on_mouse_outside (MouseEvent)
 	return false;
 }
 
+void Window::on_ready ()
+{
+}
+
+void Window::on_focus_changed ()
+{
+	for (ControlList::iterator it = control_list.begin (); it != control_list.end (); ++it) {
+		(*it)->on_focus_changed ();
+	}
+}
+
 void Window::event_loop ()
 {
 	if (size_t (focus_id) >= control_list.size ()) {
@@ -382,8 +393,10 @@ void Window::event_loop ()
 	}
 
 	while (!(requests & REQUEST_CLOSE)) {
-		MouseEvent mouse_event;
 
+		on_ready ();
+
+		MouseEvent mouse_event;
 		wchar_t c;
 		c = get (&mouse_event);
 
@@ -715,11 +728,7 @@ bool Window::set_focus_id (unsigned id, int fall_direction)
 		focus_id = try_id;
 		Control *try_ctrl = control_list[try_id];
 		if (try_ctrl->on_focus ()) {
-			// Notify every control
-			for (ControlList::iterator it = control_list.begin ();
-					it != control_list.end (); ++it) {
-				(*it)->on_focus_changed ();
-			}
+			on_focus_changed ();
 			// Emit two signals
 			if (old_focus >= 0) {
 				control_list[old_focus]->sig_defocus.emit ();

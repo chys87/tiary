@@ -32,6 +32,8 @@ namespace ui {
 MenuBar::MenuBar (Window &win)
 	: Control (win)
 	, UnfocusableControl (win)
+	, item_list ()
+	, text ()
 {
 }
 
@@ -90,6 +92,16 @@ void MenuBar::redraw ()
 	for (ItemList::iterator it=item_list.begin(); it!=item_list.end(); ++it) {
 		it->text.output (*this, make_size (it->w, 0), it->text.get_width ());
 	}
+	unsigned x = 0;
+	if (!item_list.empty ()) {
+		x = item_list.back ().w + item_list.back ().text.get_width () + 2;
+	}
+	if (x < get_size ().x) {
+		// Align to the right
+		unsigned w = minU (get_size ().x - x, text.get_width ());
+		x = get_size ().x - w;
+		text.output (*this, make_size (x, 0), w);
+	}
 }
 
 void MenuBar::slot_clicked (size_t k)
@@ -142,6 +154,14 @@ void MenuBar::slot_clicked (size_t k)
 			}
 			break;
 		}
+	}
+}
+
+void MenuBar::set_text (const std::wstring &s)
+{
+	if (text.get_text () != s) {
+		text.set_text (s, UIStringOne::NO_HOTKEY);
+		MenuBar::redraw ();
 	}
 }
 

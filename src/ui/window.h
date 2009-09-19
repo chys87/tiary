@@ -69,6 +69,8 @@ public:
 	virtual bool on_mouse (MouseEvent); // Mouse coordinates are relative to window
 	virtual void on_winch (); ///< Called when screen size changed. Default: call redraw
 	virtual bool on_mouse_outside (MouseEvent); // Mouse event outside the window boundary. Coordinates are absolute
+	virtual void on_ready (); ///< Called every time when it's ready to accept user input.
+	virtual void on_focus_changed (); ///< Called whenever the focus is changed.
 	virtual void redraw (); // Default behavior: Clear window and call every control's redraw functions
 
 	void event_loop (); // Main event loop

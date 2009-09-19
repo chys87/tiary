@@ -71,6 +71,7 @@ public:
 
 	// Overload virtual functions
 	void redraw ();
+	void on_ready ();
 
 	friend class MainCtrl;
 
