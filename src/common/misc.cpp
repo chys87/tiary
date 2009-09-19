@@ -110,26 +110,6 @@ bool safe_write_file (const char *filename, const void *ptr, size_t len)
 	return false;
 }
 
-template <typename T>
-unsigned hex_to_num (T c, unsigned error_return)
-{
-	unsigned a = c;
-	if ((a -= T('0')) < 10) {
-		return a;
-	}
-	if ((a -= T('A')-T('0')) < 6) {
-		return (a + 10);
-	}
-	if ((a -= T('a')-T('A')) < 6) {
-		return (a + 10);
-	}
-	return error_return;
-}
-
-// Explicit instantiations
-template unsigned hex_to_num <char> (char, unsigned);
-template unsigned hex_to_num <wchar_t> (wchar_t, unsigned);
-
 
 unsigned environment_expand (std::string &s)
 {

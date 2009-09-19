@@ -37,8 +37,6 @@ template <typename MapT>
 // Save or overwrite a file as safely as possible
 bool safe_write_file (const char *, const void *, size_t);
 
-template <typename ChT> unsigned hex_to_num (ChT, unsigned error_return = 0);
-
 // Expand environment variable representations like $param and ${param}
 // Returns the number of expansions
 unsigned environment_expand (std::string &);
