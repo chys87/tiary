@@ -69,10 +69,6 @@ bool Control::on_focus ()
 	return true;
 }
 
-void Control::on_focus_changed ()
-{
-}
-
 bool Control::is_focus () const
 {
 	return (win.get_focus () == this);

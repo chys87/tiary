@@ -34,7 +34,6 @@ public:
 
 	bool on_key (wchar_t);
 //	bool on_mouse (MouseEvent); // Handled by Window
-	void on_focus_changed ();
 	void redraw ();
 
 private:

@@ -38,6 +38,8 @@ public:
 	ButtonDefault ();
 	~ButtonDefault ();
 
+	void on_focus_changed ();
+
 	/**
 	 * @brief	Set the default "default button"
 	 */

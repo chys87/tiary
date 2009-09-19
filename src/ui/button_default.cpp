@@ -23,6 +23,17 @@ ButtonDefault::~ButtonDefault ()
 {
 }
 
+void ButtonDefault::on_focus_changed ()
+{
+	const ControlList &control_list = get_control_list ();
+	for (ControlList::const_iterator it = control_list.begin ();
+			it != control_list.end (); ++it) {
+		if (Button *btn = dynamic_cast <Button *> (*it)) {
+			btn->Button::redraw ();
+		}
+	}
+}
+
 void ButtonDefault::set_default_button (Button *btn)
 {
 	default_default = btn;

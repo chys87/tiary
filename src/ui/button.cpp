@@ -45,11 +45,6 @@ bool Button::on_key (wchar_t c)
 	return false;
 }
 
-void Button::on_focus_changed ()
-{
-	Button::redraw ();
-}
-
 void Button::redraw ()
 {
 	unsigned y = (get_size().y - 1) / 2;

@@ -381,9 +381,6 @@ void Window::on_ready ()
 
 void Window::on_focus_changed ()
 {
-	for (ControlList::iterator it = control_list.begin (); it != control_list.end (); ++it) {
-		(*it)->on_focus_changed ();
-	}
 }
 
 void Window::event_loop ()

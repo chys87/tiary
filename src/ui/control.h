@@ -41,7 +41,6 @@ public:
 	virtual bool on_key (wchar_t);
 	virtual void on_defocus (); // Cannot refuse defocusing
 	virtual bool on_focus ();   // Can refuse defocusing (default is acceptance)
-	virtual void on_focus_changed (); // Focus changed (called even if not related to this control)
 
 	bool is_focus () const;
 	void focus (); ///< Make this Control the focus of the Window
