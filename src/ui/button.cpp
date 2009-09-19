@@ -23,6 +23,7 @@ namespace ui {
 
 Button::Button (Window &win, const std::wstring &str)
 	: Control (win)
+	, FocusColorControl (win)
 	, text (str)
 	, attributes (0)
 {
@@ -75,17 +76,6 @@ void Button::redraw ()
 	pos = text.output (*this, pos, w-4);
 	pos = make_size (x+w-2, y);
 	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL) ? L" <" : L"  ");
-}
-
-bool Button::on_focus ()
-{
-	Button::redraw ();
-	return true;
-}
-
-void Button::on_defocus ()
-{
-	Button::redraw ();
 }
 
 } // namespace tiary::ui

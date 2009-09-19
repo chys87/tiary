@@ -24,7 +24,7 @@ namespace tiary {
 namespace ui {
 
 
-class Button : public Control
+class Button : public virtual Control, public FocusColorControl
 {
 public:
 	// The text must be a single line
@@ -35,8 +35,6 @@ public:
 	bool on_key (wchar_t);
 //	bool on_mouse (MouseEvent); // Handled by Window
 	void redraw ();
-	bool on_focus ();
-	void on_defocus ();
 
 private:
 	UIStringOne text;
