@@ -120,7 +120,8 @@ public:
 			if (other) {
 				copy_other (first_control, next);
 			}
-		} else {
+		}
+		else {
 			first_control = next;
 		}
 		last_control = next;
@@ -152,7 +153,8 @@ private:
 		if (direction == VERTICAL) {
 			a->ctrl_down = b;
 			b->ctrl_up = a;
-		} else {
+		}
+		else {
 			a->ctrl_right = b;
 			b->ctrl_left = a;
 		}
@@ -163,7 +165,8 @@ private:
 		if (direction == VERTICAL) {
 			b->ctrl_left = a->ctrl_left;
 			b->ctrl_right = a->ctrl_right;
-		} else {
+		}
+		else {
 			b->ctrl_up = a->ctrl_up;
 			b->ctrl_down = a->ctrl_down;
 		}

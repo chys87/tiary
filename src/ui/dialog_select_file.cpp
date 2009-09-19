@@ -184,7 +184,8 @@ void WindowSelectFile::slot_ok ()
 				return;
 			}
 		}
-	} else {
+	}
+	else {
 		// File selected for reading. Must exist
 		if (attr & FILE_ATTR_NONEXIST) {
 			dialog_message (L"You must select an existing file.");

@@ -101,7 +101,8 @@ XMLNode *shallow_copy (xmlNodePtr iptr)
 		}
 		xmlFree (text);
 		return optr;
-	} else { // Normal node
+	}
+	else { // Normal node
 		XMLNodeTree *optr = new XMLNodeTree ((const char *)iptr->name);
 		// Attributes. Not ordered.
 		for (xmlAttrPtr aptr=iptr->properties; aptr; aptr=aptr->next) {

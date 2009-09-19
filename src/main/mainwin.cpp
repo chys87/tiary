@@ -951,7 +951,8 @@ void MainWin::search_continue (bool bkwd)
 {
 	if (!last_search) {
 		search (bkwd);
-	} else {
+	}
+	else {
 		do_search (bkwd, false);
 	}
 }

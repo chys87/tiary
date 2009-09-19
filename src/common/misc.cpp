@@ -132,7 +132,8 @@ unsigned environment_expand (std::string &s)
 			}
 			varname.assign (dollar+2, dollarend);
 			src = dollarend+1;
-		} else {
+		}
+		else {
 			size_t varnamelen = strspn (dollar+1, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
 			varname.assign (dollar+1, varnamelen);
 			src = dollar+1+varnamelen;

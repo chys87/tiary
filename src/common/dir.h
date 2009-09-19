@@ -88,8 +88,10 @@ std::wstring get_nice_pathname (const std::wstring &);
 
 
 
-const unsigned FILE_ATTR_DIRECTORY = 1;
-const unsigned FILE_ATTR_NONEXIST  = 0x8000u;
+const unsigned FILE_ATTR_DIRECTORY  = 1;
+// Remeber the meaning of X is different for directories and files
+const unsigned FILE_ATTR_EXECUTABLE = 2;
+const unsigned FILE_ATTR_NONEXIST   = 0x8000u;
 
 /**
  * @brief	Get the attributes of a given file/directory

@@ -60,7 +60,8 @@ void GridSelect::set_select (size_t new_select, bool emit_signal)
 			}
 			GridSelect::redraw ();
 		}
-	} else {
+	}
+	else {
 		if (select < items.size ()) {
 			select = size_t (-1);
 			if (emit_signal) {

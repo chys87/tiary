@@ -38,6 +38,31 @@
 # define PATH_MAX 4096
 #endif
 
+#ifndef S_ISDIR
+# if defined S_IFMT && defined S_IFDIR
+#  define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+# else
+#  error "WTF system are you using?"
+# endif
+#endif
+
+#ifndef TIARY_HAVE_EUIDACCESS
+# define euidaccess access
+#endif
+
+#ifndef AT_EACCESS
+# define AT_EACCESS 0
+#endif
+#ifndef AT_SYMLINK_NOFOLLOW
+# define AT_SYMLINK_NOFOLLOW 0
+#endif
+
+#if defined TIARY_HAVE_FACCESSAT && defined AT_FDCWD
+# undef euidaccess
+# define euidaccess(name,mode) faccessat(AT_FDCWD,name,mode,AT_EACCESS|AT_SYMLINK_NOFOLLOW)
+#endif
+
+
 namespace tiary {
 
 namespace {
@@ -134,7 +159,8 @@ template <> std::basic_string<char> get_current_dir <char> ()
 		std::string r = dir;
 		free (dir);
 		return r;
-	} else {
+	}
+	else {
 		return std::string ();
 	}
 #else
@@ -309,20 +335,23 @@ std::wstring get_nice_pathname (const std::wstring &name)
 unsigned get_file_attr (const char *name)
 {
 	struct stat st_buf;
-	if (stat (name, &st_buf) == 0) {
-		return
-#ifdef S_ISDIR
-			S_ISDIR(st_buf.st_mode)
-#elif defined S_IFDIR
-			(st_buf.st_mode & S_IFDIR)
-#else
-# error "Neither S_ISDIR nor S_IFDIR is defined???"
-#endif
-			? FILE_ATTR_DIRECTORY : 0;
+	unsigned attr = 0;
+	if (stat (name, &st_buf) != 0) {
+		attr = FILE_ATTR_NONEXIST;
 	}
 	else {
-		return FILE_ATTR_NONEXIST;
+		if (S_ISDIR (st_buf.st_mode)) {
+			attr |= FILE_ATTR_DIRECTORY;
+		}
+		if (st_buf.st_mode & 0111) {
+			// It is executable by someone. But how about me?
+			// Ask the kernel!
+			if (euidaccess (name, X_OK) == 0) {
+				attr |= FILE_ATTR_EXECUTABLE;
+			}
+		}
 	}
+	return attr;
 }
 
 unsigned get_file_attr (const wchar_t *name)
@@ -402,33 +431,12 @@ DirEntList list_dir (
 	if (DIR *dir = ::opendir (dirname.c_str ())) {
 		DirEnt tmp_ent;
 		struct stat st_buf;
-#ifdef TIARY_HAVE_AT_FILE
-		int dirfd = ::dirfd (dir);
-#else
 		if (*c(dirname).rbegin() != '/') {
 			dirname += '/';
 		}
-#endif
 		while (struct dirent *ent = readdir (dir)) {
 			tmp_ent.name = mbs_to_wstring (ent->d_name);
-			tmp_ent.attr = 0;
-#ifdef TIARY_HAVE_AT_FILE
-			if (fstatat (dirfd, ent->d_name, &st_buf, 0) == 0)
-#else
-			if (stat ((dirname + ent->d_name).c_str(), &st_buf) == 0)
-#endif
-			{
-#if defined S_ISDIR
-				if (S_ISDIR (st_buf.st_mode))
-#elif defined S_IFDIR 
-				if (st_buf.st_mode & S_IFDIR)
-#else
-# error "Neither S_ISDIR nor S_IFDIR is defined??"
-#endif
-				{
-					tmp_ent.attr = FILE_ATTR_DIRECTORY;
-				}
-			}
+			tmp_ent.attr = get_file_attr (dirname + ent->d_name);
 			if (!filter (tmp_ent)) {
 				filelist.push_back (TIARY_STD_MOVE (tmp_ent));
 			}
@@ -464,10 +472,12 @@ std::string find_executable (const std::string &exe)
 		else {
 			result = exe;
 		}
-		if (access (result.c_str (), X_OK) != 0) {
+		if ((get_file_attr (result) & (FILE_ATTR_DIRECTORY|FILE_ATTR_EXECUTABLE))
+				!= FILE_ATTR_EXECUTABLE) {
 			result.clear ();
 		}
-	} else if (const char *path = getenv ("PATH")) {
+	}
+	else if (const char *path = getenv ("PATH")) {
 		// exe is a "bare" filename
 		for (;;) {
 			const char *colon = strchrnul (path, ':');
@@ -479,7 +489,8 @@ std::string find_executable (const std::string &exe)
 			}
 			result += '/';
 			result += exe;
-			if (access (result.c_str (), X_OK) == 0) {
+			if ((get_file_attr (result) & (FILE_ATTR_DIRECTORY|FILE_ATTR_EXECUTABLE))
+					== FILE_ATTR_EXECUTABLE) {
 				break;
 			}
 			if (*colon != ':') {
