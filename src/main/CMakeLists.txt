@@ -1,4 +1,4 @@
-add_library(tiary_main
+add_library(tiary_main STATIC
 	dialog_all_labels.h
 	dialog_all_labels.cpp
 	dialog_edit_time.h

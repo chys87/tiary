@@ -1,4 +1,4 @@
-add_library(tiary_common
+add_library(tiary_common STATIC
 	algorithm.h
 	algorithm.cpp
 	bzip2.h

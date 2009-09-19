@@ -1,4 +1,4 @@
-add_library(tiary_diary
+add_library(tiary_diary STATIC
 	config.h
 	config.cpp
 	diary.h

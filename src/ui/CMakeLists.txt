@@ -1,4 +1,4 @@
-add_library(tiary_ui
+add_library(tiary_ui STATIC
 	button.h
 	button.cpp
 	button_default.h
