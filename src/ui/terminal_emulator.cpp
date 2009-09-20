@@ -143,8 +143,9 @@ bool terminal_emulator_correct_wcwidth ()
 {
 	static bool is_utf8 = is_locale_utf8 ();
 	// In non-Unicode locales there are more problems
-	if (!is_utf8)
+	if (!is_utf8) {
 		return false;
+	}
 	switch (get_terminal_emulator ()) {
 		case LINUX_CONSOLE:
 		case RXVT_UNICODE:
