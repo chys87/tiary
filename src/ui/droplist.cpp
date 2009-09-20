@@ -17,6 +17,7 @@
 #include "ui/menu.h"
 #include "ui/paletteid.h"
 #include "ui/dialog_select.h"
+#include "common/algorithm.h"
 #include <algorithm>
 #include <wctype.h>
 

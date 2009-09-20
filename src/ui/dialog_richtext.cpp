@@ -16,6 +16,7 @@
 #include "ui/dialog_richtext.h"
 #include "ui/richtext.h"
 #include "ui/window.h"
+#include "common/algorithm.h"
 #include <utility> // std::forward
 
 

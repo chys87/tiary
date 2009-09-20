@@ -27,6 +27,7 @@
 #include "ui/layout.h"
 #include "ui/chain.h"
 #include "common/unicode.h"
+#include "common/algorithm.h"
 
 namespace tiary {
 namespace ui {

@@ -13,6 +13,7 @@
 
 
 #include "ui/terminal_emulator.h"
+#include "common/unicode.h"
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -121,6 +122,13 @@ TerminalEmulator detect_terminal_emulator ()
 	}
 }
 
+bool is_locale_utf8 ()
+{
+	// Traditional Chinese "I love you" in UTF-8 and UCS-4
+	return (mbs_to_wstring ("\xe6\x88\x91\xe6\x84\x9b\xe4\xbd\xa0")
+			== L"\u6211\u611b\u4f60");
+}
+
 } // anonymous namespace
 
 
@@ -133,6 +141,10 @@ TerminalEmulator get_terminal_emulator ()
 
 bool terminal_emulator_correct_wcwidth ()
 {
+	static bool is_utf8 = is_locale_utf8 ();
+	// In non-Unicode locales there are more problems
+	if (!is_utf8)
+		return false;
 	switch (get_terminal_emulator ()) {
 		case LINUX_CONSOLE:
 		case RXVT_UNICODE:

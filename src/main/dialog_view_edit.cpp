@@ -14,6 +14,7 @@
 
 #include "main/dialog_view_edit.h"
 #include "diary/diary.h"
+#include "common/algorithm.h"
 #include "common/unicode.h"
 #include "common/split_line.h"
 #include "ui/window.h"

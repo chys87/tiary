@@ -20,6 +20,7 @@
 #include "ui/chain.h"
 #include "common/container_of.h"
 #include "common/containers.h"
+#include "common/algorithm.h"
 #include <utility> // std::forward
 
 namespace tiary {

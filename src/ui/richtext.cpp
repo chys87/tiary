@@ -8,6 +8,7 @@
 #include "ui/paletteid.h"
 #include "ui/dialog_message.h"
 #include "common/format.h"
+#include "common/algorithm.h"
 #include <utility> // std::forward
 
 namespace tiary {

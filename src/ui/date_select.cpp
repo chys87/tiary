@@ -14,6 +14,7 @@
 
 #include "ui/date_select.h"
 #include "common/format.h"
+#include "common/algorithm.h"
 #include <utility> // std::forward
 
 namespace tiary {

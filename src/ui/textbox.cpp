@@ -17,6 +17,7 @@
 #include "ui/chain.h"
 #include "ui/paletteid.h"
 #include "common/unicode.h"
+#include "common/algorithm.h"
 #include <wctype.h>
 #include <assert.h>
 

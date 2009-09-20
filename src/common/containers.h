@@ -15,7 +15,6 @@
 #ifndef TIARY_COMMON_CONTAINERS_H
 #define TIARY_COMMON_CONTAINERS_H
 
-#include "algorithm.h"
 #include <stddef.h> // size_t
 #include <locale>
 #include <string>

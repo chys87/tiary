@@ -23,7 +23,6 @@
 
 #include "common/types.h"
 #include <vector>
-#include <algorithm>
 #include <string.h>
 #include <list>
 #include <string>
