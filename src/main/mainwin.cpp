@@ -22,6 +22,7 @@
 #include "common/split_line.h"
 #include "common/unicode.h"
 #include "common/format.h"
+#include "common/callback.h"
 #include "diary/file.h"
 #include "diary/diary.h"
 #include "ui/paletteid.h"

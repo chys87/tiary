@@ -15,7 +15,6 @@
 #ifndef TIARY_DIARY_FILE_H
 #define TIARY_DIARY_FILE_H
 
-#include "common/callback.h"
 #include "diary/config.h"
 #include <string>
 #include <vector>
@@ -40,6 +39,8 @@ enum LoadFileRet {
 
 // Read global options from ~/.tiary
 LoadFileRet load_global_options (GlobalOptionGroup &, std::list <RecentFile> &);
+
+template <typename> struct NoArgCallback;
 
 /**
  * @brief	Load tiary file

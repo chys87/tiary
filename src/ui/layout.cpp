@@ -13,9 +13,9 @@
 
 
 #include "ui/layout.h"
-#include "ui/control.h"
 #include "common/algorithm.h"
 #include <algorithm>
+#include <functional>
 
 namespace tiary {
 namespace ui {

@@ -20,10 +20,8 @@
 #ifndef TIARY_COMMON_DIR_H
 #define TIARY_COMMON_DIR_H
 
-#include "common/callback.h"
 #include <list>
 #include <string>
-#include <locale>
 #include <utility>
 
 namespace tiary {
@@ -113,32 +111,30 @@ std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &, bool 
  */
 std::wstring combine_pathname (const std::wstring &, const std::wstring &);
 
+// Forward declarations
+template <typename, typename> struct UnaryCallback;
+template <typename, typename, typename> struct BinaryCallback;
+
 struct DirEnt
 {
 	std::wstring name; ///< "Bare" filename (without path)
 	unsigned attr; ///< Attribute. Currently only supports FIILE_ATTR_DIRECTORY
-
-	class DefaultComparator : public BinaryCallback<const DirEnt &, const DirEnt &, bool>
-	{
-		std::locale loc;
-	public:
-		bool operator () (const DirEnt &, const DirEnt &) const;
-	};
 };
 
 typedef std::list<DirEnt> DirEntList;
 
 /**
  * @brief	List all files/directories in a directory
- *
- * By default, all items (include . and ..) are included. Strings are compared
- * using std::locale (equivalently, strcoll)
  */
 DirEntList list_dir (const std::wstring &dir, ///< Dir name
+		const UnaryCallback <const DirEnt &, bool> &filter, ///< A callback function to filter out unwanted items
+		const BinaryCallback <const DirEnt &, const DirEnt &, bool> &comp ///< A callback function to compare two items (less_than semantics)
+		);
+
+// Default order. Strings are compared using std::locale.
+// Directories have precedence over normal files
+DirEntList list_dir (const std::wstring &dir,
 		const UnaryCallback <const DirEnt &, bool> &filter
-			= ConstantUnaryCallback<const DirEnt &, bool, false> (), ///< A callback function to filter out unwanted items
-		const BinaryCallback <const DirEnt &, const DirEnt &, bool> &comp
-			= DirEnt::DefaultComparator () ///< A callback function to compare two items (less_than semantics)
 		);
 
 

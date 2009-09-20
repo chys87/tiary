@@ -27,6 +27,7 @@
 #include "common/algorithm.h"
 #include "ui/checkbox_label.h"
 #include "common/container_of.h"
+#include "common/callback.h"
 #include <list>
 
 namespace tiary {

@@ -22,6 +22,7 @@
 #include "common/external.h"
 #include "ui/dialog_input.h"
 #include "ui/dialog_richtext.h"
+#include "ui/richtextlist.h"
 #include "common/string.h"
 #include "common/datetime.h"
 #include "ui/paletteid.h"

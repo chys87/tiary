@@ -15,11 +15,9 @@
 #include "ui/menu.h"
 #include "ui/window.h"
 #include "ui/control.h"
-#include "ui/uistring.h"
+#include "ui/uistring_one.h"
 #include "ui/paletteid.h"
 #include "ui/chain.h"
-#include "common/container_of.h"
-#include "common/containers.h"
 #include "common/algorithm.h"
 #include <utility> // std::forward
 

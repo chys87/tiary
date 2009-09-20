@@ -14,6 +14,7 @@
 
 
 #include "ui/dialog_richtext.h"
+#include "ui/richtextlist.h"
 #include "ui/richtext.h"
 #include "ui/window.h"
 #include "common/algorithm.h"

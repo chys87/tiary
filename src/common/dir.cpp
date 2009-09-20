@@ -22,6 +22,7 @@
 #include "common/unicode.h"
 #include "common/string.h"
 #include "common/algorithm.h"
+#include "common/callback.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <limits.h> // PATH_MAX
@@ -33,6 +34,7 @@
 #include <locale>
 #include <functional>
 #include <algorithm>
+#include <locale>
 
 #ifndef PATH_MAX
 # define PATH_MAX 4096
@@ -404,8 +406,16 @@ std::wstring combine_pathname (const std::wstring &path, const std::wstring &bas
 
 
 
+namespace {
 
-bool DirEnt::DefaultComparator::operator () (const DirEnt &a, const DirEnt &b) const
+class DefaultDirEntComparator : public BinaryCallback<const DirEnt &, const DirEnt &, bool>
+{
+	std::locale loc;
+public:
+	bool operator () (const DirEnt &, const DirEnt &) const;
+};
+
+bool DefaultDirEntComparator::operator () (const DirEnt &a, const DirEnt &b) const
 {
 	// Directory < Non-directory
 	if ((a.attr ^ b.attr) & FILE_ATTR_DIRECTORY) {
@@ -415,7 +425,7 @@ bool DirEnt::DefaultComparator::operator () (const DirEnt &a, const DirEnt &b) c
 	return loc (a.name, b.name);
 }
 
-
+} // anonymous namespace
 
 
 DirEntList list_dir (
@@ -445,6 +455,11 @@ DirEntList list_dir (
 		filelist.sort (wrap (comp));
 	}
 	return filelist;
+}
+
+DirEntList list_dir (const std::wstring &directory, const UnaryCallback <const DirEnt &, bool> &filter)
+{
+	return list_dir (directory, filter, DefaultDirEntComparator ());
 }
 
 // Explicit instantiations (char)

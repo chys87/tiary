@@ -15,16 +15,14 @@
 /**
  * @file	main/doc.cpp
  * @author	chys <admin@chys.info>
- * @brief	Implements tiary::show_doc
+ * @brief	Implements tiary::show_doc, tiary::show_license and tiary::show_about
  */
 
 #include "main/doc.h"
-#include "common/external.h"
-#include "ui/window.h"
 #include "ui/dialog_message.h"
 #include "ui/dialog_richtext.h"
+#include "ui/richtextlist.h"
 #include "ui/paletteid.h"
-#include "common/algorithm.h"
 #include "common/format.h"
 
 namespace tiary {
@@ -78,7 +76,7 @@ const ui::RichTextLineC info[] = {
 void show_doc ()
 {
 	ui::dialog_richtext (L"Help",
-			ui::RichTextList (info, array_end (info))
+			ui::RichTextList (info, info + sizeof info / sizeof *info)
 			);
 }
 
@@ -133,4 +131,4 @@ void show_about ()
 			<< unsigned (TIARY_COPYRIGHT_YEAR), L"About");
 }
 
-}
+} // namespace tiary

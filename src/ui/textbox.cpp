@@ -14,7 +14,6 @@
 
 #include "ui/textbox.h"
 #include "ui/ui.h"
-#include "ui/chain.h"
 #include "ui/paletteid.h"
 #include "common/unicode.h"
 #include "common/algorithm.h"

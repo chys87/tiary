@@ -15,10 +15,15 @@
 #ifndef TIARY_UI_DIALOG_RICHTEXT_H
 #define TIARY_UI_DIALOG_RICHTEXT_H
 
-#include "ui/richtextlist.h"
+#include "ui/size.h"
+#include <string>
+#include <vector>
 
 namespace tiary {
 namespace ui {
+
+struct RichTextLine;
+typedef std::vector <RichTextLine> RichTextList;
 
 /**
  * @brief	Display text using a RichText control

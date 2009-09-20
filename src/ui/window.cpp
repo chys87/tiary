@@ -16,7 +16,6 @@
 #include "ui/window.h"
 #include "common/containers.h"
 #include "common/unicode.h"
-#include "common/misc.h"
 #include "common/algorithm.h"
 #include "ui/terminal_emulator.h"
 #include "ui/control.h"

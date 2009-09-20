@@ -14,8 +14,6 @@
 
 #include "ui/label.h"
 #include "ui/window.h"
-#include "common/unicode.h"
-#include "common/containers.h"
 #include "ui/paletteid.h"
 #include "common/signal.h"
 

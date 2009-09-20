@@ -15,7 +15,6 @@
 #ifndef TIARY_UI_LAYOUT_H
 #define TIARY_UI_LAYOUT_H
 
-#include "ui/object.h"
 #include "ui/direction.h"
 #include "ui/movable_object.h"
 #include <list>

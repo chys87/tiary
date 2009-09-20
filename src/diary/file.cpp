@@ -61,6 +61,7 @@
 #include "common/unicode.h"
 #include "common/md5.h"
 #include "common/format.h"
+#include "common/callback.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

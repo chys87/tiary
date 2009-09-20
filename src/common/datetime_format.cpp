@@ -13,8 +13,7 @@
 
 
 #include "common/datetime.h"
-#include "common/string.h"
-#include "common/containers.h"
+#include <wchar.h>
 
 namespace tiary {
 
@@ -67,7 +66,7 @@ std::wstring format_datetime (uint64_t v, const wchar_t *fmt)
 {
 	ReadableDateTime rdt = extract_datetime (v);
 	std::wstring ret;
-	ret.reserve (strlen (fmt)*2);
+	ret.reserve (wcslen (fmt)*2);
 	while (const wchar_t *p = wcschr (fmt, L'%')) {
 		if (p[1] == L'\0') {
 			break;
