@@ -16,7 +16,7 @@
 #define TIARY_UI_MENUBAR_H
 
 #include "ui/control.h"
-#include "ui/uistring.h"
+#include "ui/uistring_one.h"
 #include "ui/menu.h"
 #include <string>
 #include <list>

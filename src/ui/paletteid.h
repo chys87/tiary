@@ -26,43 +26,44 @@
 namespace tiary {
 namespace ui {
 
-const PaletteID PALETTE_ID_BACKGROUND           = 0;
-const PaletteID PALETTE_ID_MOVING_BORDER        = 22;
-const PaletteID PALETTE_ID_LABEL                = 1;
-const PaletteID PALETTE_ID_BUTTON_FOCUS         = 2;
-const PaletteID PALETTE_ID_BUTTON_NORMAL        = 3;
-const PaletteID PALETTE_ID_BUTTON_DEFAULT       = 18;
-const PaletteID PALETTE_ID_TEXTBOX              = 4;
-const PaletteID PALETTE_ID_TEXTBOX_FOCUS        = 21;
-const PaletteID PALETTE_ID_LISTBOX              = 5;
-const PaletteID PALETTE_ID_LISTBOX_SELECT       = 6;
-const PaletteID PALETTE_ID_CHECKBOX             = 7;
-const PaletteID PALETTE_ID_CHECKBOX_FOCUS       = 20;
-const PaletteID PALETTE_ID_MENU                 = 8;
-const PaletteID PALETTE_ID_MENU_SELECT          = 9;
-const PaletteID PALETTE_ID_MENU_INVALID         = 10;
-const PaletteID PALETTE_ID_MENUBAR              = 11;
-const PaletteID PALETTE_ID_MENUBAR_SELECT       = 12;
-const PaletteID PALETTE_ID_DROPLIST             = 13;
-const PaletteID PALETTE_ID_DROPLIST_FOCUS       = 19;
-const PaletteID PALETTE_ID_RICHTEXT             = 14;
-const PaletteID PALETTE_ID_GRID                 = 15;
-const PaletteID PALETTE_ID_GRID_INVALID         = 16;
-const PaletteID PALETTE_ID_GRID_SELECT          = 17;
+const unsigned PALETTEID_H_LINE = __LINE__ + 1;
+const PaletteID PALETTE_ID_BACKGROUND           = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_MOVING_BORDER        = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_LABEL                = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_BUTTON_FOCUS         = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_BUTTON_NORMAL        = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_BUTTON_DEFAULT       = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_TEXTBOX              = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_TEXTBOX_FOCUS        = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_LISTBOX              = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_LISTBOX_SELECT       = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_CHECKBOX             = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_CHECKBOX_FOCUS       = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_MENU                 = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_MENU_SELECT          = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_MENU_INVALID         = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_MENUBAR              = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_MENUBAR_SELECT       = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_DROPLIST             = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_DROPLIST_FOCUS       = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_RICHTEXT             = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_GRID                 = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_GRID_INVALID         = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_GRID_SELECT          = __LINE__ - PALETTEID_H_LINE;
 
-const PaletteID PALETTE_ID_ENTRY                = 50;
-const PaletteID PALETTE_ID_ENTRY_TEXT           = 51;
-const PaletteID PALETTE_ID_ENTRY_DATE           = 52;
-const PaletteID PALETTE_ID_ENTRY_TITLE          = 53;
-const PaletteID PALETTE_ID_ENTRY_LABELS         = 54;
-const PaletteID PALETTE_ID_ENTRY_SELECT         = 60;
-const PaletteID PALETTE_ID_ENTRY_TEXT_SELECT    = 61;
-const PaletteID PALETTE_ID_ENTRY_DATE_SELECT    = 62;
-const PaletteID PALETTE_ID_ENTRY_TITLE_SELECT   = 63;
-const PaletteID PALETTE_ID_ENTRY_LABELS_SELECT  = 64;
+const PaletteID PALETTE_ID_ENTRY                = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_TEXT           = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_DATE           = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_TITLE          = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_LABELS         = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_SELECT         = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_TEXT_SELECT    = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_DATE_SELECT    = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_TITLE_SELECT   = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_ENTRY_LABELS_SELECT  = __LINE__ - PALETTEID_H_LINE;
 
-const PaletteID PALETTE_ID_SHOW_NORMAL          = 100;
-const PaletteID PALETTE_ID_SHOW_BOLD            = 101;
+const PaletteID PALETTE_ID_SHOW_NORMAL          = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_SHOW_BOLD            = __LINE__ - PALETTEID_H_LINE;
 
 void set_palettes ();
 

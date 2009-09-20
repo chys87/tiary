@@ -111,9 +111,15 @@ void parse_options (int &pargc, char **&pargv)
 		char *arg = argv[i];
 		if (arg[0] != '-') { // Not an option
 			argv[wi++] = arg;
-			continue;
 		}
-		if (arg[1] == '-') { // Long option
+		else if (arg[1] == '-') { // Long option
+			if (arg[2] == '\0') {
+				// Bare "--". Ending options. Copy the remainders verbatim
+				while (++i < argc) {
+					argv[wi++] = argv[i];
+				}
+				break;
+			}
 			arg += 2;
 			if (!strcmp (arg, "version")) {
 				option_version ();

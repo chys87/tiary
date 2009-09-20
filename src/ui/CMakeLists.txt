@@ -66,6 +66,8 @@ add_library(tiary_ui STATIC
 	ui.cpp
 	uistring.h
 	uistring.cpp
+	uistring_base.h
+	uistring_one.h
 	window.h
 	window.cpp
 )

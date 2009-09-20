@@ -67,8 +67,9 @@ struct ContainerOf : public C
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 	ContainerOf &operator ,  (T &&x) { C::push_back (std::forward<T> (x)); return *this; }
-#endif
+#else
 	ContainerOf &operator ,  (const T &x) { C::push_back (x); return *this; }
+#endif
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 	C && operator () () { return *this; }

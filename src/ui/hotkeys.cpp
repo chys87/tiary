@@ -30,30 +30,6 @@ Hotkeys::~Hotkeys ()
 {
 }
 
-Hotkeys::Hotkeys (const Hotkeys &other)
-	: hotkey_list (other.hotkey_list)
-{
-}
-
-Hotkeys &Hotkeys::operator = (const Hotkeys &other)
-{
-	hotkey_list = other.hotkey_list;
-	return *this;
-}
-
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-Hotkeys::Hotkeys (Hotkeys &&other)
-	: hotkey_list (std::forward<HotkeyList> (other.hotkey_list))
-{
-}
-
-Hotkeys &Hotkeys::operator = (Hotkeys &&other)
-{
-	hotkey_list = std::forward<HotkeyList> (other.hotkey_list);
-	return *this;
-}
-#endif
-
 void Hotkeys::register_hotkey (wchar_t c, const Signal &sig, int options)
 {
 	wchar_t d = c;

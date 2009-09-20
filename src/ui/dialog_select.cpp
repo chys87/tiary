@@ -26,6 +26,7 @@
 #include "ui/button_default.h"
 #include "ui/layout.h"
 #include "ui/chain.h"
+#include "common/unicode.h"
 
 namespace tiary {
 namespace ui {

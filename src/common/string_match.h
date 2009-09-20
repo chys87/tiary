@@ -37,6 +37,10 @@ public:
 
 	/**
 	 * @brief	Match against a string, returning detailed results
+	 *
+	 * @result	Every match corresponds to an item in the vector, the first
+	 * of which is the offset and the second the length of the matched
+	 * substring.
 	 */
 	std::vector <std::pair <size_t, size_t> > match (const std::wstring &) const;
 

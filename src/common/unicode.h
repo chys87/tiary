@@ -23,8 +23,6 @@
 
 #include <stddef.h> // ::size_t
 #include <string>
-#include <vector>
-#include <list>
 #include <wchar.h>
 
 #define TIARY_WIDIFY(s) TIARY_WIDIFY_IMPL(s)
@@ -237,33 +235,6 @@ bool allow_line_end (wchar_t);
 
 
 
-
-struct SplitStringLine
-{
-	size_t begin; // Characters in [begin,begin+len) should be on this line. (Newline characters and excluded)
-	size_t len;
-	unsigned wid; // Width on screen
-};
-
-typedef std::vector<SplitStringLine> SplitStringLineList;
-
-// Treat newline characters as if they were spaces
-const unsigned SPLIT_NEWLINE_AS_SPACE = 1;
-// Allow splitting in the middle of a word
-const unsigned SPLIT_CUT_WORD = 2;
-
-// Only one line. Returns the offset of the starting point of the next line
-size_t split_line (SplitStringLine &, unsigned wid, const wchar_t *s, size_t slen = size_t(-1), size_t offset = 0, unsigned options = 0);
-size_t split_line (SplitStringLine &, unsigned wid, const std::wstring &s, size_t offset = 0, unsigned options = 0);
-
-// Limited number of lines. Returns the actual number of lines
-unsigned split_line (SplitStringLine [], unsigned max_lines, unsigned wid, const wchar_t *s, size_t slen);
-unsigned split_line (SplitStringLine [], unsigned max_lines, unsigned wid, const wchar_t *s);
-unsigned split_line (SplitStringLine [], unsigned max_lines, unsigned wid, const std::wstring &);
-// Unlimited number of lines. Returns a vector
-SplitStringLineList split_line (unsigned wid, const wchar_t *, size_t);
-SplitStringLineList split_line (unsigned wid, const wchar_t *);
-SplitStringLineList split_line (unsigned wid, const std::wstring &);
 
 } // namespace tiary
 

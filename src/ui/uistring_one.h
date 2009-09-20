@@ -12,59 +12,52 @@
  **************************************************************************/
 
 
-#ifndef TIARY_UI_UISTRING_H
-#define TIARY_UI_UISTRING_H
-
-/**
- * An "UI string" stores a string, and does some useful analysis
- * so that controls can use it conveniently:
- *
- * (1) Remove the first '&' character and remember its position;
- * (2) Number of lines, max line width, etc.
- * (3) Cache the results of split_line
- *
- * UIStringOne is a simplified version, supporting only one line
- */
+#ifndef TIARY_UI_UISTRING_ONE_H
+#define TIARY_UI_UISTRING_ONE_H
 
 #include "ui/uistring_base.h"
-#include "common/split_line.h"
 #include <string>
 
 namespace tiary {
 namespace ui {
 
 struct Size;
-
-class Control;
 class Window;
+class Control;
 
-class UIString : public UIStringBase
+/**
+ * @brief	One-line UIString
+ *
+ * Simplified version of tiary::ui::UIString, supporting only one line.
+ * Behavior is undefined if newline characters are found.
+ */
+class UIStringOne : public UIStringBase
 {
 public:
-	explicit UIString (const std::wstring & = std::wstring (), unsigned options = 0);
+	explicit UIStringOne (const std::wstring & = std::wstring (), unsigned options = 0);
 	void set_text (const std::wstring &, unsigned options = 0);
-
-	const SplitStringLineList &split_line (unsigned wid);
 
 	/**
 	 * @brief	Output text to a control, highlighting hotkey character
 	 * @param	pos	Position relative to the control
+	 * @param	wid	Maximal screen width to use
 	 */
-	void output (Control &, Size pos, Size size);
+	Size output (Control &, Size pos, unsigned wid);
+	/**
+	 * @brief	Output text directly to a Window, highlighting hotkey character
+	 * @param	pos	Position relative to the window
+	 * @param	wid	Maximum screen width to use
+	 */
+	Size output (Window &, Size pos, unsigned wid);
 
-	unsigned get_lines () const { return lines; }
-	unsigned get_max_width () const { return max_width; }
+	unsigned get_width () const { return width; }
 
 private:
-	unsigned lines;
-	unsigned max_width;
+	unsigned width;
 
-	unsigned split_cache_wid;
-	SplitStringLineList split_cache;
-
+	// Update width info
 	void update ();
 };
-
 
 } // namespace tiary::ui
 } // namespace ui

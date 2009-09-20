@@ -19,6 +19,7 @@
 #include "ui/dialog_input.h"
 #include "ui/dialog_select.h"
 #include "ui/search_info.h"
+#include "common/split_line.h"
 #include "common/unicode.h"
 #include "common/format.h"
 #include "diary/file.h"
@@ -509,7 +510,7 @@ void MainWin::on_ready ()
 		status += L"<New file>";
 	}
 	else {
-		status += current_filename;
+		status += get_nice_pathname (current_filename);
 	}
 	menu_bar.set_text (status);
 }

@@ -16,8 +16,7 @@
 #define TIARY_UI_BUTTON_H
 
 #include "ui/control.h"
-#include "ui/uistring.h"
-#include "common/signal.h"
+#include "ui/uistring_one.h"
 #include <string>
 
 namespace tiary {

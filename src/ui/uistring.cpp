@@ -13,6 +13,7 @@
 
 
 #include "ui/uistring.h"
+#include "ui/uistring_one.h"
 #include "ui/control.h"
 #include "common/unicode.h"
 #include "common/algorithm.h"

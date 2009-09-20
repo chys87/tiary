@@ -43,7 +43,6 @@
  */
 
 #include <string>
-#include <utility> // std::forward
 
 namespace tiary {
 

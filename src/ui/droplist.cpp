@@ -13,7 +13,7 @@
 
 
 #include "ui/droplist.h"
-#include "ui/uistring.h"
+#include "ui/uistring_one.h"
 #include "ui/menu.h"
 #include "ui/paletteid.h"
 #include "ui/dialog_select.h"

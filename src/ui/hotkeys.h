@@ -29,12 +29,6 @@ class Hotkeys
 public:
 	Hotkeys ();
 	~Hotkeys ();
-	Hotkeys (const Hotkeys &);
-	Hotkeys &operator = (const Hotkeys &);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	Hotkeys (Hotkeys &&);
-	Hotkeys &operator = (Hotkeys &&);
-#endif
 
 	static const int CASE_SENSITIVE = 1;
 	/**

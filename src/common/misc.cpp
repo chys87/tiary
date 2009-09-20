@@ -66,6 +66,13 @@ template const wchar_t *map_query <WStringLocaleOrderedMap> (const WStringLocale
 template const char    *map_query <StringUnorderedMap     > (const StringUnorderedMap &,      const char *);
 template const wchar_t *map_query <WStringUnorderedMap    > (const WStringUnorderedMap &,     const wchar_t *);
 
+#ifndef S_ISREG
+# if defined S_IFMT && defined S_IFREG
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+# else
+#  error "What funny system are you using?"
+# endif
+#endif
 
 bool safe_write_file (const char *filename, const void *ptr, size_t len)
 {
@@ -76,11 +83,7 @@ bool safe_write_file (const char *filename, const void *ptr, size_t len)
 	std::string backup_name;
 	struct stat info;
 	if (stat (filename, &info) == 0 // Already exists
-#if defined S_ISREG
 			&& S_ISREG (info.st_mode) // And is a regular file
-#elif defined S_IFREG
-			&& (info.st_mode & S_IFREG) // And is a regular file
-#endif
 			&& info.st_nlink == 1) { // And has only one link
 		backup_name = filename;
 		backup_name += ".tiary.bak";
@@ -149,4 +152,4 @@ unsigned environment_expand (std::string &s)
 	return expansions;
 }
 
-}
+} // namespace tiary

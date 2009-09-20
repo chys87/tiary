@@ -18,9 +18,10 @@
 #include "ui/movable_object.h"
 #include "ui/ui.h"
 #include "ui/hotkeys.h"
-#include "ui/uistring.h"
+#include "ui/uistring_one.h"
 #include <stddef.h> // ::size_t
 #include <string>
+#include <vector>
 
 namespace tiary {
 namespace ui {

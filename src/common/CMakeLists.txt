@@ -27,6 +27,8 @@ add_library(tiary_common STATIC
 	query.h
 	signal.h
 	signal.cpp
+	split_line.h
+	split_line.cpp
 	static_assert.h
 	string.h
 	string.cpp

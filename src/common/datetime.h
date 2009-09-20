@@ -17,7 +17,6 @@
 
 #include "common/types.h"
 #include <string>
-#include <utility> // std::pair
 #include <time.h>
 
 namespace tiary {

@@ -19,11 +19,9 @@
  */
 
 #include "diary/config.h"
-#include "common/misc.h"
 #include "common/format.h"
 #include "common/unicode.h"
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 namespace tiary {
