@@ -15,6 +15,7 @@
 #include "ui/textbox.h"
 #include "ui/ui.h"
 #include "ui/paletteid.h"
+#include "ui/mouse.h"
 #include "common/unicode.h"
 #include "common/algorithm.h"
 #include <wctype.h>

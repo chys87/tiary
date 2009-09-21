@@ -43,6 +43,7 @@ add_library(tiary_ui STATIC
 	menu.cpp
 	menubar.h
 	menubar.cpp
+	mouse.h
 	movable_object.h
 	ncurses_common.h
 	ncurses_common.cpp

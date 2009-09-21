@@ -36,7 +36,6 @@
 namespace tiary {
 namespace ui {
 
-class Control;
 struct Size;
 
 

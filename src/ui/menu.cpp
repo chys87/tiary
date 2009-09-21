@@ -18,6 +18,7 @@
 #include "ui/uistring_one.h"
 #include "ui/paletteid.h"
 #include "ui/chain.h"
+#include "ui/mouse.h"
 #include "common/algorithm.h"
 #include <utility> // std::forward
 

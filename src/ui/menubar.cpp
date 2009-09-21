@@ -16,6 +16,7 @@
 #include "ui/menu.h"
 #include "ui/paletteid.h"
 #include "ui/window.h"
+#include "ui/mouse.h"
 #include "common/algorithm.h"
 #include <utility> // std::forward
 #include <stack>

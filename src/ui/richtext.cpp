@@ -7,6 +7,7 @@
 #include "ui/richtext.h"
 #include "ui/paletteid.h"
 #include "ui/dialog_message.h"
+#include "ui/mouse.h"
 #include "common/format.h"
 #include "common/algorithm.h"
 #include <utility> // std::forward

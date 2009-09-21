@@ -26,6 +26,7 @@ namespace tiary {
 namespace ui {
 
 class Window;
+struct MouseEvent;
 
 class Control : public MovableObject, public Hotkeys
 {

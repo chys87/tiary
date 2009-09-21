@@ -14,6 +14,7 @@
 
 #include "ui/grid_select.h"
 #include "ui/paletteid.h"
+#include "ui/mouse.h"
 
 
 namespace tiary {

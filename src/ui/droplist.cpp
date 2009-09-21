@@ -16,6 +16,7 @@
 #include "ui/uistring_one.h"
 #include "ui/paletteid.h"
 #include "ui/dialog_select.h"
+#include "ui/mouse.h"
 #include "common/algorithm.h"
 #include <algorithm>
 #include <wctype.h>

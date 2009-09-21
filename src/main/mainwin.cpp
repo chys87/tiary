@@ -26,6 +26,7 @@
 #include "diary/file.h"
 #include "diary/diary.h"
 #include "ui/paletteid.h"
+#include "ui/mouse.h"
 #include "diary/config.h"
 #include "diary/filter.h"
 #include "common/datetime.h"

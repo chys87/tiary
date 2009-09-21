@@ -14,6 +14,7 @@
 
 #include "ui/listbox.h"
 #include "ui/paletteid.h"
+#include "ui/mouse.h"
 #include "common/algorithm.h"
 #include "common/unicode.h"
 #include <algorithm>

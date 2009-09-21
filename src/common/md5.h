@@ -44,9 +44,9 @@ struct MD5Context
 };
 
 // C-style interfaces
-void md5_init (MD5Context *pms);
-void md5_append (MD5Context *pms, const void *data, size_t nbytes);
-void md5_finish (MD5Context *pms);
+void md5_init (MD5Context *pms) throw ();
+void md5_append (MD5Context *pms, const void *data, size_t nbytes) throw ();
+void md5_finish (MD5Context *pms) throw ();
 
 
 

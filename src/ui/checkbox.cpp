@@ -13,6 +13,7 @@
 
 
 #include "ui/checkbox.h"
+#include "ui/mouse.h"
 #include "ui/paletteid.h"
 #include "ui/terminal_emulator.h"
 

@@ -29,7 +29,7 @@
  *
  * (1) If there's no password, it's simply an XML;
  * (2) If there is a password, the first few bytes are:
- *     0000 ~ 000F  All zerores. (Reserved, and in order to differ from "<?xml ...")
+ *     0000 ~ 000F  All zeroes. (Reserved, and in order to differ from "<?xml ...")
  *     0010 ~ 001F  MD5(password + salt1)
  *     0020 ~ ....  encrypt (XML, password)
  *
@@ -282,6 +282,10 @@ void encrypt (void *dst, const char *src, size_t datalen, const void *pass, size
 	 * The data always begins with "<?xml verison="1.0" encoding="UTF-8"?>\n<tiary>\n\t"
 	 * We must make sure one cannot crack our file using this.
 	 * (At least, cannot easily crack the whole file)
+	 *
+	 * XXX pass was intended to be the MBS string of the password, but actually we're passing
+	 * the Unicode string. This is a bug. But we must leave it as is, otherwise existing
+	 * encrypted files will be broken.
 	 */
 	union {
 		uint64_t xor_data[32];
@@ -402,10 +406,10 @@ LoadFileRet load_file (
 			return LOAD_FILE_CONTENT;
 		}
 
-		uint64_t zerores[] = { 0, 0 };
+		uint64_t zeroes[] = { 0, 0 };
 
 		// First 16 bytes must be zeroes
-		if (memcmp (&everything[0], zerores, 16) != 0) {
+		if (memcmp (&everything[0], zeroes, 16) != 0) {
 			return LOAD_FILE_CONTENT;
 		}
 

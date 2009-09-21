@@ -1,6 +1,7 @@
 add_library(tiary_common STATIC
 	algorithm.h
 	algorithm.cpp
+	bswap.h
 	bzip2.h
 	bzip2.cpp
 	callback.h

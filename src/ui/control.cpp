@@ -15,6 +15,7 @@
 #include "ui/control.h"
 #include "ui/window.h"
 #include "ui/paletteid.h"
+#include "ui/mouse.h"
 
 namespace tiary {
 namespace ui {

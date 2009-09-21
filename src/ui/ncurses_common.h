@@ -25,6 +25,7 @@
 // that an error is issued in case we have a symbol with the
 // same name
 #include "ui/ui.h"
+#include "ui/mouse.h"
 
 namespace tiary {
 namespace ui {

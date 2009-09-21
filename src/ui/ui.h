@@ -22,7 +22,6 @@
  *
  * For details on the UI system, see namespace @c tiary::ui
  */
-#include "ui/size.h"
 
 /**
  * @defgroup uisystem The UI system
@@ -84,6 +83,8 @@
 namespace tiary {
 /// @ingroup uisystem
 namespace ui {
+
+struct Size;
 
 /**
  * @brief	Initialize the UI system
@@ -215,35 +216,6 @@ inline bool special_printable (wchar_t c)
 	unsigned ch = c;
 	return ((ch - 0x60000000u) < 256);
 }
-
-typedef unsigned MouseMask;
-/**
- * @brief	Describes a mouse event
- *
- * Define this class even if TIARY_USE_MOUSE is not defined.
- */
-struct MouseEvent {
-	Size p; ///< @brief Position of the mouse event
-	MouseMask m; ///< @brief Bitwise OR'd of LEFT_PRESS, MOUSE_ALT, etc.
-};
-
-const MouseMask LEFT_PRESS       = 0x0001;
-const MouseMask LEFT_RELEASE     = 0x0002;
-const MouseMask LEFT_CLICK       = 0x0004;
-const MouseMask LEFT_DCLICK      = 0x0008;
-const MouseMask MIDDLE_PRESS     = 0x0010;
-const MouseMask MIDDLE_RELEASE   = 0x0020;
-const MouseMask MIDDLE_CLICK     = 0x0040;
-const MouseMask MIDDLE_DCLICK    = 0x0080;
-const MouseMask RIGHT_PRESS      = 0x0100;
-const MouseMask RIGHT_RELEASE    = 0x0200;
-const MouseMask RIGHT_CLICK      = 0x0400;
-const MouseMask RIGHT_DCLICK     = 0x0800;
-const MouseMask MOUSE_ALL_BUTTON = 0x0fff;
-const MouseMask MOUSE_SHIFT      = 0x1000;
-const MouseMask MOUSE_CTRL       = 0x2000;
-const MouseMask MOUSE_ALT        = 0x4000;
-const MouseMask MOUSE_MOVE       = 0x8000;
 
 // No global I/O methods available. Use tiary::ui::Window or tiary::ui::Control!
 

@@ -47,7 +47,7 @@
 
  */
 
-#include "common/algorithm.h"
+#include "common/bswap.h"
 #include "common/md5.h"
 #include <string.h>
 
@@ -122,7 +122,7 @@ namespace {
 
 
 void
-md5_process(MD5Context *pms, const uint8_t *data /*[64]*/)
+md5_process(MD5Context *pms, const uint8_t *data /*[64]*/) throw ()
 {
 	uint32_t a = pms->abcd[0];
 	uint32_t b = pms->abcd[1];
@@ -283,7 +283,7 @@ md5_process(MD5Context *pms, const uint8_t *data /*[64]*/)
 } // anonymous namespace
 
 void
-md5_init(MD5Context *pms)
+md5_init(MD5Context *pms) throw ()
 {
 	pms->count = 0;
 	pms->abcd[0] = 0x67452301;
@@ -293,7 +293,7 @@ md5_init(MD5Context *pms)
 }
 
 void
-md5_append(MD5Context *pms, const void *data, size_t nbytes)
+md5_append(MD5Context *pms, const void *data, size_t nbytes) throw ()
 {
 	if (nbytes == 0) {
 		return;
@@ -331,7 +331,7 @@ md5_append(MD5Context *pms, const void *data, size_t nbytes)
 }
 
 void
-md5_finish(MD5Context *pms)
+md5_finish(MD5Context *pms) throw ()
 {
 	static const uint8_t pad[64] = { 0x80, 0, /* 0, 0, ... */ };
 

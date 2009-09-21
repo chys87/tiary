@@ -27,6 +27,7 @@ namespace tiary {
 namespace ui {
 
 class Control;
+struct MouseEvent;
 
 /**
  * @brief	Window: An object-oriented event-driven portion of the screen

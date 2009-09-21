@@ -21,7 +21,6 @@
 #ifndef TIARY_COMMON_ALGORITHM_H
 #define TIARY_COMMON_ALGORITHM_H
 
-#include "common/types.h"
 #include <iterator>
 #include <algorithm>
 
@@ -40,32 +39,6 @@ inline size_t minSize (size_t a, size_t b) { return (a<b) ? a : b; }
 
 template <typename T>
 inline int sign (T x) { return (x<0) ? -1 : (x==0) ? 0 : 1; }
-
-// Bswap: Reverse byte order (little <==> big)
-
-inline uint16_t bswap16 (uint16_t x) { return (x << 8) | (x >> 8); }
-
-inline uint32_t bswap32 (uint32_t x)
-{
-	                              // AABBCCDD
-	x = (x >> 16) | (x << 16);    // CCDDAABB
-	x = ((x >> 8) | (0x00FF00FFu)) | // 00CC00AA
-		((x << 8) | (0xFF00FF00u));  // DD00BB00
-	return x;
-}
-
-inline uint64_t bswap64 (uint64_t x)
-{
-	                                                       // AABBCCDD EEFFGGHH
-	x = (x >> 32) | (x << 32);                             // EEFFGGHH AABBCCDD
-	x = ((x >> 16) | TIARY_UINT64_C(0x0000ffffu,0x0000ffffu)) | // 0000EEFF 0000AABB
-		((x << 16) | TIARY_UINT64_C(0xffff0000u,0xffff0000u));  // GGHH0000 CCDD0000
-	                                                            // GGHHEEFF CCDDAABB
-	x = ((x >> 8) | TIARY_UINT64_C(0x00ff00ffu,0x00ff00ffu)) |  // 00GG00EE 00CC00AA
-		((x << 8) | TIARY_UINT64_C(0xff00ff00u,0xff00ff00u));   // HH00FF00 DD00BB00
-	return x;
-}
-
 
 /**
  * @brief	Makes a reference const
@@ -173,6 +146,7 @@ GetMemberFunctor<Class,Member> get_member_fun (Member Class::*ptr)
 # define TIARY_STD_MOVE
 #endif
 
+namespace detail {
 
 template <typename A, typename B> inline
 int compare_helper (const A &x, const B &y)
@@ -188,6 +162,8 @@ int compare_helper (const A &x, const B &y)
 	}
 }
 
+} // namespace detail
+
 // Performs a binary search.
 // Returns pointer (or 0 if not found)
 template <typename T, typename T2, typename K>
@@ -195,7 +171,7 @@ T *binary_search_null (T *lo, T *hi, T2 v, K key)
 {
 	while (lo < hi) {
 		T *m = lo + size_t(hi-lo)/2;
-		switch (compare_helper (key (*m), v)) {
+		switch (detail::compare_helper (key (*m), v)) {
 			case -1:
 				lo = m + 1;
 				break;
