@@ -16,7 +16,6 @@
 #define TIARY_DIARY_FILTER_H
 
 #include "common/string_match.h"
-#include "common/noncopyable.h"
 #include <string>
 #include <vector>
 #include <functional>
@@ -85,7 +84,7 @@ typedef std::vector <Filter *> FilterList;
  *
  * Use AND or OR to combine a number of other filters
  */
-struct FilterGroup : public Filter, private FilterList, noncopyable
+struct FilterGroup : public Filter, private FilterList
 {
 public:
 

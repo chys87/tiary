@@ -21,7 +21,6 @@ add_library(tiary_common STATIC
 	md5.cpp
 	misc.h
 	misc.cpp
-	noncopyable.h
 	pcre.h
 	pcre.cpp
 	query.h

@@ -66,7 +66,7 @@ namespace detail {
  * copied from the first control to all others.
  */
 template <Direction direction, bool circle, bool other>
-class ChainControls : private noncopyable
+class ChainControls
 {
 public:
 	ChainControls ()

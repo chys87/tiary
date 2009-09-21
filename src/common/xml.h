@@ -15,7 +15,6 @@
 #ifndef TIARY_COMMON_XML_H
 #define TIARY_COMMON_XML_H
 
-#include "common/noncopyable.h"
 #include <stddef.h>
 #include <string>
 #include <map>
@@ -34,13 +33,16 @@ struct XMLNode;
 struct XMLNodeTree;
 struct XMLNodeText;
 
-struct XMLNode : private noncopyable
+struct XMLNode
 {
-public:
 	virtual ~XMLNode () {}
 	XMLNode () : next(0) {}
 
 	XMLNode *next;     // Pointer to right sibling
+
+private:
+	XMLNode (const XMLNode &);
+	void operator = (const XMLNode &);
 };
 
 struct XMLNodeTree : XMLNode

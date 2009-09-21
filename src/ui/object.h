@@ -21,17 +21,18 @@
  * @brief	Header for tiary::ui::Object
  */
 
-#include "common/noncopyable.h"
-
 namespace tiary {
 namespace ui {
 
 /**
  * @brief	Ancestor of all UI objects
  */
-class Object : private noncopyable
+class Object
 {
+	Object (const Object &);
+	void operator = (const Object &);
 public:
+	Object () {}
 	virtual ~Object () = 0;
 };
 

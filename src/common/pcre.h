@@ -17,13 +17,12 @@
 
 #ifdef TIARY_USE_PCRE
 
-#include "common/noncopyable.h"
 #include <string>
 #include <vector>
 
 namespace tiary {
 
-class PcRe : noncopyable {
+class PcRe {
 public:
 	// Construct an invalid regular expression
 	PcRe (const std::wstring &);
@@ -43,8 +42,11 @@ public:
 	 */
 	bool basic_match (const std::wstring &) const;
 
-public:
+private:
 	void *re, *re_ex;
+
+	PcRe (const PcRe &);
+	void operator = (const PcRe &);
 };
 
 } // namespace tiary
