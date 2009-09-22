@@ -403,25 +403,25 @@ void Window::event_loop ()
 				case LEFT:
 					if (pos.x) {
 						pos.x--;
-						touch_windows ();
+						touch_lines (pos.y, size.y);
 					}
 					break;
 				case RIGHT:
 					if (pos.x + size.x < get_screen_size ().x) {
 						pos.x++;
-						touch_windows ();
+						touch_lines (pos.y, size.y);
 					}
 					break;
 				case UP:
 					if (pos.y) {
 						pos.y--;
-						touch_windows ();
+						touch_lines (pos.y, size.y+1);
 					}
 					break;
 				case DOWN:
 					if (pos.y + size.y < get_screen_size ().y) {
 						pos.y++;
-						touch_windows ();
+						touch_lines (pos.y-1, size.y+1);
 					}
 					break;
 				default:
