@@ -285,25 +285,31 @@ bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntry
 void encrypt (void *data, size_t datalen, const void *pass, size_t passlen)
 {
 	union {
-		uint64_t xor_data[32];
+		uint64_t xor_u64[32]; // For alignment only
 		uint8_t xor_byte[256];
 	};
 	union {
-		uint64_t xor_data2[32];
-		uint8_t xor_byte2[255]; // 255: Not a mistake
+		uint64_t xor_u64_2[32]; // For alignment only
+		uint8_t xor_byte2[256];
 	};
-	md5 (pass, passlen) (password_salt2, sizeof password_salt2).result (xor_data+30);
+
+	// Supress "unused" warnings
+	((void) xor_u64);
+	((void) xor_u64_2);
+
+	MD5 md5_tmp = md5 (pass, passlen);
+	(MD5 (md5_tmp)) (password_salt2, sizeof password_salt2).result (xor_byte+240);
+	md5_tmp (password_salt3, sizeof password_salt3).result (xor_byte2+240);
 	for (int i=28; i>=0; i-=2) {
-		md5 (xor_data+i+2, (30-i)*8) (password_salt2, sizeof password_salt2).result (xor_data+i);
-	}
-	md5 (pass, passlen) (password_salt3, sizeof password_salt3).result (xor_data2+30);
-	for (int i=28; i>=0; i-=2) {
-		md5 (xor_data2+i+2, (30-i)*8) (password_salt3, sizeof password_salt3).result (xor_data2+i);
+		md5_tmp.reset (xor_byte+(i+2)*8, (30-i)*8) (password_salt2, sizeof password_salt2).result (xor_byte+i*8);
+		md5_tmp.reset (xor_byte2+(i+2)*8, (30-i)*8) (password_salt3, sizeof password_salt3).result (xor_byte2+i*8);
 	}
 
-	// In our program, data should be well-aligned, but it seems there's no guarantee.
-	// Hopefully there will be better solutions.
-	// (It absolutely is not a good idea to do the XOR byte by byte.)
+	/*
+	 * Let's leave the optimization to the compiler.
+	 * A recent compiler, when optimization is fully enabled,
+	 * may do some vectorization.
+	 */
 	uint8_t *byte = reinterpret_cast<uint8_t *>(data);
 
 	for (size_t i=0; i<datalen/256; ++i) {

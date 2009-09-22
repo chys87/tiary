@@ -361,4 +361,11 @@ md5_finish(MD5Context *pms) throw ()
 #endif
 }
 
+void
+md5_finish (MD5Context *pms, void *result) throw ()
+{
+	md5_finish (pms);
+	memcpy (result, pms->abcd, 16);
+}
+
 } // namespace tiary

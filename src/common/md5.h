@@ -47,6 +47,7 @@ struct MD5Context
 void md5_init (MD5Context *pms) throw ();
 void md5_append (MD5Context *pms, const void *data, size_t nbytes) throw ();
 void md5_finish (MD5Context *pms) throw ();
+void md5_finish (MD5Context *pms, void *result) throw ();
 
 
 
@@ -68,6 +69,20 @@ public:
 		return operator () (s.data (), s.length ());
 	}
 
+	MD5 &reset ()
+	{
+		md5_init (&context);
+		return *this;
+	}
+	MD5 &reset (const void *data, size_t len)
+	{
+		return reset () (data, len);
+	}
+	MD5 &reset (const std::string &s)
+	{
+		return reset () (s);
+	}
+
 	/// Note that the pointed memory is invalidated after the class is destructed
 	const void *result ()
 	{
@@ -77,7 +92,7 @@ public:
 
 	void result (void *buffer)
 	{
-		memcpy (buffer, result (), 16);
+		md5_finish (&context, buffer);
 	}
 
 private:
