@@ -52,16 +52,9 @@
 # define euidaccess access
 #endif
 
-#ifndef AT_EACCESS
-# define AT_EACCESS 0
-#endif
-#ifndef AT_SYMLINK_NOFOLLOW
-# define AT_SYMLINK_NOFOLLOW 0
-#endif
-
-#if defined TIARY_HAVE_FACCESSAT && defined AT_FDCWD
+#if defined TIARY_HAVE_FACCESSAT && defined AT_FDCWD && defined AT_EACCESS
 # undef euidaccess
-# define euidaccess(name,mode) faccessat(AT_FDCWD,name,mode,AT_EACCESS|AT_SYMLINK_NOFOLLOW)
+# define euidaccess(name,mode) faccessat(AT_FDCWD,name,mode,AT_EACCESS)
 #endif
 
 
