@@ -74,7 +74,7 @@ template const wchar_t *map_query <WStringUnorderedMap    > (const WStringUnorde
 # endif
 #endif
 
-bool safe_write_file (const char *filename, const void *ptr, size_t len)
+bool safe_write_file (const char *filename, const void *ptr, size_t len, const void *ptr2, size_t len2)
 {
 	// If we have to write a new file, then it's simple.
 	// If we have to overwite an existing file:
@@ -95,8 +95,12 @@ bool safe_write_file (const char *filename, const void *ptr, size_t len)
 	// Now write content to new file
 	if (FILE *fp = fopen (filename, "wb")) {
 		size_t fwrite_return = fwrite_unlocked (ptr, 1, len, fp);
+		size_t fwrite_return2 = 0;
+		if (ptr2 && len2) {
+			fwrite_return2 = fwrite_unlocked (ptr2, 1, len2, fp);
+		}
 		fclose (fp);
-		if (fwrite_return == len) { // Successful. Remove backup file
+		if (fwrite_return==len && fwrite_return2==len2) { // Successful. Remove backup file
 			if (!backup_name.empty ()) {
 				unlink (backup_name.c_str ());
 			}

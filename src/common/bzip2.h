@@ -23,6 +23,7 @@
 
 #include <stddef.h>
 #include <vector>
+#include <string>
 
 namespace tiary {
 
@@ -39,6 +40,10 @@ typedef std::vector<char> BZip2Result;
 BZip2Result bunzip2 (const void *, size_t);
 BZip2Result bzip2 (const void *, size_t);
 
+inline BZip2Result bzip2 (const std::string &s)
+{
+	return bzip2 (s.data (), s.length ());
+}
 
 } // namespace tiary
 

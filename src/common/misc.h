@@ -35,7 +35,8 @@ template <typename MapT>
 	map_query (const MapT &map, const typename MapT::key_type::value_type *key);
 
 // Save or overwrite a file as safely as possible
-bool safe_write_file (const char *, const void *, size_t);
+bool safe_write_file (const char *filename, const void *data, size_t datalen,
+		const void *data2 = 0, size_t datalen2 = 0);
 
 // Expand environment variable representations like $param and ${param}
 // Returns the number of expansions

@@ -22,7 +22,7 @@
  * </tiary>
  *
  *
- * Diary file format:
+ * Diary file format (old):
  *
  * The file is compressed with bzip2.
  * When decompressed, the format is as follows:
@@ -49,6 +49,11 @@
  *  ...
  * </tiary>
  *
+ *
+ * Diary file format (new) for compressed file:
+ * 0000~000F Signature
+ * 0010~001F MD5(passwoord+salt1)
+ * 0020~     encrypt (bzip2 (XML), password)
  */
 
 #include "diary/file.h"
@@ -75,6 +80,8 @@ namespace {
 const char password_salt1[] = "Tiary, written by chys <admin@chys.info>";
 const char password_salt2[] = "tIARY, WRITTEN BY CHYS <ADMIN@CHYS.INFO>";
 const char password_salt3[] = "TiArY, WrItTeN By ChYs <AdMiN@ChYs.InFo>";
+
+const char new_format_signature[16] = "TiaryEncrypted\0";
 
 /**
  * Parse the time format used in the <time> tag
@@ -275,18 +282,8 @@ bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntry
 }
 
 
-// (dst == src) is allowed, but should not be overlapped in any other way
-void encrypt (void *dst, const char *src, size_t datalen, const void *pass, size_t passlen)
+void encrypt (void *data, size_t datalen, const void *pass, size_t passlen)
 {
-	/*
-	 * The data always begins with "<?xml verison="1.0" encoding="UTF-8"?>\n<tiary>\n\t"
-	 * We must make sure one cannot crack our file using this.
-	 * (At least, cannot easily crack the whole file)
-	 *
-	 * XXX pass was intended to be the MBS string of the password, but actually we're passing
-	 * the Unicode string. This is a bug. But we must leave it as is, otherwise existing
-	 * encrypted files will be broken.
-	 */
 	union {
 		uint64_t xor_data[32];
 		uint8_t xor_byte[256];
@@ -295,48 +292,46 @@ void encrypt (void *dst, const char *src, size_t datalen, const void *pass, size
 		uint64_t xor_data2[32];
 		uint8_t xor_byte2[255]; // 255: Not a mistake
 	};
-	MD5 (pass, passlen) (password_salt2, sizeof password_salt2).result (xor_data+30);
+	md5 (pass, passlen) (password_salt2, sizeof password_salt2).result (xor_data+30);
 	for (int i=28; i>=0; i-=2) {
-		MD5 (xor_data+i+2, (30-i)*8) (password_salt2, sizeof password_salt2).result (xor_data+i);
+		md5 (xor_data+i+2, (30-i)*8) (password_salt2, sizeof password_salt2).result (xor_data+i);
 	}
-	MD5 (pass, passlen) (password_salt3, sizeof password_salt3).result (xor_data2+30);
+	md5 (pass, passlen) (password_salt3, sizeof password_salt3).result (xor_data2+30);
 	for (int i=28; i>=0; i-=2) {
-		MD5 (xor_data2+i+2, (30-i)*8) (password_salt3, sizeof password_salt3).result (xor_data2+i);
+		md5 (xor_data2+i+2, (30-i)*8) (password_salt3, sizeof password_salt3).result (xor_data2+i);
 	}
 
 	// In our program, data should be well-aligned, but it seems there's no guarantee.
 	// Hopefully there will be better solutions.
 	// (It absolutely is not a good idea to do the XOR byte by byte.)
-	uint8_t *dstbyte = reinterpret_cast<uint8_t *>(dst);
-	const uint8_t *srcbyte = reinterpret_cast<const uint8_t *>(src);
+	uint8_t *byte = reinterpret_cast<uint8_t *>(data);
 
 	for (size_t i=0; i<datalen/256; ++i) {
 		for (int j=0; j<256; ++j) {
-			dstbyte[j] = srcbyte[j] ^ xor_byte[j];
+			byte[j] ^= xor_byte[j];
 		}
-		dstbyte += 256;
-		srcbyte += 256;
+		byte += 256;
 	}
 	for (size_t i=0; i<datalen%256; ++i) {
-		dstbyte[i] = srcbyte[i] ^ xor_byte[i];
+		byte[i] ^= xor_byte[i];
 	}
 
-	dstbyte = reinterpret_cast<uint8_t *>(dst);
+	byte = reinterpret_cast<uint8_t *>(data);
 	for (size_t i=0; i<datalen/255; ++i) {
 		for (int j=0; j<255; ++j) {
-			dstbyte[j] ^= xor_byte2[j];
+			byte[j] ^= xor_byte2[j];
 		}
-		dstbyte += 255;
+		byte += 255;
 	}
 	for (size_t i=0; i<datalen%255; ++i) {
-		dstbyte[i] ^= xor_byte2[i];
+		byte[i] ^= xor_byte2[i];
 	}
 }
 
-inline void decrypt (void *dst, const char *src, size_t datalen, const void *pass, size_t passlen)
+inline void decrypt (void *data, size_t datalen, const void *pass, size_t passlen)
 {
 	// The same
-	encrypt (dst, src, datalen, pass, passlen);
+	encrypt (data, datalen, pass, passlen);
 }
 
 
@@ -388,45 +383,70 @@ LoadFileRet load_file (
 		return LOAD_FILE_READ_ERROR;
 	}
 
-	// Decompress: everything = bunzip2 (everything)
-	bunzip2 (&everything[0], everything.size ()).swap (everything);
-	if (everything.empty ()) {
-		return LOAD_FILE_BUNZIP2;
-	}
-
 
 	size_t offset = 0; // For efficiency
 
 	password.clear ();
 
-	// Is there a password?
-	if (everything[0] != '<') {
-		// We have a password.
-		if (everything.size () < 32) {
-			return LOAD_FILE_CONTENT;
-		}
-
-		uint64_t zeroes[] = { 0, 0 };
-
-		// First 16 bytes must be zeroes
-		if (memcmp (&everything[0], zeroes, 16) != 0) {
-			return LOAD_FILE_CONTENT;
-		}
-
-		// Second 16 bytes: MD5(filename + salt1)
+	// New compressed format?
+	if (everything.size()>=32 && !memcmp (&everything[0], new_format_signature, 16)) {
+		// Second 16 bytes: MD5(password+salt1)
 		password = enter_password ();
 		if (password.empty ()) { // User cancelation
 			return LOAD_FILE_PASSWORD;
 		}
-		if (memcmp (MD5 (wstring_to_mbs (password)) (password_salt1, sizeof password_salt1).result (),
+		std::string mbs_password = wstring_to_mbs (password);
+		if (memcmp (md5 (mbs_password) (password_salt1, sizeof password_salt1).result (),
 					&everything[16], 16) != 0) { // Password incorrect
 			password.clear ();
 			return LOAD_FILE_PASSWORD;
 		}
 
 		// Password correct. Decrypt now
-		decrypt (&everything[32], &everything[32], everything.size()-32, password.data(), password.length());
-		offset = 32;
+		decrypt (&everything[32], everything.size()-32, mbs_password.data(), mbs_password.length());
+		// Decompress
+		bunzip2 (&everything[32], everything.size () - 32).swap (everything);
+	}
+	else {
+		// Old format; or not compressed
+		// Decompress: everything = bunzip2 (everything)
+		bunzip2 (&everything[0], everything.size ()).swap (everything);
+		if (everything.empty ()) {
+			return LOAD_FILE_BUNZIP2;
+		}
+
+
+		// Is there a password?
+		if (everything[0] != '<') {
+			// We have a password.
+			if (everything.size () < 32) {
+				return LOAD_FILE_CONTENT;
+			}
+
+			uint64_t zeroes[] = { 0, 0 };
+
+			// First 16 bytes must be zeroes
+			if (memcmp (&everything[0], zeroes, 16) != 0) {
+				return LOAD_FILE_CONTENT;
+			}
+
+			// Second 16 bytes: MD5(password + salt1)
+			password = enter_password ();
+			if (password.empty ()) { // User cancelation
+				return LOAD_FILE_PASSWORD;
+			}
+			if (memcmp (md5 (wstring_to_mbs (password)) (password_salt1, sizeof password_salt1).result (),
+						&everything[16], 16) != 0) { // Password incorrect
+				password.clear ();
+				return LOAD_FILE_PASSWORD;
+			}
+
+			// Password correct. Decrypt now
+			decrypt (&everything[32], everything.size()-32, password.data(), password.length());
+			// Here we are passing password instead of wstring_to_mbs(password)
+			// This is because of a bug in the encryption code in the old version
+			offset = 32;
+		}
 	}
 
 	// Parse XML
@@ -592,29 +612,29 @@ bool save_file (const char *filename,
 
 
 	// Finished building the XML tree. Now make the XML text
-	std::string xml_text = xml_make (root);
+	// Make the data to everything that will finally be written to file
+	std::vector<char> everything = bzip2 (xml_make (root));
 	xml_free (root);
 
-	// The next task is to make the data to everything
-	// that will finally be written to file
-	std::vector<char> everything;
-
 	// Is there a password?
-	if (password.empty ()) { // No password.
+	if (!password.empty ()) {
+		// Yes. Encrypt
+		std::string mbs_password = wstring_to_mbs (password);
+		encrypt (&everything[0], everything.size(),
+				mbs_password.data(), mbs_password.length());
 
-		bzip2 (xml_text.data (), xml_text.length ()).swap (everything);
+		// Encrypted file header
+		char header[32];
+		memcpy (header, new_format_signature, 16);
+		md5 (mbs_password) (password_salt1, sizeof password_salt1).result (&header[16]);
 
+		// Write to file
+		return safe_write_file (filename, header, 32, &everything[0], everything.size());
 	}
-	else { // Password. Encrypt first
-
-		everything.resize (32 + xml_text.length());
-		MD5 (wstring_to_mbs (password)) (password_salt1, sizeof password_salt1).result (&everything[16]);
-		encrypt (&everything[32], xml_text.data(), xml_text.length(), password.data(), password.length());
-		bzip2 (&everything[0], everything.size ()).swap (everything); // everything = bzip2 (everything)
+	else {
+		// Write to file
+		return safe_write_file (filename, &everything[0], everything.size());
 	}
-
-	// Write to file
-	return safe_write_file (filename, &everything[0], everything.size());
 }
 
 

@@ -58,18 +58,6 @@ public:
 		md5_init (&context);
 	}
 
-	explicit MD5 (const std::string &s)
-	{
-		md5_init (&context);
-		md5_append (&context, s.data (), s.length ());
-	}
-
-	MD5 (const void *data, size_t len)
-	{
-		md5_init (&context);
-		md5_append (&context, data, len);
-	}
-
 	MD5 &operator () (const void *data, size_t len)
 	{
 		md5_append (&context, data, len);
@@ -95,6 +83,25 @@ public:
 private:
 	MD5Context context;
 };
+
+inline MD5 md5 ()
+{
+	return MD5 ();
+}
+
+inline MD5 md5 (const void *data, size_t len)
+{
+	MD5 ret;
+	ret (data, len);
+	return ret;
+}
+
+inline MD5 md5 (const std::string &s)
+{
+	MD5 ret;
+	ret (s);
+	return ret;
+}
 
 } // namespace tiary
 
