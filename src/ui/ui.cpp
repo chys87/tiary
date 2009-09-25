@@ -121,41 +121,6 @@ Size get_screen_size ()
 	return make_size (COLS, LINES);
 }
 
-namespace {
-
-struct Palettes
-{
-	ColorAttr t[NUMBER_PALETTES];
-
-	Palettes ()
-	{
-		std::fill_n (t, NUMBER_PALETTES, ColorAttr::make_default ());
-	}
-
-	ColorAttr &operator [] (size_t k) { return t[k]; }
-};
-
-Palettes palette_table;
-
-} // anonymous namespace
-
-
-void set_palette (PaletteID id, ColorAttr attr)
-{
-	if (id < NUMBER_PALETTES) {
-		palette_table[id] = attr;
-	}
-}
-
-ColorAttr get_palette (PaletteID id)
-{
-	if (id < NUMBER_PALETTES) {
-		return palette_table[id];
-	}
-	else {
-		return ColorAttr::make_default ();
-	}
-}
 
 
 

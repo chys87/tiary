@@ -54,10 +54,9 @@ void ButtonDefault::on_focus_changed ()
 
 void ButtonDefault::redraw_all_buttons ()
 {
-	const ControlList &control_list = get_control_list ();
-	for (ControlList::const_iterator it = control_list.begin ();
-			it != control_list.end (); ++it) {
-		if (Button *btn = dynamic_cast <Button *> (*it)) {
+	for (Control *ctrl = get_dummy_ctrl ()->get_next ();
+			ctrl != get_dummy_ctrl (); ctrl = ctrl->get_next ()) {
+		if (Button *btn = dynamic_cast <Button *> (ctrl)) {
 			btn->Button::redraw ();
 		}
 	}

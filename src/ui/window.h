@@ -19,9 +19,9 @@
 #include "ui/ui.h"
 #include "ui/hotkeys.h"
 #include "ui/uistring_one.h"
+#include "ui/control.h"
 #include <stddef.h> // ::size_t
 #include <string>
-#include <vector>
 
 namespace tiary {
 namespace ui {
@@ -55,16 +55,14 @@ public:
 	 * 1: Repeatedly try the next control until success or a complete failure
 	 * -1: Repeatedly try the previous control until success or a complete failure
 	 */
-	bool set_focus_id (unsigned, int fall_direction = 0);
 	bool set_focus_ptr (Control *, int fall_direction = 0);
-	bool set_focus (unsigned id, int fall_direction = 0) { return set_focus_id (id, fall_direction); }
 	bool set_focus (Control &ctrl, int fall_direction = 0) { return set_focus_ptr (&ctrl, fall_direction); }
 	bool set_focus (Control *ctrl, int fall_direction = 0) { return set_focus_ptr (ctrl, fall_direction); }
 	bool set_focus_next (bool keep_trying = false);
 	bool set_focus_prev (bool keep_trying = false);
 	// Argument = one of Control::ctrl_{up,down,left,right}
 	bool set_focus_direction (Control *Control::*);
-	Control *get_focus () const;
+	Control *get_focus () const { return focus_ctrl; }
 
 
 	// Interfaces:
@@ -85,7 +83,7 @@ public:
 	void attribute_on (Attr); ///< Force attributes on notwithstanding palette (bitwise OR'd)
 	void attribute_off (Attr); ///< Force attributes off notwithstanding palette
 	ColorAttr get_attr () const { return cur_attr; }
-	void set_attr (const ColorAttr &);
+	void set_attr (ColorAttr);
 
 	// Cursor is positioned where the focus control wants it to be
 	Size get_cursor_pos () const;
@@ -142,10 +140,12 @@ public:
 
 	void request_close (); ///< Request the window be closed
 
-
-	typedef std::vector<Control *> ControlList;
-
-	const ControlList &get_control_list () const { return control_list; }
+	DummyControl *get_dummy_ctrl () { return &dummy_ctrl; }
+	const DummyControl *get_dummy_ctrl () const { return &dummy_ctrl; }
+	Window *get_top_window () const { return top_window; }
+	Window *get_bottom_window () const { return bottom_window; }
+	static Window *get_topmost_window () { return topmost_window; }
+	static Window *get_bottommost_window () { return bottommost_window; }
 
 private:
 	unsigned requests;
@@ -172,8 +172,18 @@ private:
 	unsigned options;
 	UIStringOne title;
 
-	ControlList control_list;
-	int focus_id; ///< -1 = none
+	// The list of controls in the window is saved in a cyclic linked list
+	// One of them is dummy_ctrl
+	DummyControl dummy_ctrl; /// The first one in the linked list, a dummy
+	Control *focus_ctrl; /// 0 = none
+
+	// Points to the immediate next two windows on both sides of this window
+	Window *top_window;
+	Window *bottom_window;
+
+	// All instances of windows, ordered by order on screen
+	static Window *topmost_window;
+	static Window *bottommost_window;
 
 	// To be used by Control's contructor only
 	void add_control (Control *);

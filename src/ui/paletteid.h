@@ -66,6 +66,7 @@ const PaletteID PALETTE_ID_SHOW_NORMAL          = __LINE__ - PALETTEID_H_LINE;
 const PaletteID PALETTE_ID_SHOW_BOLD            = __LINE__ - PALETTEID_H_LINE;
 
 void set_palettes ();
+ColorAttr get_palette (PaletteID);
 
 } // namespace tiary::ui
 } // namespace tiary

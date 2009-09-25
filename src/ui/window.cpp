@@ -36,15 +36,6 @@ namespace ui {
 
 namespace {
 
-// Global variables for Window
-
-// All instances of windows, ordered by order on screen
-// Topmost windows are at the back of the list
-typedef std::vector <Window *> WindowList;
-WindowList window_list;
-
-
-
 // Not using std::vector<bool> because it's specialized by the standard
 // I don't really want that little efficiency in space, compared to the overhead
 std::vector<char> touched_lines; // 1 = Touched; 0 = Not
@@ -99,8 +90,8 @@ void commit_touched_lines ()
 		// Commit the y-th line
 		std::fill_n (line, width, def);
 
-		for (WindowList::const_iterator it = window_list.begin (); it != window_list.end (); ++it) {
-			const Window *win = *it;
+		for (const Window *win = Window::get_bottommost_window ();
+				win; win = win->get_top_window ()) {
 			if (y - win->get_pos().y >= win->get_size().y) {
 				continue;
 			}
@@ -189,8 +180,7 @@ void commit_touched_lines ()
 
 	// Cursor should be placed where the topmost window wants it to be
 	// And the visibility should be decided by the topmost window
-	if (!window_list.empty ()) {
-		Window *win = window_list.back ();
+	if (Window *win = Window::get_topmost_window ()) {
 		Size where = win->get_pos () + win->get_cursor_pos ();
 		move (where.y, where.x);
 		curs_set (win->get_cursor_visibility () ? 2 : 0);
@@ -306,6 +296,8 @@ const unsigned REQUEST_CLOSE = 1;
 
 } // anonymous namespace
 
+Window *Window::topmost_window = 0;
+Window *Window::bottommost_window = 0;
 
 Window::Window (unsigned options_, const std::wstring &title_)
 	: MovableObject ()
@@ -316,11 +308,19 @@ Window::Window (unsigned options_, const std::wstring &title_)
 	, status (STATUS_NORMAL)
 	, options (options_)
 	, title (title_, UIStringBase::NO_HOTKEY)
-	, control_list ()
-	, focus_id (-1)
+	, dummy_ctrl (*this)
+	, focus_ctrl (0)
 {
 	reallocate_char_table ();
-	window_list.push_back (this);
+	top_window = 0;
+	bottom_window = topmost_window;
+	if (topmost_window == 0) {
+		bottommost_window = this;
+	}
+	else {
+		topmost_window->top_window = this;
+	}
+	topmost_window = this;
 }
 
 Window::~Window ()
@@ -329,12 +329,19 @@ Window::~Window ()
 
 	deallocate_char_table ();
 
-	/**
-	 * Take care! The following line does NOT work...
-	 *
-	 * std::remove (window_list.begin (), window_list.end (), this);
-	 */
-	remove_first (window_list, this);
+	if (bottom_window) {
+		bottom_window->top_window = top_window;
+	}
+	else {
+		bottommost_window = top_window;
+	}
+
+	if (top_window) {
+		top_window->bottom_window = bottom_window;
+	}
+	else {
+		topmost_window = bottom_window;
+	}
 }
 
 void Window::reallocate_char_table ()
@@ -386,8 +393,8 @@ void Window::on_focus_changed ()
 
 void Window::event_loop ()
 {
-	if (size_t (focus_id) >= control_list.size ()) {
-		set_focus_id (0, 1);
+	if (!focus_ctrl) {
+		set_focus_ptr (dummy_ctrl.next, 1);
 	}
 
 	while (!(requests & REQUEST_CLOSE)) {
@@ -434,8 +441,8 @@ void Window::event_loop ()
 			// WINCH and MOUSE should be treated specially
 			touch_lines ();
 			// Signal every window. So that background windows can also redraw themselves.
-			for (WindowList::iterator it = window_list.begin (); it != window_list.end (); ++it) {
-				(*it)->on_winch ();
+			for (Window *win = bottommost_window; win; win = win->top_window) {
+				win->on_winch ();
 			}
 		}
 		else if (c == MOUSE) {
@@ -499,7 +506,7 @@ void Window::attribute_off (Attr attr)
 	cur_attr.attr &= ~attr;
 }
 
-void Window::set_attr (const ColorAttr &at)
+void Window::set_attr (ColorAttr at)
 {
 	cur_attr = at;
 }
@@ -682,8 +689,8 @@ void Window::touch_screen ()
 
 void Window::touch_windows ()
 {
-	for (WindowList::iterator it = window_list.begin (); it != window_list.end (); ++it) {
-		(*it)->redraw ();
+	for (Window *win = bottommost_window; win; win = win->top_window) {
+		win->redraw ();
 	}
 }
 
@@ -745,91 +752,98 @@ void Window::add_control (Control *ctrl)
 {
 	assert (&ctrl->win == this);
 
-	control_list.push_back (ctrl);
+	// The "dummy" of this Window.
+	// Always the first one added to the window
+	if (ctrl == &dummy_ctrl) {
+		dummy_ctrl.next = dummy_ctrl.prev = &dummy_ctrl;
+	}
+	else {
+		Control *old_last = dummy_ctrl.prev;
+		old_last->next = ctrl;
+		dummy_ctrl.prev = ctrl;
+		ctrl->prev = old_last;
+		ctrl->next = &dummy_ctrl;
+	}
 }
 
-bool Window::set_focus_id (unsigned id, int fall_direction)
+bool Window::set_focus_ptr (Control *ctrl, int fall_direction)
 {
-	if (id >= control_list.size ()) {
+	if (!ctrl) {
 		return false;
 	}
-	int old_focus = focus_id;
-	if (old_focus == int (id)) {
+	Control *old_focus = focus_ctrl;
+	if (old_focus == ctrl) {
 		return true;
 	}
-	if (old_focus >= 0) {
-		focus_id = -1;
-		control_list[old_focus]->on_defocus ();
+	if (old_focus) {
+		focus_ctrl = 0;
+		old_focus->on_defocus ();
 	}
-	unsigned N = control_list.size ();
-	unsigned fall_add = N + fall_direction;
-	unsigned try_id = id;
+	Control *try_ctrl = ctrl;
 	for (;;) {
-		focus_id = try_id;
-		Control *try_ctrl = control_list[try_id];
+		focus_ctrl = try_ctrl;
 		if (try_ctrl->on_focus ()) {
 			on_focus_changed ();
 			// Emit two signals
-			if (old_focus >= 0) {
-				control_list[old_focus]->sig_defocus.emit ();
+			if (old_focus) {
+				old_focus->sig_defocus.emit ();
 			}
 			try_ctrl->sig_focus.emit ();
 			return true;
 		}
-		try_id = (try_id + fall_add) % N;
-		if (try_id == id) {
+		if (fall_direction < 0) {
+			try_ctrl = try_ctrl->prev;
+		}
+		else if (fall_direction == 0) {
+		}
+		else {
+			try_ctrl = try_ctrl->next;
+		}
+		if (try_ctrl == ctrl) {
 			// Completely failed. Try refocusing the old focus
-			focus_id = old_focus;
-			if (old_focus >= 0) {
-				control_list[old_focus]->on_focus ();
+			focus_ctrl = old_focus;
+			if (old_focus) {
+				if (!old_focus->on_focus ()) {
+					focus_ctrl = 0;
+				}
 			}
 			return false;
 		}
 	}
 }
 
-bool Window::set_focus_ptr (Control *ctrl, int fall_direction)
-{
-	ControlList::iterator it = std::find (control_list.begin (), control_list.end (), ctrl);
-	if (it == control_list.end ()) {
-		return false;
-	}
-	return set_focus_id (it - control_list.begin (), fall_direction);
-}
-
 bool Window::set_focus_next (bool keep_trying)
 {
-	unsigned id = focus_id + 1;
-	if (id>=control_list.size()) {
-		id = 0;
+	Control *ctrl;
+	if (!focus_ctrl) {
+		ctrl = &dummy_ctrl;
 	}
-	return set_focus_id (id, keep_trying ? 1 : 0);
+	else {
+		ctrl = focus_ctrl;
+	}
+	return set_focus_ptr (ctrl->next, keep_trying ? 1 : 0);
 }
 
 bool Window::set_focus_prev (bool keep_trying)
 {
-	unsigned id = focus_id - 1;
-	if (id >= control_list.size()) {
-		id = control_list.size() - 1;
+	Control *ctrl;
+	if (!focus_ctrl) {
+		ctrl = &dummy_ctrl;
 	}
-	return set_focus_id (id, keep_trying ? -1 : 0);
+	else {
+		ctrl = focus_ctrl;
+	}
+	return set_focus_ptr (ctrl->prev, keep_trying ? -1 : 0);
 }
 
 bool Window::set_focus_direction (Control *Control::*dir)
 {
-	unsigned id = focus_id;
-	if (id < control_list.size ()) {
-		if (Control *new_focus = control_list[id]->*dir) {
+	if (focus_ctrl) {
+		if (Control *new_focus = focus_ctrl->*dir) {
 			return set_focus_ptr (new_focus, 0);
 		}
 	}
 	return false;
-}
-
-Control *Window::get_focus () const
-{
-	unsigned id = focus_id;
-	return (id >= control_list.size ()) ? 0 : control_list[id];
 }
 
 bool Window::on_mouse (MouseEvent mouse_event)
@@ -837,18 +851,18 @@ bool Window::on_mouse (MouseEvent mouse_event)
 	bool processed = false;
 
 	// First decide which control this event happens on
-	for (ControlList::iterator it = control_list.begin (); it != control_list.end (); ++it) {
-		if (both (mouse_event.p - (*it)->pos < (*it)->size)) {
+	for (Control *ctrl = dummy_ctrl.next; ctrl != &dummy_ctrl; ctrl = ctrl->next) {
+		if (both (mouse_event.p - ctrl->pos < ctrl->size)) {
 			// If it's any mouse key event, we should first try to focus it
 			// Otherwise, we do not.
 			if (mouse_event.m & MOUSE_ALL_BUTTON) {
-				set_focus (it - control_list.begin (), 0); // Regardless whether it's successful or not
+				set_focus_ptr (ctrl, 0); // Regardless whether it's successful or not
 			}
-			mouse_event.p -= (*it)->pos;
-			bool processed = (*it)->on_mouse (mouse_event);
+			mouse_event.p -= ctrl->pos;
+			bool processed = ctrl->on_mouse (mouse_event);
 			if (!processed) {
-				if ((mouse_event.m&LEFT_CLICK) && (*it)->sig_clicked.is_really_connected ()) {
-					(*it)->sig_clicked.emit ();
+				if ((mouse_event.m&LEFT_CLICK) && ctrl->sig_clicked.is_really_connected ()) {
+					ctrl->sig_clicked.emit ();
 					processed = true;
 				}
 			}
@@ -877,11 +891,11 @@ bool Window::on_key (wchar_t c)
 {
 	bool processed = false;
 	// First try the focused control
-	if (unsigned (focus_id) < control_list.size ()) {
-		processed = control_list[focus_id]->on_key (c);
+	if (focus_ctrl) {
+		processed = focus_ctrl->on_key (c);
 		// Not processed? How about local hotkeys?
 		if (!processed) {
-			processed = control_list[focus_id]->emit_hotkey (c);
+			processed = focus_ctrl->emit_hotkey (c);
 		}
 	}
 	// Not processed? How about dialog hotkeys?
@@ -968,9 +982,8 @@ void Window::redraw ()
 		}
 	}
 
-	for (ControlList::iterator it = control_list.begin ();
-			it != control_list.end (); ++it) {
-		(*it)->redraw ();
+	for (Control *ctrl = dummy_ctrl.next; ctrl != &dummy_ctrl; ctrl = ctrl->next) {
+		ctrl->redraw ();
 	}
 }
 

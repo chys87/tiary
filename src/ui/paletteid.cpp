@@ -84,12 +84,25 @@ const PaletteMap mapping[] = {
 
 };
 
+ColorAttr palette_table[NUMBER_PALETTES];
+
 } // anonymous namespace
 
 void set_palettes ()
 {
+	std::fill_n (palette_table, NUMBER_PALETTES, ColorAttr::make_default ());
 	for (unsigned i=0; i<sizeof mapping/sizeof *mapping; ++i) {
-		set_palette (mapping[i].id, mapping[i].a);
+		palette_table[mapping[i].id] = mapping[i].a;
+	}
+}
+
+ColorAttr get_palette (PaletteID id)
+{
+	if (id < NUMBER_PALETTES) {
+		return palette_table[id];
+	}
+	else {
+		return ColorAttr::make_default ();
 	}
 }
 

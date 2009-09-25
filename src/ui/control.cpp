@@ -31,6 +31,7 @@ Control::Control (Window &win_)
 	, ctrl_right (0)
 	, ctrl_up (0)
 	, ctrl_down (0)
+	// Need not set prev and next here. Set by Window::add_control
 {
 	win_.add_control (this);
 }
@@ -185,6 +186,19 @@ bool FocusColorControl::on_focus ()
 void FocusColorControl::on_defocus ()
 {
 	redraw ();
+}
+
+DummyControl::~DummyControl ()
+{
+}
+
+bool DummyControl::on_focus ()
+{
+	return false;
+}
+
+void DummyControl::redraw ()
+{
 }
 
 } // namespace tiary::ui

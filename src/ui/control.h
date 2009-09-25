@@ -82,6 +82,9 @@ public:
 
 	Window &win; // The window containing the control
 
+	Control *get_prev () { return prev; }
+	Control *get_next () { return next; }
+
 private:
 	Size curpos; ///< Cursor position
 	bool cursor_visible; ///< Whether the cursor should be visible
@@ -90,6 +93,11 @@ public:
 	// The following four pointer describe the relative position of
 	// controls so that users can use arrow keys to navigate
 	Control *ctrl_left, *ctrl_right, *ctrl_up, *ctrl_down;
+
+	// Previous/next control in the window.
+	// This linklist is cyclic
+	Control *prev;
+	Control *next;
 
 	Signal sig_defocus;
 	Signal sig_focus;
@@ -117,6 +125,16 @@ public:
 	~FocusColorControl ();
 	bool on_focus ();
 	void on_defocus ();
+};
+
+// A complete placeholder. Does nothing. Used by Window
+class DummyControl : public Control
+{
+public:
+	DummyControl (Window &win) : Control (win) {}
+	~DummyControl ();
+	bool on_focus ();
+	void redraw ();
 };
 
 } // namespace tiary::ui

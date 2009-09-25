@@ -269,9 +269,6 @@ struct CharColorAttr
 	ColorAttr a;
 };
 
-ColorAttr get_palette (PaletteID);
-void set_palette (PaletteID, ColorAttr);
-
 
 } // namespace tiary::ui
 } // namespace tiary

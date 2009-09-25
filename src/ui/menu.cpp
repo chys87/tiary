@@ -355,9 +355,11 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 MenuWindow::~MenuWindow ()
 {
 	// Delete objects new'd in ctor
-	const Window::ControlList &lst = get_control_list ();
-	for (Window::ControlList::const_iterator it = lst.begin (); it != lst.end (); ++it) {
-		delete dynamic_cast <ItemControl *>(*it);
+	for (Control *ctrl = get_dummy_ctrl ()->get_next ();
+			ctrl != get_dummy_ctrl (); ) {
+		Control *next_ctrl = ctrl->get_next ();
+		delete dynamic_cast <ItemControl *>(ctrl);
+		ctrl = next_ctrl;
 	}
 }
 
