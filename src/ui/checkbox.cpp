@@ -44,7 +44,11 @@ void CheckBox::set_status (bool new_status, bool emit_signal)
 
 void CheckBox::toggle (bool emit_signal)
 {
-	set_status (!status, emit_signal);
+	status = !status;
+	if (emit_signal) {
+		sig_toggled.emit ();
+	}
+	CheckBox::redraw ();
 }
 
 bool CheckBox::on_key (wchar_t c)
@@ -79,7 +83,9 @@ void CheckBox::redraw ()
 	pos = put (pos, status ? (
 				terminal_emulator_correct_wcwidth () ? L'\u00d7' : L'x'
 				) : L' ');
-	put (pos, L']');
+	if (wid >= 3) {
+		put (pos, L']');
+	}
 }
 
 } // namespace tiary::ui

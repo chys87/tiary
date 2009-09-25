@@ -28,9 +28,6 @@
 
 namespace tiary {
 
-// Defined in diary/diary.h
-struct DiaryEntry;
-
 // Defined in main/filter.h
 struct FilterGroup;
 
@@ -39,7 +36,10 @@ class MainWin;
 
 class MainCtrl : public ui::Control, private ui::Scroll
 {
-public:
+private:
+	// Everything is private.
+	// Only friend class MainWin can instantiate MainCtrl
+
 	// Constructor & destructor
 	explicit MainCtrl (MainWin &);
 	~MainCtrl ();
@@ -48,8 +48,6 @@ public:
 	bool on_key (wchar_t);
 	bool on_mouse (ui::MouseEvent);
 	void redraw ();
-
-private:
 
 	MainWin &w ();
 	const MainWin &w () const;

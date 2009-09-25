@@ -859,7 +859,7 @@ bool Window::on_mouse (MouseEvent mouse_event)
 	// Clicked on the top border (including close button)?
 	if (!processed) {
 		if ((mouse_event.m & LEFT_CLICK) && (mouse_event.p.y == 0)) {
-			if ((get_size ().x - 2 - mouse_event.p.x < 3)) {
+			if (get_size ().x - 2 - mouse_event.p.x < 3) {
 				processed = on_key (ESCAPE);
 			}
 			else if (!(options & WINDOW_NONMOVABLE)) {
