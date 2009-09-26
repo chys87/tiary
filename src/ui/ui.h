@@ -67,14 +67,16 @@
  * You can also force the colors and/or attributes, which overrides the
  * corresponding settings in palettes.
  *
- * It is preferrable to do I/O in Unicode, though we also have
- * some interfaces not in Unicode.
+ * I/O must be done in Unicode (UCS-4). To convert between UTF8/Locale strings
+ * and UCS-4 strings, use functions found in common/unicode.h
  *
  * To write to a Window, using tiary::ui::Window::put.
  * But more often, you should not do so, but rely on Controls
  *
  * For efficiency purposes, output functions only support printable
  * characters. It is the caller's responsibility to guarantee this.
+ * As an exception, TAB characters are supported because it's frequently
+ * used.
  *
  * @{
  * @}
