@@ -51,21 +51,20 @@ void UIStringBase::update ()
 {
 	size_t found = 0;
 	for (;;) {
-		found = text.find (L'&', found);
-		if (found == std::wstring::npos /* No "&" found */ ||
-				found+1 >= text.size () /* "&" at the end of string */) {
+		// Standard guarantees npos == size_t(-1)
+		found = text.find (L'&', found) + 1;
+		if (found == 0 /* No "&" found */ ||
+				found >= text.size () /* "&" at the end of string */) {
 			// No "&" found.
 			hotkey_pos = size_t (-1);
 			break;
 		}
-		wchar_t c;
-		if (iswprint (c = text.data ()[found+1])) {
-			text.erase (found, 1);
-			if (c != L'&') {
-				hotkey_pos = found;
-				break;
-			}
-			++found;
+		text.erase (found-1, 1);
+		wchar_t c = text.data ()[found-1];
+		// XXX What's "iswprint" here for?
+		if ((c != L'&') && iswprint (c)) {
+			hotkey_pos = found-1;
+			break;
 		}
 	}
 }
