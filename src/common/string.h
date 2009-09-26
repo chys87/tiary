@@ -21,7 +21,6 @@
  * @brief	Header for string manipulation
  */
 
-#include "common/types.h"
 #include <vector>
 #include <string.h>
 #include <list>
