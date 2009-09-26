@@ -49,14 +49,21 @@ wchar_t UIStringBase::get_hotkey () const
 
 void UIStringBase::update ()
 {
-	hotkey_pos = size_t(-1);
 	size_t found = 0;
-	while (found<text.size() && (found = text.find (L'&', found)) != std::wstring::npos) {
+	for (;;) {
+		found = text.find (L'&', found);
+		if (found == std::wstring::npos /* No "&" found */ ||
+				found+1 >= text.size () /* "&" at the end of string */) {
+			// No "&" found.
+			hotkey_pos = size_t (-1);
+			break;
+		}
 		wchar_t c;
-		if (++found<text.size() && iswprint (c = text.data()[found])) {
-			text.erase (--found, 1);
-			if (hotkey_pos==size_t(-1) && c!=L'&') {
+		if (iswprint (c = text.data ()[found+1])) {
+			text.erase (found, 1);
+			if (c != L'&') {
 				hotkey_pos = found;
+				break;
 			}
 			++found;
 		}
