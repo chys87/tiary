@@ -21,7 +21,6 @@
 #include "ui/control.h"
 #include "ui/paletteid.h"
 #include <vector>
-#include <stack>
 #include <string.h>
 #include <assert.h>
 #include <signal.h>
@@ -247,12 +246,22 @@ wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 // There is usually no or just one element in the stack.
 // Not necessary to use the complicated deque.
 // Vector is enough
-typedef std::stack <std::pair <wchar_t, MouseEvent>, std::vector <std::pair <wchar_t, MouseEvent> > > UnGetStack;
-UnGetStack stk_unget;
+struct UnGetStackItem
+{
+	wchar_t key;
+	MouseEvent mouse_event;
+};
+const size_t MAX_UNGETS = 8;
+UnGetStackItem stk_unget [MAX_UNGETS] = {};
+UnGetStackItem *stk_unget_top = stk_unget;
 
 void unget_input (wchar_t c, MouseEvent mouse_event)
 {
-	stk_unget.push (std::make_pair (c, mouse_event));
+	if (stk_unget_top < array_end (stk_unget)) {
+		stk_unget_top->key = c;
+		stk_unget_top->mouse_event = mouse_event;
+		++stk_unget_top;
+	}
 }
 
 /*
@@ -264,12 +273,12 @@ void unget_input (wchar_t c, MouseEvent mouse_event)
  */
 wchar_t get_input (MouseEvent *pmouse_event, bool block = true)
 {
-	if (!stk_unget.empty ()) {
-		wchar_t c = stk_unget.top ().first;
+	if (stk_unget_top != stk_unget) {
+		--stk_unget_top;
+		wchar_t c = stk_unget_top->key;
 		if (c == MOUSE) {
-			*pmouse_event = stk_unget.top ().second;
+			*pmouse_event = stk_unget_top->mouse_event;
 		}
-		stk_unget.pop ();
 		return c;
 	}
 	commit_touched_lines ();
