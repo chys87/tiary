@@ -31,12 +31,12 @@
  * namespace.
  *
  * First the UI system need be initialized. Before the initialization,
- * @e both the C and C++ locales must be properly set:
+ * the C++ locale must be properly set:
  * <pre>
- *       setlocale (LC_ALL, "");
  *       std::locale::global (std::locale (""));
  *       tiary::ui::init ();
  * </pre>
+ * (std::locale::global calls setlocale to set the C locale)
  * When everything is done, shut it down: <code>tiary::ui::finalize ();</code>.
  * @c tiary::ui::finalize is also registered to be automatically executed
  * at exit. So you can safely omit calling it.

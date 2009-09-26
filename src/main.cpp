@@ -21,7 +21,6 @@
 #include "ui/ui.h"
 #include "common/unicode.h"
 #include "main/mainui.h"
-#include <locale.h>
 #include <string.h>
 #include <stdlib.h>
 #include <locale>
@@ -39,7 +38,6 @@ void parse_options (int &, char **&);
 
 int main (int argc, char **argv)
 {
-	setlocale (LC_ALL, "");
 	std::locale::global (std::locale (""));
 
 	signal (SIGPIPE, SIG_IGN);
