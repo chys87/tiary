@@ -568,9 +568,10 @@ void MainWin::load (const std::wstring &filename)
 	reset_file ();
 
 	std::wstring full_filename = get_full_pathname (filename);
+	std::wstring nice_filename = get_nice_pathname (full_filename);
 	std::wstring error_info;
 	switch (load_file (wstring_to_mbs (full_filename).c_str (),
-				EnterPassword (filename),
+				EnterPassword (nice_filename),
 				entries,
 				per_file_options,
 				password)) {
@@ -588,23 +589,23 @@ void MainWin::load (const std::wstring &filename)
 			return;
 
 		case LOAD_FILE_NOT_FOUND: // Not found. Warning
-			error_info = format (L"File not found: %a") << filename;
+			error_info = format (L"File not found: %a") << nice_filename;
 			break;
 		case LOAD_FILE_PASSWORD: // Password incorrect.
 			error_info = L"Incorrect password.";
 			break;
 		case LOAD_FILE_READ_ERROR:
-			error_info = format (L"Cannot read file: %a") << filename;
+			error_info = format (L"Cannot read file: %a") << nice_filename;
 			break;
 		case LOAD_FILE_BUNZIP2:
 		case LOAD_FILE_XML:
-			error_info = format (L"File format error: %a") << filename;
+			error_info = format (L"File format error: %a") << nice_filename;
 			break;
 		case LOAD_FILE_CONTENT:
 			error_info = format (L"File content error: %a\n"
 					L"This may be due to a bug. If possible, please send a copy of this file"
 					L" to chys <admin@chys.info> so that we can fix the problem and help "
-					L"recover the contents.") << filename;
+					L"recover the contents.") << nice_filename;
 			break;
 	}
 	reset_file ();
