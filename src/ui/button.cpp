@@ -29,7 +29,9 @@ Button::Button (Window &win, const std::wstring &str)
 {
 	// Register hotkey
 	if (wchar_t c = text.get_hotkey ()) {
-		win.register_hotkey (c, Signal (sig_clicked, 0)); // Connecting to, not copying from sig_clicked
+		// Connecting to, not copying from sig_clicked
+		win.register_hotkey (c, Signal (sig_clicked, 0),
+				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
 	}
 }
 

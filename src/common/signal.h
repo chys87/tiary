@@ -123,7 +123,7 @@ class Signal
 	detail::SignalBase *info;
 
 public:
-	~Signal ();
+	~Signal () { delete info; }
 	Signal () : info(0) {}
 
 	template<typename R> explicit Signal (R (*f)()) :

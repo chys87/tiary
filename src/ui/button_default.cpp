@@ -30,9 +30,8 @@ ButtonDefault::ButtonDefault ()
 	, current_default (0)
 {
 	Signal sig_tmp (this, &ButtonDefault::slot_default_button);
-	Window::register_hotkey (RETURN, sig_tmp, Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
-	Window::register_hotkey (NEWLINE, TIARY_STD_MOVE (sig_tmp),
-			Hotkeys::CASE_SENSITIVE|Hotkeys::DISALLOW_ALT);
+	Window::register_hotkey (RETURN, sig_tmp);
+	Window::register_hotkey (NEWLINE, TIARY_STD_MOVE (sig_tmp));
 }
 
 ButtonDefault::~ButtonDefault ()

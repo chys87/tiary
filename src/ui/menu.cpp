@@ -192,7 +192,8 @@ ItemControl::ItemControl (MenuWindow &win, const MenuItem &item_, bool valid_)
 	set_cursor_visibility (false);
 	if (valid_) {
 		if (wchar_t c = text.get_hotkey ()) {
-			win.register_hotkey (c, Signal (this, &ItemControl::slot_trigger));
+			win.register_hotkey (c, Signal (this, &ItemControl::slot_trigger),
+					Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
 		}
 	}
 }

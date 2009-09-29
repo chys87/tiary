@@ -58,7 +58,8 @@ Menu &MenuBar::add (const std::wstring &text)
 		item.w = it->w + it->text.get_width () + 2 /* Space */;
 	}
 	if (wchar_t c = item.text.get_hotkey ()) {
-		win.register_hotkey (c, Signal (this, &MenuBar::slot_clicked, n-1));
+		win.register_hotkey (c, Signal (this, &MenuBar::slot_clicked, n-1),
+				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
 	}
 
 	return item.menu;

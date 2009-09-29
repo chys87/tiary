@@ -30,11 +30,11 @@ public:
 	Hotkeys ();
 	~Hotkeys ();
 
-	static const int CASE_SENSITIVE = 1;
+	static const int CASE_INSENSITIVE = 1;
 	/**
-	 * If the key is a letter, don't allow Alt + Key
+	 * If the key is a letter, also registers Alt + Key
 	 */
-	static const int DISALLOW_ALT   = 2;
+	static const int ALLOW_ALT   = 2;
 	/**
 	 * @brief	Register a hotkey
 	 *
@@ -44,9 +44,11 @@ public:
 	 * priority for handling inputs. The hotkey signal is emitted
 	 * only if the focused control fails to handle it.
 	 */
-	void register_hotkey (wchar_t, const Signal &, int options = 0 /* Case insensitive; Allow Alt */);
+	void register_hotkey (wchar_t, const Signal &);
+	void register_hotkey (wchar_t, const Signal &, int options);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	void register_hotkey (wchar_t, Signal &&, int options = 0);
+	void register_hotkey (wchar_t, Signal &&);
+	void register_hotkey (wchar_t, Signal &&, int options);
 #endif
 
 	bool emit_hotkey (wchar_t);

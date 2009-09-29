@@ -30,45 +30,57 @@ Hotkeys::~Hotkeys ()
 {
 }
 
-void Hotkeys::register_hotkey (wchar_t c, const Signal &sig, int options)
+void Hotkeys::register_hotkey (wchar_t c, const Signal &sig)
 {
-	wchar_t d = c;
-	if (!(options & CASE_SENSITIVE)) {
-		d = ucs_reverse_case (c);
-		if (d != c) {
-			hotkey_list[d] = sig;
-		}
-	}
-	if (!(options & DISALLOW_ALT)) {
-		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26) {
-			hotkey_list[ALT_BASE + c] = sig;
-			if (d != c) {
-				hotkey_list[ALT_BASE + d] = sig;
-			}
-		}
-	}
 	hotkey_list[c] = sig;
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-void Hotkeys::register_hotkey (wchar_t c, Signal &&sig, int options)
+void Hotkeys::register_hotkey (wchar_t c, const Signal &sig, int options)
 {
 	wchar_t d = c;
-	if (!(options & CASE_SENSITIVE)) {
+	if (options & CASE_INSENSITIVE) {
 		d = ucs_reverse_case (c);
 		if (d != c) {
-			hotkey_list[d] = sig; // Copy semantics
+			register_hotkey (d, sig);
 		}
 	}
-	if (!(options & DISALLOW_ALT)) {
+	if (options & ALLOW_ALT) {
 		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26) {
-			hotkey_list[ALT_BASE + c] = sig; // Copy semantics
+			register_hotkey (ALT_BASE + c, sig);
+			hotkey_list[ALT_BASE + c] = sig;
 			if (d != c) {
-				hotkey_list[ALT_BASE + d] = sig; // Copy semantics
+				register_hotkey (ALT_BASE + d, sig);
 			}
 		}
 	}
-	hotkey_list[c] = std::forward<Signal> (sig); // Move semantics
+	register_hotkey (c, sig);
+}
+
+#ifdef TIARY_HAVE_RVALUE_REFERENCES
+void Hotkeys::register_hotkey (wchar_t c, Signal &&sig)
+{
+	hotkey_list[c] = std::forward <Signal> (sig);
+}
+
+void Hotkeys::register_hotkey (wchar_t c, Signal &&sig, int options)
+{
+	wchar_t d = c;
+	if (options & CASE_INSENSITIVE) {
+		d = ucs_reverse_case (c);
+		if (d != c) {
+			register_hotkey (d, sig);
+		}
+	}
+	if (options & ALLOW_ALT) {
+		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26) {
+			register_hotkey (ALT_BASE + c, sig);
+			hotkey_list[ALT_BASE + c] = sig;
+			if (d != c) {
+				register_hotkey (ALT_BASE + d, sig);
+			}
+		}
+	}
+	register_hotkey (c, std::forward <Signal> (sig));
 }
 #endif
 

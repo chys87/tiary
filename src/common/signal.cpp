@@ -52,11 +52,6 @@ SignalGroup *SignalGroup::copy () const
 
 } // namespace detail
 
-Signal::~Signal ()
-{
-	delete info;
-}
-
 bool Signal::is_really_connected () const
 {
 	const detail::SignalBase *p = info;
