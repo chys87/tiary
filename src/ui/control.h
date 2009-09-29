@@ -11,6 +11,11 @@
  *
  **************************************************************************/
 
+/**
+ * @file	ui/control.h
+ * @author	chys <admin@chys.info>
+ * @brief	Header for class tiary::ui::Control
+ */
 
 #ifndef TIARY_UI_CONTROL_H
 #define TIARY_UI_CONTROL_H
@@ -28,6 +33,9 @@ namespace ui {
 class Window;
 struct MouseEvent;
 
+/**
+ * @brief	The base class for all controls
+ */
 class Control : public MovableObject, public Hotkeys
 {
 public:
@@ -107,7 +115,11 @@ public:
 };
 
 
-// Some attributes of Controls that can be "pasted" using virtual inheritence
+/**
+ * @brief	An "unfocusable" control.
+ *
+ * Makes on_focus return false
+ */
 class UnfocusableControl : public virtual Control
 {
 public:
@@ -116,8 +128,12 @@ public:
 	bool on_focus ();
 };
 
-// Some controls look different when focused or not.
-// So for them, on_focus and on_defocus should be forwarded to redraw
+/**
+ * @brief	Controls that look different when focused or not.
+ *
+ * This is done by forwarding on_focus and on_defocus to redraw.
+ * The user should detect whether it's focused or not in redraw.
+ */
 class FocusColorControl : public virtual Control
 {
 public:
@@ -125,16 +141,6 @@ public:
 	~FocusColorControl ();
 	bool on_focus ();
 	void on_defocus ();
-};
-
-// A complete placeholder. Does nothing. Used by Window
-class DummyControl : public Control
-{
-public:
-	DummyControl (Window &win) : Control (win) {}
-	~DummyControl ();
-	bool on_focus ();
-	void redraw ();
 };
 
 } // namespace tiary::ui

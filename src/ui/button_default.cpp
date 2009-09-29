@@ -11,6 +11,12 @@
  *
  **************************************************************************/
 
+/**
+ * @file	ui/button_default.cpp
+ * @author	chys <admin@chys.info>
+ * @brief	Implements class tiary::ui::ButtonDefault and tiary::ui::ButtonDefaultExtended
+ */
+
 
 #include "ui/button_default.h"
 #include "ui/button.h"

@@ -122,7 +122,7 @@ void MenuBar::slot_clicked (size_t k)
 		item.text.output (*this, make_size (item.w, 0), item.text.get_width ());
 
 		Size left = win.get_pos () + get_pos () + make_size (item.w, 1);
-		Size right = make_size (get_screen_size ().x, left.y);
+		Size right = make_size (get_screen_width (), left.y);
 
 		// Pop out sub menu
 		MenuItem *chosen_item = item.menu.show (left, right);

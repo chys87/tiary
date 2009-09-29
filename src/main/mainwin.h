@@ -11,17 +11,22 @@
  *
  **************************************************************************/
 
+/**
+ * @file	main/mainwin.h
+ * @author	chys <admin@chys.info>
+ * @brief	Header for the "Main Window" class, i.e. the main user interface
+ */
+
 
 #ifndef TIARY_MAIN_MAINWIN_H
 #define TIARY_MAIN_MAINWIN_H
 
 #include "ui/window.h"
-#include "ui/control.h"
-#include "ui/scroll.h"
 #include "ui/menubar.h"
 #include "ui/search_info.h"
 #include "diary/config.h"
 #include "diary/diary.h"
+#include "main/mainctrl.h"
 #include <vector>
 #include <string>
 #include <memory> // std::auto_ptr
@@ -30,35 +35,6 @@ namespace tiary {
 
 // Defined in main/filter.h
 struct FilterGroup;
-
-class MainCtrl;
-class MainWin;
-
-class MainCtrl : public ui::Control, private ui::Scroll
-{
-private:
-	// Everything is private.
-	// Only friend class MainWin can instantiate MainCtrl
-
-	// Constructor & destructor
-	explicit MainCtrl (MainWin &);
-	~MainCtrl ();
-
-	// Overload virtual functions
-	bool on_key (wchar_t);
-	bool on_mouse (ui::MouseEvent);
-	void redraw ();
-
-	MainWin &w ();
-	const MainWin &w () const;
-
-	friend class MainWin;
-
-	inline unsigned get_current_focus () const { return ui::Scroll::get_focus (); }
-
-	void set_focus (unsigned); ///< Change focus
-	void touch (); ///< Call this when any entry is modified
-};
 
 class MainWin : public ui::Window
 {

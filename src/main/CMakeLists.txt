@@ -17,6 +17,8 @@ add_library(tiary_main STATIC
 	doc.cpp
 	mainui.h
 	mainui.cpp
+	mainctrl.h
+	mainctrl.cpp
 	mainwin.h
 	mainwin.cpp
 )

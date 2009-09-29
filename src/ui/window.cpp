@@ -305,6 +305,19 @@ const unsigned REQUEST_CLOSE = 1;
 
 } // anonymous namespace
 
+Window::DummyControl::~DummyControl ()
+{
+}
+
+bool Window::DummyControl::on_focus ()
+{
+	return false;
+}
+
+void Window::DummyControl::redraw ()
+{
+}
+
 Window *Window::topmost_window = 0;
 Window *Window::bottommost_window = 0;
 
@@ -423,7 +436,7 @@ void Window::event_loop ()
 					}
 					break;
 				case RIGHT:
-					if (pos.x + size.x < get_screen_size ().x) {
+					if (pos.x + size.x < get_screen_width ()) {
 						pos.x++;
 						touch_lines (pos.y, size.y);
 					}
@@ -435,7 +448,7 @@ void Window::event_loop ()
 					}
 					break;
 				case DOWN:
-					if (pos.y + size.y < get_screen_size ().y) {
+					if (pos.y + size.y < get_screen_height ()) {
 						pos.y++;
 						touch_lines (pos.y-1, size.y+1);
 					}

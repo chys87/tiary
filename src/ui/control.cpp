@@ -188,18 +188,5 @@ void FocusColorControl::on_defocus ()
 	redraw ();
 }
 
-DummyControl::~DummyControl ()
-{
-}
-
-bool DummyControl::on_focus ()
-{
-	return false;
-}
-
-void DummyControl::redraw ()
-{
-}
-
 } // namespace tiary::ui
 } // namespace tiary

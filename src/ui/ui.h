@@ -126,6 +126,8 @@ void finalize ();
  * Note that in terminal emulators, the screen size can change from time to time.
  */
 Size get_screen_size ();
+unsigned get_screen_width ();
+unsigned get_screen_height ();
 
 
 /*

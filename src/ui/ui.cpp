@@ -121,6 +121,16 @@ Size get_screen_size ()
 	return make_size (COLS, LINES);
 }
 
+unsigned get_screen_width ()
+{
+	return COLS;
+}
+
+unsigned get_screen_height ()
+{
+	return LINES;
+}
+
 
 
 

@@ -34,6 +34,23 @@ struct MouseEvent;
  */
 class Window : public MovableObject, public Hotkeys
 {
+
+
+	/**
+	 * @brief	A placeholder control. Does nothing
+	 *
+	 * This control is used internally by tiary::ui::Window,
+	 */
+	class DummyControl : public Control
+	{
+	public:
+		DummyControl (Window &win) : Control (win) {}
+		~DummyControl ();
+		bool on_focus ();
+		void redraw ();
+	};
+
+
 public:
 	/*
 	 * If you use a border, it is your responsibility to guarantee
@@ -74,7 +91,7 @@ public:
 	virtual void on_focus_changed (); ///< Called whenever the focus is changed.
 	virtual void redraw (); // Default behavior: Clear window and call every control's redraw functions
 
-	void event_loop (); // Main event loop
+	void event_loop (); ///< Main event loop
 
 	void choose_palette (PaletteID); ///< Choose palette, invalidating all forced attributes
 	void choose_fore_color (Color); ///< Choose forecolor
@@ -140,17 +157,20 @@ public:
 
 	void request_close (); ///< Request the window be closed
 
-	DummyControl *get_dummy_ctrl () { return &dummy_ctrl; }
-	const DummyControl *get_dummy_ctrl () const { return &dummy_ctrl; }
+	Control *get_dummy_ctrl () { return &dummy_ctrl; }
+	const Control *get_dummy_ctrl () const { return &dummy_ctrl; }
 	Window *get_top_window () const { return top_window; }
 	Window *get_bottom_window () const { return bottom_window; }
 	static Window *get_topmost_window () { return topmost_window; }
 	static Window *get_bottommost_window () { return bottommost_window; }
 
 private:
+	/// A "request" is a signal sent by a derivative class or a control
+	/// to a Window (the base class).
+	/// Currently there is only one type of "request": close window
 	unsigned requests;
 
-	ColorAttr cur_attr; // Current attribute
+	ColorAttr cur_attr; ///< Current attribute
 
 	// Remember the character and attribute at every point
 	// The area is contiguous. i.e.
