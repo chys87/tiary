@@ -861,20 +861,41 @@ void MainWin::update_recent_files ()
 {
 	if (current_filename.empty ())
 		return;
+	bool changed = true; // Whether any change was made to recent_files
 	RecentFileList::iterator it = std::find (recent_files.begin (), recent_files.end (),
 			current_filename);
 	if (it == recent_files.end ()) {
 		recent_files.push_front (RecentFile ());
 		it = recent_files.begin ();
 		it->filename = current_filename;
+		it->focus_entry = main_ctrl.get_current_focus ();
+		changed = true;
 	}
-	it->focus_entry = main_ctrl.get_current_focus ();
+	else {
+		if (it != recent_files.begin ()) {
+			// C++ standard explicitly allows splicing from the list itself
+			recent_files.splice (recent_files.begin (), recent_files, it);
+			it = recent_files.begin ();
+			changed = true;
+		}
+		unsigned current_focus = main_ctrl.get_current_focus ();
+		if (current_focus != it->focus_entry) {
+			it->focus_entry = current_focus;
+			changed = true;
+		}
+	}
 
 	unsigned n_files = global_options.get_num (GLOBAL_OPTION_RECENT_FILES);
-	while (recent_files.size () > n_files) {
-		recent_files.pop_back ();
+	unsigned extra = recent_files.size () - n_files;
+	if (int (extra) > 0) {
+		for (; extra; --extra) {
+			recent_files.pop_back ();
+		}
+		changed = true;
 	}
-	save_global_options (global_options, recent_files);
+	if (changed) {
+		save_global_options (global_options, recent_files);
+	}
 }
 
 void MainWin::new_file ()
@@ -902,19 +923,24 @@ void MainWin::open_file ()
 void MainWin::open_recent_file ()
 {
 	if (check_save ()) {
-		if (recent_files.empty ()) {
+		unsigned n_recent_files = recent_files.size ();
+		if (n_recent_files == 0) {
 			ui::dialog_message (L"No recent file");
 			return;
 		}
 		std::vector <std::wstring> choices;
-		std::transform (recent_files.begin (), recent_files.end (),
-				std::back_inserter (choices),
-				get_member_fun (&RecentFile::filename));
+		choices.reserve (n_recent_files);
+		for (RecentFileList::const_iterator it = recent_files.begin ();
+				it != recent_files.end (); ++it) {
+			choices.push_back (get_nice_pathname (it->filename));
+		}
 		size_t choice = ui::dialog_select (
 				L"Recent files",
 				choices);
-		if (choice < choices.size ()) {
-			load (choices [choice]);
+		if (choice < n_recent_files) {
+			RecentFileList::const_iterator it = recent_files.begin ();
+			std::advance (it, choice);
+			load (it->filename);
 		}
 	}
 }
