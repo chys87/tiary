@@ -24,6 +24,7 @@
 #include "ui/textbox.h"
 #include "common/algorithm.h"
 #include "common/string.h"
+#include <functional>
 
 namespace tiary {
 
@@ -130,8 +131,8 @@ void WindowLabels::redraw ()
 
 WStringLocaleOrderedSet set_from_text (const std::wstring &text)
 {
-	std::list<std::wstring> lst = split_string (text, L',');
-	std::for_each (lst.begin (), lst.end (), (void (*)(std::wstring &))strip);
+	std::list<std::wstring> lst = split_string (text, L',', true);
+	std::for_each (lst.begin (), lst.end (), std::ptr_fun <std::wstring &, void> (strip));
 	WStringLocaleOrderedSet set (lst.begin (), lst.end ());
 	set.erase (std::wstring ());
 	return set;
@@ -145,7 +146,7 @@ void WindowLabels::slot_add ()
 		WStringLocaleOrderedSet current_set = set_from_text (txt_selected.get_text ());
 		if (current_set.find (label) == current_set.end ()) {
 			std::wstring new_text = txt_selected.get_text () + L',' + label;
-			txt_selected.set_text (new_text, false, new_text.size ());
+			txt_selected.set_text (TIARY_STD_MOVE (new_text), false, new_text.size ());
 		}
 	}
 }

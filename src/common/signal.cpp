@@ -59,11 +59,11 @@ Signal::~Signal ()
 
 bool Signal::is_really_connected () const
 {
-	detail::SignalBase *p = info;
-	while (detail::SignalRecursive *rec = dynamic_cast <detail::SignalRecursive *> (p)) {
+	const detail::SignalBase *p = info;
+	while (const detail::SignalRecursive *rec = dynamic_cast <const detail::SignalRecursive *> (p)) {
 		p = rec->obj.info;
 	}
-	if (detail::SignalGroup *grp = dynamic_cast <detail::SignalGroup *> (p)) {
+	if (const detail::SignalGroup *grp = dynamic_cast <const detail::SignalGroup *> (p)) {
 		for (std::list<Signal>::const_iterator it = grp->obj.begin ();
 				it != grp->obj.end (); ++it) {
 			if (it->is_really_connected ()) {

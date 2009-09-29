@@ -98,8 +98,11 @@ find_all (const std::wstring &haystack, const std::wstring &needle)
 namespace {
 
 template <typename T> inline
-void strip (std::basic_string<T> &str, const T *trim)
+void strip_impl (std::basic_string<T> &str, const T *trim)
 {
+	if (str.empty ()) {
+		return;
+	}
 	size_t startpos = str.find_first_not_of (trim);
 	if (startpos == std::basic_string<T>::npos) {
 		str.clear ();
@@ -116,12 +119,12 @@ void strip (std::basic_string<T> &str, const T *trim)
 
 void strip (std::wstring &str)
 {
-	strip (str, L" \t\v\r\n");
+	strip_impl (str, L" \t\v\r\n");
 }
 
 void strip (std::string &str)
 {
-	strip (str, " \t\v\r\n");
+	strip_impl (str, " \t\v\r\n");
 }
 
 
