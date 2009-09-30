@@ -25,17 +25,16 @@
 #include "ui/richtextlist.h"
 #include "common/string.h"
 #include "common/datetime.h"
+#include "common/dir.h"
 #include "ui/paletteid.h"
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <fcntl.h>
 #include <sys/mman.h>
 #include <string.h>
 #include <functional>
 #include <errno.h>
-#include <sys/wait.h>
 
 namespace tiary {
 
@@ -160,24 +159,25 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 {
 	// Write the contents to a temp file
 	// Then invoke an editor
-	char temp_file[] = "/tmp/tiary.temp.XXXXXXXXX";
-	int fd = mkstemp (temp_file);
+	std::string temp_file = "/tmp/tiary.temp.|.txt";
+	/*
+	 * The reason why I implement my own my_mkstemp is that
+	 * I want to add a suffix (.txt) to the filename, in order
+	 * to take advantage of the filetype recognition feature of
+	 * some editors (For example, VIM can behave slightly differently
+	 * between filenames "/tmp/tiary.temp.ABcdEF" and 
+	 * "/tmp/tiary.temp.ABcdEF.txt"
+	 */
+	int fd = my_mkstemp (temp_file);
 	if (fd < 0) {
 		return error_false (L"Failed to create a temporary file in /tmp.");
 	}
-	fchmod (fd, S_IRUSR|S_IWUSR);
-#if defined F_GETFD && defined F_SETFD && defined FD_CLOEXEC
-	int fdflag = fcntl (fd, F_GETFD);
-	if (fdflag >= 0) {
-		fcntl (fd, F_SETFD, fdflag|FD_CLOEXEC);
-	}
-#endif
 
 	// There is no universal method to notify the editor of the encoding;
 	// So the best way is to use LC_CTYPE
 	if (!write_for_edit (fd, ent.title, ent.text)) {
 		close (fd);
-		unlink (temp_file);
+		unlink (temp_file.c_str ());
 		return error_false (L"Failed to write to temporary file :( Why?");
 	}
 
@@ -185,17 +185,17 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	struct stat stbuf;
 	if (fstat (fd, &stbuf) != 0) {
 		close (fd);
-		unlink (temp_file);
+		unlink (temp_file.c_str ());
 		return error_false (L"stat on temporary file failed :( Why?");
 	}
 	oldmtime = stbuf.st_mtime;
 
 	// Call and wait for the editor
 	ui::Window::suspend ();
-	int editor_status = call_external_program_system (editor, temp_file);
+	int editor_status = call_external_program_system (editor, temp_file.c_str ());
 	ui::Window::resume ();
 
-	unlink (temp_file);
+	unlink (temp_file.c_str ());
 
 	if (editor_status != 0) { // Editor failed.
 		close (fd);

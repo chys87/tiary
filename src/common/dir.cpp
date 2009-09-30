@@ -19,6 +19,7 @@
 
 
 #include "common/dir.h"
+#include "common/types.h"
 #include "common/unicode.h"
 #include "common/string.h"
 #include "common/algorithm.h"
@@ -28,6 +29,7 @@
 #include <limits.h> // PATH_MAX
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <pwd.h>
@@ -510,7 +512,56 @@ std::string find_executable (const std::string &exe)
 	return result;
 }
 
+int my_mkstemp (std::string &name)
+{
+	size_t pipe_sign = name.find ('|');
+	if (pipe_sign == std::string::npos) {
+		// No pipe sign exist in name.
+		return -1;
+	}
+	struct timeval tv;
+	static uint64_t seed = 0;
+	gettimeofday (&tv, 0);
+	seed += uint64_t (getpid ()) ^ (uint64_t (tv.tv_usec) << 16) ^ tv.tv_sec;
 
+	std::string try_name = name;
+	try_name.insert (pipe_sign, 5, '|');
+	// Now name is copied to try_name, wit '|' replaced by 6 pipesigns
 
+	for (unsigned left_attempts = 4; left_attempts; seed += 7777, --left_attempts) {
+		static const char letters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_+";
+		uint64_t v = seed;
+		std::string::iterator iw = try_name.begin () + pipe_sign;
+		*iw++ = letters[v % 64];
+		v /= 64;
+		*iw++ = letters[v % 64];
+		v /= 64;
+		*iw++ = letters[v % 64];
+		v /= 64;
+		*iw++ = letters[v % 64];
+		v /= 64;
+		*iw++ = letters[v % 64];
+		v /= 64;
+		*iw++ = letters[v % 64];
+		int fd = open (try_name.c_str (), O_RDWR|O_CREAT|O_EXCL
+#ifdef O_CLOEXEC
+				|O_CLOEXEC
+#endif
+				, S_IRUSR|S_IWUSR);
+		if (fd >= 0) {
+#ifndef O_CLOEXEC
+# if defined F_GETFD && defined F_SETFD && defined FD_CLOEXEC
+			int fdflag = fcntl (fd, F_GETFD);
+			if (fdflag >= 0) {
+				fcntl (fd, F_SETFD, fdflag|FD_CLOEXEC);
+			}
+# endif
+#endif
+			try_name.swap (name);
+			return fd;
+		}
+	}
+	return -1;
+}
 
 } // namespace tiary

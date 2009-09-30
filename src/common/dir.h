@@ -145,6 +145,14 @@ DirEntList list_dir (const std::wstring &dir,
  */
 std::string find_executable (const std::string &);
 
+/**
+ * @brief	Create and open a temporary file, similar with mkstemp
+ * @param	name	[IN/OUT] The name for the temporary file, e.g.
+ *					"/tmp/tiary.|.txt", where "|" will be replaced by some
+ *					random characters
+ * @result	The FD for the file, open in O_RDWR|O_CREAT|O_EXCL|O_CLOEXEC
+ */
+int my_mkstemp (std::string &name);
 
 } // namespace tiary
 
