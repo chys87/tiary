@@ -46,7 +46,6 @@ private:
 	~MainCtrl ();
 
 	// Overload virtual functions
-	bool on_key (wchar_t);
 	bool on_mouse (ui::MouseEvent);
 	void redraw ();
 
@@ -58,6 +57,10 @@ private:
 	inline unsigned get_current_focus () const { return ui::Scroll::get_focus (); }
 
 	void set_focus (unsigned); ///< Change focus
+	void set_focus_up (); ///< As if UP is pressed
+	void set_focus_down (); ///< As if DOWN is pressed
+	void set_focus_pageup (); ///< As if PAGEUP is pressed
+	void set_focus_pagedown (); ///< As if PAGEDOWN is pressed
 	void touch (); ///< Call this when any entry is modified
 };
 

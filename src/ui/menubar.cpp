@@ -133,7 +133,7 @@ void MenuBar::slot_clicked (size_t k)
 
 		// Deal with the result
 		if (chosen_item) {
-			chosen_item->sig.emit ();
+			chosen_item->action.emit ();
 			break;
 		}
 

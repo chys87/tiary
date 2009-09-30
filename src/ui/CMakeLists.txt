@@ -31,6 +31,8 @@ add_library(tiary_ui STATIC
 	fixed_window.cpp
 	grid_select.h
 	grid_select.cpp
+	hotkey_hint.h
+	hotkey_hint.cpp
 	hotkeys.h
 	hotkeys.cpp
 	label.h

@@ -24,6 +24,7 @@ namespace {
 #define BACKGROUND         { BLACK, WHITE, 0 }
 #define BACKGROUND_HIGH    { WHITE, WHITE, HIGHLIGHT }
 #define BACKGROUND_GRAY    { YELLOW, WHITE, 0 }
+#define BACKGROUND_BLUE    { BLUE, WHITE, HIGHLIGHT }
 #define EDIT_AREA          { WHITE, BLACK, 0 }
 #define EDIT_AREA_SELECT   { BLACK, YELLOW, 0 }
 #define EDIT_AREA_GRAY     { YELLOW, BLACK, 0 }
@@ -67,6 +68,8 @@ const PaletteMap mapping[] = {
 	, { PALETTE_ID_GRID,               EDIT_AREA }
 	, { PALETTE_ID_GRID_INVALID,       EDIT_AREA_GRAY }
 	, { PALETTE_ID_GRID_SELECT,        EDIT_AREA_SELECT }
+	, {PALETTE_ID_HOTKEY_HINT,         BACKGROUND }
+	, {PALETTE_ID_HOTKEY_HINT_KEY,     BACKGROUND_BLUE }
 
 	, { PALETTE_ID_ENTRY,              ENTRY_TEXT }
 	, { PALETTE_ID_ENTRY_TEXT,         ENTRY_TEXT }

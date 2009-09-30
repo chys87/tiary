@@ -19,7 +19,6 @@
 
 #include "main/mainctrl.h"
 #include "main/mainwin.h"
-#include "main/doc.h"
 #include "ui/paletteid.h"
 #include "ui/mouse.h"
 #include "common/format.h"
@@ -42,182 +41,9 @@ MainCtrl::~MainCtrl ()
 {
 }
 
-bool MainCtrl::on_key (wchar_t key)
-{
-	switch (key) {
-		case L'a':
-		case L'A':
-		case ui::INSERT:
-			w().append ();
-			return true;
-
-		case L'e':
-		case L'E':
-			w().edit_current ();
-			return true;
-
-		case L't':
-		case L'T':
-			w().edit_time_current ();
-			return true;
-
-		case L'l':
-			w().edit_labels_current ();
-			return true;
-
-		case L'L':
-			w().edit_all_labels ();
-			break;
-
-		case L'd':
-		case L'D':
-		case ui::DELETE:
-			w().remove_current ();
-			return true;
-
-		case L'm':
-			w().move_up_current ();
-			return true;
-
-		case L'M':
-			w().move_down_current ();
-			return true;
-
-		case L'S':
-			w().sort_all ();
-			return true;
-
-		case L'p':
-		case L'P':
-			w().edit_password ();
-			return true;
-
-		case L'r':
-			w().edit_perfile_options ();
-			return true;
-
-		case L'R':
-			w().edit_global_options ();
-			return true;
-
-		case L'q':
-		case L'Q':
-		case ui::CTRL_Q:
-			w().quit ();
-			return true;
-
-		case ui::ESCAPE:
-			w().menu_bar.slot_clicked (0);
-			return true;
-
-		case L'k':
-		case ui::UP:
-			set_focus (get_current_focus () - 1);
-			return true;
-
-		case L'j':
-		case ui::DOWN:
-			set_focus (get_current_focus () + 1);
-			return true;
-
-		case L'b':
-		case ui::PAGEUP:
-			set_focus (get_current_focus () - ui::Scroll::get_height () + 1);
-			return true;
-
-		case L'f':
-		case ui::PAGEDOWN:
-			set_focus (get_current_focus () + ui::Scroll::get_height () - 1);
-			return true;
-
-		case L'^':
-		case L'g':
-		case L'<':
-		case ui::HOME:
-			set_focus (0);
-			return true;
-
-		case L'$':
-		case L'G':
-		case L'>':
-		case ui::END:
-			set_focus (std::numeric_limits<int>::max ());
-			return true;
-
-		case L'/':
-		case ui::CTRL_F:
-			w().search (false);
-			return true;
-
-		case L'?':
-			w().search (true);
-			return true;
-
-		case L'n':
-		case ui::F3:
-			w().search_continue (false);
-			return true;
-
-		case L'N':
-			w().search_continue (true);
-			return true;
-
-		case L'v':
-		case ui::NEWLINE:
-		case ui::RETURN:
-		case ui::RIGHT:
-			w().view_current ();
-			return true;
-
-		case L'V':
-			w().view_all ();
-			return true;
-
-		case ui::CTRL_G:
-			w().edit_filter ();
-			return true;
-
-		case ui::LEFT:
-			if (w().filter.get ()) {
-				w().clear_filter ();
-				return true;
-			}
-			else {
-				return false;
-			}
-
-		case ui::CTRL_N:
-			w().new_file ();
-			return true;
-
-		case ui::CTRL_O:
-			w().open_file ();
-			return true;
-
-		case L'w':
-		case ui::CTRL_S:
-			w().default_save ();
-			return true;
-
-		case L'W':
-			w().save_as ();
-			return true;
-
-		case L'h':
-		case L'H':
-		case ui::F1:
-			show_doc ();
-			return true;
-
-		default:
-			return false;
-	}
-	return false;
-}
-
 bool MainCtrl::on_mouse (ui::MouseEvent mouse_event)
 {
-	if (!(mouse_event.m & (ui::LEFT_CLICK | ui::RIGHT_CLICK))) {
+	if (!(mouse_event.m & (ui::LEFT_CLICK | ui::LEFT_DCLICK | ui::RIGHT_CLICK))) {
 		return false;
 	}
 	ui::Scroll::Info info = ui::Scroll::get_info ();
@@ -235,7 +61,10 @@ bool MainCtrl::on_mouse (ui::MouseEvent mouse_event)
 		return false;
 	}
 	set_focus (k);
-	if (mouse_event.m & ui::RIGHT_CLICK) {
+	if (mouse_event.m & ui::LEFT_DCLICK) {
+		w().view_current ();
+	}
+	else if (mouse_event.m & ui::RIGHT_CLICK) {
 		w().context_menu->show (mouse_event.p + get_pos (), true);
 	}
 	return true;
@@ -377,6 +206,26 @@ void MainCtrl::set_focus (unsigned k)
 	}
 	ui::Scroll::modify_focus (k);
 	MainCtrl::redraw ();
+}
+
+void MainCtrl::set_focus_up ()
+{
+	set_focus (get_current_focus () - 1);
+}
+
+void MainCtrl::set_focus_down ()
+{
+	set_focus (get_current_focus () + 1);
+}
+
+void MainCtrl::set_focus_pageup ()
+{
+	set_focus (get_current_focus () - ui::Scroll::get_height () + 1);
+}
+
+void MainCtrl::set_focus_pagedown ()
+{
+	set_focus (get_current_focus () + ui::Scroll::get_height () - 1);
 }
 
 void MainCtrl::touch ()

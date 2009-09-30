@@ -23,6 +23,7 @@
 
 #include "ui/window.h"
 #include "ui/menubar.h"
+#include "ui/hotkey_hint.h"
 #include "ui/search_info.h"
 #include "diary/config.h"
 #include "diary/diary.h"
@@ -71,6 +72,8 @@ private:
 
 	// main_ctrl must be after other members, which they use in its constructor
 	MainCtrl main_ctrl;
+
+	ui::HotkeyHint hotkey_hint;
 
 	ui::SearchInfo last_search; ///< Remember what we last searched for
 
@@ -126,8 +129,15 @@ private:
 	void update_recent_files ();
 
 	bool query_normal_mode () const;
-	bool query_nonempty () const;
+	bool query_filter_mode () const;
+	bool query_nonempty_filtered () const;
+	bool query_nonempty_all () const;
 	bool query_normal_mode_nonempty () const;
+	bool query_allow_move_up () const;
+	bool query_allow_move_down () const;
+	bool query_allow_up () const;
+	bool query_allow_down () const;
+	bool query_search_continuable () const;
 };
 
 

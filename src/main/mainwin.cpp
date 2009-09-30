@@ -55,59 +55,188 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	, saved (true)
 	, filter ()
 	, main_ctrl (*this)
+	, hotkey_hint (*this)
 	, last_search ()
 {
-	menu_bar.add (L"&File")
-		(L"&New              Ctrl+N", Signal (this, &MainWin::new_file))
-		(L"&Open...          Ctrl+O", Signal (this, &MainWin::open_file))
-		(L"Open &recent file..."    , Signal (this, &MainWin::open_recent_file))
-		()
-		(L"&Save           w Ctrl+S", Signal (this, &MainWin::default_save))
-		(L"Save &as...     W",        Signal (this, &MainWin::save_as))
-		()
-		(L"&Password...    p",        Signal (this, &MainWin::edit_password))
-		()
-		(L"&Quit           q Ctrl+Q", Signal (this, &MainWin::quit))
-		;
+	// Frequently used queries
 	Query <bool> q_normal (this, &MainWin::query_normal_mode);
-	Query <bool> q_nonempty (this, &MainWin::query_nonempty);
+	Query <bool> q_filtered (this, &MainWin::query_filter_mode);
+	Query <bool> q_nonempty (this, &MainWin::query_nonempty_filtered);
+	Query <bool> q_nonempty_all (this, &MainWin::query_nonempty_all);
 	Query <bool> q_normal_nonempty (this, &MainWin::query_normal_mode_nonempty);
+	Query <bool> q_allow_up (this, &MainWin::query_allow_up);
+	Query <bool> q_allow_down (this, &MainWin::query_allow_down);
+	Query <bool> q_search_continue (this, &MainWin::query_search_continuable);
+
+	// All actions
+	Signal action_menu (menu_bar, &ui::MenuBar::slot_clicked, 0);
+	Signal action_new_file (this, &MainWin::new_file);
+	Signal action_open_file (this, &MainWin::open_file);
+	Signal action_open_recent_file (this, &MainWin::open_recent_file);
+	Signal action_save (this, &MainWin::default_save);
+	Signal action_save_as (this, &MainWin::save_as);
+	Signal action_password (this, &MainWin::edit_password);
+	Signal action_quit (this, &MainWin::quit);
+	Action action_append (Signal (this, &MainWin::append), q_normal);
+	Action action_delete (Signal (this, &MainWin::remove_current), q_normal_nonempty);
+	Action action_edit (Signal (this, &MainWin::edit_current), q_nonempty);
+	Action action_item_labels (Signal (this, &MainWin::edit_labels_current), q_nonempty);
+	Action action_time (Signal (this, &MainWin::edit_time_current), q_nonempty);
+	Action action_view (Signal (this, &MainWin::view_current), q_nonempty);
+	Action action_view_all (Signal (this, &MainWin::view_all), q_nonempty);
+	Action action_move_up (Signal (this, &MainWin::move_up_current), Query<bool> (this, &MainWin::query_allow_move_up));
+	Action action_move_down (Signal (this, &MainWin::move_down_current), Query<bool> (this, &MainWin::query_allow_move_down));
+	Action action_sort_all (Signal (this, &MainWin::sort_all), q_normal_nonempty);
+	Action action_filter (Signal (this, &MainWin::edit_filter), q_nonempty);
+	Action action_clear_filter (Signal (this, &MainWin::clear_filter), q_filtered);
+	Action action_search (Signal (this, &MainWin::search, false), q_nonempty);
+	Action action_search_backward (Signal (this, &MainWin::search, true), q_nonempty);
+	Action action_search_next (Signal (this, &MainWin::search_continue, false), q_search_continue);
+	Action action_search_previous (Signal (this, &MainWin::search_continue, true), q_search_continue);
+	Action action_all_labels (Signal (this, &MainWin::edit_all_labels), q_nonempty_all);
+	Signal action_global_options (this, &MainWin::edit_global_options);
+	Signal action_perfile_options (this, &MainWin::edit_perfile_options);
+	Signal action_show_doc (&show_doc);
+	Signal action_show_license (&show_license);
+	Signal action_show_about (&show_about);
+	Signal action_focus_home (main_ctrl, &MainCtrl::set_focus, 0);
+	Signal action_focus_end (main_ctrl, &MainCtrl::set_focus, std::numeric_limits<int>::max ());
+	Action action_up (Signal (main_ctrl, &MainCtrl::set_focus_up), q_allow_up);
+	Action action_down (Signal (main_ctrl, &MainCtrl::set_focus_down), q_allow_down);
+	Action action_pageup (Signal (main_ctrl, &MainCtrl::set_focus_pageup), q_allow_up);
+	Action action_pagedown (Signal (main_ctrl, &MainCtrl::set_focus_pagedown), q_allow_down);
+
+	menu_bar.add (L"&File")
+		(L"&New              Ctrl+N", action_new_file)
+		(L"&Open...          Ctrl+O", action_open_file)
+		(L"Open &recent file..."    , action_open_recent_file)
+		()
+		(L"&Save           w Ctrl+S", action_save)
+		(L"Save &as...     W",        action_save_as)
+		()
+		(L"&Password...    p",        action_password)
+		()
+		(L"&Quit           q Ctrl+Q", action_quit)
+		;
 	context_menu = &menu_bar.add (L"&Entry");
 	(*context_menu)
-		(L"&New entry      a INSERT", Signal (this, &MainWin::append), q_normal)
-		(L"&Delete         d DELETE", Signal (this, &MainWin::remove_current), q_normal_nonempty)
+		(L"&New entry      a INSERT", action_append)
+		(L"&Delete         d DELETE", action_delete)
 		()
-		(L"&Edit           e",        Signal (this, &MainWin::edit_current), q_nonempty)
-		(L"Edit &labels... l",        Signal (this, &MainWin::edit_labels_current), q_nonempty)
-		(L"Edit t&ime...   t",        Signal (this, &MainWin::edit_time_current), q_nonempty)
+		(L"&Edit           e",        action_edit)
+		(L"Edit &labels... l",        action_item_labels)
+		(L"Edit t&ime...   t",        action_time)
 		()
-		(L"&View           v ENTER",  Signal (this, &MainWin::view_current), q_nonempty)
-		(L"View &all       V",        Signal (this, &MainWin::view_all), q_nonempty)
+		(L"&View           v ENTER",  action_view)
+		(L"View &all       V",        action_view_all)
 		()
-		(L"&Move up        m",        Signal (this, &MainWin::move_up_current), q_normal_nonempty)
-		(L"Move dow&n      M",        Signal (this, &MainWin::move_down_current), q_normal_nonempty)
-		(L"&Sort all       S",        Signal (this, &MainWin::sort_all), q_normal_nonempty)
+		(L"&Move up        m",        action_move_up)
+		(L"Move dow&n      M",        action_move_down)
+		(L"&Sort all       S",        action_sort_all)
 		;
 	menu_bar.add (L"&View")
-		(L"&Filter...        CtrL+G", Signal (this, &MainWin::edit_filter), q_nonempty)
+		(L"&Filter...        CtrL+G", action_filter)
+		(L"&Clear filter     LEFT",   action_clear_filter)
 		;
 	menu_bar.add (L"&Search")
-		(L"&Find...        / Ctrl+F", Signal (this, &MainWin::search, false), q_nonempty)
-		(L"Find &next      n F3",     Signal (this, &MainWin::search_continue, false), q_nonempty)
-		(L"Find &previous  N",        Signal (this, &MainWin::search_continue, true), q_nonempty)
+		(L"&Find...        / Ctrl+F", action_search)
+		(L"Find &next      n F3",     action_search_next)
+		(L"Find &previous  N",        action_search_previous)
 		;
 	menu_bar.add (L"Se&ttings")
-		(L"&Labels...      L",        Signal (this, &MainWin::edit_all_labels), q_nonempty)
+		(L"&Labels...      L",        action_all_labels)
 		()
-		(L"&Preferences... R",        Signal (this, &MainWin::edit_global_options))
-		(L"&File perferences...",     Signal (this, &MainWin::edit_perfile_options))
+		(L"&Preferences... R",        action_global_options)
+		(L"&File perferences...",     action_perfile_options)
 		;
 	menu_bar.add (L"&Help")
-		(L"&Help             F1",     Signal (show_doc))
+		(L"&Help             F1",     action_show_doc)
 		()
-		(L"&License",                 Signal (show_license))
-		(L"&About",                   Signal (show_about))
+		(L"&License",                 action_show_license)
+		(L"&About",                   action_show_about)
 		;
+
+	main_ctrl.register_hotkey (ui::ESCAPE,   action_menu);
+	main_ctrl.register_hotkey (L'a',         action_append);
+	main_ctrl.register_hotkey (L'A',         action_append);
+	main_ctrl.register_hotkey (ui::INSERT,   action_append);
+	main_ctrl.register_hotkey (L'b',         action_pageup);
+	main_ctrl.register_hotkey (ui::PAGEUP,   action_pageup);
+	main_ctrl.register_hotkey (L'd',         action_delete);
+	main_ctrl.register_hotkey (L'D',         action_delete);
+	main_ctrl.register_hotkey (ui::DELETE,   action_delete);
+	main_ctrl.register_hotkey (L'e',         action_edit);
+	main_ctrl.register_hotkey (L'E',         action_edit);
+	main_ctrl.register_hotkey (L'f',         action_pagedown);
+	main_ctrl.register_hotkey (ui::PAGEDOWN, action_pagedown);
+	main_ctrl.register_hotkey (L'g',         action_focus_home);
+	main_ctrl.register_hotkey (L'^',         action_focus_home);
+	main_ctrl.register_hotkey (L'<',         action_focus_home);
+	main_ctrl.register_hotkey (ui::HOME,     action_focus_home);
+	main_ctrl.register_hotkey (L'G',         action_focus_end);
+	main_ctrl.register_hotkey (L'$',         action_focus_end);
+	main_ctrl.register_hotkey (L'>',         action_focus_end);
+	main_ctrl.register_hotkey (ui::END,      action_focus_end);
+	main_ctrl.register_hotkey (L'h',         action_show_doc);
+	main_ctrl.register_hotkey (L'H',         action_show_doc);
+	main_ctrl.register_hotkey (ui::F1,       action_show_doc);
+	main_ctrl.register_hotkey (L'j',         action_down);
+	main_ctrl.register_hotkey (ui::DOWN,     action_down);
+	main_ctrl.register_hotkey (L'k',         action_up);
+	main_ctrl.register_hotkey (ui::UP,       action_up);
+	main_ctrl.register_hotkey (L'l',         action_item_labels);
+	main_ctrl.register_hotkey (L'L',         action_all_labels);
+	main_ctrl.register_hotkey (L'm',         action_move_up);
+	main_ctrl.register_hotkey (L'M',         action_move_down);
+	main_ctrl.register_hotkey (L'n',         action_search_next);
+	main_ctrl.register_hotkey (ui::F3,       action_search_next);
+	main_ctrl.register_hotkey (L'N',         action_search_previous);
+	main_ctrl.register_hotkey (L'p',         action_password);
+	main_ctrl.register_hotkey (L'P',         action_password);
+	main_ctrl.register_hotkey (L'q',         action_quit);
+	main_ctrl.register_hotkey (L'Q',         action_quit);
+	main_ctrl.register_hotkey (ui::CTRL_Q,   action_quit);
+	main_ctrl.register_hotkey (L'r',         action_perfile_options);
+	main_ctrl.register_hotkey (L'R',         action_global_options);
+	main_ctrl.register_hotkey (L'S',         action_sort_all);
+	main_ctrl.register_hotkey (L't',         action_time);
+	main_ctrl.register_hotkey (L'T',         action_time);
+	main_ctrl.register_hotkey (L'v',         action_view);
+	main_ctrl.register_hotkey (ui::RETURN,   action_view);
+	main_ctrl.register_hotkey (ui::NEWLINE,  action_view);
+	main_ctrl.register_hotkey (ui::RIGHT,    action_view);
+	main_ctrl.register_hotkey (L'V',         action_view_all);
+	main_ctrl.register_hotkey (L'w',         action_save);
+	main_ctrl.register_hotkey (ui::CTRL_S,   action_save);
+	main_ctrl.register_hotkey (L'W',         action_save_as);
+	main_ctrl.register_hotkey (ui::CTRL_F,   action_search);
+	main_ctrl.register_hotkey (L'/',         action_search);
+	main_ctrl.register_hotkey (L'?',         action_search_backward);
+	main_ctrl.register_hotkey (ui::CTRL_G,   action_filter);
+	main_ctrl.register_hotkey (ui::CTRL_N,   action_new_file);
+	main_ctrl.register_hotkey (ui::CTRL_O,   action_open_file);
+	main_ctrl.register_hotkey (ui::LEFT,     action_clear_filter);
+
+	hotkey_hint
+		(L"Esc",     L"Menu",             TIARY_STD_MOVE (action_menu))
+		(L"LEFT",    L"Clear filter",     TIARY_STD_MOVE (action_clear_filter))
+		(L"a",       L"New entry",        TIARY_STD_MOVE (action_append))
+		(L"e",       L"Edit",             TIARY_STD_MOVE (action_edit))
+		(L"d",       L"Delete",           TIARY_STD_MOVE (action_delete))
+		(L"^G",      L"Filter",           TIARY_STD_MOVE (action_filter))
+		(L"/",       L"Search",           TIARY_STD_MOVE (action_search))
+		(L"n",       L"Next",             TIARY_STD_MOVE (action_search_next))
+		(L"t",       L"Time",             TIARY_STD_MOVE (action_time))
+		(L"l",       L"Labels",           TIARY_STD_MOVE (action_item_labels))
+		(L"L",       L"Manage labels",    TIARY_STD_MOVE (action_all_labels))
+		(L"m",       L"Move up",          TIARY_STD_MOVE (action_move_up))
+		(L"M",       L"Move down",        TIARY_STD_MOVE (action_move_down))
+		(L"S",       L"Sort",             TIARY_STD_MOVE (action_sort_all))
+		(L"p",       L"Password",         TIARY_STD_MOVE (action_password))
+		(L"F1",      L"Help",             TIARY_STD_MOVE (action_show_doc))
+		(L"q",       L"Quit",             TIARY_STD_MOVE (action_quit))
+		;
+
 	MainWin::redraw ();
 
 	switch (load_global_options (global_options, recent_files)) {
@@ -141,7 +270,8 @@ void MainWin::redraw ()
 	scrsize -= ui::make_size (1, 0);
 	move_resize (ui::make_size (), scrsize);
 	menu_bar.move_resize (ui::make_size (), ui::make_size (scrsize.x, 1));
-	main_ctrl.move_resize (ui::make_size (0, 1), scrsize - ui::make_size (0, 1));
+	main_ctrl.move_resize (ui::make_size (0, 1), scrsize - ui::make_size (0, 2));
+	hotkey_hint.move_resize (ui::make_size (0, scrsize.y-1), ui::make_size (scrsize.x, 1));
 	Window::redraw ();
 }
 
@@ -162,7 +292,8 @@ void MainWin::on_ready ()
 	else {
 		status += get_nice_pathname (current_filename);
 	}
-	menu_bar.set_text (status);
+	menu_bar.set_text (TIARY_STD_MOVE (status));
+	hotkey_hint.HotkeyHint::redraw ();
 }
 
 void MainWin::updated_filter ()
@@ -611,8 +742,10 @@ void MainWin::edit_filter ()
 
 void MainWin::clear_filter ()
 {
-	filter.reset ();
-	updated_filter ();
+	if (filter.get ()) {
+		filter.reset ();
+		updated_filter ();
+	}
 }
 
 void MainWin::search (bool bkwd)
@@ -748,14 +881,49 @@ bool MainWin::query_normal_mode () const
 	return !filter.get ();
 }
 
-bool MainWin::query_nonempty () const
+bool MainWin::query_filter_mode () const
+{
+	return filter.get ();
+}
+
+bool MainWin::query_nonempty_filtered () const
 {
 	return !get_current_list ().empty ();
 }
 
+bool MainWin::query_nonempty_all () const
+{
+	return !entries.empty ();
+}
+
 bool MainWin::query_normal_mode_nonempty () const
 {
-	return (query_normal_mode () && query_nonempty ());
+	return (query_normal_mode () && query_nonempty_all ());
+}
+
+bool MainWin::query_allow_move_up () const
+{
+	return (query_normal_mode_nonempty () && query_allow_up ());
+}
+
+bool MainWin::query_allow_move_down () const
+{
+	return (query_normal_mode () && query_allow_down ());
+}
+
+bool MainWin::query_allow_up () const
+{
+	return main_ctrl.get_current_focus ();
+}
+
+bool MainWin::query_allow_down () const
+{
+	return (main_ctrl.get_current_focus () + 1 < get_current_list ().size ());
+}
+
+bool MainWin::query_search_continuable () const
+{
+	return (query_nonempty_filtered () && !last_search.get_pattern ().empty ());
 }
 
 } // namespace tiary

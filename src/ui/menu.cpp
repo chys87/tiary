@@ -27,35 +27,40 @@ namespace ui {
 
 MenuItem::MenuItem ()
 	: text ()
-	, sig ()
+	, action ()
 	, hidden (false)
 	, submenu (0)
-	, valid_foo ()
 {
 }
 
 MenuItem::MenuItem (const std::wstring &text_, const Signal &sig_)
 	: text (text_)
-	, sig (sig_)
+	, action (sig_)
 	, hidden (false)
 	, submenu (0)
-	, valid_foo ()
+{
+}
+
+MenuItem::MenuItem (const std::wstring &text_, const Action &act_)
+	: text (text_)
+	, action (act_)
+	, hidden (false)
+	, submenu (0)
 {
 }
 
 MenuItem::MenuItem (const MenuItem &other)
 	: text (other.text)
-	, sig (other.sig)
+	, action (other.action)
 	, hidden (other.hidden)
 	, submenu (other.submenu ? new Menu (*other.submenu) : 0)
-	, valid_foo (other.valid_foo)
 {
 }
 
 MenuItem &MenuItem::operator = (const MenuItem &other)
 {
 	text = other.text;
-	sig = other.sig;
+	action = other.action;
 	hidden = other.hidden;
 	submenu = other.submenu ? new Menu (*other.submenu) : 0;
 	return *this;
@@ -64,19 +69,25 @@ MenuItem &MenuItem::operator = (const MenuItem &other)
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 MenuItem::MenuItem (const std::wstring &text_, Signal &&sig_)
 	: text (text_)
-	, sig (std::forward<Signal> (sig_))
+	, action (std::move (sig_))
 	, hidden (false)
 	, submenu (0)
-	, valid_foo ()
+{
+}
+
+MenuItem::MenuItem (const std::wstring &text_, Action &&act_)
+	: text (text_)
+	, action (std::move (act_))
+	, hidden (false)
+	, submenu (0)
 {
 }
 
 MenuItem::MenuItem (MenuItem &&other)
 	: text (std::forward<std::wstring> (other.text))
-	, sig (std::forward<Signal> (other.sig))
+	, action (std::move (other.action))
 	, hidden (other.hidden)
 	, submenu (other.submenu)
-	, valid_foo (std::forward <Query <bool> > (other.valid_foo))
 {
 	other.submenu = 0;
 }
@@ -84,11 +95,10 @@ MenuItem::MenuItem (MenuItem &&other)
 MenuItem &MenuItem::operator = (MenuItem &&other)
 {
 	text = std::forward<std::wstring> (other.text);
-	sig = std::forward<Signal> (other.sig);
+	action = std::move (other.action);
 	hidden = other.hidden;
 	submenu = other.submenu;
 	other.submenu = 0;
-	valid_foo = std::forward <Query <bool> > (other.valid_foo);
 	return *this;
 }
 #endif
@@ -121,10 +131,22 @@ MenuItem &Menu::add (const wchar_t *text, const Signal &sig)
 	return item_list.back ();
 }
 
+MenuItem &Menu::add (const wchar_t *text, const Action &act)
+{
+	item_list.push_back (MenuItem (text, act));
+	return item_list.back ();
+}
+
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 MenuItem &Menu::add (const wchar_t *text, Signal &&sig)
 {
 	item_list.push_back (MenuItem (text, std::forward<Signal> (sig)));
+	return item_list.back ();
+}
+
+MenuItem &Menu::add (const wchar_t *text, Action &&act)
+{
+	item_list.push_back (MenuItem (text, std::move (act)));
 	return item_list.back ();
 }
 #endif
@@ -317,7 +339,7 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	unsigned maxwid = 0;
 	for (Menu::const_iterator it = menu_.begin (); it != menu_.end (); ++it) {
 		if (!it->hidden) {
-			bool validity = it->valid_foo.call (true);
+			bool validity = it->action.call_query (true);
 			ItemControl *p = *pi++ = new ItemControl (*this, *it, validity);
 			if (validity && !p->text.get_text ().empty ()) {
 				*pv++ = p;
@@ -409,7 +431,7 @@ MenuItem *Menu::show (Size left, Size right, bool emit_signal)
 	}
 	// Destruct the window before emitting the signal
 	if (emit_signal && sel) {
-		sel->sig.emit ();
+		sel->action.emit ();
 	}
 	return sel;
 }

@@ -50,6 +50,8 @@ const PaletteID PALETTE_ID_RICHTEXT             = __LINE__ - PALETTEID_H_LINE;
 const PaletteID PALETTE_ID_GRID                 = __LINE__ - PALETTEID_H_LINE;
 const PaletteID PALETTE_ID_GRID_INVALID         = __LINE__ - PALETTEID_H_LINE;
 const PaletteID PALETTE_ID_GRID_SELECT          = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_HOTKEY_HINT          = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_HOTKEY_HINT_KEY      = __LINE__ - PALETTEID_H_LINE;
 
 const PaletteID PALETTE_ID_ENTRY                = __LINE__ - PALETTEID_H_LINE;
 const PaletteID PALETTE_ID_ENTRY_TEXT           = __LINE__ - PALETTEID_H_LINE;
