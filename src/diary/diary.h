@@ -45,7 +45,7 @@ struct RecentFile
 	std::wstring filename;
 	unsigned focus_entry;
 
-	bool operator == (const std::wstring &name)
+	bool operator == (const std::wstring &name) const
 	{
 		return (filename == name);
 	}

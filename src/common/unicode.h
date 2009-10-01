@@ -128,6 +128,7 @@ std::string wstring_to_utf8 (const std::wstring &src);
  * remaining data. So we do not attempt recovering at all.)
  */
 std::wstring mbs_to_wstring (const char *);
+std::wstring mbs_to_wstring (const char *, size_t);
 std::wstring mbs_to_wstring (const std::string &);
 
 /**

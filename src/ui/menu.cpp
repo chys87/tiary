@@ -121,33 +121,28 @@ Menu &MenuItem::get_submenu ()
 
 MenuItem &Menu::add ()
 {
-	item_list.push_back (MenuItem ());
-	return item_list.back ();
+	return *item_list.insert (item_list.end (), MenuItem ());
 }
 
 MenuItem &Menu::add (const wchar_t *text, const Signal &sig)
 {
-	item_list.push_back (MenuItem (text, sig));
-	return item_list.back ();
+	return *item_list.insert (item_list.end (), MenuItem (text, sig));
 }
 
 MenuItem &Menu::add (const wchar_t *text, const Action &act)
 {
-	item_list.push_back (MenuItem (text, act));
-	return item_list.back ();
+	return *item_list.insert (item_list.end (), MenuItem (text, act));
 }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 MenuItem &Menu::add (const wchar_t *text, Signal &&sig)
 {
-	item_list.push_back (MenuItem (text, std::forward<Signal> (sig)));
-	return item_list.back ();
+	return *item_list.insert (item_list.end (), MenuItem (text, std::forward<Signal> (sig)));
 }
 
 MenuItem &Menu::add (const wchar_t *text, Action &&act)
 {
-	item_list.push_back (MenuItem (text, std::move (act)));
-	return item_list.back ();
+	return *item_list.insert (item_list.end (), MenuItem (text, std::move (act)));
 }
 #endif
 

@@ -70,8 +70,8 @@ std::vector <std::pair <size_t, size_t> > PcRe::match (const std::wstring &str) 
 		// We do not distinguish these situations
 
 		// Values in ovector are in bytes, not in UTF-8 characters
-		size_t wchar_offset = mbs_to_wstring (utf8.substr (0, ovector[0])).length ();
-		size_t wchar_len = mbs_to_wstring (utf8.substr (ovector[0], ovector[1]-ovector[0])).length ();
+		size_t wchar_offset = mbs_to_wstring (utf8.data (), ovector[0]).length ();
+		size_t wchar_len = mbs_to_wstring (utf8.data () + ovector[0], ovector[1]-ovector[0]).length ();
 		ret.push_back (std::make_pair (wchar_offset, wchar_len));
 		offset = ovector[1];
 	}

@@ -25,7 +25,7 @@ namespace tiary {
 class PcRe {
 public:
 	// Construct an invalid regular expression
-	PcRe (const std::wstring &);
+	explicit PcRe (const std::wstring &);
 	~PcRe ();
 
 	operator void * () const { return re; }

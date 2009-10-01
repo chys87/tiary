@@ -258,6 +258,11 @@ std::wstring mbs_to_wstring (const char *src)
 	return ret;
 }
 
+std::wstring mbs_to_wstring (const char *src, size_t len)
+{
+	return mbs_to_wstring (std::string (src, len));
+}
+
 std::wstring mbs_to_wstring (const std::string &src)
 {
 	size_t len = src.size ();

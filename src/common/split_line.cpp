@@ -103,21 +103,21 @@ unsigned split_line (SplitStringLine *result, unsigned max_lines, unsigned wid, 
 
 SplitStringLineList split_line (unsigned wid, const wchar_t *s, size_t slen)
 {
-	SplitStringLineList ret;
+	SplitStringLineList ret (slen);
 	if (wid < 2) { // Robustness. Avoid dead loops
 		for (size_t k=0; k<slen; ++k) {
-			ret.push_back (SplitStringLine ());
-			SplitStringLine &o = ret.back ();
-			o.begin = k;
-			o.len = 1;
-			o.wid = ucs_width (s[k]);
+			ret[k].begin = k;
+			ret[k].len = 1;
+			ret[k].wid = ucs_width (s[k]);
 		}
 	}
 	else {
+		SplitStringLineList::iterator it = ret.begin ();
 		for (unsigned offset = 0; offset < slen; ) {
-			ret.push_back (SplitStringLine ());
-			offset = split_line (ret.back (), wid, s, slen, offset, 0);
+			offset = split_line (*it, wid, s, slen, offset, 0);
+			++it;
 		}
+		ret.erase (it, ret.end ());
 	}
 	return ret;
 }

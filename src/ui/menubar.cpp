@@ -45,8 +45,7 @@ MenuBar::~MenuBar ()
 
 Menu &MenuBar::add (const std::wstring &text)
 {
-	item_list.push_back (Item ());
-	Item &item = item_list.back ();
+	Item &item = *item_list.insert (item_list.end (), Item ());
 	item.text.set_text (text);
 	size_t n = item_list.size ();
 	if (n == 1) {
