@@ -157,7 +157,8 @@ md5_process(MD5Context *pms, const uint8_t *data /*[64]*/) throw ()
 	if ((uintptr_t (data) & 3) == 0) {
 		/* data are properly aligned */
 		X = reinterpret_cast <const uint32_t *> (data);
-	} else {
+	}
+	else {
 		/* not aligned */
 		X = reinterpret_cast <const uint32_t *> (memcpy (xbuf, data, 64));
 	}

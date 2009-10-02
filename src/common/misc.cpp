@@ -53,7 +53,8 @@ template <typename MapT>
 	typename MapT::const_iterator it = map.find (key);
 	if (it != map.end ()) {
 		return it->second.c_str ();
-	} else {
+	}
+	else {
 		return 0;
 	}
 }
