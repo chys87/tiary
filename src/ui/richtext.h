@@ -25,8 +25,8 @@
 #include "ui/control.h"
 #include "ui/richtextlist.h"
 #include "ui/search_info.h"
+#include "common/pod_pair.h"
 #include <vector>
-#include <utility> // std::pair
 #include <memory> // std::auto_ptr
 
 namespace tiary {
@@ -69,7 +69,9 @@ private:
 	const LineList line_list;
 	unsigned top_line;
 
-	typedef std::vector <std::vector <std::pair <size_t, size_t> > > HighlightList;
+	// HighlightList should be a complete type here.
+	// So we have to include common/pod_pair.h in this header, sadly
+	typedef std::vector <std::vector <Pair <size_t, size_t> > > HighlightList;
 	std::auto_ptr <HighlightList> highlight_list;
 
 	SearchInfo search_info;

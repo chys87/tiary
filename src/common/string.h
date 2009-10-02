@@ -29,6 +29,8 @@
 
 namespace tiary {
 
+// Forward declaration
+template <typename, typename> struct Pair;
 
 // Allow some "char" functions for wchar_t as well
 inline const wchar_t *strchr (const wchar_t *str, wchar_t ch) { return wcschr (str, ch); }
@@ -78,12 +80,13 @@ std::wstring strlower (const std::wstring &);
  *
  * We return the length in the result to align with PcRe::match
  */
-std::vector <std::pair <size_t, size_t> >
+std::vector <Pair <size_t, size_t> >
 	find_all (const std::wstring &haystack, const std::wstring &needle);
 
 // Remove spaces at the beginning and the end
-void strip (std::string &);
-void strip (std::wstring &);
+// Returns if the string was changed
+bool strip (std::string &);
+bool strip (std::wstring &);
 
 
 // Split a string into tokens

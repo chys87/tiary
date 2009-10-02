@@ -57,9 +57,9 @@ void RichText::redraw ()
 		clear (pos, make_size (wid, 1));
 		const std::wstring &text = line_list[top_line+i].text;
 		if (hllst && !(*hllst)[top_line+i].empty ()) {
-			const std::vector <std::pair <size_t, size_t> > &hl = (*hllst)[top_line+i];
+			const std::vector <Pair <size_t, size_t> > &hl = (*hllst)[top_line+i];
 			size_t offset = 0;
-			for (std::vector <std::pair <size_t, size_t> >::const_iterator it = hl.begin ();
+			for (std::vector <Pair <size_t, size_t> >::const_iterator it = hl.begin ();
 					it != hl.end (); ++it) {
 				pos = put (pos, text.data()+offset, it->first-offset);
 				attribute_on (REVERSE);

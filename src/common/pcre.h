@@ -22,6 +22,8 @@
 
 namespace tiary {
 
+template <typename, typename> struct Pair;
+
 class PcRe {
 public:
 	// Construct an invalid regular expression
@@ -34,7 +36,7 @@ public:
 	 * @brief	Match the pattern against a string
 	 * @result	For each pair, @c first is the offset, @c second is the length
 	 */
-	std::vector<std::pair <size_t, size_t> > match (const std::wstring &) const;
+	std::vector<Pair <size_t, size_t> > match (const std::wstring &) const;
 
 	/**
 	 * @brief	Match the pattern against a string

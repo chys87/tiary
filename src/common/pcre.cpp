@@ -16,6 +16,7 @@
 
 #include "common/pcre.h"
 #include "common/unicode.h"
+#include "common/pod_pair.h"
 #include <pcre.h>
 
 namespace tiary {
@@ -52,7 +53,7 @@ PcRe::~PcRe ()
 	}
 }
 
-std::vector <std::pair <size_t, size_t> > PcRe::match (const std::wstring &str) const
+std::vector <Pair <size_t, size_t> > PcRe::match (const std::wstring &str) const
 {
 	// We are not interested in subpatterns
 	// pcre_exec requires an extra 50% space in ovector
@@ -60,7 +61,7 @@ std::vector <std::pair <size_t, size_t> > PcRe::match (const std::wstring &str) 
 
 	std::string utf8 = wstring_to_utf8 (str);
 
-	std::vector <std::pair <size_t, size_t> > ret;
+	std::vector <Pair <size_t, size_t> > ret;
 
 	int rc;
 	size_t offset = 0;
@@ -72,7 +73,7 @@ std::vector <std::pair <size_t, size_t> > PcRe::match (const std::wstring &str) 
 		// Values in ovector are in bytes, not in UTF-8 characters
 		size_t wchar_offset = mbs_to_wstring (utf8.data (), ovector[0]).length ();
 		size_t wchar_len = mbs_to_wstring (utf8.data () + ovector[0], ovector[1]-ovector[0]).length ();
-		ret.push_back (std::make_pair (wchar_offset, wchar_len));
+		ret.push_back (make_Pair (wchar_offset, wchar_len));
 		offset = ovector[1];
 	}
 

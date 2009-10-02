@@ -25,6 +25,7 @@ add_library(tiary_common STATIC
 	misc.cpp
 	pcre.h
 	pcre.cpp
+	pod_pair.h
 	query.h
 	signal.h
 	signal.cpp

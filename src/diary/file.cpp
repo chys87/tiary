@@ -59,6 +59,7 @@
 #include "diary/file.h"
 #include "diary/config.h"
 #include "diary/diary.h"
+#include "common/algorithm.h"
 #include "common/xml.h"
 #include "common/bzip2.h"
 #include "common/misc.h"
@@ -107,6 +108,25 @@ std::string format_time (const DateTime &date_time)
 	return wstring_to_utf8 (date_time.format (L"%Y-%m-%d %H:%M:%S"));
 }
 
+bool is_legal_label_name (const std::wstring &name)
+{
+	if (name.empty ()) {
+		return false;
+	}
+	if (name.find (L',') != std::wstring::npos) {
+		return false;
+	}
+	wchar_t c = name[0];
+	if (c==L' ' || c==L'\t' || c==L'\v' || c==L'\r' || c==L'\n') {
+		return false;
+	}
+	c = *name.rbegin ();
+	if (c==L' ' || c==L'\t' || c==L'\v' || c==L'\r' || c==L'\n') {
+		return false;
+	}
+	return true;
+}
+
 /**
  * Given an <entry> node, construct and return the corresponding DiaryEntry
  * If any error is encountered, returns 0
@@ -120,85 +140,84 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 	DiaryEntry::LabelList labels;
 
 	for (const XMLNode *xptr = entry_node->children; xptr; xptr = xptr->next) {
-		if (const XMLNodeTree *ptr = dynamic_cast <const XMLNodeTree *>(xptr)) {
-			if (ptr->name == "time") { // <time local="...." utc="...." />
+		const XMLNodeTree *ptr = dynamic_cast <const XMLNodeTree *>(xptr);
+		if (ptr == 0) {
+			// Wild text directly within <entry> - Never allowed
+			return 0;
+		}
+		if (ptr->name == "time") { // <time local="...." utc="...." />
 
-				if (local_time/* | utc_time*/) { // More than one <time> tags.
-					return 0;
-				}
-
-				const char *local = map_query (ptr->properties, "local");
-//				const char *utc = map_query (ptr->properties, "utc");
-				if (!local/* || !utc*/) {
-					return 0;
-				}
-
-				if (!(local_time = parse_time (local))/* || !(utc_time = parse_time (utc))*/) {
-					return 0;
-				}
-
+			if (local_time/* | utc_time*/) {
+				// More than one <time> tags.
+				return 0;
 			}
-			else if (ptr->name == "tag" || ptr->name == "label") {
-				// A "label" used to be called a "tag".
-				// Older formats use "tag" instead of "label"
 
-				const char *name = map_query (ptr->properties, "name");
-				if (!name) {
-					return 0;
-				}
-				// Convert name from UTF-8 to UCS-4
-				std::wstring wname = utf8_to_wstring (name);
-				if (wname.empty ()) { // Labels cannot be empty
-					return 0;
-				}
-				labels.insert (wname);
-
+			const char *local = map_query (ptr->properties, "local");
+//			const char *utc = map_query (ptr->properties, "utc");
+			if (!local/* || !utc*/) {
+				return 0;
 			}
-			else if (ptr->name == "title") {
 
-				if (title != 0) { // More than one <title> tags
-					return 0;
-				}
-
-				if (ptr->children == 0) { // Empty
-					title = "";
-				}
-				else if (const XMLNodeText *title_node = dynamic_cast<const XMLNodeText *>(ptr->children)) {
-					if (title_node->next != 0) {
-						return 0;
-					}
-					title = title_node->text.c_str ();
-				}
-
+			if (!(local_time = parse_time (local))/* || !(utc_time = parse_time (utc))*/) {
+				return 0;
 			}
-			else if (ptr->name == "text") {
 
-				if (text != 0) { // More than one <text> tags
+		}
+		else if (ptr->name == "tag" || ptr->name == "label") {
+			// A "label" used to be called a "tag".
+			// Older formats use "tag" instead of "label"
+
+			const char *name = map_query (ptr->properties, "name");
+			if (!name) {
+				return 0;
+			}
+			// Convert name from UTF-8 to UCS-4
+			std::wstring wname = utf8_to_wstring (name);
+			if (!is_legal_label_name (wname)) {
+				return 0;
+			}
+			labels.insert (wname);
+
+		}
+		else if (ptr->name == "title") {
+
+			if (title != 0) { // More than one <title> tags
+				return 0;
+			}
+
+			if (ptr->children == 0) { // Empty
+				title = "";
+			}
+			else if (const XMLNodeText *title_node = dynamic_cast<const XMLNodeText *>(ptr->children)) {
+				if (title_node->next != 0) {
 					return 0;
 				}
+				title = title_node->text.c_str ();
+			}
 
-				if (ptr->children == 0) { // Empty
-					text = "";
-				}
-				else if (const XMLNodeText *text_node = dynamic_cast<const XMLNodeText *>(ptr->children)) {
-					if (text_node->next != 0) {
-						return 0;
-					}
-					text = text_node->text.c_str ();
-				}
-				else {
+		}
+		else if (ptr->name == "text") {
+
+			if (text != 0) { // More than one <text> tags
+				return 0;
+			}
+
+			if (ptr->children == 0) { // Empty
+				text = "";
+			}
+			else if (const XMLNodeText *text_node = dynamic_cast<const XMLNodeText *>(ptr->children)) {
+				if (text_node->next != 0) {
 					return 0;
 				}
-
+				text = text_node->text.c_str ();
 			}
 			else {
-				// Unknown child tag within <entry>
 				return 0;
 			}
 
 		}
 		else {
-			// Error - wild text directly within <entry>
+			// Unknown child tag within <entry>
 			return 0;
 		}
 	}
@@ -211,10 +230,10 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 	// Finally successful
 	DiaryEntry *entry = new DiaryEntry;
 	entry->local_time = DateTime (local_time);
-//	entry->utc_time.assign (utc_time);
-	utf8_to_wstring (title).swap (entry->title);
-	utf8_to_wstring (text).swap (entry->text);
-	entry->labels.swap (labels);
+//	entry->utc_time = DateTime (utc_time);
+	entry->title = utf8_to_wstring (title);
+	entry->text = utf8_to_wstring (text);
+	entry->labels = TIARY_STD_MOVE (labels);
 	return entry;
 }
 
@@ -223,7 +242,12 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
  * Assuming we have successfully parsed the XML, analyzes the XML and extracts useful info.
  * Applicable for both ~/.tiary and diary files
  */
-bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntryList *entries, RecentFileList *recent_files)
+bool general_analyze_xml (const XMLNode *root,
+		OptionGroupBase &opts,
+		DiaryEntryList *entries,
+		RecentFileList *recent_files,
+		bool strictest ///< Should be enabled for data file, and disabled for config files
+		)
 {
 	const XMLNodeTree *root_diary = dynamic_cast<const XMLNodeTree *>(root);
 	if (root_diary == 0) {
@@ -240,40 +264,68 @@ bool general_analyze_xml (const XMLNode *root, OptionGroupBase &opts, DiaryEntry
 	}
 	// OK. Now loop thru its children
 	for (const XMLNode *main_childx = root_diary->children; main_childx; main_childx = main_childx->next) {
-		if (const XMLNodeTree *main_child = dynamic_cast <const XMLNodeTree *>(main_childx)) {
-
-			if (main_child->name == "option") { // An option
-				if (const char *option_name = map_query (main_child->properties, "name")) {
-					if (const char *option_value = map_query (main_child->properties, "value")) {
-						opts.set (option_name, option_value);
-					}
-				}
-			}
-			else if (entries && main_child->name == "entry") {
-
-				DiaryEntry *entry = analyze_entry_xml (main_child);
-				if (entry == 0) {
-					return false;
-				}
-				entries->push_back (entry);
-				
-			}
-			else if (recent_files && main_child->name == "recent") {
-				if (const char *file_name = map_query (main_child->properties, "file")) {
-					if (const char *line_number = map_query (main_child->properties, "line")) {
-						RecentFile &item = *recent_files->insert (recent_files->end (), RecentFile ());
-						item.filename = utf8_to_wstring (file_name);
-						item.focus_entry = strtoul (line_number, 0, 10);
-					}
-				}
+		const XMLNodeTree *main_child = dynamic_cast <const XMLNodeTree *>(main_childx);
+		if (main_child == 0) {
+			// Wild text directly within <tiary> - must be an error
+			// But we choose to be as tolerant as possible in non-strict mode
+			if (strictest) {
+				return false;
 			}
 			else {
-				// Ignored for forward compatibility
+				continue;
+			}
+		}
+
+		if (main_child->name == "option") { // An option
+			if (const char *option_name = map_query (main_child->properties, "name")) {
+				if (const char *option_value = map_query (main_child->properties, "value")) {
+					opts.set (option_name, option_value);
+				}
+				else if (strictest) {
+					// <option> without "name" - Disallowed in strict mode
+					return false;
+				}
+			}
+			else if (strictest) {
+				// <option> without "name" - Disallowed in strict mode
+				return false;
+			}
+		}
+		else if (entries && main_child->name == "entry") {
+
+			DiaryEntry *entry = analyze_entry_xml (main_child);
+			if (entry == 0) {
+				return false;
+			}
+			entries->push_back (entry);
+			
+		}
+		else if (recent_files && main_child->name == "recent") {
+			if (const char *file_name = map_query (main_child->properties, "file")) {
+				RecentFile &item = *recent_files->insert (recent_files->end (), RecentFile ());
+				item.filename = utf8_to_wstring (file_name);
+				if (const char *line_number = map_query (main_child->properties, "line")) {
+					item.focus_entry = strtoul (line_number, 0, 10);
+				}
+				else {
+					// <option> without "line"
+					if (strictest) {
+						// Disallowed in strict mode
+						return false;
+					}
+					else {
+						// Default to 0 in non-strict mode
+						item.focus_entry = 0;
+					}
+				}
+			}
+			else if (strictest) {
+				// <option> without "file" - Disallowed in strict mode
+				return false;
 			}
 		}
 		else {
-			// It must be an error - wild text directly within <tiary>
-			return false;
+			// Ignored for forward compatibility - even in strict mode
 		}
 	}
 
@@ -348,18 +400,20 @@ LoadFileRet load_global_options (GlobalOptionGroup &options, RecentFileList &rec
 	if (fp == 0) {
 		return LOAD_FILE_NOT_FOUND;
 	}
-	std::vector<char> data;
-	bool ret = read_whole_file (fp, data);
-	fclose (fp);
-	if (!ret) {
-		return LOAD_FILE_READ_ERROR;
+	XMLNode *root;
+	{
+		std::vector<char> data;
+		bool ret = read_whole_file (fp, data, 128*1024);
+		fclose (fp);
+		if (!ret) {
+			return LOAD_FILE_READ_ERROR;
+		}
+		root = xml_parse (&data[0], data.size ());
 	}
-	XMLNode *root = xml_parse (&data[0], data.size ());
-	std::vector<char>().swap(data);
 	if (root == 0) {
 		return LOAD_FILE_XML;
 	}
-	ret = general_analyze_xml (root, options, 0, &recent_files);
+	bool ret = general_analyze_xml (root, options, 0, &recent_files, false);
 	xml_free (root);
 	if (!ret) {
 		return LOAD_FILE_CONTENT;
@@ -410,12 +464,11 @@ LoadFileRet load_file (
 		// Password correct. Decrypt now
 		decrypt (&everything[32], everything.size()-32, mbs_password.data(), mbs_password.length());
 		// Decompress
-		bunzip2 (&everything[32], everything.size () - 32).swap (everything);
+		everything = bunzip2 (&everything[32], everything.size () - 32);
 	}
 	else {
 		// Old format; or not compressed
-		// Decompress: everything = bunzip2 (everything)
-		bunzip2 (&everything[0], everything.size ()).swap (everything);
+		everything = bunzip2 (&everything[0], everything.size ());
 		if (everything.empty ()) {
 			return LOAD_FILE_BUNZIP2;
 		}
@@ -460,7 +513,7 @@ LoadFileRet load_file (
 		return LOAD_FILE_XML;
 	}
 	options.reset ();
-	bool_ret = general_analyze_xml (root, options, &entries, 0);
+	bool_ret = general_analyze_xml (root, options, &entries, 0, true);
 	xml_free (root);
 	if (!bool_ret) {
 		return LOAD_FILE_CONTENT;
@@ -591,7 +644,7 @@ bool save_file (const char *filename,
 			XMLNodeTree *label_node = new XMLNodeTree ("label");
 			sub_ptr = sub_ptr->next = label_node;
 			// Convert from UCS-4 to UTF-8
-			wstring_to_utf8 (*it).swap (label_node->properties["name"]);
+			label_node->properties["name"] = wstring_to_utf8 (*it);
 		}
 
 		// Text

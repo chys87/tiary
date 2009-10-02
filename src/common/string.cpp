@@ -13,6 +13,7 @@
 
 
 #include "common/string.h"
+#include "common/pod_pair.h"
 #include <algorithm>
 #include <wctype.h>
 
@@ -76,10 +77,10 @@ std::wstring strlower (const std::wstring &str)
 	return result;
 }
 
-std::vector <std::pair <size_t, size_t> >
+std::vector <Pair <size_t, size_t> >
 find_all (const std::wstring &haystack, const std::wstring &needle)
 {
-	std::vector <std::pair <size_t, size_t> > ret;
+	std::vector <Pair <size_t, size_t> > ret;
 	size_t neelen = needle.length ();
 	size_t haylen = haystack.length ();
 	size_t offset = 0;
@@ -88,7 +89,7 @@ find_all (const std::wstring &haystack, const std::wstring &needle)
 		if (found == std::wstring::npos) {
 			break;
 		}
-		ret.push_back (std::make_pair (found, neelen));
+		ret.push_back (make_Pair (found, neelen));
 		offset = found + neelen;
 	}
 	return ret;
@@ -98,33 +99,46 @@ find_all (const std::wstring &haystack, const std::wstring &needle)
 namespace {
 
 template <typename T> inline
-void strip_impl (std::basic_string<T> &str, const T *trim)
+bool strip_impl (std::basic_string<T> &str, const T *trim)
 {
 	if (str.empty ()) {
-		return;
+		return false;
 	}
 	size_t startpos = str.find_first_not_of (trim);
 	if (startpos == std::basic_string<T>::npos) {
 		str.clear ();
+		return true;
 	}
 	else {
-		size_t endpos = str.find_last_not_of (trim);
-		// If any implementation of string does not handle
-		// the following alias, it should be thrown away
-		str.assign (str, startpos, endpos-startpos+1);
+		size_t endpos = str.find_last_not_of (trim) + 1;
+		if (startpos == 0) {
+			if (endpos >= str.size ()) {
+				return false;
+			}
+			else {
+				str.resize (endpos);
+				return true;
+			}
+		}
+		else {
+			// If any implementation of string does not handle
+			// the following alias, it should be thrown away
+			str.assign (str, startpos, endpos-startpos);
+			return true;
+		}
 	}
 }
 
 }
 
-void strip (std::wstring &str)
+bool strip (std::wstring &str)
 {
-	strip_impl (str, L" \t\v\r\n");
+	return strip_impl (str, L" \t\v\r\n");
 }
 
-void strip (std::string &str)
+bool strip (std::string &str)
 {
-	strip_impl (str, " \t\v\r\n");
+	return strip_impl (str, " \t\v\r\n");
 }
 
 
