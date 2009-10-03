@@ -26,6 +26,7 @@ enum TerminalEmulator
 	VTE,                 // vte:     Width from font engine
 	ETERM,               // ??
 	MLTERM,              // ??
+	ZHCON,               // zhcon: Actually incompatible with ncursesw
 	TRUE_XTERM,          // _true_ xterm
 	GENERAL_XTERM,       // Too many f**king terminal emulators say they are xterm
 	UNKNOWN_TERMINAL     // Unknown

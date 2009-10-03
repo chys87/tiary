@@ -38,9 +38,6 @@ TerminalEmulator detect_terminal_emulator ()
 		if (strcmp (term_env, "rxvt-unicode") == 0) {
 			return RXVT_UNICODE;
 		}
-		if (strcmp (term_env, "linux") == 0) {
-			return LINUX_CONSOLE;
-		}
 		if (strcmp (term_env, "Eterm") == 0) {
 			return ETERM;
 		}
@@ -93,6 +90,9 @@ TerminalEmulator detect_terminal_emulator ()
 		if (strcmp (p, "mlterm") == 0) {
 			return MLTERM;
 		}
+		if (strcmp (p, "zhcon") == 0) {
+			return ZHCON;
+		}
 
 		// Attempt to get PPID of PID
 		sprintf (bufa, "/proc/%u/status", unsigned (pid));
@@ -116,6 +116,9 @@ TerminalEmulator detect_terminal_emulator ()
 
 	if (term_env && strcmp (term_env, "xterm") == 0) {
 		return GENERAL_XTERM;
+	}
+	else if (term_env && strcmp (term_env, "linux") == 0) {
+		return LINUX_CONSOLE;
 	}
 	else {
 		return UNKNOWN_TERMINAL;
