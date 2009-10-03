@@ -47,11 +47,11 @@ class RichText : public Control
 public:
 
 	typedef RichTextLine Line;
-	typedef RichTextList LineList;
+	typedef RichTextLineList LineList;
 
-	RichText (Window &, const LineList &);
+	RichText (Window &, const std::wstring &, const LineList &);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	RichText (Window &, LineList &&);
+	RichText (Window &, const std::wstring &, LineList &&);
 #endif
 	~RichText ();
 
@@ -66,13 +66,14 @@ public:
 
 private:
 
+	const std::wstring text;
 	const LineList line_list;
 	unsigned top_line;
 
-	// HighlightList should be a complete type here.
-	// So we have to include common/pod_pair.h in this header, sadly
-	typedef std::vector <std::vector <Pair <size_t, size_t> > > HighlightList;
-	std::auto_ptr <HighlightList> highlight_list;
+	// first = starting offset of highlight spots
+	// second = length of highlight spots
+	typedef std::map <size_t, size_t> HighlightList;
+	HighlightList highlight_list;
 
 	SearchInfo search_info;
 

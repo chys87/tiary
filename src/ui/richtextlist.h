@@ -24,32 +24,15 @@ struct RichTextLineC
 
 struct RichTextLine
 {
+	size_t offset; ///< Offset relative to the beginning of the text
+	size_t len; ///< Number of wchar_t's on the screen
 	PaletteID id;
-	std::wstring text;
 	unsigned screen_wid; ///< Width on screen
-
-
-	RichTextLine (const RichTextLineC &);
-	RichTextLine (PaletteID id_, const std::wstring &text_);
-	RichTextLine (PaletteID id_, const wchar_t *text_);
-
-	RichTextLine (const RichTextLine &other)
-		: id(other.id)
-		, text (other.text)
-		, screen_wid (other.screen_wid)
-	{
-	}
-
-	RichTextLine &operator = (const RichTextLine &other)
-	{
-		id = other.id;
-		text = other.text;
-		screen_wid = other.screen_wid;
-		return *this;
-	}
 };
 
-typedef std::vector<RichTextLine> RichTextList;
+typedef std::vector<RichTextLine> RichTextLineList;
+
+RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *, size_t);
 
 } // namespace tiary::ui
 } // namespace tiary

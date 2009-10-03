@@ -18,7 +18,6 @@
 #include "ui/richtext.h"
 #include "ui/window.h"
 #include "common/algorithm.h"
-#include <utility> // std::forward
 
 
 namespace tiary {
@@ -34,40 +33,22 @@ class WindowRichText : public Window
 	unsigned max_text_width;
 
 public:
-	WindowRichText (const std::wstring &title, const RichTextList &list, Size size_hint);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	WindowRichText (const std::wstring &title, RichTextList &&list, Size size_hint);
-#endif
-	void ctor_finish ();
+	WindowRichText (const std::wstring &title, const std::wstring &text,
+			const RichTextLineList &list, Size size_hint);
 	~WindowRichText ();
 
 	void redraw ();
 };
 
-WindowRichText::WindowRichText (const std::wstring &title, const RichTextList &lst, Size size_hint_)
+WindowRichText::WindowRichText (const std::wstring &title, const std::wstring &text,
+		const RichTextLineList &lst, Size size_hint_)
 	: Window (0, title)
-	, text (*this, lst)
+	, text (*this, text, lst)
 	, size_hint (size_hint_)
 {
-	ctor_finish ();
-}
-
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-WindowRichText::WindowRichText (const std::wstring &title, RichTextList &&lst, Size size_hint_)
-	: Window (0, title)
-	, text (*this, std::forward <RichTextList> (lst))
-	, size_hint (size_hint_)
-{
-	ctor_finish ();
-}
-#endif
-
-void WindowRichText::ctor_finish ()
-{
-	// Continue with the c'tor
 	max_text_width = 0;
-	for (RichTextList::const_iterator it = text.get_list ().begin ();
-			it != text.get_list ().end (); ++it) {
+	for (RichTextLineList::const_iterator it = lst.begin ();
+			it != lst.end (); ++it) {
 		if (max_text_width < it->screen_wid) {
 			max_text_width = it->screen_wid;
 		}
@@ -106,19 +87,13 @@ void WindowRichText::redraw ()
 
 } // anonymous namespace
 
-void dialog_richtext (const std::wstring &title, const RichTextList &list,
+void dialog_richtext (const std::wstring &title,
+		const std::wstring &text,
+		const RichTextLineList &list,
 		Size size_hint)
 {
-	WindowRichText (title, list, size_hint).event_loop ();
+	WindowRichText (title, text, list, size_hint).event_loop ();
 }
-
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-void dialog_richtext (const std::wstring &title, RichTextList &&list,
-		Size size_hint)
-{
-	WindowRichText (title, std::forward <RichTextList> (list), size_hint).event_loop ();
-}
-#endif
 
 } // namespace tiary::ui
 } // namespace tiary

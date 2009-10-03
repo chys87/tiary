@@ -75,8 +75,10 @@ const ui::RichTextLineC info[] = {
 
 void show_doc ()
 {
+	std::wstring text;
 	ui::dialog_richtext (L"Help",
-			ui::RichTextList (info, info + sizeof info / sizeof *info)
+			text,
+			ui::combine_lines (text, info, sizeof info / sizeof *info)
 			);
 }
 

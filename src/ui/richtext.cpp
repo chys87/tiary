@@ -15,8 +15,9 @@
 namespace tiary {
 namespace ui {
 
-RichText::RichText (Window &win, const LineList &lst)
+RichText::RichText (Window &win, const std::wstring &txt, const LineList &lst)
 	: Control (win)
+	, text (txt)
 	, line_list (lst)
 	, top_line (0)
 	, highlight_list ()
@@ -26,8 +27,9 @@ RichText::RichText (Window &win, const LineList &lst)
 }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-RichText::RichText (Window &win, LineList &&lst)
+RichText::RichText (Window &win, const std::wstring &txt, LineList &&lst)
 	: Control (win)
+	, text (txt)
 	, line_list (std::forward <LineList> (lst))
 	, top_line (0)
 	, highlight_list ()
@@ -48,31 +50,37 @@ void RichText::redraw ()
 	if (int (wid) < 0 || int (hgt) < 0) {
 		return;
 	}
-	HighlightList *hllst = highlight_list.get ();
 	unsigned show_lines = minU (hgt, line_list.size () - top_line);
 
 	for (unsigned i=0; i<show_lines; ++i) {
 		Size pos = make_size (0, i);
 		choose_palette (line_list[top_line+i].id);
 		clear (pos, make_size (wid, 1));
-		const std::wstring &text = line_list[top_line+i].text;
-		if (hllst && !(*hllst)[top_line+i].empty ()) {
-			const std::vector <Pair <size_t, size_t> > &hl = (*hllst)[top_line+i];
-			size_t offset = 0;
-			for (std::vector <Pair <size_t, size_t> >::const_iterator it = hl.begin ();
-					it != hl.end (); ++it) {
-				pos = put (pos, text.data()+offset, it->first-offset);
-				attribute_on (REVERSE);
-				pos = put (pos, text.data()+it->first, it->second);
-				attribute_off (REVERSE);
-				offset = it->first + it->second;
+		size_t offset = line_list[top_line+i].offset;
+		size_t end_offset = line_list[top_line+i].len + offset;
+		HighlightList::const_iterator lower = highlight_list.lower_bound (offset);
+		HighlightList::const_iterator upper = highlight_list.lower_bound (end_offset);
+		// We may have a match whose starting point is on the previous line
+		// Check for that!
+		if (lower != highlight_list.begin ()) {
+			HighlightList::const_iterator last = lower;
+			--last;
+			if (offset < last->first + last->second) {
+				lower = last;
 			}
-			pos = put (pos, text.data()+offset);
 		}
-		else {
-			// Nothing to highlight
-			put (pos, text);
+		for (HighlightList::const_iterator it = lower; it != upper; ++it) {
+			if (offset < it->first) {
+				pos = put (pos, text.data()+offset, it->first-offset);
+				offset = it->first;
+			}
+			attribute_on (REVERSE);
+			size_t highlight_end = minSize (it->first+it->second, end_offset);
+			pos = put (pos, text.data()+offset, highlight_end-offset);
+			attribute_off (REVERSE);
+			offset = highlight_end;
 		}
+		pos = put (pos, text.data()+offset, end_offset-offset);
 	}
 	if (show_lines < hgt) {
 		choose_palette (PALETTE_ID_RICHTEXT);
@@ -181,11 +189,11 @@ bool RichText::on_key (wchar_t key)
 void RichText::slot_search (bool bkwd)
 {
 	if (search_info.dialog (bkwd)) {
-		bkwd = search_info.get_backward ();
-		HighlightList *hllst = new HighlightList (line_list.size ());
-		highlight_list.reset (hllst);
-		for (size_t i=0, n=line_list.size(); i<n; ++i) {
-			(*hllst)[i] = search_info.match (line_list[i].text);
+		std::vector <Pair <size_t, size_t> > result = search_info.match (text);
+		highlight_list.clear ();
+		for (std::vector <Pair <size_t, size_t> >::const_iterator it = result.begin ();
+				it != result.end (); ++it) {
+			highlight_list.insert (std::make_pair (it->first, it->second));
 		}
 		do_search (false, true);
 	}
@@ -206,12 +214,13 @@ void RichText::do_search (bool previous, bool include_current)
 	unsigned k = top_line;
 	unsigned num_ents = line_list.size ();
 	int inc = (!previous == !search_info.get_backward ()) ? 1 : -1;
-	HighlightList *hllst = highlight_list.get ();
 	if (!include_current) {
 		k += inc;
 	}
 	for (; k < num_ents; k += inc) {
-		if (!(*hllst)[k].empty ()) {
+		// Is there any match on the k-th line?
+		if (highlight_list.lower_bound (line_list[k].offset)
+				!= highlight_list.lower_bound (line_list[k].offset+line_list[k].len)) {
 			top_line = k;
 			RichText::redraw ();
 			return;

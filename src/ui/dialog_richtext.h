@@ -16,14 +16,12 @@
 #define TIARY_UI_DIALOG_RICHTEXT_H
 
 #include "ui/size.h"
+#include "ui/richtextlist.h"
 #include <string>
 #include <vector>
 
 namespace tiary {
 namespace ui {
-
-struct RichTextLine;
-typedef std::vector <RichTextLine> RichTextList;
 
 /**
  * @brief	Display text using a RichText control
@@ -31,17 +29,10 @@ typedef std::vector <RichTextLine> RichTextList;
  */
 void dialog_richtext (
 		const std::wstring &title, ///< Title for the dialog
-		const RichTextList &list, ///< Contents
+		const std::wstring &text,  ///< Text
+		const RichTextLineList &list, ///< Line info
 		Size size_hint = make_size () ///< A text area size hint (may be silently ignored)
 		);
-
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-void dialog_richtext (
-		const std::wstring &title, ///< Title for the dialog
-		RichTextList &&list, ///< Contents
-		Size size_hint = make_size () ///< A text area size hint (may be silently ignored)
-		);
-#endif
 
 } // namespace tiary::ui
 } // namespace tiary
