@@ -58,23 +58,33 @@ void tiary::xml_free (XMLNode *root)
 	XMLNode *p = root; // Current node
 
 	for (;;) {
-		// Push right sibling into stack
-		if (p->next) {
-			stk.push (p->next);
-		}
+		XMLNode *right_sibling = p->next;
 		XMLNode *first_child = 0;
 		if (XMLNodeTree *q = dynamic_cast<XMLNodeTree *>(p)) {
 			first_child = q->children;
 		}
 		delete p;
 		if (first_child) {
+			// Proceed to children
+			if (right_sibling) {
+				stk.push (right_sibling);
+			}
 			p = first_child;
 		}
+		else if (right_sibling) {
+			// Only right sibling
+			p = right_sibling;
+		}
 		else if (!stk.empty ()) {
+			// Neither right sibling nor children
+			// Pop one from stack
 			p = stk.top ();
 			stk.pop ();
 		}
 		else {
+			// Neither right sibling nor children
+			// And stack is empty.
+			// Everything is done.
 			break;
 		}
 	}
@@ -93,23 +103,25 @@ using namespace tiary;
 XMLNode *shallow_copy (xmlNodePtr iptr)
 {
 	if (xmlNodeIsText (iptr)) { // Text node
-		char *text = (char *)xmlNodeGetContent (iptr);
-		// If a text node is empty or completely consists of space (tab, newline) etc.
-		// Eliminate it!
 		XMLNodeText *optr = 0;
-		if (strspn (text, " \t\r\n\v")[text] != '\0') {
-			optr = new XMLNodeText (text);
+		if (char *text = (char *)xmlNodeGetContent (iptr)) {
+			// If a text node is empty or completely consists of space (tab, newline) etc.
+			// Eliminate it!
+			if (strspn (text, " \t\r\n\v")[text] != '\0') {
+				optr = new XMLNodeText (text);
+			}
+			xmlFree (text);
 		}
-		xmlFree (text);
 		return optr;
 	}
 	else { // Normal node
 		XMLNodeTree *optr = new XMLNodeTree ((const char *)iptr->name);
 		// Attributes. Not ordered.
 		for (xmlAttrPtr aptr=iptr->properties; aptr; aptr=aptr->next) {
-			char *text = (char *)xmlNodeGetContent (aptr->children);
-			optr->properties[(const char *)aptr->name] = text;
-			xmlFree (text);
+			if (char *text = (char *)xmlNodeGetContent (aptr->children)) {
+				optr->properties[(const char *)aptr->name] = text;
+				xmlFree (text);
+			}
 		}
 		return optr;
 	}

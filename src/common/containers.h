@@ -37,17 +37,35 @@ namespace tiary {
    using std::unordered_map;
    using std::hash;
 
+# if TIARY_HAVE_STD_HASH_STRING_REF
+	typedef std::hash <const std::string &> StringHash;
+	typedef std::hash <const std::wstring&> WStringHash;
+# else
+	typedef std::hash <std::string> StringHash;
+	typedef std::hash <std::wstring> WStringHash;
+# endif
+
 #elif TIARY_HAVE_TR1_UNORDERED_SET_MAP // unordered_{set,map} not in std, but available in std::tr1
 
    using std::tr1::unordered_set;
    using std::tr1::unordered_map;
    using std::tr1::hash;
 
+# if TIARY_HAVE_STD_TR1_HASH_STRING_REF
+	typedef std::tr1::hash <const std::string &> StringHash;
+	typedef std::tr1::hash <const std::wstring&> WStringHash;
+# else
+	typedef std::tr1::hash <std::string> StringHash;
+	typedef std::tr1::hash <std::wstring> WStringHash;
+# endif
+
 #else // Fallback to std::set and std::map
 
-  template <typename T> struct hash {};
-  template <typename T, typename H = hash<T> > class unordered_set : public std::set <T> {};
-  template <typename K, typename T, typename H = hash<T> > class unordered_map : public std::map <K,T> {};
+   template <typename T> struct hash {};
+   template <typename T, typename H = void> class unordered_set : public std::set <T> {};
+   template <typename K, typename T, typename H = void> class unordered_map : public std::map <K,T> {};
+   typedef void StringHash;
+   typedef void WStringHash;
 
 #endif
 
@@ -61,11 +79,11 @@ typedef std::set<std::string > StringOrderedSet;
 typedef std::map<std::wstring,std::wstring> WStringOrderedMap;
 typedef std::map<std::string, std::string > StringOrderedMap;
 
-typedef /* No std:: here */unordered_set<std::wstring> WStringUnorderedSet;
-typedef /* No std:: here */unordered_set<std::string > StringUnorderedSet;
+typedef tiary::unordered_set<std::wstring, WStringHash> WStringUnorderedSet;
+typedef tiary::unordered_set<std::string,  StringHash> StringUnorderedSet;
 
-typedef /* No std:: here */unordered_map<std::wstring, std::wstring> WStringUnorderedMap;
-typedef /* No std:: here */unordered_map<std::string,  std::string > StringUnorderedMap;
+typedef tiary::unordered_map<std::wstring, std::wstring, WStringHash> WStringUnorderedMap;
+typedef tiary::unordered_map<std::string,  std::string,  StringHash > StringUnorderedMap;
 
 
 } // namespace tiary

@@ -74,6 +74,9 @@ TerminalEmulator detect_terminal_emulator ()
 			++p;
 		}
 
+		if (strcmp (p, "vte") == 0) {
+			return VTE;
+		}
 		if (strcmp (p, "gnome-terminal") == 0) {
 			return VTE;
 		}
@@ -112,7 +115,7 @@ TerminalEmulator detect_terminal_emulator ()
 		}
 		pid = (pid_t) strtoul (p+5, 0, 10);
 
-	} while (pid >= 2); // 0 = Nohting; 1 = init
+	} while (pid >= 2); // 0 = Nothing; 1 = init
 
 	if (term_env && strcmp (term_env, "xterm") == 0) {
 		return GENERAL_XTERM;

@@ -15,9 +15,9 @@
 #ifndef TIARY_COMMON_XML_H
 #define TIARY_COMMON_XML_H
 
+#include "common/containers.h"
 #include <stddef.h>
 #include <string>
-#include <map>
 
 /**
  * @file	common/xml.h
@@ -53,7 +53,7 @@ struct XMLNodeTree : XMLNode
 	XMLNode *children; // Pointer to first child
 	const std::string name;
 
-	typedef std::map<std::string,std::string> PropertyList;
+	typedef StringUnorderedMap PropertyList;
 
 	PropertyList properties;
 };

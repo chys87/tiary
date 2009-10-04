@@ -259,42 +259,68 @@ CHECK_CXX_SOURCE_COMPILES("
 		set.insert (\"1\");
 		set.insert (\"2\");
 		const pair <const wstring, unordered_set <string> > &pr = *map.begin ();
-		if (pr.first != L\"hello\")
-			return EXIT_FAILURE;
-		if (pr.second.size () != 2)
-			return EXIT_FAILURE;
 		return 0;
 	}
 " HAVE_UNORDERED_SET_MAP)
+
+# tr1/unordered_{set,map} (>= gcc 4)
+CHECK_CXX_SOURCE_COMPILES("
+	#include <tr1/unordered_set> \n
+	#include <tr1/unordered_map> \n
+	#include <string> \n
+	#include <cstdlib> \n
+	using namespace std;
+	tr1::unordered_map <wstring, tr1::unordered_set <string> > map;
+	int main ()
+	{
+		tr1::unordered_set <string> & set = map[L\"hello\"];
+		set.insert (\"1\");
+		set.insert (\"2\");
+		const pair <const wstring, tr1::unordered_set <string> > &pr = *map.begin ();
+		return 0;
+	}
+" HAVE_TR1_UNORDERED_SET_MAP)
+
+# std::hash<const std::string &> ?
+CHECK_CXX_SOURCE_COMPILES("
+	#include <unordered_set> \n
+	#include <string> \n
+	using namespace std;
+	int main ()
+	{
+		unordered_set<std::string, std::hash<const std::string &> > s1;
+		unordered_set<std::wstring, std::hash<const std::wstring &> > s2;
+		s1.insert (\"1\");
+		s2.insert (L\"1\");
+		return 0;
+	}" HAVE_HASH_STRING_REF)
+
+# hash<const std::tr1::string &> ?
+# (Nonstandard but improves efficiency)
+CHECK_CXX_SOURCE_COMPILES("
+	#include <tr1/unordered_set> \n
+	#include <string> \n
+	using namespace std;
+	int main ()
+	{
+		tr1::unordered_set<std::string, std::tr1::hash<const std::string &> > s1;
+		tr1::unordered_set<std::wstring, std::tr1::hash<const std::wstring &> > s2;
+		s1.insert (\"1\");
+		s2.insert (L\"1\");
+		return 0;
+	}" HAVE_TR1_HASH_STRING_REF)
+
 IF(HAVE_UNORDERED_SET_MAP)
 	ADD_DEFINITIONS("-DTIARY_HAVE_STD_UNORDERED_SET_MAP=1")
-ELSE(HAVE_UNORDERED_SET_MAP)
-	# tr1/unordered_{set,map} (>= gcc 4)
-	CHECK_CXX_SOURCE_COMPILES("
-		#include <tr1/unordered_set> \n
-		#include <tr1/unordered_map> \n
-		#include <string> \n
-		#include <cstdlib> \n
-		using namespace std;
-		tr1::unordered_map <wstring, tr1::unordered_set <string> > map;
-		int main ()
-		{
-			tr1::unordered_set <string> & set = map[L\"hello\"];
-			set.insert (\"1\");
-			set.insert (\"2\");
-			const pair <const wstring, tr1::unordered_set <string> > &pr = *map.begin ();
-			if (pr.first != L\"hello\")
-				return EXIT_FAILURE;
-			if (pr.second.size () != 2)
-				return EXIT_FAILURE;
-			return 0;
-		}
-	" HAVE_TR1_UNORDERED_SET_MAP)
-	IF(HAVE_TR1_UNORDERED_SET_MAP)
-		ADD_DEFINITIONS("-DTIARY_HAVE_TR1_UNORDERED_SET_MAP=1")
-	ENDIF(HAVE_TR1_UNORDERED_SET_MAP)
+	IF(HAVE_HASH_STRING_REF)
+		ADD_DEFINITIONS("-DTIARY_HAVE_STD_HASH_STRING_REF=1")
+	ENDIF(HAVE_HASH_STRING_REF)
+ELSEIF(HAVE_TR1_UNORDERED_SET_MAP)
+	ADD_DEFINITIONS("-DTIARY_HAVE_TR1_UNORDERED_SET_MAP=1")
+	IF(HAVE_TR1_HASH_STRING_REF)
+		ADD_DEFINITIONS("-DTIARY_HAVE_STD_TR1_HASH_STRING_REF=1")
+	ENDIF(HAVE_TR1_HASH_STRING_REF)
 ENDIF(HAVE_UNORDERED_SET_MAP)
-
 
 # initializer list (>= gcc 4.4)
 CHECK_CXX_SOURCE_COMPILES("
