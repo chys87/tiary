@@ -17,7 +17,6 @@
 
 #include "ui/control.h"
 #include "common/action.h"
-#include <map>
 #include <utility>
 
 namespace tiary {

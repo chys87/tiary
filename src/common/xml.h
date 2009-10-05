@@ -29,10 +29,6 @@
 
 namespace tiary {
 
-struct XMLNode;
-struct XMLNodeTree;
-struct XMLNodeText;
-
 struct XMLNode
 {
 	virtual ~XMLNode () {}
@@ -72,7 +68,10 @@ struct XMLNodeText : XMLNode
 // Returns NULL on error
 XMLNode *xml_parse (const char *, size_t);
 
-XMLNode *xml_parse (const std::string &s);
+inline XMLNode *xml_parse (const std::string &s)
+{
+	return xml_parse (s.data (), s.length ());
+}
 
 // Recursively deletes an XML tree
 void xml_free (XMLNode *);

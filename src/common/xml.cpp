@@ -90,11 +90,6 @@ void tiary::xml_free (XMLNode *root)
 	}
 }
 
-tiary::XMLNode *tiary::xml_parse (const std::string &s)
-{
-	return xml_parse (s.data (), s.length ());
-}
-
 namespace {
 
 using namespace tiary;

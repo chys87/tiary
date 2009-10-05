@@ -360,6 +360,14 @@ void encrypt (void *data, size_t datalen, const void *pass, size_t passlen)
 	 * Let's leave the optimization to the compiler.
 	 * A recent compiler, when optimization is fully enabled,
 	 * may do some vectorization.
+	 *
+	 * The loops are written in a way which most current
+	 * vectorization-supporting compiler recognize, as opposed
+	 * to something like this (harder for optimizer):
+	 *
+	 * for (size_t i=0; i<datalen; ++i) {
+	 *     byte[i] ^= xor_byte[i%256];
+	 * }
 	 */
 	uint8_t *byte = reinterpret_cast<uint8_t *>(data);
 
