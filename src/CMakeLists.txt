@@ -199,7 +199,17 @@ ELSE(SIZEOF_LONG STREQUAL 8)
 	MESSAGE(FATAL_ERROR "I do not know how to define a 64-bit integer.")
 ENDIF(SIZEOF_LONG STREQUAL 8)
 
+# Check for optional stdint.h
+CHECK_INCLUDE_FILES("stdint.h" HAVE_STDINT_H)
+IF(HAVE_STDINT_H)
+	ADD_DEFINITIONS("-DTIARY_HAVE_STDINT_H")
+ENDIF(HAVE_STDINT_H)
 
+# Add "-Wall" to make useful warnings
+CHECK_CXX_COMPILER_FLAG("-Wall" HAVE_CXX_WALL)
+IF(HAVE_CXX_WALL)
+	ADD_DEFINITIONS("-Wall")
+ENDIF(HAVE_CXX_WALL)
 
 # Add options additional flags that will reduce the 
 # code size and/or improve efficiency
