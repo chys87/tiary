@@ -9,6 +9,8 @@ add_library(tiary_main STATIC
 	dialog_global_pref.cpp
 	dialog_labels.h
 	dialog_labels.cpp
+	dialog_open_recent.h
+	dialog_open_recent.cpp
 	dialog_perfile_pref.h
 	dialog_perfile_pref.cpp
 	dialog_view_edit.h

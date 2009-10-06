@@ -22,7 +22,6 @@
 #include "ui/dialog_message.h"
 #include "ui/dialog_select_file.h"
 #include "ui/dialog_input.h"
-#include "ui/dialog_select.h"
 #include "ui/search_info.h"
 #include "common/unicode.h"
 #include "common/format.h"
@@ -42,6 +41,7 @@
 #include "main/dialog_all_labels.h"
 #include "main/dialog_edit_time.h"
 #include "main/dialog_view_edit.h"
+#include "main/dialog_open_recent.h"
 #include <limits>
 
 namespace tiary {
@@ -708,6 +708,15 @@ void MainWin::open_recent_file ()
 			ui::dialog_message (L"No recent file");
 			return;
 		}
+		bool modified = false;
+		std::wstring file = dialog_open_recent_file (recent_files, modified);
+		if (modified) {
+			save_global_options (global_options, recent_files);
+		}
+		if (!file.empty ()) {
+			load (file);
+		}
+#if 0
 		std::vector <std::wstring> choices;
 		choices.reserve (n_recent_files);
 		for (RecentFileList::const_iterator it = recent_files.begin ();
@@ -722,6 +731,7 @@ void MainWin::open_recent_file ()
 			std::advance (it, choice);
 			load (it->filename);
 		}
+#endif
 	}
 }
 
