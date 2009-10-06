@@ -203,19 +203,13 @@ public:
 	// Connect to a list of Signals
 	void connect (const std::list<Signal> &);
 	// Copy from another Signal
-	void copy (const Signal &sig)
-	{
-		if (this != &sig) {
-			delete info;
-			info = sig.info ? sig.info->copy () : 0;
-		}
-	}
+	void copy_from (const Signal &sig);
 
-	Signal &operator = (const Signal &sig) { copy (sig); return *this; }
+	Signal &operator = (const Signal &sig) { copy_from (sig); return *this; }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES // Rvalue reference. Move semantics
 	Signal (Signal &&sig) : info (sig.info) { sig.info = 0; }
-	void copy (Signal &&sig) { swap (sig); }
+	void copy_from (Signal &&sig) { swap (sig); }
 	Signal &operator = (Signal &&sig) { swap (sig); return *this; }
 	Signal (std::list<Signal> &&);
 	void connect (std::list<Signal> &&);

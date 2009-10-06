@@ -52,6 +52,14 @@ SignalGroup *SignalGroup::copy () const
 
 } // namespace detail
 
+void Signal::copy_from (const Signal &sig)
+{
+	if (this != &sig) {
+		delete info;
+		info = sig.info ? sig.info->copy () : 0;
+	}
+}
+
 bool Signal::is_really_connected () const
 {
 	const detail::SignalBase *p = info;

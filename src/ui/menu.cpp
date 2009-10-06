@@ -339,7 +339,7 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	unsigned maxwid = 0;
 	for (Menu::const_iterator it = menu_.begin (); it != menu_.end (); ++it) {
 		if (!it->hidden) {
-			bool validity = it->action.call_query (true);
+			bool validity = it->action.call_condition (true);
 			ItemControl *p = *pi++ = new ItemControl (*this, *it, validity);
 			if (validity && !p->text.get_text ().empty ()) {
 				*pv++ = p;

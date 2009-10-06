@@ -6,6 +6,8 @@ add_library(tiary_common STATIC
 	bzip2.h
 	bzip2.cpp
 	callback.h
+	condition.h
+	condition.cpp
 	container_of.h
 	containers.h
 	datetime.h
@@ -26,7 +28,6 @@ add_library(tiary_common STATIC
 	pcre.h
 	pcre.cpp
 	pod_pair.h
-	query.h
 	signal.h
 	signal.cpp
 	split_line.h

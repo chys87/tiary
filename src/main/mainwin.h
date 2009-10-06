@@ -132,9 +132,6 @@ private:
 	bool query_filter_mode () const;
 	bool query_nonempty_filtered () const;
 	bool query_nonempty_all () const;
-	bool query_normal_mode_nonempty () const;
-	bool query_allow_move_up () const;
-	bool query_allow_move_down () const;
 	bool query_allow_up () const;
 	bool query_allow_down () const;
 	bool query_search_continuable () const;

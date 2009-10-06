@@ -59,14 +59,14 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	, last_search ()
 {
 	// Frequently used queries
-	Query <bool> q_normal (this, &MainWin::query_normal_mode);
-	Query <bool> q_filtered (this, &MainWin::query_filter_mode);
-	Query <bool> q_nonempty (this, &MainWin::query_nonempty_filtered);
-	Query <bool> q_nonempty_all (this, &MainWin::query_nonempty_all);
-	Query <bool> q_normal_nonempty (this, &MainWin::query_normal_mode_nonempty);
-	Query <bool> q_allow_up (this, &MainWin::query_allow_up);
-	Query <bool> q_allow_down (this, &MainWin::query_allow_down);
-	Query <bool> q_search_continue (this, &MainWin::query_search_continuable);
+	Condition q_normal (this, &MainWin::query_normal_mode);
+	Condition q_filtered (this, &MainWin::query_filter_mode);
+	Condition q_nonempty (this, &MainWin::query_nonempty_filtered);
+	Condition q_nonempty_all (this, &MainWin::query_nonempty_all);
+	Condition q_normal_nonempty = q_normal && q_nonempty_all;
+	Condition q_allow_up (this, &MainWin::query_allow_up);
+	Condition q_allow_down (this, &MainWin::query_allow_down);
+	Condition q_search_continue (this, &MainWin::query_search_continuable);
 
 	// All actions
 	Signal action_menu (menu_bar, &ui::MenuBar::slot_clicked, 0);
@@ -84,8 +84,8 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	Action action_time (Signal (this, &MainWin::edit_time_current), q_nonempty);
 	Action action_view (Signal (this, &MainWin::view_current), q_nonempty);
 	Action action_view_all (Signal (this, &MainWin::view_all), q_nonempty);
-	Action action_move_up (Signal (this, &MainWin::move_up_current), Query<bool> (this, &MainWin::query_allow_move_up));
-	Action action_move_down (Signal (this, &MainWin::move_down_current), Query<bool> (this, &MainWin::query_allow_move_down));
+	Action action_move_up (Signal (this, &MainWin::move_up_current), q_normal_nonempty && q_allow_up);
+	Action action_move_down (Signal (this, &MainWin::move_down_current), q_normal_nonempty && q_allow_down);
 	Action action_sort_all (Signal (this, &MainWin::sort_all), q_normal_nonempty);
 	Action action_filter (Signal (this, &MainWin::edit_filter), q_nonempty);
 	Action action_clear_filter (Signal (this, &MainWin::clear_filter), q_filtered);
@@ -99,10 +99,10 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	Signal action_show_doc (&show_doc);
 	Signal action_show_license (&show_license);
 	Signal action_show_about (&show_about);
-	Signal action_focus_home (main_ctrl, &MainCtrl::set_focus, 0);
-	Signal action_focus_end (main_ctrl, &MainCtrl::set_focus, std::numeric_limits<int>::max ());
-	Action action_up (Signal (main_ctrl, &MainCtrl::set_focus_up), q_allow_up);
-	Action action_down (Signal (main_ctrl, &MainCtrl::set_focus_down), q_allow_down);
+	Action action_focus_home (Signal (main_ctrl, &MainCtrl::set_focus, 0), q_nonempty);
+	Action action_focus_end (Signal (main_ctrl, &MainCtrl::set_focus, std::numeric_limits<int>::max ()), q_nonempty);
+	Action action_up (Signal (main_ctrl, &MainCtrl::set_focus_up), q_nonempty && q_allow_up);
+	Action action_down (Signal (main_ctrl, &MainCtrl::set_focus_down), q_nonempty && q_allow_down);
 	Action action_pageup (Signal (main_ctrl, &MainCtrl::set_focus_pageup), q_allow_up);
 	Action action_pagedown (Signal (main_ctrl, &MainCtrl::set_focus_pagedown), q_allow_down);
 
@@ -904,21 +904,6 @@ bool MainWin::query_nonempty_filtered () const
 bool MainWin::query_nonempty_all () const
 {
 	return !entries.empty ();
-}
-
-bool MainWin::query_normal_mode_nonempty () const
-{
-	return (query_normal_mode () && query_nonempty_all ());
-}
-
-bool MainWin::query_allow_move_up () const
-{
-	return (query_normal_mode_nonempty () && query_allow_up ());
-}
-
-bool MainWin::query_allow_move_down () const
-{
-	return (query_normal_mode () && query_allow_down ());
 }
 
 bool MainWin::query_allow_up () const

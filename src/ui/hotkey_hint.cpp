@@ -40,7 +40,7 @@ void HotkeyHint::redraw ()
 	unsigned height = get_size ().y;
 	Size pos = make_size ();
 	for (HotkeyList::iterator it = key_list.begin (); it != key_list.end (); ++it) {
-		if (!it->action.call_query (true)) {
+		if (!it->action.call_condition (true)) {
 			it->y = unsigned (-1);
 			continue;
 		}
