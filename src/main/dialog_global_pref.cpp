@@ -221,7 +221,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 	lbl_default_file.sig_hotkey.connect (
 			TIARY_LIST_OF(Signal)
 				Signal (this, &Window::set_focus_ptr, &btn_default_file, 0),
-				Signal (btn_default_file.sig_clicked, 0) // Connect to, not copy from
+				Signal (btn_default_file, &Button::slot_clicked)
 			TIARY_LIST_OF_END
 			);
 	btn_default_file.sig_clicked.connect (this, &WindowGlobalOptions::slot_default_file);

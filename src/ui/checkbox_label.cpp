@@ -31,7 +31,7 @@ CheckBoxLabel::CheckBoxLabel (Window &win, const std::wstring &text, bool initia
 				Signal (checkbox, &CheckBox::toggle, true)
 			TIARY_LIST_OF_END
 		);
-	label.sig_hotkey = label.sig_clicked;
+	label.sig_hotkey = label.sig_clicked.signal;
 }
 
 CheckBoxLabel::~CheckBoxLabel ()

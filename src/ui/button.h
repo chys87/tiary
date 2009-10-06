@@ -35,6 +35,8 @@ public:
 //	bool on_mouse (MouseEvent); // Handled by Window
 	void redraw ();
 
+	void slot_clicked (); ///< Intentionally public
+
 private:
 	UIStringOne text;
 	unsigned attributes;

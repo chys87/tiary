@@ -29,9 +29,7 @@ Button::Button (Window &win, const std::wstring &str)
 {
 	// Register hotkey
 	if (wchar_t c = text.get_hotkey ()) {
-		// Connecting to, not copying from sig_clicked
-		win.register_hotkey (c, Signal (sig_clicked, 0),
-				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
+		win.register_hotkey (c, Signal (this, &Button::slot_clicked));
 	}
 }
 
@@ -41,11 +39,20 @@ Button::~Button ()
 
 bool Button::on_key (wchar_t c)
 {
-	if (c==L'\r' || c==L' ') {
-		sig_clicked.emit ();
-		return true;
+	if (c==RETURN || c==NEWLINE || c==L' ') {
+		if (sig_clicked.is_really_connected () && sig_clicked.call_condition (true)) {
+			sig_clicked.emit ();
+			return true;
+		}
 	}
 	return false;
+}
+
+void Button::slot_clicked ()
+{
+	if (sig_clicked.call_condition (true)) {
+		sig_clicked.emit ();
+	}
 }
 
 void Button::redraw ()
@@ -55,7 +62,15 @@ void Button::redraw ()
 	unsigned x = (get_size().x - w) / 2;
 
 	PaletteID id;
-	if (is_focus ()) {
+	if (!sig_clicked.call_condition (true)) {
+		if (is_focus ()) {
+			id = PALETTE_ID_BUTTON_FOCUS_INVALID;
+		}
+		else {
+			id = PALETTE_ID_BUTTON_INVALID;
+		}
+	}
+	else if (is_focus ()) {
 		id = PALETTE_ID_BUTTON_FOCUS;
 	}
 	else if (ButtonDefault *def_chooser = dynamic_cast <ButtonDefault *> (&win)) {
@@ -74,10 +89,10 @@ void Button::redraw ()
 	Size pos = make_size (x,y);
 	clear ();
 	move_cursor (pos);
-	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL) ? L"> " : L"  ");
+	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL && id != PALETTE_ID_BUTTON_INVALID) ? L"> " : L"  ");
 	pos = text.output (*this, pos, w-4);
 	pos = make_size (x+w-2, y);
-	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL) ? L" <" : L"  ");
+	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL && id != PALETTE_ID_BUTTON_INVALID) ? L" <" : L"  ");
 }
 
 } // namespace tiary::ui

@@ -22,6 +22,7 @@
 #include "common/unicode.h"
 #include "common/algorithm.h"
 #include "common/dir.h"
+#include "common/container_of.h"
 
 namespace tiary {
 
@@ -51,12 +52,15 @@ public:
 
 	void redraw ();
 
+	const std::wstring &get_result () const { return result; }
+	bool get_modified () const { return modified; }
+
+private:
 	void slot_ok ();
 	void slot_remove ();
 	void slot_remove_all ();
-
-	const std::wstring &get_result () const { return result; }
-	bool get_modified () const { return modified; }
+	
+	bool is_valid_select () const;
 };
 
 WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
@@ -105,6 +109,13 @@ WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
 	ChainControlsHorizontalO () (btn_ok) (btn_cancel) (btn_remove) (btn_remove_all);
 
 	lst_files.sig_double_clicked.connect (this, &WindowRecentFiles::slot_ok);
+	lst_files.sig_select_changed.connect (
+			TIARY_LIST_OF(Signal)
+				Signal (btn_ok, &Button::redraw),
+				Signal (btn_remove, &Button::redraw)
+			TIARY_LIST_OF_END
+		);
+	btn_ok.sig_clicked = btn_remove.sig_clicked = Condition (this, &WindowRecentFiles::is_valid_select);
 	btn_ok.sig_clicked.connect (this, &WindowRecentFiles::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 	btn_remove.sig_clicked.connect (this, &WindowRecentFiles::slot_remove);
@@ -155,7 +166,7 @@ void WindowRecentFiles::slot_remove ()
 		lst_orig.erase (it);
 		ListBox::ItemList lst_display = lst_files.get_items ();
 		lst_display.erase (lst_display.begin() + select);
-		lst_files.set_items (TIARY_STD_MOVE (lst_display), size_t (-1), false);
+		lst_files.set_items (TIARY_STD_MOVE (lst_display), minU (select+1, lst_display.size ()) - 1, true);
 		modified = true;
 	}
 }
@@ -165,6 +176,11 @@ void WindowRecentFiles::slot_remove_all ()
 	lst_orig.clear ();
 	modified = true;
 	Window::request_close ();
+}
+
+bool WindowRecentFiles::is_valid_select () const
+{
+	return (lst_files.get_select () < lst_files.get_items ().size ());
 }
 
 } // anonymous namespace

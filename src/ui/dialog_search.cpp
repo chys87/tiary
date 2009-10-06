@@ -56,7 +56,9 @@ public:
 
 	//void redraw (); // The default one is okay
 
+private:
 	void slot_ok (); ///< Pressed Enter or clicked OK
+	bool is_text_nonempty () const;
 };
 
 WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_, 
@@ -102,6 +104,8 @@ WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 
 	set_default_button (btn_ok);
 
+	box_input.sig_changed.connect (btn_ok, &Button::redraw);
+	btn_ok.sig_clicked = Condition (this, &WindowSearch::is_text_nonempty);
 	btn_ok.sig_clicked.connect (this, &WindowSearch::slot_ok);
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
 
@@ -122,6 +126,11 @@ void WindowSearch::slot_ok ()
 	o_regex = false;
 #endif
 	request_close ();
+}
+
+bool WindowSearch::is_text_nonempty () const
+{
+	return !box_input.get_text ().empty ();
 }
 
 } // anonymous namespace

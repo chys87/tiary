@@ -54,6 +54,7 @@ private:
 	Button *current_default; // Updated by on_focus_changed
 
 	void slot_default_button ();
+	bool cond_default_button () const; // Whether the default button is usable
 	void redraw_all_buttons ();
 
 	friend class ButtonDefaultExtended;

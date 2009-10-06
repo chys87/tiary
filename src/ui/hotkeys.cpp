@@ -15,7 +15,7 @@
 #include "ui/hotkeys.h"
 #include "ui/ui.h"
 #include "common/unicode.h"
-#include <utility> // std::forward
+#include <utility> // std::move
 
 
 namespace tiary {
@@ -30,12 +30,12 @@ Hotkeys::~Hotkeys ()
 {
 }
 
-void Hotkeys::register_hotkey (wchar_t c, const Signal &sig)
+void Hotkeys::register_hotkey (wchar_t c, const Action &sig)
 {
 	hotkey_list[c] = sig;
 }
 
-void Hotkeys::register_hotkey (wchar_t c, const Signal &sig, int options)
+void Hotkeys::register_hotkey (wchar_t c, const Action &sig, int options)
 {
 	wchar_t d = c;
 	if (options & CASE_INSENSITIVE) {
@@ -57,12 +57,12 @@ void Hotkeys::register_hotkey (wchar_t c, const Signal &sig, int options)
 }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-void Hotkeys::register_hotkey (wchar_t c, Signal &&sig)
+void Hotkeys::register_hotkey (wchar_t c, Action &&sig)
 {
-	hotkey_list[c] = std::forward <Signal> (sig);
+	hotkey_list[c] = std::move (sig);
 }
 
-void Hotkeys::register_hotkey (wchar_t c, Signal &&sig, int options)
+void Hotkeys::register_hotkey (wchar_t c, Action &&sig, int options)
 {
 	wchar_t d = c;
 	if (options & CASE_INSENSITIVE) {
@@ -80,7 +80,7 @@ void Hotkeys::register_hotkey (wchar_t c, Signal &&sig, int options)
 			}
 		}
 	}
-	register_hotkey (c, std::forward <Signal> (sig));
+	register_hotkey (c, std::move (sig));
 }
 #endif
 
@@ -88,12 +88,13 @@ bool Hotkeys::emit_hotkey (wchar_t c)
 {
 	HotkeyList::iterator it = hotkey_list.find (c);
 	if (it != hotkey_list.end ()) {
-		it->second.emit ();
-		return true;
+		Action &act = it->second;
+		if (act.is_really_connected () && act.call_condition (true)) {
+			act.emit ();
+			return true;
+		}
 	}
-	else {
-		return false;
-	}
+	return false;
 }
 
 } // namespace tiary::ui

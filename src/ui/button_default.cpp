@@ -35,7 +35,8 @@ ButtonDefault::ButtonDefault ()
 	, default_default (0)
 	, current_default (0)
 {
-	Signal sig_tmp (this, &ButtonDefault::slot_default_button);
+	Action sig_tmp (Signal (this, &ButtonDefault::slot_default_button),
+			Condition (this, &ButtonDefault::cond_default_button));
 	Window::register_hotkey (RETURN, sig_tmp);
 	Window::register_hotkey (NEWLINE, TIARY_STD_MOVE (sig_tmp));
 }
@@ -77,6 +78,16 @@ void ButtonDefault::slot_default_button ()
 	if (Button *btn = get_current_default_button ()) {
 		btn->sig_clicked.emit ();
 	}
+}
+
+bool ButtonDefault::cond_default_button () const
+{
+	if (Button *btn = get_current_default_button ()) {
+		if (btn->sig_clicked.call_condition (true)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 

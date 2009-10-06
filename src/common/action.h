@@ -33,22 +33,22 @@ struct Action
 
 	Action () : signal (), condition () {}
 	~Action () {}
-	explicit Action (const Signal &sig) : signal (sig), condition () {}
-	explicit Action (const Condition &cond) : signal (), condition (cond) {}
+	Action (const Signal &sig) : signal (sig), condition () {}
+	Action (const Condition &cond) : signal (), condition (cond) {}
 	Action (const Signal &sig, const Condition &cond) : signal (sig), condition (cond) {}
 	Action (const Action &act) : signal (act.signal), condition (act.condition) {}
-	Action &operator = (const Signal &sig) { signal = sig; return *this; }
-	Action &operator = (const Condition &cond) { condition = cond; return *this; }
+	Signal &operator = (const Signal &sig) { return signal = sig; }
+	Condition &operator = (const Condition &cond) { return condition = cond; }
 	Action &operator = (const Action &act) { signal = act.signal; condition = act.condition; return *this; }
 
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	explicit Action (Signal &&sig) : signal (std::move (sig)), condition () {}
-	explicit Action (Condition &&cond) : signal (), condition (std::move (cond)) {}
-	explicit Action (Signal &&sig, const Condition &cond) : signal (std::move (sig)), condition (cond) {}
-	explicit Action (const Signal &sig, Condition &&cond) : signal (sig), condition (std::move (cond)) {}
-	explicit Action (Signal &&sig, Condition &&cond) : signal (std::move (sig)), condition (std::move (cond)) {}
-	Action &operator = (Signal &&sig) { signal = std::move (sig); return *this; }
-	Action &operator = (Condition &&cond) { condition = std::move (cond); return *this; }
+	Action (Signal &&sig) : signal (std::move (sig)), condition () {}
+	Action (Condition &&cond) : signal (), condition (std::move (cond)) {}
+	Action (Signal &&sig, const Condition &cond) : signal (std::move (sig)), condition (cond) {}
+	Action (const Signal &sig, Condition &&cond) : signal (sig), condition (std::move (cond)) {}
+	Action (Signal &&sig, Condition &&cond) : signal (std::move (sig)), condition (std::move (cond)) {}
+	Signal &operator = (Signal &&sig) { return signal = std::move (sig); }
+	Condition &operator = (Condition &&cond) { return condition = std::move (cond); }
 	Action &operator = (Action &&act) { signal = std::move (act.signal); condition = std::move (act.condition); return *this; }
 #endif // rvalue ref
 
@@ -109,12 +109,6 @@ struct Action
 
 	void emit () { signal.emit (); }
 	bool call_condition (bool default_return) const { return condition.call (default_return); }
-
-	// rvalue-reference of *this is not supported by GCC yet
-	operator Signal & () { return signal; }
-	operator Condition & () { return condition; }
-	operator const Signal & () const { return signal; }
-	operator const Condition & () const { return condition; }
 };
 
 } // namespace tiary

@@ -15,7 +15,7 @@
 #ifndef TIARY_UI_HOTKEYS_H
 #define TIARY_UI_HOTKEYS_H
 
-#include "common/signal.h"
+#include "common/action.h"
 #include "common/containers.h"
 
 namespace tiary {
@@ -44,17 +44,17 @@ public:
 	 * priority for handling inputs. The hotkey signal is emitted
 	 * only if the focused control fails to handle it.
 	 */
-	void register_hotkey (wchar_t, const Signal &);
-	void register_hotkey (wchar_t, const Signal &, int options);
+	void register_hotkey (wchar_t, const Action &);
+	void register_hotkey (wchar_t, const Action &, int options);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	void register_hotkey (wchar_t, Signal &&);
-	void register_hotkey (wchar_t, Signal &&, int options);
+	void register_hotkey (wchar_t, Action &&);
+	void register_hotkey (wchar_t, Action &&, int options);
 #endif
 
 	bool emit_hotkey (wchar_t);
 
 private:
-	typedef unordered_map<wchar_t, Signal> HotkeyList;
+	typedef unordered_map<wchar_t, Action> HotkeyList;
 
 	HotkeyList hotkey_list;
 };

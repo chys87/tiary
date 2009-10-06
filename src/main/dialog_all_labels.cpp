@@ -25,6 +25,7 @@
 #include "diary/diary.h"
 #include "common/format.h"
 #include "common/containers.h"
+#include "common/container_of.h"
 
 /**
  * @file	main/dialog_all_labels.cpp
@@ -69,7 +70,9 @@ public:
 
 	bool get_modified () const { return modified; }
 
+private:
 	void refresh_list (const std::wstring &select_hint = std::wstring ());
+	bool is_valid_select () const;
 };
 
 WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
@@ -104,11 +107,18 @@ WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
 		(layout_right, 10, 10)
 		;
 
+	btn_rename.sig_clicked = btn_delete.sig_clicked = Condition (this, &WindowAllLabels::is_valid_select);
 	btn_rename.sig_clicked.connect (this, &WindowAllLabels::slot_rename);
 	btn_delete.sig_clicked.connect (this, &WindowAllLabels::slot_delete);
 	btn_ok.sig_clicked.connect (this, &WindowAllLabels::slot_ok);
 
 	lst_labels.register_hotkey (DELETE, btn_delete.sig_clicked);
+	lst_labels.sig_select_changed.connect (
+			TIARY_LIST_OF(Signal)
+				Signal (btn_rename, &Button::redraw),
+				Signal (btn_delete, &Button::redraw)
+			TIARY_LIST_OF_END
+		);
 
 	register_hotkey (ESCAPE, btn_ok.sig_clicked);
 	set_default_button (btn_ok);
@@ -210,7 +220,12 @@ void WindowAllLabels::refresh_list (const std::wstring &select_hint)
 		new_select = std::distance (all_labels.begin (), it);
 	}
 	lst_labels.set_items (std::vector<std::wstring> (all_labels.begin (), all_labels.end ()),
-			new_select, false);
+			new_select, true);
+}
+
+bool WindowAllLabels::is_valid_select () const
+{
+	return (lst_labels.get_select () < lst_labels.get_items ().size ());
 }
 
 } // anonymous namespace
