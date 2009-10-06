@@ -52,6 +52,16 @@ struct Action
 	Action &operator = (Action &&act) { signal = std::move (act.signal); query = std::move (act.query); return *this; }
 #endif // rvalue ref
 
+#ifdef TIARY_HAVE_RVALUE_REFERENCES
+	void swap (Action &&other)
+#else
+	void swap (Action &other)
+#endif
+	{
+		signal.swap (other.signal);
+		query.swap (other.query);
+	}
+
 	void emit () { signal.emit (); }
 	bool call_query (bool default_return) const { return query.call (default_return); }
 

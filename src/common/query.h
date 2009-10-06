@@ -71,11 +71,29 @@ public:
 	~Query () { delete info; }
 	Query () : info (0) {}
 	Query (const Query &other) : info (other.info ? other.info->copy () : 0) {}
-	Query &operator = (const Query &other) { delete info; info = other.info ? other.info->copy () : 0; return *this; }
+	Query &operator = (const Query &other)
+	{
+		if (this != &other) {
+			delete info;
+			info = other.info ? other.info->copy () : 0;
+		}
+		return *this;
+	}
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 	Query (Query &&other) : info (other.info) { other.info = 0; }
-	Query &operator = (Query &&other) { delete info; info = other.info; other.info = 0; return *this; }
+	Query &operator = (Query &&other) { swap (other); return *this; }
 #endif
+
+#ifdef TIARY_HAVE_RVALUE_REFERENCES
+	void swap (Query &&other)
+#else
+	void swap (Query &other)
+#endif
+	{
+		Base *tmp = info;
+		info = other.info;
+		other.info = tmp;
+	}
 
 	template <typename D> Query (D &obj, R (D::*foo)()) : info (new ChildMV <D> (&obj, foo)) {}
 	template <typename D> Query (D *obj, R (D::*foo)()) : info (new ChildMV <D> (obj, foo)) {}

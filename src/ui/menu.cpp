@@ -59,10 +59,13 @@ MenuItem::MenuItem (const MenuItem &other)
 
 MenuItem &MenuItem::operator = (const MenuItem &other)
 {
-	text = other.text;
-	action = other.action;
-	hidden = other.hidden;
-	submenu = other.submenu ? new Menu (*other.submenu) : 0;
+	if (this != &other) {
+		text = other.text;
+		action = other.action;
+		hidden = other.hidden;
+		delete submenu;
+		submenu = other.submenu ? new Menu (*other.submenu) : 0;
+	}
 	return *this;
 }
 
@@ -91,17 +94,19 @@ MenuItem::MenuItem (MenuItem &&other)
 {
 	other.submenu = 0;
 }
-
-MenuItem &MenuItem::operator = (MenuItem &&other)
-{
-	text = std::forward<std::wstring> (other.text);
-	action = std::move (other.action);
-	hidden = other.hidden;
-	submenu = other.submenu;
-	other.submenu = 0;
-	return *this;
-}
 #endif
+
+#ifdef TIARY_HAVE_RVALUE_REFERENCES
+void MenuItem::swap (MenuItem &&other)
+#else
+void MenuItem::swap (MenuItem &other)
+#endif
+{
+	text.swap (other.text);
+	action.swap (other.action);
+	std::swap (hidden, other.hidden);
+	std::swap (submenu, other.submenu);
+}
 
 MenuItem::~MenuItem ()
 {

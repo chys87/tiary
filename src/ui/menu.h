@@ -54,7 +54,13 @@ struct MenuItem
 	MenuItem &operator = (const MenuItem &); ///< Deep copy...
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
 	MenuItem (MenuItem &&);
-	MenuItem &operator = (MenuItem &&);
+	MenuItem &operator = (MenuItem &&other) { swap (other); return *this; }
+#endif
+
+#ifdef TIARY_HAVE_RVALUE_REFERENCES
+	void swap (MenuItem &&);
+#else
+	void swap (MenuItem &);
 #endif
 
 	~MenuItem ();

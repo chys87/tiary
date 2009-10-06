@@ -195,16 +195,20 @@ public:
 	// Connect to another Signal
 	void connect (Signal &sig)
 	{
-		delete info;
-		info = new detail::SignalRecursive (sig);
+		if (this != &sig) {
+			delete info;
+			info = new detail::SignalRecursive (sig);
+		}
 	}
 	// Connect to a list of Signals
 	void connect (const std::list<Signal> &);
 	// Copy from another Signal
 	void copy (const Signal &sig)
 	{
-		delete info;
-		info = sig.info ? sig.info->copy () : 0;
+		if (this != &sig) {
+			delete info;
+			info = sig.info ? sig.info->copy () : 0;
+		}
 	}
 
 	Signal &operator = (const Signal &sig) { copy (sig); return *this; }
