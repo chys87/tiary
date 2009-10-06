@@ -62,6 +62,51 @@ struct Action
 		condition.swap (other.condition);
 	}
 
+	// Forward is_connected and is_really_connected to signal
+	bool is_connected () const { return signal.is_connected (); }
+	bool is_really_connected () const { return signal.is_really_connected (); }
+	// Forward all calls to connect to signal
+#if defined TIARY_HAVE_RVALUE_REFERENCES && defined TIARY_HAVE_TUPLES
+	template <typename... Args> void connect (Args &&...args)
+	{
+		signal.connect (std::forward <Args> (args)...);
+	}
+#elif defined TIARY_HAVE_RVALUE_REFERENCES
+	template <typename A> void connect (A &&a)
+	{
+		signal.connect (std::forward <A> (a));
+	}
+	template <typename A, typename B> void connect (A &&a, B &&b)
+	{
+		signal.connect (std::forward <A> (a), std::forward <B> (b));
+	}
+	template <typename A, typename B, typename C> void connect (A &&a, B &&b, C &&c)
+	{
+		signal.connect (std::forward <A> (a), std::forward <B> (b), std::forward <C> (c));
+	}
+	template <typename A, typename B, typename C, typename D> void connect (A &&a, B &&b, C &&c, D &&d)
+	{
+		signal.connect (std::forward <A> (a), std::forward <B> (b), std::forward <C> (c), std::forward <D> (d));
+	}
+#else
+	template <typename A> void connect (const A &a)
+	{
+		signal.connect (a);
+	}
+	template <typename A, typename B> void connect (const A &a, const B &b)
+	{
+		signal.connect (a, b);
+	}
+	template <typename A, typename B, typename C> void connect (const A &a, const B &b, const C &c)
+	{
+		signal.connect (a, b, c);
+	}
+	template <typename A, typename B, typename C, typename D> void connect (const A &a, const B &b, const C &c, const D &d)
+	{
+		signal.connect (a, b, c, d);
+	}
+#endif
+
 	void emit () { signal.emit (); }
 	bool call_condition (bool default_return) const { return condition.call (default_return); }
 

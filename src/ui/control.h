@@ -20,7 +20,7 @@
 #ifndef TIARY_UI_CONTROL_H
 #define TIARY_UI_CONTROL_H
 
-#include "common/signal.h"
+#include "common/action.h"
 #include "ui/movable_object.h"
 #include "ui/size.h"
 #include "ui/ui.h"
@@ -109,7 +109,7 @@ public:
 
 	Signal sig_defocus;
 	Signal sig_focus;
-	Signal sig_clicked;
+	Action sig_clicked;
 
 	friend class Window;
 };

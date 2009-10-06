@@ -883,7 +883,9 @@ bool Window::on_mouse (MouseEvent mouse_event)
 			mouse_event.p -= ctrl->pos;
 			bool processed = ctrl->on_mouse (mouse_event);
 			if (!processed) {
-				if ((mouse_event.m&LEFT_CLICK) && ctrl->sig_clicked.is_really_connected ()) {
+				if ((mouse_event.m&LEFT_CLICK) &&
+						ctrl->sig_clicked.is_really_connected () &&
+						ctrl->sig_clicked.call_condition (true)) {
 					ctrl->sig_clicked.emit ();
 					processed = true;
 				}
