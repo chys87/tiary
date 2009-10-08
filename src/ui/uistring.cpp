@@ -57,10 +57,9 @@ void UIString::output (Control &ctrl, Size pos, Size size)
 	for (unsigned i=0, n=minU(height,lst.size()); i<n; ++i) {
 		if (get_hotkey_pos () - lst[i].begin < lst[i].len) {
 			Size next = ctrl.put (pos, get_text().data()+lst[i].begin, get_hotkey_pos () - lst[i].begin);
-			ColorAttr remember = ctrl.get_attr ();
-			ctrl.attribute_on (UNDERLINE);
+			ctrl.attribute_toggle (UNDERLINE);
 			next = ctrl.put (next, get_text().data()[get_hotkey_pos ()]);
-			ctrl.set_attr (remember);
+			ctrl.attribute_toggle (UNDERLINE);
 			next = ctrl.put (next, get_text().data()+get_hotkey_pos()+1, lst[i].len - (get_hotkey_pos () - lst[i].begin + 1));
 		}
 		else {

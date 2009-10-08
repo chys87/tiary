@@ -78,6 +78,7 @@ public:
 	void choose_color (Color, Color);
 	void attribute_on (Attr);
 	void attribute_off (Attr);
+	void attribute_toggle (Attr);
 	ColorAttr get_attr () const;
 	void set_attr (ColorAttr);
 	Size put (Size xy, wchar_t c);

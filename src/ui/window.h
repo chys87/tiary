@@ -99,6 +99,7 @@ public:
 	void choose_color (Color fore, Color back); ///< Choose both fore and back color
 	void attribute_on (Attr); ///< Force attributes on notwithstanding palette (bitwise OR'd)
 	void attribute_off (Attr); ///< Force attributes off notwithstanding palette
+	void attribute_toggle (Attr); ///< Flip attributes notwithstanding palette
 	ColorAttr get_attr () const { return cur_attr; }
 	void set_attr (ColorAttr);
 

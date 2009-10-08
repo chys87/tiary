@@ -74,10 +74,10 @@ void RichText::redraw ()
 				pos = put (pos, text.data()+offset, it->first-offset);
 				offset = it->first;
 			}
-			attribute_on (REVERSE);
+			attribute_toggle (REVERSE);
 			size_t highlight_end = minSize (it->first+it->second, end_offset);
 			pos = put (pos, text.data()+offset, highlight_end-offset);
-			attribute_off (REVERSE);
+			attribute_toggle (REVERSE);
 			offset = highlight_end;
 		}
 		pos = put (pos, text.data()+offset, end_offset-offset);
@@ -88,15 +88,16 @@ void RichText::redraw ()
 	}
 	// Status bar
 	choose_palette (PALETTE_ID_BACKGROUND);
+	clear (make_size (0, hgt), make_size (wid, 1));
 	put (make_size (0, hgt),
-			format (L"Lines %a-%b/%c                      ") << top_line+1 << top_line+show_lines
+			format (L"Lines %a-%b/%c") << top_line+1 << top_line+show_lines
 				<< unsigned (line_list.size ())
 			);
 	// Scroll bar
 	clear (make_size (wid, 0), make_size (1, hgt+1));
 	unsigned bar_start = top_line * hgt / line_list.size ();
 	unsigned bar_height = maxU (1, (top_line + show_lines) * hgt / line_list.size () - bar_start);
-	attribute_on (REVERSE);
+	attribute_toggle (REVERSE);
 	clear (make_size (wid, bar_start), make_size (1, bar_height));
 }
 

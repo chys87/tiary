@@ -260,7 +260,7 @@ void ListBox::redraw ()
 			put (pos, str.c_str (), display_wchars);
 			choose_palette (PALETTE_ID_LISTBOX);
 			pos = put (make_size (maxS(disp_wid-4,0),i), L' ');
-			attribute_on (REVERSE);
+			attribute_toggle (REVERSE);
 			pos = put (pos, L"...");
 		}
 	}
@@ -276,7 +276,7 @@ void ListBox::redraw ()
 		bar_start = info.first * disp_hgt / items.size ();
 		bar_hgt = maxU (1, (info.first + info.len) * disp_hgt / items.size () - bar_start);
 	}
-	attribute_on (REVERSE);
+	attribute_toggle (REVERSE);
 	clear (make_size (disp_wid,bar_start), make_size (1, bar_hgt));
 
 	move_cursor (make_size (0, info.focus_pos));

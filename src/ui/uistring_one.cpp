@@ -45,10 +45,9 @@ Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid)
 	}
 	if (get_hotkey_pos () < end) {
 		pos = ctrl.put (pos, get_text().data(), get_hotkey_pos ());
-		ColorAttr remember = ctrl.get_attr ();
-		ctrl.attribute_on (UNDERLINE);
+		ctrl.attribute_toggle (UNDERLINE);
 		pos = ctrl.put (pos, get_text().data()[get_hotkey_pos()]);
-		ctrl.set_attr (remember);
+		ctrl.attribute_toggle (UNDERLINE);
 		pos = ctrl.put (pos, get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
 	}
 	else {
@@ -67,10 +66,9 @@ Size UIStringOne::output (Window &win, Size pos, unsigned wid)
 	}
 	if (get_hotkey_pos () < end) {
 		pos = win.put (pos, get_text().data(), get_hotkey_pos ());
-		ColorAttr remember = win.get_attr ();
-		win.attribute_on (UNDERLINE);
+		win.attribute_toggle (UNDERLINE);
 		pos = win.put (pos, get_text().data()[get_hotkey_pos()]);
-		win.set_attr (remember);
+		win.attribute_toggle (UNDERLINE);
 		pos = win.put (pos, get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
 	}
 	else {

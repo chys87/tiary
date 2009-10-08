@@ -116,6 +116,11 @@ void Control::attribute_off (Attr attr)
 	win.attribute_off (attr);
 }
 
+void Control::attribute_toggle (Attr attr)
+{
+	win.attribute_toggle (attr);
+}
+
 ColorAttr Control::get_attr () const
 {
 	return win.get_attr ();
@@ -158,9 +163,10 @@ void Control::clear (Size fill_pos, Size fill_size)
 
 void Control::fill (Size fill_pos, Size fill_size, wchar_t ch)
 {
-	fill_pos &= size;
-	fill_size &= size - fill_pos;
-	win.fill (fill_pos + pos, fill_size, ch);
+	if (both (size > fill_pos)) {
+		fill_size &= size - fill_pos;
+		win.fill (fill_pos + pos, fill_size, ch);
+	}
 }
 
 

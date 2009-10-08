@@ -528,6 +528,11 @@ void Window::attribute_off (Attr attr)
 	cur_attr.attr &= ~attr;
 }
 
+void Window::attribute_toggle (Attr attr)
+{
+	cur_attr.attr ^= attr;
+}
+
 void Window::set_attr (ColorAttr at)
 {
 	cur_attr = at;
@@ -576,7 +581,8 @@ void Window::clear (Size fill_pos, Size fill_size)
 
 void Window::fill (Size top_left, Size fill_size, wchar_t ch)
 {
-	// FIXME: Deal with full-width characters properly
+	// WONTFIX: Deal with full-width characters properly
+	// Caller's responsibility
 	unsigned fill_top = top_left.y;
 	unsigned fill_left = top_left.x;
 	unsigned fill_width = fill_size.x;
