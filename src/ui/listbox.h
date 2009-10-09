@@ -33,6 +33,7 @@ public:
 
 	size_t get_select () const; // -1 if none
 	const ItemList &get_items () const { return items; }
+	bool is_valid_select () const { return select_any; }
 
 	void set_items (const ItemList &, size_t new_select = size_t(-1), bool emit_signal = true);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES

@@ -72,7 +72,6 @@ public:
 
 private:
 	void refresh_list (const std::wstring &select_hint = std::wstring ());
-	bool is_valid_select () const;
 };
 
 WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
@@ -107,7 +106,7 @@ WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
 		(layout_right, 10, 10)
 		;
 
-	btn_rename.sig_clicked = btn_delete.sig_clicked = Condition (this, &WindowAllLabels::is_valid_select);
+	btn_rename.sig_clicked = btn_delete.sig_clicked = Condition (lst_labels, &ListBox::is_valid_select);
 	btn_rename.sig_clicked.connect (this, &WindowAllLabels::slot_rename);
 	btn_delete.sig_clicked.connect (this, &WindowAllLabels::slot_delete);
 	btn_ok.sig_clicked.connect (this, &WindowAllLabels::slot_ok);
@@ -221,11 +220,6 @@ void WindowAllLabels::refresh_list (const std::wstring &select_hint)
 	}
 	lst_labels.set_items (std::vector<std::wstring> (all_labels.begin (), all_labels.end ()),
 			new_select, true);
-}
-
-bool WindowAllLabels::is_valid_select () const
-{
-	return (lst_labels.get_select () < lst_labels.get_items ().size ());
 }
 
 } // anonymous namespace

@@ -59,8 +59,6 @@ private:
 	void slot_ok ();
 	void slot_remove ();
 	void slot_remove_all ();
-	
-	bool is_valid_select () const;
 };
 
 WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
@@ -115,7 +113,7 @@ WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
 				Signal (btn_remove, &Button::redraw)
 			TIARY_LIST_OF_END
 		);
-	btn_ok.sig_clicked = btn_remove.sig_clicked = Condition (this, &WindowRecentFiles::is_valid_select);
+	btn_ok.sig_clicked = btn_remove.sig_clicked = Condition (lst_files, &ListBox::is_valid_select);
 	btn_ok.sig_clicked.connect (this, &WindowRecentFiles::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 	btn_remove.sig_clicked.connect (this, &WindowRecentFiles::slot_remove);
@@ -176,11 +174,6 @@ void WindowRecentFiles::slot_remove_all ()
 	lst_orig.clear ();
 	modified = true;
 	Window::request_close ();
-}
-
-bool WindowRecentFiles::is_valid_select () const
-{
-	return (lst_files.get_select () < lst_files.get_items ().size ());
 }
 
 } // anonymous namespace

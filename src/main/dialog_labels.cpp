@@ -108,7 +108,9 @@ WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocal
 
 	btn_ok.sig_clicked.connect (this, &WindowLabels::slot_ok);
 
+	btn_add.sig_clicked = Condition (lst_all, &ListBox::is_valid_select);
 	btn_add.sig_clicked = lst_all.sig_double_clicked = Signal (this, &WindowLabels::slot_add);
+	lst_all.sig_select_changed.connect (btn_add, &Button::redraw);
 
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
@@ -145,7 +147,11 @@ void WindowLabels::slot_add ()
 		const std::wstring &label = lst_all.get_items () [k];
 		WStringLocaleOrderedSet current_set = set_from_text (txt_selected.get_text ());
 		if (current_set.find (label) == current_set.end ()) {
-			std::wstring new_text = txt_selected.get_text () + L',' + label;
+			std::wstring new_text = txt_selected.get_text ();
+			if (!new_text.empty () && *c(new_text).rbegin () != L',') {
+				new_text += L',';
+			}
+			new_text += label;
 			txt_selected.set_text (TIARY_STD_MOVE (new_text), false, new_text.size ());
 		}
 	}
