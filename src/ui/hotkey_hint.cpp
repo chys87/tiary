@@ -63,7 +63,7 @@ void HotkeyHint::redraw ()
 		choose_palette (PALETTE_ID_HOTKEY_HINT);
 		pos = put (pos, L'-');
 		pos = put (pos, it->fun_name);
-		pos = put (pos, L"  ");
+		pos = put (pos, L' ');
 	}
 }
 
