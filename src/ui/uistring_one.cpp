@@ -24,18 +24,17 @@ namespace ui {
 
 UIStringOne::UIStringOne (const std::wstring &s, unsigned options)
 	: UIStringBase (s, options)
-	, width (0)
+	, width (ucs_width (get_text ()))
 {
-	update ();
 }
 
 void UIStringOne::set_text (const std::wstring &s, unsigned options)
 {
 	UIStringBase::set_text (s, options);
-	update ();
+	width = ucs_width (get_text ());
 }
 
-Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid)
+Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid) const
 {
 	size_t end = get_text ().length ();
 	if (wid < width) {
@@ -56,7 +55,7 @@ Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid)
 	return pos;
 }
 
-Size UIStringOne::output (Window &win, Size pos, unsigned wid)
+Size UIStringOne::output (Window &win, Size pos, unsigned wid) const
 {
 	size_t end = get_text ().length ();
 	if (wid < width) {
@@ -75,11 +74,6 @@ Size UIStringOne::output (Window &win, Size pos, unsigned wid)
 		pos = win.put (pos, get_text().data (), end);
 	}
 	return pos;
-}
-
-void UIStringOne::update ()
-{
-	width = ucs_width (get_text ());
 }
 
 

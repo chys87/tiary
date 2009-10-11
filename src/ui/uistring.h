@@ -44,13 +44,13 @@ public:
 	explicit UIString (const std::wstring & = std::wstring (), unsigned options = 0);
 	void set_text (const std::wstring &, unsigned options = 0);
 
-	const SplitStringLineList &split_line (unsigned wid);
+	const SplitStringLineList &split_line (unsigned wid) const;
 
 	/**
 	 * @brief	Output text to a control, highlighting hotkey character
 	 * @param	pos	Position relative to the control
 	 */
-	void output (Control &, Size pos, Size size);
+	void output (Control &, Size pos, Size size) const;
 
 	unsigned get_lines () const { return lines; }
 	unsigned get_max_width () const { return max_width; }
@@ -59,8 +59,9 @@ private:
 	unsigned lines;
 	unsigned max_width;
 
-	unsigned split_cache_wid;
-	SplitStringLineList split_cache;
+	// They are mutable because split_line need modify them
+	mutable unsigned split_cache_wid;
+	mutable SplitStringLineList split_cache;
 
 	void update ();
 };

@@ -43,10 +43,6 @@ public:
 private:
 	std::wstring text;
 	size_t hotkey_pos; // size_t(-1) if none
-
-	// Find the hotkey character position,
-	// and remove the first '&' from the string
-	void update ();
 };
 
 } // namespace tiary::ui

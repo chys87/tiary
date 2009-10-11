@@ -42,21 +42,18 @@ public:
 	 * @param	pos	Position relative to the control
 	 * @param	wid	Maximal screen width to use
 	 */
-	Size output (Control &, Size pos, unsigned wid);
+	Size output (Control &, Size pos, unsigned wid) const;
 	/**
 	 * @brief	Output text directly to a Window, highlighting hotkey character
 	 * @param	pos	Position relative to the window
 	 * @param	wid	Maximum screen width to use
 	 */
-	Size output (Window &, Size pos, unsigned wid);
+	Size output (Window &, Size pos, unsigned wid) const;
 
 	unsigned get_width () const { return width; }
 
 private:
 	unsigned width;
-
-	// Update width info
-	void update ();
 };
 
 } // namespace tiary::ui

@@ -18,23 +18,25 @@
 namespace tiary {
 namespace ui {
 
+namespace {
+
+// Find the hotkey character position,
+// and remove the first '&' from the string
+// Returns the position of the hotkey character or -1
+size_t remove_amp (std::wstring &text, unsigned options);
+
+} // anonymous namespace
 
 UIStringBase::UIStringBase (const std::wstring &s, unsigned options)
 	: text (s)
-	, hotkey_pos (size_t(-1))
+	, hotkey_pos (remove_amp (text, options))
 {
-	if (!(options & NO_HOTKEY)) {
-		update ();
-	}
 }
 
 void UIStringBase::set_text (const std::wstring &s, unsigned options)
 {
 	text = s;
-	hotkey_pos = size_t(-1);
-	if (!(options & NO_HOTKEY)) {
-		update ();
-	}
+	hotkey_pos = remove_amp (text, options);
 }
 
 wchar_t UIStringBase::get_hotkey () const
@@ -47,8 +49,13 @@ wchar_t UIStringBase::get_hotkey () const
 	}
 }
 
-void UIStringBase::update ()
+namespace {
+
+size_t remove_amp (std::wstring &text, unsigned options)
 {
+	if (options & UIStringBase::NO_HOTKEY) {
+		return size_t (-1);
+	}
 	size_t found = 0;
 	for (;;) {
 		// Standard guarantees npos == size_t(-1)
@@ -56,19 +63,17 @@ void UIStringBase::update ()
 		if (found == 0 /* No "&" found */ ||
 				found >= text.size () /* "&" at the end of string */) {
 			// No "&" found.
-			hotkey_pos = size_t (-1);
-			break;
+			return size_t (-1);
 		}
 		text.erase (found-1, 1);
 		wchar_t c = text.data ()[found-1];
-		// XXX What's "iswprint" here for?
-		if ((c != L'&') && iswprint (c)) {
-			hotkey_pos = found-1;
-			break;
+		if (c != L'&') {
+			return (found-1);
 		}
 	}
 }
 
+} // anonymous namespace
 
 } // namespace tiary::ui
 } // namespace ui

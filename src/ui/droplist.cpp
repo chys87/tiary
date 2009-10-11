@@ -13,7 +13,6 @@
 
 
 #include "ui/droplist.h"
-#include "ui/uistring_one.h"
 #include "ui/paletteid.h"
 #include "ui/dialog_select.h"
 #include "ui/mouse.h"
@@ -129,7 +128,7 @@ void DropList::redraw ()
 {
 	choose_palette (is_focus () ? PALETTE_ID_DROPLIST_FOCUS : PALETTE_ID_DROPLIST);
 	clear ();
-	UIStringOne (items[select]).output (*this, make_size (), get_size ().x);
+	put (make_size (), items[select]);
 }
 
 } // namespace tiary::ui

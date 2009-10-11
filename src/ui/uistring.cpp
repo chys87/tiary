@@ -39,33 +39,35 @@ void UIString::set_text (const std::wstring &s, unsigned options)
 	update ();
 }
 
-const SplitStringLineList &UIString::split_line (unsigned wid)
+const SplitStringLineList &UIString::split_line (unsigned wid) const
 {
 	if (wid != split_cache_wid) {
 		split_cache_wid = wid;
-		tiary::split_line (wid, get_text ()). swap (split_cache);
+		split_cache = tiary::split_line (wid, get_text ());
 	}
 	return split_cache;
 }
 
-void UIString::output (Control &ctrl, Size pos, Size size)
+void UIString::output (Control &ctrl, Size pos, Size size) const
 {
 	unsigned wid = size.x;
 	unsigned height = size.y;
 	const SplitStringLineList &lst = split_line (wid);
+	const SplitStringLine *ptr = &lst[0];
 
-	for (unsigned i=0, n=minU(height,lst.size()); i<n; ++i) {
-		if (get_hotkey_pos () - lst[i].begin < lst[i].len) {
-			Size next = ctrl.put (pos, get_text().data()+lst[i].begin, get_hotkey_pos () - lst[i].begin);
+	for (unsigned n=minU(height,lst.size()); n; --n) {
+		if (get_hotkey_pos () - ptr->begin < ptr->len) {
+			Size next = ctrl.put (pos, get_text().data()+ptr->begin, get_hotkey_pos () - ptr->begin);
 			ctrl.attribute_toggle (UNDERLINE);
 			next = ctrl.put (next, get_text().data()[get_hotkey_pos ()]);
 			ctrl.attribute_toggle (UNDERLINE);
-			next = ctrl.put (next, get_text().data()+get_hotkey_pos()+1, lst[i].len - (get_hotkey_pos () - lst[i].begin + 1));
+			next = ctrl.put (next, get_text().data()+get_hotkey_pos()+1, ptr->len - (get_hotkey_pos () - ptr->begin + 1));
 		}
 		else {
-			ctrl.put (pos, get_text().data()+lst[i].begin, lst[i].len);
+			ctrl.put (pos, get_text().data()+ptr->begin, ptr->len);
 		}
 		pos.y++;
+		++ptr;
 	}
 }
 

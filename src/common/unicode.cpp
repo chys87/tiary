@@ -107,7 +107,7 @@ int utf8_len_by_first_byte (unsigned char b)
 		2, 2, 2, 2, // 110x x
 		3, 3, // 1110 x
 		4, // 1111 0
-		0, // 1111 1
+		0 // 1111 1
 	};
 	return ret[b >> 3];
 }
@@ -159,9 +159,16 @@ wchar_t utf8_to_wchar (char *src, char **end)
 	return utf8_to_wchar (src, (const char **)end);
 }
 
-std::wstring utf8_to_wstring (const char *s, wchar_t substitute)
+namespace {
+
+/**
+ * This function requries BOTH the string to be null-terminated
+ * and the length to be given
+ */
+std::wstring utf8_to_wstring_impl (const char *s, size_t l, wchar_t substitute)
 {
-	std::wstring r;
+	std::wstring r (l, L'\0');
+	std::wstring::iterator iw = r.begin ();
 	while (*s) {
 		const char *next;
 		wchar_t c = utf8_to_wchar (s, &next);
@@ -169,16 +176,25 @@ std::wstring utf8_to_wstring (const char *s, wchar_t substitute)
 			c = substitute;
 		}
 		if (c) {
-			r += c;
+			*iw++ = c;
 		}
 		s = next;
 	}
+	r.erase (iw, r.end ());
 	return r;
+}
+
+} // anonymous namespace
+
+std::wstring utf8_to_wstring (const char *s, wchar_t substitute)
+{
+	return utf8_to_wstring_impl (s, strlen (s), substitute);
 }
 
 std::wstring utf8_to_wstring (const std::string &s, wchar_t substitute)
 {
-	return utf8_to_wstring (s.c_str(), substitute);
+	return utf8_to_wstring_impl (s.c_str() /* Not to be replaced by data () */,
+			s.length (), substitute);
 }
 
 char *wchar_to_utf8 (char *dst, wchar_t w)
@@ -213,14 +229,6 @@ char *wchar_to_utf8 (char *d, const wchar_t *s)
 		d = wchar_to_utf8 (d, *s);
 	}
 	*d = 0;
-	return d;
-}
-
-char *wchar_to_utf8 (char *d, const wchar_t *s, const wchar_t *end)
-{
-	for (; s < end; ++s) {
-		d = wchar_to_utf8 (d, *s);
-	}
 	return d;
 }
 
@@ -314,6 +322,9 @@ std::string wstring_to_mbs (const std::wstring &src, char substitute)
  */
 unsigned ucs_width (wchar_t c)
 {
+	if (uint32_t (c) < 0x80) {
+		return 1;
+	}
 #ifdef TIARY_HAVE_WCWIDTH
 	if (wcwidth (c) > 1) {
 		return 2;
@@ -357,7 +368,7 @@ unsigned ucs_width (const std::wstring &s)
 
 size_t max_chars_in_width (const std::wstring &s, unsigned scrwid)
 {
-	return (s.data (), s.length (), scrwid);
+	return max_chars_in_width (s.data (), s.length (), scrwid);
 }
 
 size_t max_chars_in_width (const wchar_t *s, unsigned scrwid)
@@ -379,8 +390,7 @@ size_t max_chars_in_width (const wchar_t *s, unsigned scrwid)
 size_t max_chars_in_width (const wchar_t *s, size_t len, unsigned scrwid)
 {
 	const wchar_t *p = s;
-	const wchar_t *end = s+len;
-	while (p < end) {
+	for (; len; --len) {
 		unsigned w = ucs_width (*p);
 		if (int (scrwid -= w) <= 0) {
 			if (scrwid == 0) {

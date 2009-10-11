@@ -98,14 +98,6 @@ char *wchar_to_utf8 (char *dst, const wchar_t *src);
  * @brief	Converts a wide (Unicode) string to UTF-8
  * @param	dst	Points to a block of memory, which must be sufficient
  *			to store the converted UTF-8 string.
- * @param	srcend	Points to the memory immediately following the last character to be converted.
- * @result	Points to the byte following the last one in the converted string.
- */
-char *wchar_to_utf8 (char *dst, const wchar_t *src, const wchar_t *srcend);
-/**
- * @brief	Converts a wide (Unicode) string to UTF-8
- * @param	dst	Points to a block of memory, which must be sufficient
- *			to store the converted UTF-8 string.
  * @param	srclen	Length of the string to be converted, in <code>wchar_t</code>'s
  * @result	Points to the byte following the last one in the converted string
  */
