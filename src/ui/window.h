@@ -18,7 +18,6 @@
 #include "ui/movable_object.h"
 #include "ui/ui.h"
 #include "ui/hotkeys.h"
-#include "ui/uistring_one.h"
 #include "ui/control.h"
 #include <stddef.h> // ::size_t
 #include <string>
@@ -190,8 +189,9 @@ private:
 		, STATUS_MOVING
 	};
 	Status status;
-	unsigned options;
-	UIStringOne title;
+	const unsigned options;
+	const std::wstring title;
+	const unsigned title_scr_width;
 
 	// The list of controls in the window is saved in a cyclic linked list
 	// One of them is dummy_ctrl

@@ -329,7 +329,8 @@ Window::Window (unsigned options_, const std::wstring &title_)
 	, char_table (0)
 	, status (STATUS_NORMAL)
 	, options (options_)
-	, title (title_, UIStringBase::NO_HOTKEY)
+	, title (title_)
+	, title_scr_width (ucs_width (title))
 	, dummy_ctrl (*this)
 	, focus_ctrl (0)
 {
@@ -998,12 +999,11 @@ void Window::redraw ()
 		put (make_size (size.x-1, size.y-1), BORDER_4); // Bottom, right
 
 		// Show the title
-		if (!title.get_text().empty ()) {
-			unsigned title_width = minU (title.get_width (), size.x);
-			unsigned left = (size.x - title_width - 2) / 2;
+		if (!title.empty ()) {
+			unsigned left = (size.x - title_scr_width - 2) / 2;
 			Size pos = make_size (left, 0);
 			pos = put (pos, L' ');
-			pos = title.output (*this, pos, title_width);
+			pos = put (make_size (), make_size (size.x, 1), pos, title);
 			pos = put (pos, L' ');
 		}
 
