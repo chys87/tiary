@@ -833,6 +833,8 @@ bool Window::set_focus_ptr (Control *ctrl, int fall_direction)
 			if (old_focus) {
 				if (!old_focus->on_focus ()) {
 					focus_ctrl = 0;
+					on_focus_changed ();
+					old_focus->sig_defocus.emit ();
 				}
 			}
 			return false;
@@ -886,8 +888,9 @@ bool Window::on_mouse (MouseEvent mouse_event)
 			if (mouse_event.m & MOUSE_ALL_BUTTON) {
 				set_focus_ptr (ctrl, 0); // Regardless whether it's successful or not
 			}
-			mouse_event.p -= ctrl->pos;
-			bool processed = ctrl->on_mouse (mouse_event);
+			MouseEvent rel_mouse_event = mouse_event;
+			rel_mouse_event.p -= ctrl->pos;
+			processed = ctrl->on_mouse (rel_mouse_event);
 			if (!processed) {
 				if ((mouse_event.m&LEFT_CLICK) &&
 						ctrl->sig_clicked.is_really_connected () &&
@@ -901,9 +904,9 @@ bool Window::on_mouse (MouseEvent mouse_event)
 	}
 
 	// Clicked on the top border (including close button)?
-	if (!processed) {
+	if (!processed && !(options & WINDOW_NO_BORDER)) {
 		if ((mouse_event.m & LEFT_CLICK) && (mouse_event.p.y == 0)) {
-			if (get_size ().x - 2 - mouse_event.p.x < 3) {
+			if (!(options & WINDOW_NO_CLOSE_BUTTON) && (get_size ().x - 2 - mouse_event.p.x < 3)) {
 				processed = on_key (ESCAPE);
 			}
 			else if (!(options & WINDOW_NONMOVABLE)) {
