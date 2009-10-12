@@ -22,7 +22,7 @@ namespace tiary {
 
 struct SplitStringLine
 {
-	size_t begin; // Characters in [begin,begin+len) should be on this line. (Newline characters and excluded)
+	size_t begin; // Characters in [begin,begin+len) should be on this line. (Newline characters are excluded)
 	size_t len;
 	unsigned wid; // Width on screen
 	size_t padding___;
