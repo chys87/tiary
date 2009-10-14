@@ -32,7 +32,10 @@ struct RichTextLine
 
 typedef std::vector<RichTextLine> RichTextLineList;
 
+/// @brief Convert a series of lines represented in RichTextLineC to RichTextLineList
 RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *, size_t);
+/// @brief Split a string to lines, each with the same palette id
+RichTextLineList split_richtext_lines (const std::wstring &, PaletteID, unsigned wid);
 
 } // namespace tiary::ui
 } // namespace tiary

@@ -1,5 +1,8 @@
 #include "ui/richtextlist.h"
 #include "common/unicode.h"
+#include "common/split_line.h"
+#include <functional>
+#include <algorithm>
 
 
 namespace tiary {
@@ -21,6 +24,33 @@ RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *linec, s
 		++it;
 	}
 	return line_list;
+}
+
+namespace {
+
+struct SplitStringLine2RichTextLine : public std::unary_function <const SplitStringLine &, RichTextLine>
+{
+	PaletteID id;
+	explicit SplitStringLine2RichTextLine (PaletteID &id_) : id(id_) {}
+	RichTextLine operator () (const SplitStringLine &in) const
+	{
+		RichTextLine ret;
+		ret.offset = in.begin;
+		ret.len = in.len;
+		ret.id = id;
+		ret.screen_wid = in.wid;
+		return ret;
+	}
+};
+
+} // anonymous namespace
+
+RichTextLineList split_richtext_lines (const std::wstring &str, PaletteID id, unsigned wid)
+{
+	SplitStringLineList split = split_line (wid, str);
+	RichTextLineList ret (split.size ());
+	std::transform (split.begin (), split.end (), ret.begin (), SplitStringLine2RichTextLine (id));
+	return ret;
 }
 
 } // namespace tiary::ui

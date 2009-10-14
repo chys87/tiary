@@ -112,7 +112,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\
 
 void show_license ()
 {
-	ui::dialog_message (license, L"License (Three-clause BSD license)");
+	std::wstring text = license;
+	ui::dialog_richtext (L"License (Three-clause BSD license)",
+			text,
+			ui::split_richtext_lines (text, ui::PALETTE_ID_SHOW_NORMAL, 80)
+			);
 }
 
 const wchar_t about [] = L"\
