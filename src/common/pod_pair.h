@@ -40,7 +40,7 @@ struct Pair
 // If using that would improve efficiency for TA or TB,
 // then there's no difference for std::pair and tiary::Pair
 // for them.
-template <typename TA, typename TB>
+template <typename TA, typename TB> inline
 Pair <TA, TB> make_Pair (const TA &a, const TB &b)
 {
 	Pair <TA, TB> ret = { a, b };
