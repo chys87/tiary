@@ -29,7 +29,7 @@ namespace tiary {
 extern const OptionDescription g_global_option_descriptions[] = {
 	{ GLOBAL_OPTION_DEFAULT_FILE      , "" },
 	{ GLOBAL_OPTION_EXPAND_LINES      , "4" },
-	{ GLOBAL_OPTION_EDITOR            , "$EDITOR|rvim|vim|emacs -nw|nano|gedit|kwrite" },
+	{ GLOBAL_OPTION_EDITOR            , "rvim|vim|emacs -nw|nano|gedit|kwrite" },
 	{ GLOBAL_OPTION_DATETIME_FORMAT   , "%m/%d/%Y" },
 	{ GLOBAL_OPTION_LONGTIME_FORMAT   , "%W %B %d, %Y  %h:%M:%S %P" },
 	{ GLOBAL_OPTION_RECENT_FILES      , "4" },
