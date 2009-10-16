@@ -223,7 +223,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	size_t fsize = lseek (fd, 0, SEEK_END);
 	if (ssize_t (fsize) < 0 || write (fd, "", 1) != 1) {
 		close (fd);
-		return error_false (L"Failed to append one byte to temporary file :( Why?");
+		return error_false (L"Strange IO error with temporary file :( Why?");
 	}
 	++fsize;
 	char *raw = (char *) mmap (NULL, fsize, PROT_READ, MAP_PRIVATE
@@ -233,7 +233,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 			, fd, 0);
 	close (fd);
 	if (raw == MAP_FAILED) {
-		return error_false (L"Failed to read new entry :(");
+		return error_false (L"Strange IO error with temporary file :( Why?");
 	}
 #ifdef MADV_SEQUENTIAL
 	madvise (raw, fsize, MADV_SEQUENTIAL);
