@@ -145,22 +145,18 @@ bool strip (std::string &str)
 namespace {
 
 template <typename T> inline
-std::list <std::basic_string <T> > split_string_impl (const T *str, T delimiter, bool remove_empties)
+std::list <std::basic_string <T> > split_string_impl (const T *str, T delimiter)
 {
-	std::basic_string <T> empty_string;
 	std::list <std::basic_string <T> > ret_list;
 	for (;;) {
-		if (remove_empties) {
-			while (*str == delimiter) {
-				++str;
-			}
+		while (*str == delimiter) {
+			++str;
 		}
 		if (*str == T ()) {
 			break;
 		}
 		const T *del = strchrnul (str, delimiter);
-		ret_list.push_back (empty_string);
-		ret_list.back ().assign (str, del);
+		ret_list.push_back (std::basic_string <T> (str, del));
 		if (*del != delimiter) {
 			break;
 		}
@@ -171,13 +167,13 @@ std::list <std::basic_string <T> > split_string_impl (const T *str, T delimiter,
 
 } // anonymous namespace
 
-std::list <std::string> split_string (const char *str, int delimiter, bool remove_empties)
+std::list <std::string> split_string (const char *str, char delimiter)
 {
-	return split_string_impl<char> (str, delimiter, remove_empties);
+	return split_string_impl<char> (str, delimiter);
 }
-std::list <std::wstring> split_string (const wchar_t *str, wchar_t delimiter, bool remove_empties)
+std::list <std::wstring> split_string (const wchar_t *str, wchar_t delimiter)
 {
-	return split_string_impl (str, delimiter, remove_empties);
+	return split_string_impl (str, delimiter);
 }
 
 

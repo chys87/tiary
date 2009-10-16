@@ -180,9 +180,9 @@ std::wstring get_full_pathname (const std::wstring &name)
 {
 	std::list <std::wstring> split = split_string (
 			(name[0] != L'/' ? get_current_dir <wchar_t> () + L'/' + name : name),
-			L'/', true);
-	// By setting the 3rd paremter to split_string to true,
-	// "//" is replaced by "/"
+			L'/');
+	// Empty tokens are eliminated by split_string, effectively
+	// getting "//" replaced by "/"
 
 	// Eliminate single dots and double dots
 	for (std::list <std::wstring>::iterator it = split.begin (); it != split.end (); ) {

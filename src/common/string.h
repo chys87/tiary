@@ -90,15 +90,15 @@ bool strip (std::wstring &);
 
 
 // Split a string into tokens
-std::list <std::string> split_string (const char *, int delimiter = ' ', bool remove_empties = true);
-std::list <std::wstring> split_string (const wchar_t *, wchar_t delimiter = L' ', bool remove_empties = true);
-inline std::list <std::string> split_string (const std::string &str, int delimiter = ' ', bool remove_empties = true)
+std::list <std::string> split_string (const char *, char delimiter);
+std::list <std::wstring> split_string (const wchar_t *, wchar_t delimiter);
+inline std::list <std::string> split_string (const std::string &str, char delimiter)
 {
-	return split_string (str.c_str (), delimiter, remove_empties);
+	return split_string (str.c_str (), delimiter);
 }
-inline std::list <std::wstring> split_string (const std::wstring &str, wchar_t delimiter = L' ', bool remove_empties = true)
+inline std::list <std::wstring> split_string (const std::wstring &str, wchar_t delimiter)
 {
-	return split_string (str.c_str (), delimiter, remove_empties);
+	return split_string (str.c_str (), delimiter);
 }
 
 
