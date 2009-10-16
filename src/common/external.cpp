@@ -41,7 +41,7 @@ std::string make_external_command_line (const char *prog, const char *extra_para
 
 	std::string command = "false";
 
-	// Split editor into chunks deliminated by pipe strings
+	// Split prog into tokens deliminated by pipe strings
 	std::list <std::string> progs = split_string (prog, '|');
 	for (std::list <std::string>::iterator it = progs.begin (); it != progs.end (); ++it) {
 		environment_expand (*it);
