@@ -524,14 +524,13 @@ int my_mkstemp (std::string &name)
 	gettimeofday (&tv, 0);
 	seed += uint64_t (getpid ()) ^ (uint64_t (tv.tv_usec) << 16) ^ tv.tv_sec;
 
-	std::string try_name = name;
-	try_name.insert (pipe_sign, 5, '|');
-	// Now name is copied to try_name, wit '|' replaced by 6 pipesigns
+	name.insert (pipe_sign, 5, '|');
+	// '|' is now replaced by 6 pipesigns
 
-	for (unsigned left_attempts = 4; left_attempts; seed += 7777, --left_attempts) {
+	for (unsigned left_attempts = 20; left_attempts; seed += 7777, --left_attempts) {
 		static const char letters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_+";
 		uint64_t v = seed;
-		std::string::iterator iw = try_name.begin () + pipe_sign;
+		std::string::iterator iw = name.begin () + pipe_sign;
 		*iw++ = letters[v % 64];
 		v /= 64;
 		*iw++ = letters[v % 64];
@@ -543,21 +542,18 @@ int my_mkstemp (std::string &name)
 		*iw++ = letters[v % 64];
 		v /= 64;
 		*iw++ = letters[v % 64];
-		int fd = open (try_name.c_str (), O_RDWR|O_CREAT|O_EXCL
+		int fd = open (name.c_str (), O_RDWR|O_CREAT|O_EXCL
 #ifdef O_CLOEXEC
 				|O_CLOEXEC
 #endif
 				, S_IRUSR|S_IWUSR);
 		if (fd >= 0) {
-#ifndef O_CLOEXEC
-# if defined F_GETFD && defined F_SETFD && defined FD_CLOEXEC
+#if !defined O_CLOEXEC && defined F_GETFD && defined F_SETFD && defined FD_CLOEXEC
 			int fdflag = fcntl (fd, F_GETFD);
-			if (fdflag >= 0) {
+			if ((fdflag >= 0) && !(fdflag & FD_CLOEXEC)) {
 				fcntl (fd, F_SETFD, fdflag|FD_CLOEXEC);
 			}
-# endif
 #endif
-			try_name.swap (name);
 			return fd;
 		}
 	}

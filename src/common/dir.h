@@ -151,6 +151,8 @@ std::string find_executable (const std::string &);
  *					"/tmp/tiary.|.txt", where "|" will be replaced by some
  *					random characters
  * @result	The FD for the file, open in O_RDWR|O_CREAT|O_EXCL|O_CLOEXEC
+ *
+ * @c name is modified in an undefined way on failure.
  */
 int my_mkstemp (std::string &name);
 
