@@ -17,10 +17,11 @@
 #include "common/string.h"
 #include <wchar.h>
 #include <string.h>
+#include <math.h>
 
 namespace tiary {
 
-std::wstring format_dec (unsigned x)
+std::wstring format_dec (unsigned x, unsigned width, wchar_t fill)
 {
 	const size_t BUFFER_SIZE = 3 * sizeof (unsigned);
 	wchar_t buffer [BUFFER_SIZE];
@@ -28,7 +29,20 @@ std::wstring format_dec (unsigned x)
 	do {
 		*--p = L'0' + (x % 10);
 	} while (x /= 10);
-	return std::wstring (p, buffer + BUFFER_SIZE);
+	if (width <= BUFFER_SIZE) {
+		int diff = (buffer + BUFFER_SIZE - p) - width;
+		if (diff < 0) {
+			for (; diff; ++diff) {
+				*--p = fill;
+			}
+		}
+		return std::wstring (p, buffer + BUFFER_SIZE);
+	}
+	else {
+		std::wstring ret (width - (buffer + BUFFER_SIZE - p), L' ');
+		ret.append (p, buffer + BUFFER_SIZE);
+		return ret;
+	}
 }
 
 std::string format_dec_narrow (unsigned x)
@@ -66,6 +80,31 @@ std::string format_hex_narrow (unsigned x)
 		*--p = (tmp < 10) ? ('0'+tmp) : ('a'-10+tmp);
 	} while (x);
 	return std::string (p, buffer + BUFFER_SIZE);
+}
+
+std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
+{
+	if (frac_digits == 0) {
+		return format_dec (x, int_digits);
+	}
+
+	// Calculate 10 to the power of frac_digits
+	unsigned pow = 1;
+	unsigned base = 10;
+	for (unsigned n = frac_digits; n; n>>=1) {
+		if (n & 1) {
+			pow *= base;
+		}
+		base *= base;
+	}
+
+	// FIXME: lrint should be used. We need to modify CMakeLists.txt for this
+	unsigned val = unsigned (x * pow);
+	unsigned quo = val/pow, rem = val%pow;
+	std::wstring ret = format_dec (quo, int_digits, L' ');
+	ret += L'.';
+	ret += format_dec (rem, frac_digits, L'0');
+	return ret;
 }
 
 Format::~Format ()

@@ -32,6 +32,8 @@ struct RichTextLine
 
 typedef std::vector<RichTextLine> RichTextLineList;
 
+void append_richtext_line (std::wstring &text, RichTextLineList &lst,
+		PaletteID id, const std::wstring &line_text);
 /// @brief Convert a series of lines represented in RichTextLineC to RichTextLineList
 RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *, size_t);
 /// @brief Split a string to lines, each with the same palette id

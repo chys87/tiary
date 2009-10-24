@@ -8,6 +8,15 @@
 namespace tiary {
 namespace ui {
 
+void append_richtext_line (std::wstring &text, RichTextLineList &lst,
+		PaletteID id, const std::wstring &line_text)
+{
+	RichTextLine tmp_line = { text.length (), line_text.length (), id, ucs_width (line_text) };
+	lst.push_back (tmp_line);
+	text += line_text;
+}
+
+
 RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *linec, size_t nlines)
 {
 	str.clear ();

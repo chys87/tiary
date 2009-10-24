@@ -42,6 +42,7 @@
 #include "main/dialog_edit_time.h"
 #include "main/dialog_view_edit.h"
 #include "main/dialog_open_recent.h"
+#include "main/stat.h"
 #include <limits>
 
 namespace tiary {
@@ -76,6 +77,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	Signal action_save (this, &MainWin::default_save);
 	Signal action_save_as (this, &MainWin::save_as);
 	Signal action_password (this, &MainWin::edit_password);
+	Action action_statistics (Signal (this, &MainWin::display_statistics), q_nonempty_all);
 	Signal action_quit (this, &MainWin::quit);
 	Action action_append (Signal (this, &MainWin::append), q_normal);
 	Action action_delete (Signal (this, &MainWin::remove_current), q_normal_nonempty);
@@ -115,6 +117,8 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		(L"Save &as...     W",        action_save_as)
 		()
 		(L"&Password...    p",        action_password)
+		()
+		(L"S&tatistics     s",        action_statistics)
 		()
 		(L"&Quit           q Ctrl+Q", action_quit)
 		;
@@ -198,6 +202,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	main_ctrl.register_hotkey (ui::CTRL_Q,   action_quit);
 	main_ctrl.register_hotkey (L'r',         action_perfile_options);
 	main_ctrl.register_hotkey (L'R',         action_global_options);
+	main_ctrl.register_hotkey (L's',         action_statistics);
 	main_ctrl.register_hotkey (L'S',         action_sort_all);
 	main_ctrl.register_hotkey (L't',         action_time);
 	main_ctrl.register_hotkey (L'T',         action_time);
@@ -877,6 +882,11 @@ void MainWin::edit_perfile_options ()
 	if (tiary::edit_perfile_options (per_file_options)) {
 		main_ctrl.touch ();
 	}
+}
+
+void MainWin::display_statistics ()
+{
+	tiary::display_statistics (entries, filtered_entries.get (), get_current ());
 }
 
 void MainWin::quit ()

@@ -59,11 +59,19 @@ inline HexTag hex (unsigned v)
 
 
 // Format one decimal number
-std::wstring format_dec (unsigned x);
+std::wstring format_dec (unsigned x, unsigned wid = 0, wchar_t fill = L' ');
 std::string format_dec_narrow (unsigned x);
 // Format one hexadecimal number
 std::wstring format_hex (unsigned x);
 std::string format_hex_narrow (unsigned x);
+
+// Format floating point numbers, currently not suppoted by Format class
+// This is a very simple and naive implementation, lacking
+// support for INF or NAN.
+// Even negative numbers are _not_ supported!!
+// Nor are very large numbers or large frac_digits supported..
+// ( x * pow(10,frac_digits) must be within the limits of unsigned )
+std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits);
 
 
 class Format {

@@ -45,26 +45,18 @@ using namespace ui;
 const unsigned edit_line_width = 78;
 const unsigned view_line_width = 78;
 
-void append_one_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, const std::wstring &line_text)
-{
-	RichTextLine tmp_line = { text.length (), line_text.length (), id, ucs_width (line_text) };
-	lst.push_back (tmp_line);
-	text += line_text;
-}
-
 void write_for_view (std::wstring &text, RichTextLineList &lst,
 		const DiaryEntry &ent, const std::wstring &longtime_format)
 {
-	append_one_line (text, lst, PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'='));
-	append_one_line (text, lst, PALETTE_ID_SHOW_BOLD, ent.title);
-	append_one_line (text, lst, PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'='));
-	append_one_line (text, lst, PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format));
+	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'='));
+	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, ent.title);
+	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'='));
+	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format));
 	if (!ent.labels.empty ()) {
 		std::wstring labelstr = L"Labels: " + join (ent.labels.begin (), ent.labels.end (), L", ");
-		append_one_line (text, lst, PALETTE_ID_SHOW_NORMAL, labelstr);
+		append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, labelstr);
 	}
-	append_one_line (text, lst, PALETTE_ID_SHOW_NORMAL, std::wstring ());
+	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, std::wstring ());
 
 	// Text
 	SplitStringLineList split_list = split_line (edit_line_width, ent.text);

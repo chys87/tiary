@@ -92,6 +92,7 @@ private:
 	void edit_all_labels ();
 	void edit_global_options ();
 	void edit_perfile_options ();
+	void display_statistics ();
 	void quit ();
 
 	void edit_filter ();

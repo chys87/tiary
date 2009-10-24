@@ -50,6 +50,7 @@ const ui::RichTextLineC info[] = {
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    d D DELETE           Remove the selected entry" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    m                    Move the selected entry up" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    M                    Move the selected entry down" },
+	{ ui::PALETTE_ID_SHOW_NORMAL, L"    s                    Display statistics info" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    S                    Sort all entries by date and time" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    / CTRL+F             Search forward" },
 	{ ui::PALETTE_ID_SHOW_NORMAL, L"    ?                    Search backward" },

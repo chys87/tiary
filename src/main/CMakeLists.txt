@@ -23,4 +23,6 @@ add_library(tiary_main STATIC
 	mainctrl.cpp
 	mainwin.h
 	mainwin.cpp
+	stat.h
+	stat.cpp
 )
