@@ -39,7 +39,7 @@ std::wstring format_dec (unsigned x, unsigned width, wchar_t fill)
 		return std::wstring (p, buffer + BUFFER_SIZE);
 	}
 	else {
-		std::wstring ret (width - (buffer + BUFFER_SIZE - p), L' ');
+		std::wstring ret (width - (buffer + BUFFER_SIZE - p), fill);
 		ret.append (p, buffer + BUFFER_SIZE);
 		return ret;
 	}
@@ -85,7 +85,7 @@ std::string format_hex_narrow (unsigned x)
 std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
 {
 	if (frac_digits == 0) {
-		return format_dec (x, int_digits);
+		return format_dec (unsigned (x + .5), int_digits);
 	}
 
 	// Calculate 10 to the power of frac_digits
@@ -99,7 +99,7 @@ std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
 	}
 
 	// FIXME: lrint should be used. We need to modify CMakeLists.txt for this
-	unsigned val = unsigned (x * pow);
+	unsigned val = unsigned (x * pow + .5);
 	unsigned quo = val/pow, rem = val%pow;
 	std::wstring ret = format_dec (quo, int_digits, L' ');
 	ret += L'.';
