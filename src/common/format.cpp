@@ -84,10 +84,6 @@ std::string format_hex_narrow (unsigned x)
 
 std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
 {
-	if (frac_digits == 0) {
-		return format_dec (unsigned (x + .5), int_digits);
-	}
-
 	// Calculate 10 to the power of frac_digits
 	unsigned pow = 1;
 	unsigned base = 10;
@@ -102,8 +98,10 @@ std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
 	unsigned val = unsigned (x * pow + .5);
 	unsigned quo = val/pow, rem = val%pow;
 	std::wstring ret = format_dec (quo, int_digits, L' ');
-	ret += L'.';
-	ret += format_dec (rem, frac_digits, L'0');
+	if (frac_digits) {
+		ret += L'.';
+		ret += format_dec (rem, frac_digits, L'0');
+	}
 	return ret;
 }
 
