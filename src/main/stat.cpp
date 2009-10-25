@@ -86,7 +86,7 @@ Stat stat_string (const std::wstring &text)
 			++ret.characters;
 			if (ucs_iscjk (c)) {
 				++ret.cjks;
-				last_alpha = false;
+				this_alpha = false;
 			}
 			else {
 				this_alpha = ucs_isalpha (c);
