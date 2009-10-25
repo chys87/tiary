@@ -721,22 +721,6 @@ void MainWin::open_recent_file ()
 		if (!file.empty ()) {
 			load (file);
 		}
-#if 0
-		std::vector <std::wstring> choices;
-		choices.reserve (n_recent_files);
-		for (RecentFileList::const_iterator it = recent_files.begin ();
-				it != recent_files.end (); ++it) {
-			choices.push_back (get_nice_pathname (it->filename));
-		}
-		size_t choice = ui::dialog_select (
-				L"Recent files",
-				choices);
-		if (choice < n_recent_files) {
-			RecentFileList::const_iterator it = recent_files.begin ();
-			std::advance (it, choice);
-			load (it->filename);
-		}
-#endif
 	}
 }
 
