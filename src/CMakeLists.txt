@@ -211,6 +211,18 @@ IF(HAVE_CXX_WALL)
 	ADD_DEFINITIONS("-Wall")
 ENDIF(HAVE_CXX_WALL)
 
+# Add "-ffast-math" if supported
+CHECK_CXX_COMPILER_FLAG("-ffast-math" HAVE_FAST_MATH)
+IF(HAVE_FAST_MATH)
+	ADD_DEFINITIONS("-ffast-math")
+ENDIF(HAVE_FAST_MATH)
+
+# Add "-fno-math-errno" if supported
+CHECK_CXX_COMPILER_FLAG("-fno-math-errno" HAVE_NO_MATH_ERRNO)
+IF(HAVE_NO_MATH_ERRNO)
+	ADD_DEFINITIONS("-fno-math-errno")
+ENDIF(HAVE_NO_MATH_ERRNO)
+
 # Add options additional flags that will reduce the 
 # code size and/or improve efficiency
 CHECK_CXX_COMPILER_FLAG("-fno-threadsafe-statics" HAVE_NO_THREADSAFE_STATICS)
