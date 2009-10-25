@@ -49,30 +49,6 @@ struct Stat
 	}
 };
 
-// Average value, obtained by deviding Stat by an integer
-struct AStat
-{
-	double bytes;
-	double characters;
-	double char_graph;
-	double words;
-	double cjks;
-	double paragraphs;
-};
-
-AStat operator / (const Stat &x, unsigned n)
-{
-	AStat r;
-	double y = 1. / n;
-	r.bytes = x.bytes * y;
-	r.characters = x.characters * y;
-	r.char_graph = x.char_graph * y;
-	r.words = x.words * y;
-	r.cjks = x.cjks * y;
-	r.paragraphs = x.paragraphs * y;
-	return r;
-}
-
 Stat stat_string (const std::wstring &text)
 {
 	Stat ret = {};
@@ -161,20 +137,21 @@ void append_stat (std::wstring &text, ui::RichTextLineList &lst, const Stat &inf
 			L"UTF-8 bytes         " + format_dec (info.bytes, 8));
 }
 
-void append_stat (std::wstring &text, ui::RichTextLineList &lst, const AStat &info)
+void append_average_stat (std::wstring &text, ui::RichTextLineList &lst, const Stat &info, unsigned n)
 {
+	double x = 1. / n;
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Characters          " + format_double (info.characters, 8, 4));
+			L"Characters          " + format_double (info.characters * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Printable characters" + format_double (info.char_graph, 8, 4));
+			L"Printable characters" + format_double (info.char_graph * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Non-CJK words       " + format_double (info.words, 8, 4));
+			L"Non-CJK words       " + format_double (info.words * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"CJK characters      " + format_double (info.cjks, 8, 4));
+			L"CJK characters      " + format_double (info.cjks * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Paragraphs          " + format_double (info.paragraphs, 8, 4));
+			L"Paragraphs          " + format_double (info.paragraphs * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"UTF-8 bytes         " + format_double (info.bytes, 8, 4));
+			L"UTF-8 bytes         " + format_double (info.bytes * x, 8, 4));
 }
 
 } // anonymous namespace
@@ -265,8 +242,7 @@ void display_statistics (const DiaryEntryList &all_entries,
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL, std::wstring ());
 
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Average entry");
-	AStat ainfo = info / all_entries.size ();
-	append_stat (rich_text, rich_lines, ainfo);
+	append_average_stat (rich_text, rich_lines, info, all_entries.size ());
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL, std::wstring ());
 
 	ui::dialog_richtext (L"Statistics", rich_text, rich_lines);
