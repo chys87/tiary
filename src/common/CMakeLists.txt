@@ -23,6 +23,7 @@ add_library(tiary_common STATIC
 	format.cpp
 	hash64.h
 	hash64.cpp
+	iterator.h
 	md5.h
 	md5.cpp
 	misc.h

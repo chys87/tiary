@@ -21,6 +21,7 @@
 #include "common/unicode.h"
 #include "common/hash64.h"
 #include "common/algorithm.h"
+#include "common/iterator.h"
 #include <wctype.h>
 #include <math.h>
 
@@ -217,10 +218,9 @@ void display_statistics (const DiaryEntryList &all_entries,
 		for (DiaryEntryList::const_iterator it=all_entries.begin(), e=all_entries.end();
 				it != e; ++it) {
 			n_labels += (*it)->labels.size ();
-			for (DiaryEntry::LabelList::const_iterator jt=(*it)->labels.begin(), f=(*it)->labels.end();
-					jt != f; ++jt) {
-				all_labels.insert (hash64 (*jt));
-			}
+			all_labels.insert (
+					transform_iterator (hash64_wstring, (*it)->labels.begin ()),
+					transform_iterator (hash64_wstring, (*it)->labels.end ()));
 		}
 		n_distinct_labels = all_labels.size ();
 	}

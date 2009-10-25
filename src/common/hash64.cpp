@@ -41,4 +41,9 @@ uint64_t hash64_wchar (const wchar_t *p, size_t len)
 	return A;
 }
 
+uint64_t hash64_wstring (const std::wstring &s)
+{
+	return hash64_wchar (s.data (), s.length ());
+}
+
 } // namespace tiary
