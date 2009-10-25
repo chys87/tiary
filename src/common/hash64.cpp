@@ -12,7 +12,6 @@
  **************************************************************************/
 
 #include "common/hash64.h"
-#include "common/md5.h"
 
 namespace tiary {
 
