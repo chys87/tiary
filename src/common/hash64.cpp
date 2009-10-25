@@ -28,22 +28,17 @@ uint64_t hash64 (const void *data, size_t len)
 	return A;
 }
 
-uint64_t hash64_wchar (const wchar_t *p, size_t len)
+uint64_t hash64_wstring (const std::wstring &s)
 {
 	uint64_t A = TIARY_UINT64_C (0xcbf29ce4, 0x84222325);
-	for (; len; --len) {
-		wchar_t c = *p++;
+	for (const wchar_t *p = s.c_str (); *p; ++p) {
+		wchar_t c = *p;
 		A ^= uint8_t (c);
 		A *= TIARY_UINT64_C (0x100, 0x1b3);
 		A ^= uint32_t (c) >> 8;
 		A *= TIARY_UINT64_C (0x100, 0x1b3);
 	}
 	return A;
-}
-
-uint64_t hash64_wstring (const std::wstring &s)
-{
-	return hash64_wchar (s.data (), s.length ());
 }
 
 } // namespace tiary

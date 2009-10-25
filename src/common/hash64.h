@@ -39,7 +39,6 @@ inline uint64_t hash64 (uint64_t x)
 }
 
 uint64_t hash64 (const void *, size_t);
-uint64_t hash64_wchar (const wchar_t *, size_t);
 uint64_t hash64_wstring (const std::wstring &);
 
 inline uint64_t hash64 (const std::string &s)
