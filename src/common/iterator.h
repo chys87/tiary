@@ -79,9 +79,9 @@ public:
 		++it;
 		return *this;
 	}
-	Iterator operator ++ (int)
+	TransformIterator operator ++ (int)
 	{
-		Iterator copy (it);
+		TransformIterator copy (*this);
 		++it;
 		return copy;
 	}
