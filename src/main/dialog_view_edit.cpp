@@ -238,7 +238,9 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 void view_entry (DiaryEntry &ent, const std::wstring &longtime_format)
 {
 	std::wstring text;
+	text.reserve (ent.text.length () + 512);
 	RichTextLineList text_list;
+	text_list.reserve (ent.text.length () / 32);
 	write_for_view (text, text_list, ent, longtime_format);
 	ui::dialog_richtext (
 			ent.title,
@@ -253,7 +255,9 @@ void view_all_entries (const DiaryEntryList &entries, const std::wstring &longti
 		return;
 	}
 	std::wstring text;
+	text.reserve (512 * entries.size ()); // This is arbitrary. Actual size is difficult to guess.
 	ui::RichTextLineList text_list;
+	text_list.reserve (32 * entries.size ()); // This is arbitrary. Actual size is difficult to guess.
 	DiaryEntryList::const_iterator it = entries.begin ();
 	for (;;) {
 		write_for_view (text, text_list, **it, longtime_format);

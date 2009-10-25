@@ -36,24 +36,12 @@ struct Stat
 	unsigned words;      // Number of non-CJK words
 	unsigned cjks;       // Number of CJK characters
 	unsigned paragraphs; // Number of paragraphs (excluding title)
-
-	Stat &operator += (const Stat &other)
-	{
-		bytes += other.bytes;
-		characters += other.characters;
-		char_graph += other.char_graph;
-		words += other.words;
-		cjks += other.cjks;
-		paragraphs += other.paragraphs;
-		return *this;
-	}
 };
 
-Stat stat_string (const std::wstring &text)
+// The result is _added_ to ret
+void stat_string (Stat &ret, const std::wstring &text)
 {
-	Stat ret = {};
-
-	ret.characters = text.length ();
+	ret.characters += text.length ();
 
 	bool last_alpha = false;
 	wchar_t lastc = L'\n';
@@ -85,15 +73,15 @@ Stat stat_string (const std::wstring &text)
 		last_alpha = this_alpha;
 		ret.bytes += utf8_len_by_wchar (c);
 	}
-	return ret;
 }
 
-Stat stat_entry (const DiaryEntry &entry)
+// The result is _added_ to ret
+void stat_entry (Stat &ret, const DiaryEntry &entry)
 {
-	Stat ret = stat_string (entry.title);
-	ret.paragraphs = 0;
-	ret += stat_string (entry.text);
-	return ret;
+	unsigned old_paragraphs = ret.paragraphs;
+	stat_string (ret, entry.title);
+	ret.paragraphs = old_paragraphs;
+	stat_string (ret, entry.text);
 }
 
 struct TimeSpan
@@ -161,11 +149,13 @@ void display_statistics (const DiaryEntryList &all_entries,
 		const DiaryEntry *current_entry)
 {
 	std::wstring rich_text;
+	rich_text.reserve (4096); // Just a rough guess
 	ui::RichTextLineList rich_lines;
+	rich_lines.reserve (128); // Just a rough guess
 
 	Stat info = {};
 	if (current_entry) {
-		info = stat_entry (*current_entry);
+		stat_entry (info, *current_entry);
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Current entry");
 		append_stat (rich_text, rich_lines, info);
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
@@ -175,7 +165,7 @@ void display_statistics (const DiaryEntryList &all_entries,
 		for (DiaryEntryList::const_iterator it=filtered_entries->begin(), e=filtered_entries->end();
 				it != e; ++it) {
 			if (*it != current_entry) {
-				info += stat_entry (**it);
+				stat_entry (info, **it);
 			}
 		}
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD,
@@ -195,7 +185,7 @@ void display_statistics (const DiaryEntryList &all_entries,
 		for (DiaryEntryList::const_iterator it=all_entries.begin(), e=all_entries.end();
 				it != e; ++it) {
 			if (filtered_set.find (*it) == filtered_set.end ()) {
-				info += stat_entry (**it);
+				stat_entry (info, **it);
 			}
 		}
 	}
