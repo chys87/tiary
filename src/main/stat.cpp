@@ -19,6 +19,8 @@
 #include "common/containers.h"
 #include "common/format.h"
 #include "common/unicode.h"
+#include "common/hash64.h"
+#include "common/algorithm.h"
 #include <wctype.h>
 #include <math.h>
 
@@ -236,6 +238,30 @@ void display_statistics (const DiaryEntryList &all_entries,
 		);
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
 		L"Entries per day     " + format_double (double (all_entries.size ()) / days, 8, 4));
+
+	unsigned n_labels = 0;
+	unsigned n_distinct_labels;
+	// Count the number of distinct labels
+	{
+		// This set stores only the hash64 values of labels
+		// Older versions of GCC does not define std::tr1::hash<uint64_t>
+		// So we need to provide our own
+		tiary::unordered_set<uint64_t, CastFunctor<size_t, uint64_t> > all_labels;
+		for (DiaryEntryList::const_iterator it=all_entries.begin(), e=all_entries.end();
+				it != e; ++it) {
+			n_labels += (*it)->labels.size ();
+			for (DiaryEntry::LabelList::const_iterator jt=(*it)->labels.begin(), f=(*it)->labels.end();
+					jt != f; ++jt) {
+				all_labels.insert (hash64 (*jt));
+			}
+		}
+		n_distinct_labels = all_labels.size ();
+	}
+	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
+			L"Labels              " + format_dec (n_distinct_labels, 8));
+	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
+			L"Labels per entry    " + format_double (double (n_labels) / all_entries.size (), 8, 4));
+
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL, std::wstring ());
 
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Average entry");
