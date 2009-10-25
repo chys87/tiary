@@ -34,6 +34,15 @@ typedef std::vector<RichTextLine> RichTextLineList;
 
 void append_richtext_line (std::wstring &text, RichTextLineList &lst,
 		PaletteID id, const std::wstring &line_text);
+void append_richtext_line (std::wstring &text, RichTextLineList &lst,
+		PaletteID id, const wchar_t *line_text);
+void append_richtext_line (std::wstring &text, RichTextLineList &lst,
+		PaletteID id, unsigned repeat, wchar_t ch);
+void append_richtext_line (std::wstring &text, RichTextLineList &lst,
+		PaletteID id); // Empty line
+void append_richtext_line (std::wstring &text, RichTextLineList &lst,
+		PaletteID id, const wchar_t *line_text, const std::wstring &text2);
+
 /// @brief Convert a series of lines represented in RichTextLineC to RichTextLineList
 RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *, size_t);
 /// @brief Split a string to lines, each with the same palette id

@@ -48,15 +48,15 @@ const unsigned view_line_width = 78;
 void write_for_view (std::wstring &text, RichTextLineList &lst,
 		const DiaryEntry &ent, const std::wstring &longtime_format)
 {
-	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'='));
+	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, view_line_width, L'=');
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, ent.title);
-	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, std::wstring (view_line_width, L'='));
+	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, view_line_width, L'=');
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format));
 	if (!ent.labels.empty ()) {
-		std::wstring labelstr = L"Labels: " + join (ent.labels.begin (), ent.labels.end (), L", ");
-		append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, labelstr);
+		append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL,
+				join (L"Labels: ", ent.labels.begin (), ent.labels.end (), L", "));
 	}
-	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, std::wstring ());
+	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL);
 
 	// Text
 	SplitStringLineList split_list = split_line (edit_line_width, ent.text);
