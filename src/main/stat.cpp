@@ -212,7 +212,7 @@ void display_statistics (const DiaryEntryList &all_entries,
 	// Count the number of distinct labels
 	{
 		// This set stores only the hash64 values of labels
-		// Older versions of GCC does not define std::tr1::hash<uint64_t>
+		// Older versions of GCC do not define std::tr1::hash<uint64_t>
 		// So we need to provide our own
 		tiary::unordered_set<uint64_t, CastFunctor<size_t, uint64_t> > all_labels;
 		for (DiaryEntryList::const_iterator it=all_entries.begin(), e=all_entries.end();
