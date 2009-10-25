@@ -870,7 +870,9 @@ void MainWin::edit_perfile_options ()
 
 void MainWin::display_statistics ()
 {
-	tiary::display_statistics (entries, filtered_entries.get (), get_current ());
+	if (!entries.empty ()) {
+		tiary::display_statistics (entries, filtered_entries.get (), get_current ());
+	}
 }
 
 void MainWin::quit ()
