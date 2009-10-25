@@ -29,7 +29,8 @@ namespace {
 struct Stat
 {
 	unsigned bytes;      // Number of bytes when represented in UTF-8
-	unsigned characters; // Number of characters (excluding newlines and spaces)
+	unsigned characters; // Number of characters (including newlines and spaces)
+	unsigned char_graph; // Number of characters (excluding newlines and spaces)
 	unsigned words;      // Number of non-CJK words
 	unsigned cjks;       // Number of CJK characters
 	unsigned paragraphs; // Number of paragraphs (excluding title)
@@ -38,6 +39,7 @@ struct Stat
 	{
 		bytes += other.bytes;
 		characters += other.characters;
+		char_graph += other.char_graph;
 		words += other.words;
 		cjks += other.cjks;
 		paragraphs += other.paragraphs;
@@ -50,6 +52,7 @@ struct AStat
 {
 	double bytes;
 	double characters;
+	double char_graph;
 	double words;
 	double cjks;
 	double paragraphs;
@@ -61,6 +64,7 @@ AStat operator / (const Stat &x, unsigned n)
 	double y = 1. / n;
 	r.bytes = x.bytes * y;
 	r.characters = x.characters * y;
+	r.char_graph = x.char_graph * y;
 	r.words = x.words * y;
 	r.cjks = x.cjks * y;
 	r.paragraphs = x.paragraphs * y;
@@ -70,6 +74,8 @@ AStat operator / (const Stat &x, unsigned n)
 Stat stat_string (const std::wstring &text)
 {
 	Stat ret = {};
+
+	ret.characters = text.length ();
 
 	bool last_alpha = false;
 	wchar_t lastc = L'\n';
@@ -82,8 +88,8 @@ Stat stat_string (const std::wstring &text)
 		lastc = c;
 
 		bool this_alpha;
-		if (iswprint (c)) {
-			++ret.characters;
+		if (iswgraph (c)) {
+			++ret.char_graph;
 			if (ucs_iscjk (c)) {
 				++ret.cjks;
 				this_alpha = false;
@@ -142,6 +148,8 @@ void append_stat (std::wstring &text, ui::RichTextLineList &lst, const Stat &inf
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
 			L"Characters          " + format_dec (info.characters, 8));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+			L"Printable characters" + format_dec (info.char_graph, 8));
+	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
 			L"Non-CJK words       " + format_dec (info.words, 8));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
 			L"CJK characters      " + format_dec (info.cjks, 8));
@@ -155,6 +163,8 @@ void append_stat (std::wstring &text, ui::RichTextLineList &lst, const AStat &in
 {
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
 			L"Characters          " + format_double (info.characters, 8, 4));
+	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+			L"Printable characters" + format_double (info.char_graph, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
 			L"Non-CJK words       " + format_double (info.words, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
