@@ -15,6 +15,7 @@
 #include "ui/size.h"
 #include "ui/control.h"
 #include "ui/window.h"
+#include "ui/output.h"
 #include "common/unicode.h"
 #include "common/split_line.h"
 
@@ -43,14 +44,16 @@ Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid) const
 		end = oneline.len;
 	}
 	if (get_hotkey_pos () < end) {
-		pos = ctrl.put (pos, get_text().data(), get_hotkey_pos ());
-		ctrl.attribute_toggle (UNDERLINE);
-		pos = ctrl.put (pos, get_text().data()[get_hotkey_pos()]);
-		ctrl.attribute_toggle (UNDERLINE);
-		pos = ctrl.put (pos, get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
+		pos = ctrl << pos
+			<< str (get_text().data(), get_hotkey_pos ())
+			<< toggle (UNDERLINE)
+			<< get_text().data()[get_hotkey_pos()]
+			<< toggle (UNDERLINE)
+			<< str (get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
 	}
 	else {
-		pos = ctrl.put (pos, get_text().data (), end);
+		pos = ctrl << pos
+			<< str (get_text().data (), end);
 	}
 	return pos;
 }
@@ -64,14 +67,16 @@ Size UIStringOne::output (Window &win, Size pos, unsigned wid) const
 		end = oneline.len;
 	}
 	if (get_hotkey_pos () < end) {
-		pos = win.put (pos, get_text().data(), get_hotkey_pos ());
-		win.attribute_toggle (UNDERLINE);
-		pos = win.put (pos, get_text().data()[get_hotkey_pos()]);
-		win.attribute_toggle (UNDERLINE);
-		pos = win.put (pos, get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
+		pos = win << pos
+			<< str (get_text().data(), get_hotkey_pos ())
+			<< toggle (UNDERLINE)
+			<< get_text().data()[get_hotkey_pos()]
+			<< toggle (UNDERLINE)
+			<< str (get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
 	}
 	else {
-		pos = win.put (pos, get_text().data (), end);
+		pos = win << pos
+			<< str (get_text().data (), end);
 	}
 	return pos;
 }

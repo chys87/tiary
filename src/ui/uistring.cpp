@@ -15,6 +15,7 @@
 #include "ui/uistring.h"
 #include "ui/size.h"
 #include "ui/control.h"
+#include "ui/output.h"
 #include "common/unicode.h"
 #include "common/algorithm.h"
 
@@ -57,14 +58,16 @@ void UIString::output (Control &ctrl, Size pos, Size size) const
 
 	for (unsigned n=minU(height,lst.size()); n; --n) {
 		if (get_hotkey_pos () - ptr->begin < ptr->len) {
-			Size next = ctrl.put (pos, get_text().data()+ptr->begin, get_hotkey_pos () - ptr->begin);
-			ctrl.attribute_toggle (UNDERLINE);
-			next = ctrl.put (next, get_text().data()[get_hotkey_pos ()]);
-			ctrl.attribute_toggle (UNDERLINE);
-			next = ctrl.put (next, get_text().data()+get_hotkey_pos()+1, ptr->len - (get_hotkey_pos () - ptr->begin + 1));
+			ctrl << pos
+				<< str (get_text().data()+ptr->begin, get_hotkey_pos() - ptr->begin)
+				<< toggle (UNDERLINE)
+				<< get_text().data()[get_hotkey_pos ()]
+				<< toggle (UNDERLINE)
+				<< str (get_text().data()+get_hotkey_pos()+1, ptr->len - (get_hotkey_pos () - ptr->begin + 1));
 		}
 		else {
-			ctrl.put (pos, get_text().data()+ptr->begin, ptr->len);
+			ctrl << pos
+				<< str (get_text().data()+ptr->begin, ptr->len);
 		}
 		pos.y++;
 		++ptr;

@@ -50,6 +50,7 @@ add_library(tiary_ui STATIC
 	ncurses_common.h
 	ncurses_common.cpp
 	object.h
+	output.h
 	paletteid.h
 	paletteid.cpp
 	richtext.h

@@ -14,6 +14,7 @@
 #include "ui/hotkey_hint.h"
 #include "ui/mouse.h"
 #include "ui/paletteid.h"
+#include "ui/output.h"
 #include "common/algorithm.h"
 #include "common/unicode.h"
 #include <functional>
@@ -100,12 +101,14 @@ void HotkeyHint::redraw ()
 		// Remember its position
 		it->x = x;
 		// Display this item
-		choose_palette (PALETTE_ID_HOTKEY_HINT_KEY);
-		Size pos = put (make_size (x, 0), it->key_name);
-		choose_palette (PALETTE_ID_HOTKEY_HINT);
-		pos = put (pos, L'-');
-		pos = put (pos, it->fun_name);
-		pos = put (pos, L' ');
+		Size pos = this
+			<< make_size (x, 0)
+			<< PALETTE_ID_HOTKEY_HINT_KEY
+			<< it->key_name
+			<< PALETTE_ID_HOTKEY_HINT
+			<< L'-'
+			<< it->fun_name
+			<< L' ';
 		x = pos.x;
 	}
 }
