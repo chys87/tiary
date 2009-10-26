@@ -17,7 +17,8 @@
 
 #include "ui/control.h"
 #include "common/action.h"
-#include <utility>
+#include <vector>
+#include <list>
 
 namespace tiary {
 namespace ui {
@@ -32,11 +33,11 @@ public:
 	void redraw ();
 
 	// Does not automatically call redraw
-	HotkeyHint &operator () (const wchar_t *key_name, const wchar_t *fun_name, const Action &act);
-	HotkeyHint &operator () (const wchar_t *key_name, const wchar_t *fun_name, const Signal &sig);
+	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Action &act);
+	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Signal &sig);
 #ifdef TIARY_HAVE_RVALUE_REFERENCES
-	HotkeyHint &operator () (const wchar_t *key_name, const wchar_t *fun_name, Action &&act);
-	HotkeyHint &operator () (const wchar_t *key_name, const wchar_t *fun_name, Signal &&sig);
+	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Action &&act);
+	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Signal &&sig);
 #endif // Rvalue references
 
 private:
@@ -44,14 +45,19 @@ private:
 	{
 		const wchar_t *key_name; ///< Name of the key, expected to be a string literal
 		const wchar_t *fun_name; ///< Function of the key, expected to be a string literal
-		unsigned w_key; ///< ucs_width (key_name)
-		unsigned w_fun; ///< ucs_width (fun_name)
 		Action action;
-		unsigned x, y; ///< Actually position displayed
+		unsigned wid; ///< ucs_width (key_name) + ucs_width (fun_name)
+		unsigned weight; ///< The larger, the more important
+		unsigned x; ///< Actually position displayed at
 	};
-	// The key is the order 
+	// Holds all HotkeyItem objects
 	typedef std::list <HotkeyItem> HotkeyList;
 	HotkeyList key_list;
+	// Sorted by weight, from largest to smallest
+	typedef std::vector <HotkeyItem *> SortedList;
+	SortedList sorted_list;
+
+	void construct_sorted_list ();
 };
 
 } // namespace tiary::ui
