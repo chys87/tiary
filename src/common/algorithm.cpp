@@ -34,7 +34,7 @@ struct UIntInd
 	unsigned *ptr;
 };
 
-bool operator > (const UIntInd &a, const UIntInd &b)
+inline bool operator > (const UIntInd &a, const UIntInd &b)
 {
 	return (a.val > b.val);
 }
