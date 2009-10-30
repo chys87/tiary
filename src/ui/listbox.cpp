@@ -15,6 +15,7 @@
 #include "ui/listbox.h"
 #include "ui/paletteid.h"
 #include "ui/mouse.h"
+#include "ui/scrollbar.h"
 #include "common/algorithm.h"
 #include "common/unicode.h"
 #include <algorithm>
@@ -189,7 +190,7 @@ bool ListBox::on_mouse (MouseEvent mouse_event)
 	else if (mouse_event.m & (LEFT_CLICK|LEFT_PRESS|LEFT_DCLICK)) {
 		if (mouse_event.p.x + 1 >= get_size().x) {
 			// Clicked on the scroll bar
-			new_focus = mouse_event.p.y * items.size () / get_size ().y;
+			new_focus = scrollbar_click (get_size().y, items.size(), mouse_event.p.y);
 			focus_to_first = true;
 		}
 		else {
@@ -267,17 +268,9 @@ void ListBox::redraw ()
 	// Display the scroll bar
 	choose_palette (PALETTE_ID_LISTBOX);
 	clear (make_size (disp_wid,0), make_size (1, disp_hgt));
-	unsigned bar_start, bar_hgt;
-	if (items.empty ()) {
-		bar_start = 0;
-		bar_hgt = disp_hgt;
-	}
-	else {
-		bar_start = info.first * disp_hgt / items.size ();
-		bar_hgt = maxU (1, (info.first + info.len) * disp_hgt / items.size () - bar_start);
-	}
 	attribute_toggle (REVERSE);
-	clear (make_size (disp_wid,bar_start), make_size (1, bar_hgt));
+	ScrollBarInfo scrollbar = scrollbar_info (disp_hgt, items.size(), info.first);
+	clear (make_size (disp_wid,scrollbar.pos), make_size (1, scrollbar.size));
 
 	move_cursor (make_size (0, info.focus_pos));
 }

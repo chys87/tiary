@@ -8,6 +8,7 @@
 #include "ui/paletteid.h"
 #include "ui/dialog_message.h"
 #include "ui/mouse.h"
+#include "ui/scrollbar.h"
 #include "common/format.h"
 #include "common/algorithm.h"
 #include <utility> // std::forward
@@ -95,10 +96,9 @@ void RichText::redraw ()
 			);
 	// Scroll bar
 	clear (make_size (wid, 0), make_size (1, hgt+1));
-	unsigned bar_start = top_line * hgt / line_list.size ();
-	unsigned bar_height = maxU (1, (top_line + show_lines) * hgt / line_list.size () - bar_start);
 	attribute_toggle (REVERSE);
-	clear (make_size (wid, bar_start), make_size (1, bar_height));
+	ScrollBarInfo scrollbar = scrollbar_info (hgt, line_list.size (), top_line);
+	clear (make_size (wid, scrollbar.pos), make_size (1, scrollbar.size));
 }
 
 bool RichText::on_mouse (MouseEvent mouse_event)
@@ -107,7 +107,7 @@ bool RichText::on_mouse (MouseEvent mouse_event)
 			(mouse_event.p.x+1 < get_size().x)) {
 		return false;
 	}
-	top_line = mouse_event.p.y * line_list.size () / (get_size ().y - 1);
+	top_line = scrollbar_click (get_size ().y - 1, line_list.size (), mouse_event.p.y);
 	RichText::redraw ();
 	return true;
 }

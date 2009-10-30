@@ -59,6 +59,8 @@ add_library(tiary_ui STATIC
 	richtextlist.cpp
 	scroll.h
 	scroll.cpp
+	scrollbar.h
+	scrollbar.cpp
 	search_info.h
 	search_info.cpp
 	size.h
