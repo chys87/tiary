@@ -148,7 +148,7 @@ uint32_t make_time (const ReadableTime &rt) throw ()
 	return ((rt.H*60 + rt.M)*60 + rt.S);
 }
 
-uint64_t make_datetime (uint32_t date, uint32_t time)
+uint64_t make_datetime (uint32_t date, uint32_t time) throw ()
 {
 	return (date * uint64_t (SECONDS_PER_DAY) + time);
 }
