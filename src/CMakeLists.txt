@@ -211,28 +211,45 @@ IF(HAVE_CXX_WALL)
 	ADD_DEFINITIONS("-Wall")
 ENDIF(HAVE_CXX_WALL)
 
-# Add "-ffast-math" if supported
-CHECK_CXX_COMPILER_FLAG("-ffast-math" HAVE_FAST_MATH)
-IF(HAVE_FAST_MATH)
-	ADD_DEFINITIONS("-ffast-math")
-ENDIF(HAVE_FAST_MATH)
+IF(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
 
-# Add "-fno-math-errno" if supported
-CHECK_CXX_COMPILER_FLAG("-fno-math-errno" HAVE_NO_MATH_ERRNO)
-IF(HAVE_NO_MATH_ERRNO)
-	ADD_DEFINITIONS("-fno-math-errno")
-ENDIF(HAVE_NO_MATH_ERRNO)
+	# Add "-ffast-math" if supported
+	CHECK_CXX_COMPILER_FLAG("-ffast-math" HAVE_FAST_MATH)
+	IF(HAVE_FAST_MATH)
+		ADD_DEFINITIONS("-ffast-math")
+	ENDIF(HAVE_FAST_MATH)
 
-# Add options additional flags that will reduce the 
-# code size and/or improve efficiency
-CHECK_CXX_COMPILER_FLAG("-fno-threadsafe-statics" HAVE_NO_THREADSAFE_STATICS)
-IF(HAVE_NO_THREADSAFE_STATICS)
-	ADD_DEFINITIONS("-fno-threadsafe-statics")
-ENDIF(HAVE_NO_THREADSAFE_STATICS)
-CHECK_CXX_COMPILER_FLAG("-fno-exceptions" HAVE_NO_EXCEPTIONS)
-IF(HAVE_NO_EXCEPTIONS)
-	ADD_DEFINITIONS("-fno-exceptions")
-ENDIF(HAVE_NO_EXCEPTIONS)
+	# Add "-fno-math-errno" if supported
+	CHECK_CXX_COMPILER_FLAG("-fno-math-errno" HAVE_NO_MATH_ERRNO)
+	IF(HAVE_NO_MATH_ERRNO)
+		ADD_DEFINITIONS("-fno-math-errno")
+	ENDIF(HAVE_NO_MATH_ERRNO)
+
+	# Add "-fmerge-all-constants" if supported
+	CHECK_CXX_COMPILER_FLAG("-fmerge-all-constants" HAVE_MERGE_ALL_CONSTANTS)
+	IF(HAVE_MERGE_ALL_CONSTANTS)
+		ADD_DEFINITIONS("-fmerge-all-constants")
+	ENDIF(HAVE_MERGE_ALL_CONSTANTS)
+
+	# Add "-funsafe-loop-optimizations -Wunsafe-loop-optimizations" if supported
+	CHECK_CXX_COMPILER_FLAG("-funsafe-loop-optimizations -Wunsafe-loop-optimizations" HAVE_UNSAFE_LOOP_OPTIMIZATIONS)
+	IF(HAVE_UNSAFE_LOOP_OPTIMIZATIONS)
+		ADD_DEFINITIONS("-funsafe-loop-optimizations")
+		ADD_DEFINITIONS("-Wunsafe-loop-optimizations")
+	ENDIF(HAVE_UNSAFE_LOOP_OPTIMIZATIONS)
+
+	# Add options additional flags that will reduce the 
+	# code size and/or improve efficiency
+	CHECK_CXX_COMPILER_FLAG("-fno-threadsafe-statics" HAVE_NO_THREADSAFE_STATICS)
+	IF(HAVE_NO_THREADSAFE_STATICS)
+		ADD_DEFINITIONS("-fno-threadsafe-statics")
+	ENDIF(HAVE_NO_THREADSAFE_STATICS)
+	CHECK_CXX_COMPILER_FLAG("-fno-exceptions" HAVE_NO_EXCEPTIONS)
+	IF(HAVE_NO_EXCEPTIONS)
+		ADD_DEFINITIONS("-fno-exceptions")
+	ENDIF(HAVE_NO_EXCEPTIONS)
+
+ENDIF(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
 
 
 # Check whether the compiler has some support for C++0x
