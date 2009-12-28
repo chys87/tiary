@@ -21,7 +21,7 @@
 #ifndef TIARY_COMMON_ALGORITHM_H
 #define TIARY_COMMON_ALGORITHM_H
 
-#include <iterator>
+#include <functional>
 #include <algorithm>
 
 namespace tiary {
@@ -36,9 +36,6 @@ inline int minS (int a, int b) { return (a<b) ? a : b; }
 // These functions make sure arguments are cast to size_t
 inline size_t maxSize (size_t a, size_t b) { return (a<b) ? b : a; }
 inline size_t minSize (size_t a, size_t b) { return (a<b) ? a : b; }
-
-template <typename T>
-inline int sign (T x) { return (x<0) ? -1 : (x==0) ? 0 : 1; }
 
 /**
  * @brief	Makes a reference const
@@ -277,85 +274,6 @@ A bitwise_reverse_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi,
 	return from;
 }
 
-
-/*
- * Removes the first element in container equal to value
- *
- * The third argument helps guaranteeing that the first argument is a container,
- * similar to "concept" (former candidate for C++0x)
- */
-template <typename Container, typename T>
-void remove_first (Container &container, const T &value, typename Container::iterator = typename Container::iterator ())
-{
-	typename Container::iterator it = std::find (container.begin (), container.end (), value);
-	if (it != container.end ()) {
-		container.erase (it);
-	}
-}
-
-/*
- * Removes every element in container equal to value
- */
-template <typename Container, typename T>
-void remove_all (Container &container, const T &value, typename Container::iterator = typename Container::iterator ())
-{
-	typename Container::iterator it = std::remove (container.begin (), container.end (), value);
-	container.erase (it, container.end ());
-}
-
-
-/*
- * Get the sum of everything in an interval
- */
-template <typename Iter, typename F>
-typename F::result_type sum (Iter first, Iter last, F foo, typename F::result_type initial_value = typename F::result_type ())
-{
-	typename F::result_type r (initial_value);
-	while (first != last) {
-		r += foo (*first);
-		++first;
-	}
-	return r;
-}
-
-/*
- * No transform
- */
-template <typename Iter>
-typename Iter::value_type sum (Iter first, Iter last, typename Iter::value_type initial_value = typename Iter::value_type ())
-{
-	typename Iter::value_type r (initial_value);
-	while (first != last) {
-		r += *first;
-		++first;
-	}
-	return r;
-}
-
-/*
- * Also possible to replace last with a number
- */
-template <typename Iter, typename F>
-typename F::result_type sum (Iter first, size_t n, F foo, typename F::result_type initial_value = typename F::result_type ())
-{
-	typename F::result_type r (initial_value);
-	for (; n; --n) {
-		r += foo (*first);
-		++first;
-	}
-	return r;
-}
-template <typename Iter>
-typename std::iterator_traits<Iter>::value_type sum (Iter first, size_t n,
-		typename std::iterator_traits<Iter>::value_type initial_value = typename std::iterator_traits<Iter>::value_type ())
-{
-	typename std::iterator_traits<Iter>::value_type r (initial_value);
-	for (; n; --n) {
-		r += *first;
-		++first;
-	}
-	return r;
-}
 
 
 /**
