@@ -25,7 +25,6 @@
 #include "ui/control.h"
 #include "ui/richtextlist.h"
 #include "ui/search_info.h"
-#include "common/pod_pair.h"
 #include <vector>
 #include <memory> // std::auto_ptr
 

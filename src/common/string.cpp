@@ -13,7 +13,6 @@
 
 
 #include "common/string.h"
-#include "common/pod_pair.h"
 #include <algorithm>
 #include <wctype.h>
 
@@ -77,10 +76,10 @@ std::wstring strlower (const std::wstring &str)
 	return result;
 }
 
-std::vector <Pair <size_t, size_t> >
+std::vector <std::pair <size_t, size_t> >
 find_all (const std::wstring &haystack, const std::wstring &needle)
 {
-	std::vector <Pair <size_t, size_t> > ret;
+	std::vector <std::pair <size_t, size_t> > ret;
 	size_t neelen = needle.length ();
 	size_t haylen = haystack.length ();
 	size_t offset = 0;
@@ -89,7 +88,7 @@ find_all (const std::wstring &haystack, const std::wstring &needle)
 		if (found == std::wstring::npos) {
 			break;
 		}
-		ret.push_back (make_Pair (found, neelen));
+		ret.push_back (std::make_pair (found, neelen));
 		offset = found + neelen;
 	}
 	return ret;

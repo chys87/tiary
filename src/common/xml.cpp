@@ -13,7 +13,6 @@
 
 
 #include "common/xml.h"
-#include "common/pod_pair.h"
 #include <stack>
 #include <vector>
 #include <libxml/tree.h>
@@ -174,7 +173,7 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 	// Successfully parsed. Now we need to construct our own XML tree
 
 	// "(a,b) in stk" means "b's children should be copied as a's children"
-	std::stack<Pair<XMLNodeTree *, xmlNodePtr>, std::vector<Pair<XMLNodeTree *, xmlNodePtr> > > stk;
+	std::stack<std::pair<XMLNodeTree *, xmlNodePtr>, std::vector<std::pair<XMLNodeTree *, xmlNodePtr> > > stk;
 
 	XMLNode *root = shallow_copy (iptr);
 	XMLNodeTree *optr = dynamic_cast<XMLNodeTree *>(root);
@@ -194,7 +193,7 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 			if (XMLNode *newnode = shallow_copy (child_ptr)) {
 				last = last->next = newnode;
 				if (child_ptr->xmlChildrenNode) {
-					stk.push (make_Pair (static_cast<XMLNodeTree *>(newnode), child_ptr));
+					stk.push (std::make_pair (static_cast<XMLNodeTree *>(newnode), child_ptr));
 				}
 			}
 		}
@@ -233,7 +232,7 @@ std::string tiary::xml_make (const XMLNode *root)
 		xmlDocSetRootElement(doc, oroot);
 
 		// "(a,b) in stk" means "a's children should be copied as b's children"
-		std::stack<Pair<const XMLNodeTree *, xmlNodePtr>, std::vector<Pair<const XMLNodeTree *, xmlNodePtr> > > stk;
+		std::stack<std::pair<const XMLNodeTree *, xmlNodePtr>, std::vector<std::pair<const XMLNodeTree *, xmlNodePtr> > > stk;
 		xmlNodePtr optr = oroot;         // Current working output node
 		const XMLNodeTree *iptr = iroot; // Current working input node
 
@@ -243,7 +242,7 @@ std::string tiary::xml_make (const XMLNode *root)
 				if (xmlNodePtr nptr = shallow_copy (child_ptr)) {
 					xmlAddChild (optr, nptr);
 					if (const XMLNodeTree *ip = dynamic_cast <const XMLNodeTree *> (child_ptr)) {
-						stk.push (make_Pair (ip, nptr));
+						stk.push (std::make_pair (ip, nptr));
 					}
 				}
 			}

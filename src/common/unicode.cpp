@@ -22,6 +22,7 @@
 #include <wchar.h>
 #include <wctype.h>
 #include <string.h>
+#include <stdint.h>
 
 namespace tiary {
 

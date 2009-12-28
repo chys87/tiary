@@ -22,8 +22,6 @@
 
 namespace tiary {
 
-template <typename, typename> struct Pair;
-
 class StringMatch
 {
 public:
@@ -43,7 +41,7 @@ public:
 	 * of which is the offset and the second the length of the matched
 	 * substring.
 	 */
-	std::vector <Pair <size_t, size_t> > match (const std::wstring &) const;
+	std::vector <std::pair <size_t, size_t> > match (const std::wstring &) const;
 
 	/**
 	 * @brief	Match against a string, returning only true/false

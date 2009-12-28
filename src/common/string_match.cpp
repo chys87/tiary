@@ -14,7 +14,6 @@
 
 #include "common/string_match.h"
 #include "common/string.h"
-#include "common/pod_pair.h"
 
 
 namespace tiary {
@@ -53,7 +52,7 @@ bool StringMatch::assign (const std::wstring &pattern_, bool use_regex)
 	return true;
 }
 
-std::vector <Pair <size_t, size_t> > StringMatch::match (const std::wstring &haystack) const
+std::vector <std::pair <size_t, size_t> > StringMatch::match (const std::wstring &haystack) const
 {
 #ifdef TIARY_USE_PCRE
 	if (PcRe *rex = regex.get ()) {

@@ -190,9 +190,9 @@ bool RichText::on_key (wchar_t key)
 void RichText::slot_search (bool bkwd)
 {
 	if (search_info.dialog (bkwd)) {
-		std::vector <Pair <size_t, size_t> > result = search_info.match (text);
+		std::vector <std::pair <size_t, size_t> > result = search_info.match (text);
 		highlight_list.clear ();
-		for (std::vector <Pair <size_t, size_t> >::const_iterator it = result.begin ();
+		for (std::vector <std::pair <size_t, size_t> >::const_iterator it = result.begin ();
 				it != result.end (); ++it) {
 			highlight_list.insert (std::make_pair (it->first, it->second));
 		}
