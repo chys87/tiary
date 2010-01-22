@@ -230,7 +230,7 @@ ReadableDate extract_date (uint32_t v) throw ()
 	}
 	v -= tmp * 365;
 	++v; // Now v = number of day in year; starting 1
-	y += tmp + 1; // +1: Convert to human-extractable year number
+	y += tmp + 1; // +1: Convert to human-readable year number
 	m = (int)revdays[v-1];
 	d = v - days[m + 9];
 	if ((int)m <= 0) {
