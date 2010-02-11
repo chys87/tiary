@@ -44,7 +44,7 @@ int main (int argc, char **argv)
 
 	parse_options (argc, argv);
 	if (argc >= 3) {
-		fputs ("Too many arguments.\n", stderr);
+		fputs_unlocked ("Too many arguments.\n", stderr);
 		exit (EXIT_FAILURE);
 	}
 
