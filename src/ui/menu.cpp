@@ -96,11 +96,7 @@ MenuItem::MenuItem (MenuItem &&other)
 }
 #endif
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-void MenuItem::swap (MenuItem &&other)
-#else
 void MenuItem::swap (MenuItem &other)
-#endif
 {
 	text.swap (other.text);
 	action.swap (other.action);

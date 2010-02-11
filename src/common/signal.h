@@ -225,11 +225,7 @@ public:
 	bool is_really_connected () const;
 
 	// Efficiently swap two Signal objects
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	void swap (Signal &&sig)
-#else
 	void swap (Signal &sig)
-#endif
 	{
 		detail::SignalBase *bak_info = info;
 		info = sig.info;

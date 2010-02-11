@@ -57,11 +57,7 @@ struct MenuItem
 	MenuItem &operator = (MenuItem &&other) { swap (other); return *this; }
 #endif
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	void swap (MenuItem &&);
-#else
 	void swap (MenuItem &);
-#endif
 
 	~MenuItem ();
 

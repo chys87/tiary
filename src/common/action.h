@@ -52,15 +52,7 @@ struct Action
 	Action &operator = (Action &&act) { signal = std::move (act.signal); condition = std::move (act.condition); return *this; }
 #endif // rvalue ref
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	void swap (Action &&other)
-#else
-	void swap (Action &other)
-#endif
-	{
-		signal.swap (other.signal);
-		condition.swap (other.condition);
-	}
+	void swap (Action &other) { signal.swap (other.signal); condition.swap (other.condition); }
 
 	// Forward is_connected and is_really_connected to signal
 	bool is_connected () const { return signal.is_connected (); }

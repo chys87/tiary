@@ -82,11 +82,7 @@ public:
 	Condition &operator = (Condition &&other) { swap (other); return *this; }
 #endif
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	void swap (Condition &&other)
-#else
 	void swap (Condition &other)
-#endif
 	{
 		detail::CondBase *tmp = info;
 		info = other.info;
