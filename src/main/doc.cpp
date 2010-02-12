@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -85,7 +85,7 @@ void show_doc ()
 }
 
 const wchar_t license [] = L"\
-Copyright (c) 2009, chys <admin@CHYS.INFO>\n\
+Copyright (c) " TIARY_COPYRIGHT_YEAR_WIDE L", chys <admin@CHYS.INFO>\n\
 All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\
@@ -136,7 +136,7 @@ void show_about ()
 	ui::dialog_message (format (about) << unsigned (TIARY_MAJOR_VERSION)
 			<< unsigned (TIARY_MINOR_VERSION)
 			<< unsigned (TIARY_PATCH_VERSION)
-			<< unsigned (TIARY_COPYRIGHT_YEAR), L"About");
+			<< TIARY_COPYRIGHT_YEAR_WIDE, L"About");
 }
 
 } // namespace tiary
