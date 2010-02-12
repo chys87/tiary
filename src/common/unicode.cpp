@@ -19,10 +19,10 @@
  */
 #include "common/unicode.h"
 #include "common/algorithm.h"
+#include "common/types.h"
 #include <wchar.h>
 #include <wctype.h>
 #include <string.h>
-#include <stdint.h>
 
 namespace tiary {
 
