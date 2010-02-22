@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -54,7 +54,7 @@ void write_for_view (std::wstring &text, RichTextLineList &lst,
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format));
 	if (!ent.labels.empty ()) {
 		append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL,
-				join (L"Labels: ", ent.labels.begin (), ent.labels.end (), L", "));
+				L"Labels: " + join (ent.labels.begin (), ent.labels.end (), L", "));
 	}
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL);
 

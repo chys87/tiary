@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -104,21 +104,6 @@ template <typename InputIterator, typename JoinT>
 typename std::iterator_traits<InputIterator>::value_type join (InputIterator first, InputIterator last, const JoinT &joiner)
 {
 	typename std::iterator_traits<InputIterator>::value_type ret;
-	if (first != last) {
-		ret = *first;
-		while (++first != last) {
-			ret += joiner;
-			ret += *first;
-		}
-	}
-	return ret;
-}
-
-// Join tokens into a string
-template <typename InputIterator, typename LeadT, typename JoinT>
-typename std::iterator_traits<InputIterator>::value_type join (const LeadT &leader, InputIterator first, InputIterator last, const JoinT &joiner)
-{
-	typename std::iterator_traits<InputIterator>::value_type ret (leader);
 	if (first != last) {
 		ret = *first;
 		while (++first != last) {
