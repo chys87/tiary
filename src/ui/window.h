@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -143,7 +143,7 @@ public:
 	static void touch_windows ();
 	// Get a key/mouse event
 	static wchar_t get (MouseEvent *);
-	static wchar_t get_noblock (MouseEvent *); ///< Returns L'\0' if no input
+	static wchar_t get_noblock (MouseEvent *); ///< Returns 0 if no input
 	// Put a key/mouse event back to the queue
 	static void unget (wchar_t);
 	static void unget (MouseEvent);

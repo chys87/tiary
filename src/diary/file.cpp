@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -85,7 +85,7 @@ const char password_salt3[] = "TiArY, WrItTeN By ChYs <AdMiN@ChYs.InFo>";
 const char new_format_signature[16] = "TiaryEncrypted\0";
 
 /**
- * Parse the time format used in the <time> tag
+ * Parse the time format used in the @c <time> tag
  * (%Y-%m-%d %H:%M:%S)
  * Returns 0 on error
  */
@@ -100,7 +100,7 @@ uint64_t parse_time (const char *s)
 }
 
 /**
- * Format the time as used in the <time> tag
+ * Format the time as used in the @c <time> tag
  * (%Y-%m-%d %H:%M:%S)
  */
 std::string format_time (const DateTime &date_time)
@@ -128,7 +128,7 @@ bool is_legal_label_name (const std::wstring &name)
 }
 
 /**
- * Given an <entry> node, construct and return the corresponding DiaryEntry
+ * Given an @c <entry> node, construct and return the corresponding DiaryEntry
  * If any error is encountered, returns 0
  */
 DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)

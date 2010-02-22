@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -267,7 +267,7 @@ inline ColorAttr ColorAttr::make_default ()
 
 struct CharColorAttr
 {
-	/// Sometimes, L'\0' is the placeholder for the second position
+	/// Sometimes, wchar_t(0) is the placeholder for the second position
 	/// for full-width character
 	wchar_t c;
 	ColorAttr a;

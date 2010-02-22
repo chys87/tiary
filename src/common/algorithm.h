@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -15,7 +15,7 @@
 /**
  * @file	common/algorithm.h
  * @author	chys <admin@chys.info>
- * @brief	Extensions to <algorithm>, <functional> and some useful utilities
+ * @brief	Extensions to @c <algorithm>, @c <functional> and some useful utilities
  */
 
 #ifndef TIARY_COMMON_ALGORITHM_H

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -94,19 +94,19 @@ void WindowInput::slot_ok ()
 } // anonymous namespace
 
 std::wstring dialog_input (const std::wstring &hint, const std::wstring &default_text,
-		unsigned text_box_width, WindowInputAttribute attr,
+		unsigned text_box_width, WindowInputAttribute attributes,
 		const std::wstring &return_on_error)
 {
 	return dialog_input2 (std::wstring (), hint, default_text, text_box_width,
-			attr, return_on_error);
+			attributes, return_on_error);
 }
 
 std::wstring dialog_input2 (const std::wstring &title, const std::wstring &hint,
 		const std::wstring &default_text, unsigned text_box_width,
-		WindowInputAttribute attr, const std::wstring &return_on_error)
+		WindowInputAttribute attributes, const std::wstring &return_on_error)
 {
 	std::wstring ret = return_on_error;
-	WindowInput (title, hint, default_text, text_box_width, attr, ret).event_loop ();
+	WindowInput (title, hint, default_text, text_box_width, attributes, ret).event_loop ();
 	return ret;
 }
 

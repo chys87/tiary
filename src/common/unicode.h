@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -52,7 +52,7 @@ int utf8_len_by_first_byte (unsigned char b);
  * @param	end	If non-NULL, stores a pointer to the next byte following the last
  *				one in the UTF-8 sequence
  * @result	The converted Unicode character. \n
- *			If the UTF-8 sequence is invalid, <code>L'\\0'</code> is returned.
+ *			If the UTF-8 sequence is invalid, 0 is returned.
  */
 wchar_t utf8_to_wchar (const char *src, const char **end = 0);
 /**
@@ -119,7 +119,7 @@ std::string wstring_to_utf8 (const std::wstring &src);
  * (Many encodings are not as robust as UTF-8. Usually one error jungles all
  * remaining data. So we do not attempt recovering at all.)
  */
-std::wstring mbs_to_wstring (const char *);
+std::wstring mbs_to_wstring (const char *src);
 std::wstring mbs_to_wstring (const char *, size_t);
 std::wstring mbs_to_wstring (const std::string &);
 
@@ -162,7 +162,7 @@ unsigned ucs_width (const wchar_t *str, size_t len);
  * @result	The total on-screen width of str. \n
  *			Abnormal and nonprintable characters are counted as 1.
  */
-unsigned ucs_width (const std::wstring &);
+unsigned ucs_width (const std::wstring &str);
 /**
  * @brief	Returns the maximum number of characters to fit in the specified screen width
  * @param	str	The given wide (Unicode) string
