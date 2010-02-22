@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -52,8 +52,8 @@ wchar_t *stpcpy (wchar_t *dst, const wchar_t *src)
 const char *strchrnul (const char *str, int ch)
 {
 	size_t len = strlen (str);
-	const char *ptr = (const char *)memchr (str, len, ch);
-	if (ptr == NULL) {
+	const char *ptr = (const char *)memchr (str, ch, len);
+	if (ptr == 0) {
 		ptr = str + len;
 	}
 	return ptr;
