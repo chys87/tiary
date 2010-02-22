@@ -55,11 +55,10 @@ bool init ()
 		intrflush (stdscr, FALSE);
 
 #ifdef TIARY_HAVE_ESCDELAY
-		// ESCDELAY is an undocumented feature
 		// The default value set in ncurses is way too long
 		// VIM uses 25 milliseconds
 		if (getenv ("ESCDELAY") == 0) {
-			ESCDELAY = 50;
+			set_escdelay (50);
 		}
 #endif
 

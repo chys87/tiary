@@ -38,11 +38,9 @@ IF(NOT HAVE_NCURSESW_HEADERS OR NOT HAVE_LIBNCURSESW)
 	MESSAGE(FATAL_ERROR "ncurses with Unicode support is required.")
 ENDIF(NOT HAVE_NCURSESW_HEADERS OR NOT HAVE_LIBNCURSESW)
 
-# Check for ESCDELAY in libncursesw (undocumented feature)
+# Check for set_escdelay in libncursesw
 SET(CMAKE_REQUIRED_LIBRARIES -lncursesw)
-CHECK_CXX_SOURCE_COMPILES(
-	"#include <ncursesw/curses.h> \n
-	int main () { ESCDELAY = 50; }" HAVE_ESCDELAY)
+CHECK_FUNCTION_EXISTS(set_escdelay HAVE_ESCDELAY)
 SET(CMAKE_REQUIRED_LIBRARIES)
 IF(HAVE_ESCDELAY)
 	ADD_DEFINITIONS("-DTIARY_HAVE_ESCDELAY=1")
