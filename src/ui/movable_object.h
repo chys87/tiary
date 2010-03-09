@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,8 +26,8 @@ class Control;
 /**
  * @brief	A class for a movable/resizable object
  *
- * The sole purpose of this function is to provide a pure virtual
- * move_reisze function.
+ * The sole purpose of this class is to provide the @c pos
+ * and @c size members and a pure virtual @c move_reisze function.
  */
 class MovableObject : public Object
 {
