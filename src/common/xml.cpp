@@ -96,28 +96,29 @@ using namespace tiary;
 // Copy the attribute name and attributes, without children
 XMLNode *shallow_copy (xmlNodePtr iptr)
 {
-	if (xmlNodeIsText (iptr)) { // Text node
+	if (iptr->type == XML_TEXT_NODE || iptr->type == XML_CDATA_SECTION_NODE) { // Text node
 		XMLNodeText *optr = 0;
-		if (char *text = (char *)xmlNodeGetContent (iptr)) {
+		if (const char *text = (const char *)iptr->content) {
 			// If a text node is empty or completely consists of space (tab, newline) etc.
 			// Eliminate it!
 			if (strspn (text, " \t\r\n\v")[text] != '\0') {
 				optr = new XMLNodeText (text);
 			}
-			xmlFree (text);
 		}
 		return optr;
 	}
-	else { // Normal node
+	else if (iptr->type == XML_ELEMENT_NODE) { // Element node
 		XMLNodeTree *optr = new XMLNodeTree ((const char *)iptr->name);
 		// Attributes. Not ordered.
 		for (xmlAttrPtr aptr=iptr->properties; aptr; aptr=aptr->next) {
-			if (char *text = (char *)xmlNodeGetContent (aptr->children)) {
-				optr->properties[(const char *)aptr->name] = text;
-				xmlFree (text);
+			if (aptr->name && aptr->children) {
+				optr->properties[(const char *)aptr->name] = (const char *)aptr->children->content;
 			}
 		}
 		return optr;
+	}
+	else { // Other kinds of nodes. Not supported.
+		return 0;
 	}
 }
 
