@@ -267,6 +267,7 @@ void WindowGlobalOptions::slot_default_file ()
 void WindowGlobalOptions::slot_default_file_current ()
 {
 	lbl_default_file_name.set_text (
+			current_filename.empty () ? std::wstring () :
 			get_full_pathname (current_filename),
 			UIString::NO_HOTKEY);
 }
