@@ -34,11 +34,7 @@ struct SignalBase
 {
 	virtual void emit () = 0;
 	virtual SignalBase *copy () const = 0;
-#ifdef TIARY_HAVE_DEFAULT_DELETE_FUNCTIONS
-	virtual ~SignalBase () = default;
-#else
 	virtual ~SignalBase () {}
-#endif
 };
 
 template <typename R> struct SignalNV : SignalBase
