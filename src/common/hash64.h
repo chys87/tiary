@@ -19,9 +19,6 @@
  * This hash function is much simpler and faster than MD5.
  * For practical purposes, it still maps different objects
  * to different hash values.
- *
- * NOTE: While the result of MD5 is platform dependent, the results of
- * hash64 do depend on the endianness of the machines.
  */
 
 #ifndef TIARY_COMMON_HASH64_H

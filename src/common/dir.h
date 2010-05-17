@@ -44,7 +44,7 @@ std::wstring get_home_dir (const std::wstring &);
 /**
  * @brief	Concatenates the home dir with a name under the home
  *
- * E.g. make_home_dirname((char*)0) = "/home/xxx";
+ * E.g. make_home_dirname(NULL) = "/home/xxx";
  *
  * make_home_dirname("abc") = "/home/xxx/abc";
  */
