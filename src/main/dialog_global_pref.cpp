@@ -295,7 +295,7 @@ void WindowGlobalOptions::slot_reset ()
 const wchar_t help_info[] = L"\
 Default file: This file is automatically loaded, unless you explicitly open another one.\n\
 \n\
-Expand lines: The number of lines the selected diary entry should use ons creen.\n\
+Expand lines: The number of lines the selected diary entry should use on screen.\n\
 \n\
 Editor: The editor used to edit diary entries.\n\
 \n\
