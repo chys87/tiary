@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2011 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -579,10 +579,12 @@ void MainWin::move_down_current ()
 
 namespace {
 
-bool compare_entry (const DiaryEntry *a, const DiaryEntry *b)
-{
-	return (a->local_time < b->local_time);
-}
+struct CompareEntry {
+	bool operator () (const DiaryEntry *a, const DiaryEntry *b) const
+	{
+		return (a->local_time < b->local_time);
+	}
+};
 
 } // anonymous namespace
 
@@ -593,7 +595,7 @@ void MainWin::sort_all ()
 	}
 	if (ui::dialog_message (L"Are you sure you want to sort all entries by time? This operation cannot be undone.",
 				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_DEFAULT_NO) == ui::MESSAGE_YES) {
-		std::stable_sort (entries.begin (), entries.end (), compare_entry);
+		std::stable_sort (entries.begin (), entries.end (), CompareEntry ());
 		main_ctrl.touch ();
 	}
 }
