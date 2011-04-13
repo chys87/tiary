@@ -229,13 +229,6 @@ IF(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
 		ADD_DEFINITIONS("-fmerge-all-constants")
 	ENDIF(HAVE_MERGE_ALL_CONSTANTS)
 
-	# Add "-funsafe-loop-optimizations -Wunsafe-loop-optimizations" if supported
-	CHECK_CXX_COMPILER_FLAG("-funsafe-loop-optimizations -Wunsafe-loop-optimizations" HAVE_UNSAFE_LOOP_OPTIMIZATIONS)
-	IF(HAVE_UNSAFE_LOOP_OPTIMIZATIONS)
-		ADD_DEFINITIONS("-funsafe-loop-optimizations")
-		ADD_DEFINITIONS("-Wunsafe-loop-optimizations")
-	ENDIF(HAVE_UNSAFE_LOOP_OPTIMIZATIONS)
-
 	# Add options additional flags that will reduce the 
 	# code size and/or improve efficiency
 	CHECK_CXX_COMPILER_FLAG("-fno-threadsafe-statics" HAVE_NO_THREADSAFE_STATICS)
