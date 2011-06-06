@@ -57,15 +57,6 @@ inline char *strchrnul (char *str, int ch) { return const_cast <char *> (strchrn
 #endif
 const wchar_t *strchrnul (const wchar_t *, wchar_t);
 inline wchar_t *strchrnul (wchar_t *str, wchar_t ch) { return const_cast <wchar_t *> (strchrnul ((const wchar_t *)str, ch)); }
-#ifdef TIARY_HAVE_RAWMEMCHR
-inline const char *strend (const char *str) { return (const char *)::rawmemchr (str, '\0'); }
-inline char *strend (char *str) { return (char *)::rawmemchr (str, '\0'); }
-#else
-inline const char *strend (const char *str) { return strlen (str) + str; }
-inline char *strend (char *str) { return strlen (str) + str; }
-#endif
-inline const wchar_t *strend (const wchar_t *str) { return ::wcslen (str) + str; }
-inline wchar_t *strend (wchar_t *str) { return ::wcslen (str) + str; }
 
 
 /// @brief	Make a string lowercase
