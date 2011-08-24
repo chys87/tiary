@@ -68,6 +68,7 @@ const PaletteID PALETTE_ID_ENTRY_LABELS_SELECT  = __LINE__ - PALETTEID_H_LINE;
 
 const PaletteID PALETTE_ID_SHOW_NORMAL          = __LINE__ - PALETTEID_H_LINE;
 const PaletteID PALETTE_ID_SHOW_BOLD            = __LINE__ - PALETTEID_H_LINE;
+const PaletteID PALETTE_ID_SHOW_QUOTE           = __LINE__ - PALETTEID_H_LINE;
 
 void set_palettes ();
 ColorAttr get_palette (PaletteID);

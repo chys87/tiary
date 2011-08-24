@@ -62,9 +62,17 @@ void write_for_view (std::wstring &text, RichTextLineList &lst,
 	SplitStringLineList split_list = split_line (edit_line_width, ent.text);
 	size_t base_offset = text.length ();
 	text += ent.text;
+	PaletteID palette = PALETTE_ID_SHOW_NORMAL;
 	for (SplitStringLineList::const_iterator it = split_list.begin ();
 			it != split_list.end (); ++it) {
-		RichTextLine tmp_line = { base_offset+it->begin, it->len, PALETTE_ID_SHOW_NORMAL, it->wid };
+		size_t begin = base_offset + it->begin;
+		// If a line begins with a space, it's considered the first line of a qutoed paragraph
+		if (it->len && (text[begin] == L' '))
+			palette = PALETTE_ID_SHOW_QUOTE;
+		// An empty line ends a quoted paragraph
+		if (it->len == 0)
+			palette = PALETTE_ID_SHOW_NORMAL;
+		RichTextLine tmp_line = { begin, it->len, palette, it->wid };
 		lst.push_back (tmp_line);
 	}
 }

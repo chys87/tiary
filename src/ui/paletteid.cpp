@@ -36,6 +36,7 @@ namespace {
 #define SELECT_ENTRY_LABEL { CYAN, MAGENTA, HIGHLIGHT }
 #define RICHTEXT_NORMAL    { WHITE, BLACK, 0 }
 #define RICHTEXT_BOLD      { WHITE, BLACK, HIGHLIGHT }
+#define RICHTEXT_QUOTE     { CYAN, BLACK, 0 }
 
 struct PaletteMap
 {
@@ -86,6 +87,7 @@ const PaletteMap mapping[] = {
 
 	, { PALETTE_ID_SHOW_NORMAL,        RICHTEXT_NORMAL }
 	, { PALETTE_ID_SHOW_BOLD,          RICHTEXT_BOLD }
+	, { PALETTE_ID_SHOW_QUOTE,         RICHTEXT_QUOTE }
 
 };
 
