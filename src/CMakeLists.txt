@@ -305,35 +305,6 @@ CHECK_CXX_SOURCE_COMPILES("
 	}
 " HAVE_TR1_UNORDERED_SET_MAP)
 
-# std::hash<const std::string &> ?
-CHECK_CXX_SOURCE_COMPILES("
-	#include <unordered_set> \n
-	#include <string> \n
-	using namespace std;
-	int main ()
-	{
-		unordered_set<std::string, std::hash<const std::string &> > s1;
-		unordered_set<std::wstring, std::hash<const std::wstring &> > s2;
-		s1.insert (\"1\");
-		s2.insert (L\"1\");
-		return 0;
-	}" HAVE_HASH_STRING_REF)
-
-# hash<const std::tr1::string &> ?
-# (Nonstandard but improves efficiency)
-CHECK_CXX_SOURCE_COMPILES("
-	#include <tr1/unordered_set> \n
-	#include <string> \n
-	using namespace std;
-	int main ()
-	{
-		tr1::unordered_set<std::string, std::tr1::hash<const std::string &> > s1;
-		tr1::unordered_set<std::wstring, std::tr1::hash<const std::wstring &> > s2;
-		s1.insert (\"1\");
-		s2.insert (L\"1\");
-		return 0;
-	}" HAVE_TR1_HASH_STRING_REF)
-
 IF(HAVE_UNORDERED_SET_MAP)
 	ADD_DEFINITIONS("-DTIARY_HAVE_STD_UNORDERED_SET_MAP=1")
 	IF(HAVE_HASH_STRING_REF)

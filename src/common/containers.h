@@ -37,13 +37,8 @@ namespace tiary {
    using std::unordered_map;
    using std::hash;
 
-# ifdef TIARY_HAVE_STD_HASH_STRING_REF
-	typedef std::hash <const std::string &> StringHash;
-	typedef std::hash <const std::wstring&> WStringHash;
-# else
-	typedef std::hash <std::string> StringHash;
-	typedef std::hash <std::wstring> WStringHash;
-# endif
+   typedef std::hash <std::string> StringHash;
+   typedef std::hash <std::wstring> WStringHash;
 
 #elif defined TIARY_HAVE_TR1_UNORDERED_SET_MAP // unordered_{set,map} not in std, but available in std::tr1
 
@@ -51,13 +46,8 @@ namespace tiary {
    using std::tr1::unordered_map;
    using std::tr1::hash;
 
-# ifdef TIARY_HAVE_STD_TR1_HASH_STRING_REF
-	typedef std::tr1::hash <const std::string &> StringHash;
-	typedef std::tr1::hash <const std::wstring&> WStringHash;
-# else
-	typedef std::tr1::hash <std::string> StringHash;
-	typedef std::tr1::hash <std::wstring> WStringHash;
-# endif
+   typedef std::tr1::hash <std::string> StringHash;
+   typedef std::tr1::hash <std::wstring> WStringHash;
 
 #else // Fallback to std::set and std::map
 
