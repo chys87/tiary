@@ -21,8 +21,8 @@
 #include "ui/label.h"
 #include "common/datetime.h"
 #include "common/containers.h"
-#include "common/types.h"
 #include <functional>
+#include <stdint.h>
 
 namespace tiary {
 namespace ui {

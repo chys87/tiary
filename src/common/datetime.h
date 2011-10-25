@@ -15,7 +15,7 @@
 #ifndef TIARY_COMMON_DATETIME_H
 #define TIARY_COMMON_DATETIME_H
 
-#include "common/types.h"
+#include <stdint.h>
 #include <string>
 #include <time.h>
 

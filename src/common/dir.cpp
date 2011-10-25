@@ -19,7 +19,6 @@
 
 
 #include "common/dir.h"
-#include "common/types.h"
 #include "common/unicode.h"
 #include "common/string.h"
 #include "common/algorithm.h"
@@ -37,6 +36,7 @@
 #include <functional>
 #include <algorithm>
 #include <locale>
+#include <stdint.h>
 
 #ifndef PATH_MAX
 # define PATH_MAX 4096

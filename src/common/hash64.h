@@ -24,7 +24,7 @@
 #ifndef TIARY_COMMON_HASH64_H
 #define TIARY_COMMON_HASH64_H
 
-#include "common/types.h"
+#include <stdint.h>
 #include <string>
 #include <string.h>
 

@@ -12,7 +12,7 @@
  **************************************************************************/
 
 #include "ui/scrollbar.h"
-#include "common/types.h"
+#include <stdint.h>
 
 namespace tiary {
 namespace ui {

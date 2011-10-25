@@ -39,7 +39,6 @@ add_library(tiary_common STATIC
 	string.cpp
 	string_match.h
 	string_match.cpp
-	types.h
 	unicode.h
 	unicode.cpp
 	xml.h

@@ -28,7 +28,7 @@
  * license. (--chys)
  */
 
-#include "common/types.h"
+#include <stdint.h>
 #include <string>
 #include <string.h> // ::memcpy
 #include <stddef.h> // ::size_t

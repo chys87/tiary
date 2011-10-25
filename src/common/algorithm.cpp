@@ -18,11 +18,11 @@
  */
 
 #include "common/algorithm.h"
-#include "common/types.h"
 #include <algorithm>
 #include <functional>
 #include <string.h> // memcpy
 #include <assert.h>
+#include <stdint.h>
 
 namespace tiary {
 
