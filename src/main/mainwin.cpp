@@ -44,6 +44,7 @@
 #include "main/dialog_open_recent.h"
 #include "main/stat.h"
 #include <limits>
+#include <unistd.h>
 
 namespace tiary {
 
@@ -378,6 +379,7 @@ void MainWin::load (const std::wstring &filename)
 			break;
 		case LOAD_FILE_PASSWORD: // Password incorrect.
 			error_info = L"Incorrect password.";
+			sleep (1);
 			break;
 		case LOAD_FILE_READ_ERROR:
 			error_info = format (L"Cannot read file: %a") << nice_filename;
