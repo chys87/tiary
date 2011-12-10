@@ -245,48 +245,6 @@ IF(HAVE_DEFAULT_DELETE_FUNCTIONS)
 	ADD_DEFINITIONS("-DTIARY_HAVE_DEFAULT_DELETE_FUNCTIONS=1")
 ENDIF(HAVE_DEFAULT_DELETE_FUNCTIONS)
 
-# unordered_set/unordered_map (>= gcc 4.3)
-CHECK_CXX_SOURCE_COMPILES("
-	#include <unordered_set> \n
-	#include <unordered_map> \n
-	#include <string> \n
-	#include <cstdlib> \n
-	using namespace std;
-	unordered_map <wstring, unordered_set <string> > map;
-	int main ()
-	{
-		unordered_set <string> & set = map[L\"hello\"];
-		set.insert (\"1\");
-		set.insert (\"2\");
-		const pair <const wstring, unordered_set <string> > &pr = *map.begin ();
-		return 0;
-	}
-" HAVE_UNORDERED_SET_MAP)
-
-# tr1/unordered_{set,map} (>= gcc 4)
-CHECK_CXX_SOURCE_COMPILES("
-	#include <tr1/unordered_set> \n
-	#include <tr1/unordered_map> \n
-	#include <string> \n
-	#include <cstdlib> \n
-	using namespace std;
-	tr1::unordered_map <wstring, tr1::unordered_set <string> > map;
-	int main ()
-	{
-		tr1::unordered_set <string> & set = map[L\"hello\"];
-		set.insert (\"1\");
-		set.insert (\"2\");
-		const pair <const wstring, tr1::unordered_set <string> > &pr = *map.begin ();
-		return 0;
-	}
-" HAVE_TR1_UNORDERED_SET_MAP)
-
-IF(HAVE_UNORDERED_SET_MAP)
-	ADD_DEFINITIONS("-DTIARY_HAVE_STD_UNORDERED_SET_MAP=1")
-ELSEIF(HAVE_TR1_UNORDERED_SET_MAP)
-	ADD_DEFINITIONS("-DTIARY_HAVE_TR1_UNORDERED_SET_MAP=1")
-ENDIF(HAVE_UNORDERED_SET_MAP)
-
 # initializer list (>= gcc 4.4)
 CHECK_CXX_SOURCE_COMPILES("
 	#include <list> \n

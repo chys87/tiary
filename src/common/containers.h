@@ -20,44 +20,9 @@
 #include <string>
 #include <set>
 #include <map>
-#if TIARY_HAVE_STD_UNORDERED_SET_MAP
-# include <unordered_set>
-# include <unordered_map>
-#elif TIARY_HAVE_TR1_UNORDERED_SET_MAP
-# include <tr1/unordered_set>
-# include <tr1/unordered_map>
-#endif
 
 
 namespace tiary {
-
-#ifdef TIARY_HAVE_STD_UNORDERED_SET_MAP
-
-   using std::unordered_set;
-   using std::unordered_map;
-   using std::hash;
-
-   typedef std::hash <std::string> StringHash;
-   typedef std::hash <std::wstring> WStringHash;
-
-#elif defined TIARY_HAVE_TR1_UNORDERED_SET_MAP // unordered_{set,map} not in std, but available in std::tr1
-
-   using std::tr1::unordered_set;
-   using std::tr1::unordered_map;
-   using std::tr1::hash;
-
-   typedef std::tr1::hash <std::string> StringHash;
-   typedef std::tr1::hash <std::wstring> WStringHash;
-
-#else // Fallback to std::set and std::map
-
-   template <typename T> struct hash {};
-   template <typename T, typename H = void> class unordered_set : public std::set <T> {};
-   template <typename K, typename T, typename H = void> class unordered_map : public std::map <K,T> {};
-   typedef void StringHash;
-   typedef void WStringHash;
-
-#endif
 
 typedef std::set<std::wstring,std::locale> WStringLocaleOrderedSet;
 typedef std::set<std::string, std::locale> StringLocaleOrderedSet;
@@ -68,13 +33,6 @@ typedef std::set<std::wstring> WStringOrderedSet;
 typedef std::set<std::string > StringOrderedSet;
 typedef std::map<std::wstring,std::wstring> WStringOrderedMap;
 typedef std::map<std::string, std::string > StringOrderedMap;
-
-typedef tiary::unordered_set<std::wstring, WStringHash> WStringUnorderedSet;
-typedef tiary::unordered_set<std::string,  StringHash> StringUnorderedSet;
-
-typedef tiary::unordered_map<std::wstring, std::wstring, WStringHash> WStringUnorderedMap;
-typedef tiary::unordered_map<std::string,  std::string,  StringHash > StringUnorderedMap;
-
 
 } // namespace tiary
 

@@ -16,7 +16,7 @@
 #define TIARY_UI_HOTKEYS_H
 
 #include "common/action.h"
-#include "common/containers.h"
+#include <map>
 
 namespace tiary {
 namespace ui {
@@ -54,7 +54,7 @@ public:
 	bool emit_hotkey (wchar_t);
 
 private:
-	typedef unordered_map<wchar_t, Action> HotkeyList;
+	typedef std::map<wchar_t, Action> HotkeyList;
 
 	HotkeyList hotkey_list;
 };

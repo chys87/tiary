@@ -15,7 +15,7 @@
 #define TIARY_UI_BUTTON_DEFAULT_H
 
 #include "ui/window.h"
-#include "common/containers.h"
+#include <map>
 
 namespace tiary {
 namespace ui {
@@ -84,7 +84,7 @@ public:
 
 private:
 
-	typedef /* No std:: here */unordered_map <Control *, Button *> SpecialMap;
+	typedef std::map <Control *, Button *> SpecialMap;
 
 	SpecialMap special_map;
 };

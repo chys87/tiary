@@ -20,8 +20,8 @@
 #include "ui/droplist.h"
 #include "ui/label.h"
 #include "common/datetime.h"
-#include "common/containers.h"
 #include <functional>
+#include <set>
 #include <stdint.h>
 
 namespace tiary {
@@ -38,7 +38,7 @@ public:
 
 	Signal sig_date_changed;
 
-	typedef /* No std:: */ unordered_set <uint32_t> SelectableDates;
+	typedef std::set <uint32_t> SelectableDates;
 
 	SelectableDates selectable_dates;
 

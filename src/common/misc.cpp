@@ -64,8 +64,6 @@ template const char    *map_query <StringOrderedMap       > (const StringOrdered
 template const wchar_t *map_query <WStringOrderedMap      > (const WStringOrderedMap &,       const wchar_t *);
 template const char    *map_query <StringLocaleOrderedMap > (const StringLocaleOrderedMap &,  const char *);
 template const wchar_t *map_query <WStringLocaleOrderedMap> (const WStringLocaleOrderedMap &, const wchar_t *);
-template const char    *map_query <StringUnorderedMap     > (const StringUnorderedMap &,      const char *);
-template const wchar_t *map_query <WStringUnorderedMap    > (const WStringUnorderedMap &,     const wchar_t *);
 
 #ifndef S_ISREG
 # if defined S_IFMT && defined S_IFREG

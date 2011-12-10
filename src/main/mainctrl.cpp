@@ -102,7 +102,7 @@ void MainCtrl::redraw ()
 	std::wstring date_format = w().global_options.get_wstring (GLOBAL_OPTION_DATETIME_FORMAT);
 
 	// Build a map to get entry ID from pointer
-	unordered_map <const DiaryEntry *, unsigned> id_map;
+	std::map <const DiaryEntry *, unsigned> id_map;
 	for (size_t i=0; i<w().entries.size (); ++i) {
 		id_map.insert (std::make_pair (w().entries[i], i+1));
 	}

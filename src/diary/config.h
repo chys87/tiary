@@ -51,7 +51,7 @@ class OptionGroupBase
 {
 protected:
 
-	typedef StringUnorderedMap DataType;
+	typedef StringOrderedMap DataType;
 
 	void reset (const OptionDescription *); // Does not affect unknown options
 

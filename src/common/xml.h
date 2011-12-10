@@ -49,7 +49,7 @@ struct XMLNodeTree : XMLNode
 	XMLNode *children; // Pointer to first child
 	const std::string name;
 
-	typedef StringUnorderedMap PropertyList;
+	typedef StringOrderedMap PropertyList;
 
 	PropertyList properties;
 };
