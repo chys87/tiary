@@ -213,13 +213,19 @@ IF(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
 ENDIF(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
 
 
-# Check whether the compiler has some support for C++0x
+# Check whether the compiler has some support for C++11
 # Currently supports: GCC (>= gcc 4.3); ICC (>= icc 11)
-CHECK_CXX_COMPILER_FLAG("-std=gnu++0x" HAVE_SOME_CXX0X)
-IF(HAVE_SOME_CXX0X)
-	ADD_DEFINITIONS("-std=gnu++0x")
-	SET(CMAKE_REQUIRED_FLAGS "-std=gnu++0x")
-ENDIF(HAVE_SOME_CXX0X)
+CHECK_CXX_COMPILER_FLAG("-std=gnu++11" HAVE_SOME_CXX11)
+IF(HAVE_SOME_CXX11)
+	ADD_DEFINITIONS("-std=gnu++11")
+	SET(CMAKE_REQUIRED_FLAGS "-std=gnu++11")
+ELSE(HAVE_SOME_CXX11)
+	CHECK_CXX_COMPILER_FLAG("-std=gnu++0x" HAVE_SOME_CXX0X)
+	IF(HAVE_SOME_CXX0X)
+		ADD_DEFINITIONS("-std=gnu++0x")
+		SET(CMAKE_REQUIRED_FLAGS "-std=gnu++0x")
+	ENDIF(HAVE_SOME_CXX0X)
+ENDIF(HAVE_SOME_CXX11)
 
 # Rvalue references (>= gcc 4.3)
 CHECK_CXX_SOURCE_COMPILES("

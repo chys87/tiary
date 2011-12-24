@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2011, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -21,7 +21,7 @@
  * @brief	Defines macro TIARY_STATIC_ASSERT
  *
  * Static assertions are used to detect errors at compile time.
- * If the compiler itself supports static assertions (a C++0x feature), we use it.
+ * If the compiler itself supports static assertions (a C++11 feature), we use it.
  */
 
 // Static assertion
