@@ -54,7 +54,7 @@ bool init ()
 		keypad (stdscr, TRUE);
 		intrflush (stdscr, FALSE);
 
-#ifdef TIARY_HAVE_ESCDELAY
+#ifdef HAVE_SET_ESCDELAY
 		// The default value set in ncurses is way too long
 		// VIM uses 25 milliseconds
 		if (getenv ("ESCDELAY") == 0) {

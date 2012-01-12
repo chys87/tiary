@@ -50,11 +50,15 @@
 # endif
 #endif
 
-#ifndef TIARY_HAVE_EUIDACCESS
-# define euidaccess access
+#ifndef HAVE_EUIDACCESS
+# ifdef HAVE_EACCESS
+#  define euidaccess eaccess
+# else
+#  define euidaccess access
+# endif
 #endif
 
-#if defined TIARY_HAVE_FACCESSAT && defined AT_FDCWD && defined AT_EACCESS
+#if defined HAVE_FACCESSAT && defined AT_FDCWD && defined AT_EACCESS
 # undef euidaccess
 # define euidaccess(name,mode) faccessat(AT_FDCWD,name,mode,AT_EACCESS)
 #endif
@@ -151,7 +155,7 @@ std::wstring make_home_dirname (const wchar_t *file)
 
 template <> std::basic_string<char> get_current_dir <char> ()
 {
-#ifdef TIARY_HAVE_GET_CURRENT_DIR_NAME
+#ifdef HAVE_GET_CURRENT_DIR_NAME
 	if (char *dir = get_current_dir_name ()) {
 		std::string r = dir;
 		free (dir);

@@ -36,19 +36,19 @@ inline const char *strchr (const char *str, int ch) { return ::strchr (str, ch);
 inline char *strchr (char *str, int ch) { return ::strchr (str, ch); }
 inline size_t strlen (const char *str) { return ::strlen (str); }
 inline size_t strlen (const wchar_t *str) { return ::wcslen (str); }
-#ifdef TIARY_HAVE_MEMPCPY
+#ifdef HAVE_MEMPCPY
 using ::mempcpy;
 #else
 void *mempcpy (void *, const void *, size_t);
 #endif
-#ifdef TIARY_HAVE_STPCPY
+#ifdef HAVE_STPCPY
 inline char *stpcpy (char *dst, const char *src) { return ::stpcpy (dst, src); }
 inline wchar_t *stpcpy (wchar_t *dst, const wchar_t *src) { return ::wcpcpy (dst, src); }
 #else
 char *stpcpy (char *dst, const char *src);
 wchar_t *stpcpy (wchar_t *dst, const wchar_t *src);
 #endif
-#ifdef TIARY_HAVE_STRCHRNUL
+#ifdef HAVE_STRCHRNUL
 inline const char *strchrnul (const char *str, int ch) { return ::strchrnul (str, ch); }
 inline char *strchrnul (char *str, int ch) { return ::strchrnul (str, ch); }
 #else

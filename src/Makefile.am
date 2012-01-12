@@ -1,0 +1,177 @@
+# /***********************************************************************
+#  *
+#  * Tiary, a terminal-based diary keeping system for Unix-like systems
+#  * Copyright (C) 2009, 2010, 2011, 2012, chys <admin@CHYS.INFO>
+#  *
+#  * This software is licensed under the 3-clause BSD license.
+#  * See LICENSE in the source package and/or online info for details.
+#  *
+#  **********************************************************************/
+
+
+
+# FIXME:
+# For now, I am forced to put the files all here, instead of putting them
+# separately in {common,diary,main,ui}/Makefile.am. I encounter problems
+# if we do it that way, e.g., #include <string.h> gets common/string.h included
+# I don't know how to remove the superfluous -I... flags
+
+bin_PROGRAMS = tiary
+
+tiary_SOURCES = main.cpp \
+	common/action.h \
+	common/algorithm.h \
+	common/algorithm.cpp \
+	common/bswap.h \
+	common/bzip2.h \
+	common/bzip2.cpp \
+	common/callback.h \
+	common/condition.h \
+	common/condition.cpp \
+	common/container_of.h \
+	common/containers.h \
+	common/datetime.h \
+	common/datetime.cpp \
+	common/datetime_format.cpp \
+	common/debuglog.h \
+	common/debuglog.cpp \
+	common/dir.h \
+	common/dir.cpp \
+	common/external.h \
+	common/external.cpp \
+	common/format.h \
+	common/format.cpp \
+	common/hash64.h \
+	common/hash64.cpp \
+	common/iterator.h \
+	common/md5.h \
+	common/md5.cpp \
+	common/misc.h \
+	common/misc.cpp \
+	common/pcre.h \
+	common/pcre.cpp \
+	common/signal.h \
+	common/signal.cpp \
+	common/split_line.h \
+	common/split_line.cpp \
+	common/static_assert.h \
+	common/string.h \
+	common/string.cpp \
+	common/string_match.h \
+	common/string_match.cpp \
+	common/unicode.h \
+	common/unicode.cpp \
+	common/xml.h \
+	common/xml.cpp \
+	diary/config.h \
+	diary/config.cpp \
+	diary/diary.h \
+	diary/file.h \
+	diary/file.cpp \
+	diary/filter.h \
+	diary/filter.cpp \
+	main/dialog_all_labels.h \
+	main/dialog_all_labels.cpp \
+	main/dialog_edit_time.h \
+	main/dialog_edit_time.cpp \
+	main/dialog_filter.h \
+	main/dialog_filter.cpp \
+	main/dialog_global_pref.h \
+	main/dialog_global_pref.cpp \
+	main/dialog_labels.h \
+	main/dialog_labels.cpp \
+	main/dialog_open_recent.h \
+	main/dialog_open_recent.cpp \
+	main/dialog_perfile_pref.h \
+	main/dialog_perfile_pref.cpp \
+	main/dialog_view_edit.h \
+	main/dialog_view_edit.cpp \
+	main/doc.h \
+	main/doc.cpp \
+	main/mainui.h \
+	main/mainui.cpp \
+	main/mainctrl.h \
+	main/mainctrl.cpp \
+	main/mainwin.h \
+	main/mainwin.cpp \
+	main/stat.h \
+	main/stat.cpp \
+	ui/button.h \
+	ui/button.cpp \
+	ui/button_default.h \
+	ui/button_default.cpp \
+	ui/chain.h \
+	ui/checkbox.h \
+	ui/checkbox.cpp \
+	ui/checkbox_label.h \
+	ui/checkbox_label.cpp \
+	ui/control.h \
+	ui/control.cpp \
+	ui/date_select.h \
+	ui/date_select.cpp \
+	ui/dialog_input.h \
+	ui/dialog_input.cpp \
+	ui/dialog_message.h \
+	ui/dialog_message.cpp \
+	ui/dialog_richtext.h \
+	ui/dialog_richtext.cpp \
+	ui/dialog_search.h \
+	ui/dialog_search.cpp \
+	ui/dialog_select.h \
+	ui/dialog_select.cpp \
+	ui/dialog_select_file.h \
+	ui/dialog_select_file.cpp \
+	ui/direction.h \
+	ui/droplist.h \
+	ui/droplist.cpp \
+	ui/fixed_window.h \
+	ui/fixed_window.cpp \
+	ui/grid_select.h \
+	ui/grid_select.cpp \
+	ui/hotkey_hint.h \
+	ui/hotkey_hint.cpp \
+	ui/hotkeys.h \
+	ui/hotkeys.cpp \
+	ui/label.h \
+	ui/label.cpp \
+	ui/layout.h \
+	ui/layout.cpp \
+	ui/listbox.h \
+	ui/listbox.cpp \
+	ui/menu.h \
+	ui/menu.cpp \
+	ui/menubar.h \
+	ui/menubar.cpp \
+	ui/mouse.h \
+	ui/movable_object.h \
+	ui/ncurses_common.h \
+	ui/ncurses_common.cpp \
+	ui/object.h \
+	ui/output.h \
+	ui/paletteid.h \
+	ui/paletteid.cpp \
+	ui/richtext.h \
+	ui/richtext.cpp \
+	ui/richtextlist.h \
+	ui/richtextlist.cpp \
+	ui/scroll.h \
+	ui/scroll.cpp \
+	ui/scrollbar.h \
+	ui/scrollbar.cpp \
+	ui/search_info.h \
+	ui/search_info.cpp \
+	ui/size.h \
+	ui/terminal_emulator.h \
+	ui/terminal_emulator.cpp \
+	ui/textbox.h \
+	ui/textbox.cpp \
+	ui/ui.h \
+	ui/ui.cpp \
+	ui/uistring.h \
+	ui/uistring.cpp \
+	ui/uistring_base.h \
+	ui/uistring_base.cpp \
+	ui/uistring_one.h \
+	ui/uistring_one.cpp \
+	ui/window.h \
+	ui/window.cpp

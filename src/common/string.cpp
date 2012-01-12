@@ -18,14 +18,14 @@
 
 namespace tiary {
 
-#ifndef TIARY_HAVE_MEMPCPY
+#ifndef HAVE_MEMPCPY
 void *mempcpy (void *dst, const void *src, size_t len)
 {
 	return len + (char *) memcpy (dst, src, len);
 }
 #endif
 
-#ifndef TIARY_HAVE_STPCPY
+#ifndef HAVE_STPCPY
 namespace {
 
 template <typename T> inline
@@ -48,7 +48,7 @@ wchar_t *stpcpy (wchar_t *dst, const wchar_t *src)
 }
 #endif
 
-#ifndef TIARY_HAVE_STRCHRNUL
+#ifndef HAVE_STRCHRNUL
 const char *strchrnul (const char *str, int ch)
 {
 	size_t len = strlen (str);

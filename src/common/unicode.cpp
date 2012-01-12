@@ -326,7 +326,7 @@ unsigned ucs_width (wchar_t c)
 	if (uint32_t (c) < 0x80) {
 		return 1;
 	}
-#ifdef TIARY_HAVE_WCWIDTH
+#ifdef HAVE_WCWIDTH
 	if (wcwidth (c) > 1) {
 		return 2;
 	}
@@ -341,7 +341,7 @@ unsigned ucs_width (wchar_t c)
 		{0xFFE0, 0xFFE7}, {0x20000, 0x2FFFE}, {0x30000, 0x3FFFE}
 	};
 	return find(table,array_end(table),c) ? 2 : 1;
-#endif // !TIARY_HAVE_WCWIDTH
+#endif // !HAVE_WCWIDTH
 }
 
 unsigned ucs_width (const wchar_t *s)
