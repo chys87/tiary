@@ -22,6 +22,7 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 PKG_PROG_PKG_CONFIG
 
+dnl Use CXX compiler during configure
 AC_LANG(C++)
 
 dnl Define versions
@@ -122,16 +123,18 @@ AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fn
 AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
 
 dnl Check whether the compiler has some support for C++11
-dnl Currently supports: GCC (>= gcc 4.3); ICC (>= icc 11)
-AX_CHECK_COMPILE_FLAG([-std=gnu++11],[
-	have_some_cxx0x=yes
-	AX_APPEND_COMPILE_FLAGS([-std=gnu++11])
-],[
-	AX_CHECK_COMPILE_FLAG([-std=gnu++0x],[
+if "$CXX" -dumpspecs >/dev/null 2>&1; then
+	# If we reach here, it's true GCC, not ICC or clang which pretend to be GCC
+	AX_CHECK_COMPILE_FLAG([-std=gnu++11],[
 		have_some_cxx0x=yes
-		AX_APPEND_COMPILE_FLAGS([-std=gnu++0x])
+		AX_APPEND_COMPILE_FLAGS([-std=gnu++11])
+	],[
+		AX_CHECK_COMPILE_FLAG([-std=gnu++0x],[
+			have_some_cxx0x=yes
+			AX_APPEND_COMPILE_FLAGS([-std=gnu++0x])
+		])
 	])
-])
+fi
 
 if test x"$have_some_cxx0x" = xyes; then
 
