@@ -33,8 +33,7 @@ AC_DEFINE([TIARY_COPYRIGHT_YEAR],["2009, 2010, 2011, 2012"],[Copyright year])
 AC_DEFINE([TIARY_COPYRIGHT_YEAR_WIDE],[L"2009, 2010, 2011, 2012"],[Copyright year])
 
 dnl Define some useful feature macros
-AC_DEFINE([_GNU_SOURCE],[1],[Always defined])
-AC_DEFINE([_ALL_SOURCE],[1],[Always defined])
+AC_USE_SYSTEM_EXTENSIONS
 AC_DEFINE([_FORTIFY_SOURCE],[2],[Always defined])
 AC_DEFINE([_FILE_OFFSET_BITS],[64],[Always defined to 64])
 
