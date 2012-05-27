@@ -189,8 +189,8 @@ uint64_t make_datetime_local (time_t t) throw ()
 #else
 	struct tm *T = localtime (&t);
 #endif
-	struct ReadableDate rd = { T->tm_year+1900, T->tm_mon+1, T->tm_mday };
-	struct ReadableTime rt = { T->tm_hour, T->tm_min, T->tm_sec };
+	struct ReadableDate rd = { (unsigned)T->tm_year+1900, (unsigned)T->tm_mon+1, (unsigned)T->tm_mday };
+	struct ReadableTime rt = { (unsigned)T->tm_hour, (unsigned)T->tm_min, (unsigned)T->tm_sec };
 	return make_datetime (rd, rt);
 }
 
@@ -202,8 +202,8 @@ uint64_t make_datetime_utc (time_t t) throw ()
 #else
 	struct tm *T = gmtime (&t);
 #endif
-	struct ReadableDate rd = { T->tm_year+1900, T->tm_mon+1, T->tm_mday };
-	struct ReadableTime rt = { T->tm_hour, T->tm_min, T->tm_sec };
+	struct ReadableDate rd = { (unsigned)T->tm_year+1900, (unsigned)T->tm_mon+1, (unsigned)T->tm_mday };
+	struct ReadableTime rt = { (unsigned)T->tm_hour, (unsigned)T->tm_min, (unsigned)T->tm_sec };
 	return make_datetime (rd, rt);
 }
 

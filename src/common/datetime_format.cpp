@@ -21,7 +21,7 @@ namespace {
 
 void to_string_2 (std::wstring &dst, unsigned x)
 {
-	wchar_t buffer[2] = { L'0' + (x/10)%10, L'0' + (x%10) };
+	wchar_t buffer[2] = { wchar_t(L'0' + (x/10)%10), wchar_t(L'0' + (x%10)) };
 	dst.append (buffer, 2);
 }
 
