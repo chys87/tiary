@@ -125,11 +125,11 @@ AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
 dnl Check whether the compiler has some support for C++11
 AX_CHECK_COMPILE_FLAG([-std=gnu++11],[
 	have_some_cxx0x=yes
-	AX_APPEND_COMPILE_FLAGS([-std=gnu++11])
+	AX_APPEND_FLAG([-std=gnu++11])
 ],[
 	AX_CHECK_COMPILE_FLAG([-std=gnu++0x],[
 		have_some_cxx0x=yes
-		AX_APPEND_COMPILE_FLAGS([-std=gnu++0x])
+		AX_APPEND_FLAG([-std=gnu++0x])
 	])
 ])
 
