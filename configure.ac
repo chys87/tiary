@@ -16,7 +16,7 @@ AC_DEFUN([MINOR_VERSION], [3])
 AC_DEFUN([PATCH_VERSION], [0])
 
 AC_INIT([tiary],MAJOR_VERSION.MINOR_VERSION.PATCH_VERSION,[admin@CHYS.INFO])
-AM_INIT_AUTOMAKE([foreign -Wall dist-bzip2 dist-lzma dist-xz])
+AM_INIT_AUTOMAKE([foreign -Wall dist-bzip2 dist-xz])
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
