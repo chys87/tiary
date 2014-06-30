@@ -12,10 +12,13 @@
 
 AM_CPPFLAGS = -I$(top_builddir)/src -I$(top_srcdir)/src
 
-SUBDIRS = common diary main ui
+noinst_LIBRARIES = libdiary.a
 
-bin_PROGRAMS = tiary
-
-tiary_LDADD = main/libmain.a ui/libui.a diary/libdiary.a common/libcommon.a
-
-tiary_SOURCES = main.cpp
+libdiary_a_SOURCES = \
+	config.h \
+	config.cpp \
+	diary.h \
+	file.h \
+	file.cpp \
+	filter.h \
+	filter.cpp

@@ -16,9 +16,10 @@ AC_DEFUN([MINOR_VERSION], [3])
 AC_DEFUN([PATCH_VERSION], [1])
 
 AC_INIT([tiary],MAJOR_VERSION.MINOR_VERSION.PATCH_VERSION,[admin@CHYS.INFO])
-AM_INIT_AUTOMAKE([foreign -Wall dist-bzip2 dist-xz])
+AM_INIT_AUTOMAKE([foreign -Wall dist-bzip2 dist-xz nostdinc])
 AC_PROG_CC
 AC_PROG_CXX
+AC_PROG_RANLIB
 AC_PROG_INSTALL
 PKG_PROG_PKG_CONFIG
 
@@ -29,9 +30,9 @@ dnl Define versions
 AC_DEFINE([TIARY_MAJOR_VERSION],MAJOR_VERSION,[Version])
 AC_DEFINE([TIARY_MINOR_VERSION],MINOR_VERSION,[Version])
 AC_DEFINE([TIARY_PATCH_VERSION],PATCH_VERSION,[Version])
-dnl Remember to change the years on ever new year!
-AC_DEFINE([TIARY_COPYRIGHT_YEAR],["2009, 2010, 2011, 2012"],[Copyright year])
-AC_DEFINE([TIARY_COPYRIGHT_YEAR_WIDE],[L"2009, 2010, 2011, 2012"],[Copyright year])
+dnl Remember to change the years on every new year!
+AC_DEFINE([TIARY_COPYRIGHT_YEAR],["2009, 2010, 2011, 2012, 2013, 2014"],[Copyright year])
+AC_DEFINE([TIARY_COPYRIGHT_YEAR_WIDE],[L"2009, 2010, 2011, 2012, 2013, 2014"],[Copyright year])
 
 dnl Define some useful feature macros
 AC_USE_SYSTEM_EXTENSIONS
@@ -213,5 +214,9 @@ AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
+	src/common/Makefile
+	src/diary/Makefile
+	src/main/Makefile
+	src/ui/Makefile
 ])
 AC_OUTPUT
