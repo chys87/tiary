@@ -1,7 +1,7 @@
 dnl /***********************************************************************
 dnl  *
 dnl  * Tiary, a terminal-based diary keeping system for Unix-like systems
-dnl  * Copyright (C) 2009, 2010, 2011, 2012, chys <admin@CHYS.INFO>
+dnl  * Copyright (C) 2009, 2010, 2011, 2012, 2014 chys <admin@CHYS.INFO>
 dnl  *
 dnl  * This software is licensed under the 3-clause BSD license.
 dnl  * See LICENSE in the source package and/or online info for details.
@@ -36,8 +36,7 @@ AC_DEFINE([TIARY_COPYRIGHT_YEAR_WIDE],[L"2009, 2010, 2011, 2012, 2013, 2014"],[C
 
 dnl Define some useful feature macros
 AC_USE_SYSTEM_EXTENSIONS
-AC_DEFINE([_FORTIFY_SOURCE],[2],[Always defined])
-AC_DEFINE([_FILE_OFFSET_BITS],[64],[Always defined to 64])
+AH_TOP([#include "config-common.h"])
 
 dnl Check for required wchar_t support
 AC_FUNC_MBRTOWC
