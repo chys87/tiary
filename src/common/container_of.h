@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -44,43 +44,7 @@
 #define TIARY_VECTOR_OF(type)	TIARY_CONTAINER_OF(::std::vector<type >)
 #define TIARY_VECTOR_OF_END		TIARY_CONTAINER_OF_END
 
-#ifdef TIARY_HAVE_INITIALIZER_LIST
-
 # define TIARY_CONTAINER_OF(type)	(type {
 # define TIARY_CONTAINER_OF_END		} )
-
-#else // ifndef TIARY_HAVE_INITIALIZER_LIST
-
-# define TIARY_CONTAINER_OF(type)	(::tiary::detail::ContainerOf<type >(),
-# define TIARY_CONTAINER_OF_END		)()
-
-#include <utility> // std::forward
-
-namespace tiary {
-
-namespace detail {
-
-template <typename C>
-struct ContainerOf : public C
-{
-	typedef typename C::value_type T;
-
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	ContainerOf &operator ,  (T &&x) { C::push_back (std::forward<T> (x)); return *this; }
-#else
-	ContainerOf &operator ,  (const T &x) { C::push_back (x); return *this; }
-#endif
-
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-	C && operator () () { return *this; }
-#else
-	C & operator () () { return *this; }
-#endif
-};
-
-} // namespace detail
-} // namespace tiary
-
-#endif // !TIARY_HAVE_INITIALIZER_LIST
 
 #endif // Include guard

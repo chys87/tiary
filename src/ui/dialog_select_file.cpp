@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -248,7 +248,7 @@ void WindowSelectFile::set_text (const std::wstring &newname, bool rewrite_input
 			}
 			display_list.push_back (it->name);
 		}
-		list_files.set_items (TIARY_STD_MOVE (display_list), size_t(-1), false);
+		list_files.set_items (std::move (display_list), size_t(-1), false);
 	}
 	// Select a corresponding item
 	// If our item is "r", and we have "rel" and "r", we must make

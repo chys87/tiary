@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2016 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -136,12 +136,6 @@ GetMemberFunctor<Class,Member> get_member_fun (Member Class::*ptr)
 }
 
 
-
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-# define TIARY_STD_MOVE ::std::move
-#else
-# define TIARY_STD_MOVE
-#endif
 
 namespace detail {
 

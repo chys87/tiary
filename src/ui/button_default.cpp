@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -38,7 +38,7 @@ ButtonDefault::ButtonDefault ()
 	Action sig_tmp (Signal (this, &ButtonDefault::slot_default_button),
 			Condition (this, &ButtonDefault::cond_default_button));
 	Window::register_hotkey (RETURN, sig_tmp);
-	Window::register_hotkey (NEWLINE, TIARY_STD_MOVE (sig_tmp));
+	Window::register_hotkey (NEWLINE, std::move (sig_tmp));
 }
 
 ButtonDefault::~ButtonDefault ()

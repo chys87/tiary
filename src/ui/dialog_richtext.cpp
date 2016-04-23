@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -58,7 +58,7 @@ WindowRichText::WindowRichText (const std::wstring &title, const std::wstring &t
 	register_hotkey (RETURN, sig_close);
 	register_hotkey (NEWLINE, sig_close);
 	register_hotkey (ESCAPE, sig_close);
-	register_hotkey (L'q', TIARY_STD_MOVE (sig_close));
+	register_hotkey (L'q', std::move (sig_close));
 
 	WindowRichText::redraw ();
 }

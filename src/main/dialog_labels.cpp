@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -152,7 +152,7 @@ void WindowLabels::slot_add ()
 				new_text += L',';
 			}
 			new_text += label;
-			txt_selected.set_text (TIARY_STD_MOVE (new_text), false, new_text.size ());
+			txt_selected.set_text (std::move (new_text), false, new_text.size ());
 		}
 	}
 }

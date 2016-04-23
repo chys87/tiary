@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -77,10 +77,8 @@ public:
 	Condition () : info (0) {}
 	Condition (const Condition &other) : info (other.info ? other.info->copy () : 0) {}
 	Condition &operator = (const Condition &other);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	Condition (Condition &&other) : info (other.info) { other.info = 0; }
 	Condition &operator = (Condition &&other) { swap (other); return *this; }
-#endif
 
 	void swap (Condition &other)
 	{
@@ -102,7 +100,6 @@ private:
 	friend Condition operator ! (const Condition &);
 	friend Condition operator && (const Condition &, const Condition &);
 	friend Condition operator || (const Condition &, const Condition &);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	friend Condition operator ! (Condition &&);
 	friend Condition operator && (const Condition &, Condition &&);
 	friend Condition operator && (Condition &&, const Condition &);
@@ -110,7 +107,6 @@ private:
 	friend Condition operator || (const Condition &, Condition &&);
 	friend Condition operator || (Condition &&, const Condition &);
 	friend Condition operator || (Condition &&, Condition &&);
-#endif
 };
 
 namespace detail {
@@ -120,9 +116,7 @@ struct CondNot : public CondBase
 	Condition obj;
 
 	explicit CondNot (const Condition &o) : obj(o) {}
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	explicit CondNot (Condition &&o) : obj(std::move (o)) {}
-#endif
 	~CondNot ();
 	bool call (bool);
 	CondNot *copy () const;
@@ -141,18 +135,12 @@ struct CondNot : public CondBase
 		cname *copy () const;\
 	};
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
-# define TIARY_COND_BIN_CLASS(cname) \
+#define TIARY_COND_BIN_CLASS(cname) \
 		TIARY_COND_BIN_CLASS_HEADER(cname)\
 		cname (const Condition &oa, Condition &&ob) : obja(oa), objb(std::move(ob)) {}\
 		cname (Condition &&oa, const Condition &ob) : obja(std::move(oa)), objb(ob) {}\
 		cname (Condition &&oa, Condition &&ob) : obja(std::move(oa)), objb(std::move(ob)) {}\
 		TIARY_COND_BIN_CLASS_FOOTER(cname)
-#else
-# define TIARY_COND_BIN_CLASS(cname) \
-		TIARY_COND_BIN_CLASS_HEADER(cname)\
-		TIARY_COND_BIN_CLASS_FOOTER(cname)
-#endif
 
 TIARY_COND_BIN_CLASS(CondAnd)
 TIARY_COND_BIN_CLASS(CondOr)
@@ -178,7 +166,6 @@ inline Condition operator || (const Condition &obja, const Condition &objb)
 	return Condition (new detail::CondOr (obja, objb));
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 inline Condition operator ! (Condition &&obj)
 {
 	return Condition (new detail::CondNot (std::move (obj)));
@@ -213,7 +200,6 @@ inline Condition operator || (Condition &&obja, Condition &&objb)
 {
 	return Condition (new detail::CondOr (std::move (obja), std::move (objb)));
 }
-#endif
 
 } // namespace tiary
 

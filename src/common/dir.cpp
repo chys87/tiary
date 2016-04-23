@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -446,7 +446,7 @@ DirEntList list_dir (
 			tmp_ent.name = mbs_to_wstring (ent->d_name);
 			tmp_ent.attr = get_file_attr (dirname + ent->d_name);
 			if (!filter (tmp_ent)) {
-				filelist.push_back (TIARY_STD_MOVE (tmp_ent));
+				filelist.push_back (std::move (tmp_ent));
 			}
 		}
 		closedir (dir);

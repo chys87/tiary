@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -85,7 +85,7 @@ WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
 			max_width = maxU (max_width, ucs_width (lst_display.back ()));
 		}
 
-		lst_files.set_items (TIARY_STD_MOVE (lst_display), 0, false);
+		lst_files.set_items (std::move (lst_display), 0, false);
 	}
 
 	layout_buttons.add
@@ -164,7 +164,7 @@ void WindowRecentFiles::slot_remove ()
 		lst_orig.erase (it);
 		ListBox::ItemList lst_display = lst_files.get_items ();
 		lst_display.erase (lst_display.begin() + select);
-		lst_files.set_items (TIARY_STD_MOVE (lst_display), minU (select+1, lst_display.size ()) - 1, true);
+		lst_files.set_items (std::move (lst_display), minU (select+1, lst_display.size ()) - 1, true);
 		modified = true;
 	}
 }

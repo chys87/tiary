@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -41,7 +41,6 @@ struct Action
 	Condition &operator = (const Condition &cond) { return condition = cond; }
 	Action &operator = (const Action &act) { signal = act.signal; condition = act.condition; return *this; }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	Action (Signal &&sig) : signal (std::move (sig)), condition () {}
 	Action (Condition &&cond) : signal (), condition (std::move (cond)) {}
 	Action (Signal &&sig, const Condition &cond) : signal (std::move (sig)), condition (cond) {}
@@ -50,7 +49,6 @@ struct Action
 	Signal &operator = (Signal &&sig) { return signal = std::move (sig); }
 	Condition &operator = (Condition &&cond) { return condition = std::move (cond); }
 	Action &operator = (Action &&act) { signal = std::move (act.signal); condition = std::move (act.condition); return *this; }
-#endif // rvalue ref
 
 	void swap (Action &other) { signal.swap (other.signal); condition.swap (other.condition); }
 
@@ -58,46 +56,10 @@ struct Action
 	bool is_connected () const { return signal.is_connected (); }
 	bool is_really_connected () const { return signal.is_really_connected (); }
 	// Forward all calls to connect to signal
-#if defined TIARY_HAVE_RVALUE_REFERENCES && defined TIARY_HAVE_TUPLES
 	template <typename... Args> void connect (Args &&...args)
 	{
 		signal.connect (std::forward <Args> (args)...);
 	}
-#elif defined TIARY_HAVE_RVALUE_REFERENCES
-	template <typename A> void connect (A &&a)
-	{
-		signal.connect (std::forward <A> (a));
-	}
-	template <typename A, typename B> void connect (A &&a, B &&b)
-	{
-		signal.connect (std::forward <A> (a), std::forward <B> (b));
-	}
-	template <typename A, typename B, typename C> void connect (A &&a, B &&b, C &&c)
-	{
-		signal.connect (std::forward <A> (a), std::forward <B> (b), std::forward <C> (c));
-	}
-	template <typename A, typename B, typename C, typename D> void connect (A &&a, B &&b, C &&c, D &&d)
-	{
-		signal.connect (std::forward <A> (a), std::forward <B> (b), std::forward <C> (c), std::forward <D> (d));
-	}
-#else
-	template <typename A> void connect (const A &a)
-	{
-		signal.connect (a);
-	}
-	template <typename A, typename B> void connect (const A &a, const B &b)
-	{
-		signal.connect (a, b);
-	}
-	template <typename A, typename B, typename C> void connect (const A &a, const B &b, const C &c)
-	{
-		signal.connect (a, b, c);
-	}
-	template <typename A, typename B, typename C, typename D> void connect (const A &a, const B &b, const C &c, const D &d)
-	{
-		signal.connect (a, b, c, d);
-	}
-#endif
 
 	void emit () { signal.emit (); }
 	bool call_condition (bool default_return) const { return condition.call (default_return); }

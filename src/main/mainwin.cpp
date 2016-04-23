@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2011 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2011, 2016 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -224,24 +224,24 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	main_ctrl.register_hotkey (ui::LEFT,     action_clear_filter);
 
 	hotkey_hint
-		(8000, L"Esc",     L"Menu",             TIARY_STD_MOVE (action_menu))
-		(7000, L"LEFT",    L"Clear filter",     TIARY_STD_MOVE (action_clear_filter))
-		(1000, L"a",       L"New entry",        TIARY_STD_MOVE (action_append))
-		(1000, L"e",       L"Edit",             TIARY_STD_MOVE (action_edit))
-		(1000, L"d",       L"Delete",           TIARY_STD_MOVE (action_delete))
-		(500,  L"^G",      L"Filter",           TIARY_STD_MOVE (action_filter))
-		(1000, L"/",       L"Search",           TIARY_STD_MOVE (action_search))
-		(2000, L"n",       L"Next",             TIARY_STD_MOVE (action_search_next))
-		(1000, L"t",       L"Time",             TIARY_STD_MOVE (action_time))
-		(1000, L"l",       L"Labels",           TIARY_STD_MOVE (action_item_labels))
-		(500,  L"L",       L"Manage labels",    TIARY_STD_MOVE (action_all_labels))
-		(1000, L"m",       L"Move up",          TIARY_STD_MOVE (action_move_up))
-		(1000, L"M",       L"Move down",        TIARY_STD_MOVE (action_move_down))
-		(0,    L"s",       L"Statistics",       TIARY_STD_MOVE (action_statistics))
-		(500,  L"S",       L"Sort",             TIARY_STD_MOVE (action_sort_all))
-		(500,  L"p",       L"Password",         TIARY_STD_MOVE (action_password))
-		(0,    L"F1",      L"Help",             TIARY_STD_MOVE (action_show_doc))
-		(8000, L"q",       L"Quit",             TIARY_STD_MOVE (action_quit))
+		(8000, L"Esc",     L"Menu",             std::move (action_menu))
+		(7000, L"LEFT",    L"Clear filter",     std::move (action_clear_filter))
+		(1000, L"a",       L"New entry",        std::move (action_append))
+		(1000, L"e",       L"Edit",             std::move (action_edit))
+		(1000, L"d",       L"Delete",           std::move (action_delete))
+		(500,  L"^G",      L"Filter",           std::move (action_filter))
+		(1000, L"/",       L"Search",           std::move (action_search))
+		(2000, L"n",       L"Next",             std::move (action_search_next))
+		(1000, L"t",       L"Time",             std::move (action_time))
+		(1000, L"l",       L"Labels",           std::move (action_item_labels))
+		(500,  L"L",       L"Manage labels",    std::move (action_all_labels))
+		(1000, L"m",       L"Move up",          std::move (action_move_up))
+		(1000, L"M",       L"Move down",        std::move (action_move_down))
+		(0,    L"s",       L"Statistics",       std::move (action_statistics))
+		(500,  L"S",       L"Sort",             std::move (action_sort_all))
+		(500,  L"p",       L"Password",         std::move (action_password))
+		(0,    L"F1",      L"Help",             std::move (action_show_doc))
+		(8000, L"q",       L"Quit",             std::move (action_quit))
 		;
 
 	MainWin::redraw ();
@@ -299,7 +299,7 @@ void MainWin::on_ready ()
 	else {
 		status += get_nice_pathname (current_filename);
 	}
-	menu_bar.set_text (TIARY_STD_MOVE (status));
+	menu_bar.set_text (std::move (status));
 	hotkey_hint.HotkeyHint::redraw ();
 }
 
