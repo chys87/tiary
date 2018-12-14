@@ -21,3 +21,4 @@ config.status
 /tiary-*.tar.*
 *.test
 /compile
+.*.sw?
