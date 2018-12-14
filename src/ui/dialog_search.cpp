@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,7 +26,6 @@
 #include "ui/chain.h"
 #include "ui/checkbox_label.h"
 #include "ui/label.h"
-#include "common/container_of.h"
 
 
 namespace tiary {

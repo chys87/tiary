@@ -25,7 +25,6 @@ libcommon_a_SOURCES = \
 	callback.h \
 	condition.h \
 	condition.cpp \
-	container_of.h \
 	containers.h \
 	datetime.h \
 	datetime.cpp \

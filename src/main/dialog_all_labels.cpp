@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -25,7 +25,6 @@
 #include "diary/diary.h"
 #include "common/format.h"
 #include "common/containers.h"
-#include "common/container_of.h"
 
 /**
  * @file	main/dialog_all_labels.cpp
@@ -113,10 +112,10 @@ WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
 
 	lst_labels.register_hotkey (DELETE, btn_delete.sig_clicked);
 	lst_labels.sig_select_changed.connect (
-			TIARY_LIST_OF(Signal)
+			std::list<Signal>{
 				Signal (btn_rename, &Button::redraw),
 				Signal (btn_delete, &Button::redraw)
-			TIARY_LIST_OF_END
+			}
 		);
 
 	register_hotkey (ESCAPE, btn_ok.sig_clicked);
