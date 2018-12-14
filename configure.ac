@@ -132,7 +132,6 @@ AX_CHECK_COMPILE_FLAG([-std=gnu++14],[
 
 dnl Now we assume these C++14 features are always present
 AC_DEFINE([TIARY_HAVE_RVALUE_REFERENCES], [1], [Always define to 1 since we now assume C++14 support])
-AC_DEFINE([TIARY_HAVE_STATIC_ASSERT], [1], [Always define to 1 since we now assume C++14 support])
 AC_DEFINE([TIARY_HAVE_DEFAULT_DELETE_FUNCTIONS], [1], [Always define to 1 since we now assume C++14 support])
 AC_DEFINE([TIARY_HAVE_INITIALIZER_LIST], [1], [Always define to 1 since we now assume C++14 support])
 AC_DEFINE([TIARY_HAVE_TUPLES], [1], [Always define to 1 since we now assume C++14 support])
