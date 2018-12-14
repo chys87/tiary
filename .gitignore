@@ -20,3 +20,4 @@ config.status
 /configure
 /tiary-*.tar.*
 *.test
+/compile
