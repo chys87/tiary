@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -20,6 +20,7 @@
 #include "common/algorithm.h"
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <string.h> // memcpy
 #include <assert.h>
 #include <stdint.h>
@@ -70,7 +71,7 @@ void min_max_programming (unsigned *result, const unsigned *min, const unsigned 
 	unsigned left = S -= minsum;
 
 	// Now use "Largest remainder method"
-	UIntInd *rem = new UIntInd [n];
+	std::unique_ptr<UIntInd[]> rem{new UIntInd[n]};
 	for (unsigned i=0; i<n; ++i) {
 		unsigned quotient = unsigned (left * uint64_t (max[i] - min[i]) / diffsum);
 		uint64_t remainder = left * uint64_t (max[i] - min[i]) % diffsum;
@@ -87,7 +88,6 @@ void min_max_programming (unsigned *result, const unsigned *min, const unsigned 
 	for (UIntInd *p=first; p!=middle; ++p) {
 		++*p->ptr;
 	}
-	delete [] rem;
 }
 
 

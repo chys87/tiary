@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -15,6 +15,7 @@
 #include "ui/layout.h"
 #include "common/algorithm.h"
 #include <algorithm>
+#include <memory>
 #include <functional>
 
 namespace tiary {
@@ -157,26 +158,25 @@ void Layout::move_resize (Size pos, Size size)
 	}
 	else if (total_this <= max_sum) {
 		// Everything is between [min, max]
-		unsigned *min = new unsigned [n * 3];
+		std::unique_ptr<unsigned[]> min{new unsigned [n * 3]};
 		unsigned *max;
 		unsigned *result;
 		if (total_this <= mid_sum) {
 			// All controls have size between min and max
 			// All spacers have min size
-			max = std::transform (lst.begin (), lst.end (), min, get_member_fun (&Item::min));
+			max = std::transform(lst.begin(), lst.end(), min.get(), get_member_fun(&Item::min));
 			result = std::transform (lst.begin (), lst.end (), max, SelectMinMax<&Item::max, &Item::min>());
 		}
 		else {
 			// All controls have max size
 			// All spacers have size between min and max
-			max = std::transform (lst.begin (), lst.end (), min, SelectMinMax<&Item::max, &Item::min>());
+			max = std::transform(lst.begin(), lst.end(), min.get(), SelectMinMax<&Item::max, &Item::min>());
 			result = std::transform (lst.begin (), lst.end (), max, get_member_fun (&Item::max));
 		}
-		min_max_programming (result, min, max, n, total_this);
+		min_max_programming(result, min.get(), max, n, total_this);
 		for (ItemList::iterator it = lst.begin (); it != lst.end (); ++it) {
 			pos = move_resize_one (*it, pos, *result++, total_other, direction);
 		}
-		delete [] min;
 	}
 	else {
 		// All controls and spacers have max size,
