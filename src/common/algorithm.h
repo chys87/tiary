@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2016 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2016, 2018 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -282,27 +282,10 @@ void min_max_programming (unsigned *result, const unsigned *min, const unsigned 
 
 
 // Measure the length of an array conveniently
-template <typename T, size_t N> inline size_t array_length (T (&)[N]) { return N; }
-
-// If the result must be a compile-time constant, then the following
-// difficult-to-read implementation can be helpful
-namespace detail {
-template <size_t N> struct array_length_helper2
-{
-	char y[N];
-};
-template <typename T, size_t N>
-inline array_length_helper2<N> array_length_helper (T (&)[N])
-{
-	return array_length_helper2<N>();
-}
-} // namespace detail
-#define TIARY_ARRAY_LENGTH(x) sizeof(::tiary::detail::array_length_helper(x).y)
+template <typename T, size_t N> inline constexpr size_t array_length(T (&)[N]) { return N; }
 
 // Get the end of an array conveniently
-template <typename T, size_t N> inline T* array_end (T (&a)[N]) { return (a+N); }
-// Compile-time constant
-#define TIARY_ARRAY_END(x) ((x) + TIARY_ARRAY_LENGTH(x))
+template <typename T, size_t N> inline constexpr T* array_end(T (&a)[N]) { return (a+N); }
 
 
 } // namespace tiary
