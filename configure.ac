@@ -1,7 +1,7 @@
 dnl /***********************************************************************
 dnl  *
 dnl  * Tiary, a terminal-based diary keeping system for Unix-like systems
-dnl  * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2016 chys <admin@CHYS.INFO>
+dnl  * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2016, 2018 chys <admin@CHYS.INFO>
 dnl  *
 dnl  * This software is licensed under the 3-clause BSD license.
 dnl  * See LICENSE in the source package and/or online info for details.
@@ -122,79 +122,21 @@ dnl Add several useful flags if supported by compiler
 AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fno-exceptions])
 AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
 
-dnl Check whether the compiler has some support for C++11
-AX_CHECK_COMPILE_FLAG([-std=gnu++11],[
+dnl Check whether the compiler has some support for C++14
+AX_CHECK_COMPILE_FLAG([-std=gnu++14],[
 	have_some_cxx0x=yes
-	AX_APPEND_FLAG([-std=gnu++11])
+	AX_APPEND_FLAG([-std=gnu++14])
 ],[
-	AC_MSG_ERROR(["-std=gnu++11" is not supported. You need a modern compiler.])
+	AC_MSG_ERROR(["-std=gnu++14" is not supported. You need a modern compiler.])
 ])
 
-dnl A macro to test for C++11/0x feature
-dnl $1 = description
-dnl $2 = macro name
-dnl $3 = program
-AC_DEFUN([TIARY_CHECK_CXX11_FEATURE],[
-	AS_VAR_PUSHDEF([CACHEVAR],[tiary_cv_cxx0x_$1])
-	AC_CACHE_CHECK([whether C++ compiler supports $1 in C++11/0x mode], CACHEVAR,[
-		AC_LINK_IFELSE([$3],[
-			AS_VAR_SET(CACHEVAR,[yes])
-		],[
-			AC_MSG_ERROR([Required C++11 feature is missing. You need a modern compiler.])
-		])
-	])
-	AC_DEFINE([$2],[1],[Define to 1 if C++ compiler supports $1 in C++11/0x mode])
-	AS_VAR_POPDEF([CACHEVAR])
-])
-
-dnl Rvalue references (>= gcc 4.3)
-TIARY_CHECK_CXX11_FEATURE([rvalue references],[TIARY_RVALUE_REFERENCES],[AC_LANG_PROGRAM([
-		#include <utility>
-		int my_move (int && y) { return std::move(y); }
-		],[[
-		return my_move (0);
-	]])])
-
-dnl static_assert (>= gcc 4.3)
-TIARY_CHECK_CXX11_FEATURE([static assertions],[TIARY_HAVE_STATIC_ASSERT],[AC_LANG_PROGRAM([
-		static_assert(1 == 1, "The impossible happens.");
-		],[])])
-
-dnl default/delete functions (>= gcc 4.4)
-TIARY_CHECK_CXX11_FEATURE([default/delete functions],[TIARY_HAVE_DEFAULT_DELETE_FUNCTIONS],[AC_LANG_PROGRAM([
-		struct A { A () = default; A (const A&) = delete; };
-		],[])])
-
-dnl initializer list (>= gcc 4.4)
-TIARY_CHECK_CXX11_FEATURE([initializer list],[TIARY_HAVE_INITIALIZER_LIST],[AC_LANG_PROGRAM([
-		#include <list>
-		],[
-		return (std::list<int>{2,3,4,5}.size() == 4) ? 0 : 1;
-		])])
-
-dnl Variadic templates and tuples (>= gcc 4.3)
-TIARY_CHECK_CXX11_FEATURE([variadic templates and tuples],[TIARY_HAVE_TUPLES],[AC_LANG_PROGRAM([
-	#include <tuple>
-	using namespace std;
-	template <typename... Args>
-	size_t mysizeof (Args... args) { return sizeof...(Args); }
-	template <typename... Args>
-	typename tuple_element<0, tuple<Args...> >::type first (const tuple<Args...>&tp)
-	{ return get<0>(tp); }
-	],[
-	return mysizeof() + first(make_tuple(0, "Hello", 3.2));
-	])])
-
-dnl decltype (>= gcc 4.3)
-TIARY_CHECK_CXX11_FEATURE([decltype],[TIARY_HAVE_DECLTYPE],[AC_LANG_PROGRAM([
-	#include <cstdlib>
-	template <typename F> void test (F foo)
-	{
-		decltype (foo ()) ret = foo ();
-		int y = ret;
-	}],[
-		test (std::rand);
-	])])
+dnl Now we assume these C++14 features are always present
+AC_DEFINE([TIARY_HAVE_RVALUE_REFERENCES], [1], [Always define to 1 since we now assume C++14 support])
+AC_DEFINE([TIARY_HAVE_STATIC_ASSERT], [1], [Always define to 1 since we now assume C++14 support])
+AC_DEFINE([TIARY_HAVE_DEFAULT_DELETE_FUNCTIONS], [1], [Always define to 1 since we now assume C++14 support])
+AC_DEFINE([TIARY_HAVE_INITIALIZER_LIST], [1], [Always define to 1 since we now assume C++14 support])
+AC_DEFINE([TIARY_HAVE_TUPLES], [1], [Always define to 1 since we now assume C++14 support])
+AC_DEFINE([TIARY_HAVE_DECLTYPE], [1], [Always define to 1 since we now assume C++14 support])
 
 dnl Let's always include config.h
 CFLAGS="$CFLAGS -include config.h"
