@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,6 +26,7 @@
  * (menu items, buttons, etc.)
  */
 
+#include <memory>
 #include <list>
 #include <utility> // std::forward
 
@@ -68,24 +69,14 @@ struct CondCMV : CondBase
 
 class Condition
 {
-
-	detail::CondBase *info;
-
 public:
-
-	~Condition () { delete info; }
-	Condition () : info (0) {}
-	Condition (const Condition &other) : info (other.info ? other.info->copy () : 0) {}
+	Condition() = default;
+	Condition(const Condition &other) : info (other.info ? other.info->copy() : nullptr) {}
 	Condition &operator = (const Condition &other);
-	Condition (Condition &&other) : info (other.info) { other.info = 0; }
-	Condition &operator = (Condition &&other) { swap (other); return *this; }
+	Condition(Condition &&other) = default;
+	Condition &operator = (Condition &&other) = default;
 
-	void swap (Condition &other)
-	{
-		detail::CondBase *tmp = info;
-		info = other.info;
-		other.info = tmp;
-	}
+	void swap(Condition &other) { std::swap(info, other.info); }
 
 	template <typename D> Condition (D &obj, bool (D::*foo)()) : info (new detail::CondMV <D> (&obj, foo)) {}
 	template <typename D> Condition (D *obj, bool (D::*foo)()) : info (new detail::CondMV <D> (obj, foo)) {}
@@ -107,6 +98,9 @@ private:
 	friend Condition operator || (const Condition &, Condition &&);
 	friend Condition operator || (Condition &&, const Condition &);
 	friend Condition operator || (Condition &&, Condition &&);
+
+private:
+	std::unique_ptr<detail::CondBase> info;
 };
 
 namespace detail {
