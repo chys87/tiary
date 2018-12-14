@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -122,7 +122,7 @@ namespace {
 
 
 void
-md5_process(MD5Context *pms, const uint8_t *data /*[64]*/) throw ()
+md5_process(MD5Context *pms, const uint8_t *data /*[64]*/) noexcept
 {
 	uint32_t a = pms->abcd[0];
 	uint32_t b = pms->abcd[1];
@@ -284,7 +284,7 @@ md5_process(MD5Context *pms, const uint8_t *data /*[64]*/) throw ()
 } // anonymous namespace
 
 void
-md5_init(MD5Context *pms) throw ()
+md5_init(MD5Context *pms) noexcept
 {
 	pms->count = 0;
 	pms->abcd[0] = 0x67452301;
@@ -294,7 +294,7 @@ md5_init(MD5Context *pms) throw ()
 }
 
 void
-md5_append(MD5Context *pms, const void *data, size_t nbytes) throw ()
+md5_append(MD5Context *pms, const void *data, size_t nbytes) noexcept
 {
 	if (nbytes == 0) {
 		return;
@@ -332,7 +332,7 @@ md5_append(MD5Context *pms, const void *data, size_t nbytes) throw ()
 }
 
 void
-md5_finish(MD5Context *pms) throw ()
+md5_finish(MD5Context *pms) noexcept
 {
 	static const uint8_t pad[64] = { 0x80, 0, /* 0, 0, ... */ };
 
@@ -363,7 +363,7 @@ md5_finish(MD5Context *pms) throw ()
 }
 
 void
-md5_finish (MD5Context *pms, void *result) throw ()
+md5_finish (MD5Context *pms, void *result) noexcept
 {
 	md5_finish (pms);
 	memcpy (result, pms->abcd, 16);

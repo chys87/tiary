@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -60,7 +60,7 @@ const signed char revdays[366] = {
 };
 
 // Cumulative leap days from Year 1 to Year y-1 (either true/pseudo cal)
-inline unsigned cumul_leap_days (unsigned y) throw ()
+inline unsigned cumul_leap_days (unsigned y) noexcept
 {
 	return y/4 - y/100 + y/100/4;
 }
@@ -68,7 +68,7 @@ inline unsigned cumul_leap_days (unsigned y) throw ()
 } // anonymous namespace
 
 // Checks whether a year is leap; either true/pseudo cal
-bool is_leap_year (unsigned y) throw ()
+bool is_leap_year (unsigned y) noexcept
 {
 	if (y % 4) {
 		return false;
@@ -79,7 +79,7 @@ bool is_leap_year (unsigned y) throw ()
 	return true;
 }
 
-unsigned day_of_month (unsigned y, unsigned m) throw ()
+unsigned day_of_month (unsigned y, unsigned m) noexcept
 {
 	--m;
 	if (m >= 12) {
@@ -98,7 +98,7 @@ unsigned day_of_month (unsigned y, unsigned m) throw ()
 }
 
 
-uint32_t make_date_strict (const ReadableDate &rd) throw ()
+uint32_t make_date_strict (const ReadableDate &rd) noexcept
 {
 	unsigned y = rd.y;
 	unsigned m = rd.m;
@@ -119,7 +119,7 @@ uint32_t make_date_strict (const ReadableDate &rd) throw ()
 	return (y * 365 + cumul_leap_days (y) + days[m-1] + d - 306);
 }
 
-uint32_t make_date (const ReadableDate &rd) throw ()
+uint32_t make_date (const ReadableDate &rd) noexcept
 {
 	unsigned y = rd.y;
 	unsigned m = rd.m;
@@ -143,17 +143,17 @@ uint32_t make_date (const ReadableDate &rd) throw ()
 	return (y * 365 + cumul_leap_days (y) + days[m-1] + d - 306);
 }
 
-uint32_t make_time (const ReadableTime &rt) throw ()
+uint32_t make_time (const ReadableTime &rt) noexcept
 {
 	return ((rt.H*60 + rt.M)*60 + rt.S);
 }
 
-uint64_t make_datetime (uint32_t date, uint32_t time) throw ()
+uint64_t make_datetime (uint32_t date, uint32_t time) noexcept
 {
 	return (date * uint64_t (SECONDS_PER_DAY) + time);
 }
 
-uint64_t make_datetime_strict (const ReadableDate &rd, const ReadableTime &rt) throw ()
+uint64_t make_datetime_strict (const ReadableDate &rd, const ReadableTime &rt) noexcept
 {
 	if (rt.H>=24 || rt.M>=60 || rt.S>=60) {
 		return INVALID_DATETIME;
@@ -166,22 +166,22 @@ uint64_t make_datetime_strict (const ReadableDate &rd, const ReadableTime &rt) t
 	return make_datetime (date_v, time_v);
 }
 
-uint64_t make_datetime_strict (const ReadableDateTime &rdt) throw ()
+uint64_t make_datetime_strict (const ReadableDateTime &rdt) noexcept
 {
 	return make_datetime_strict (rdt, rdt);
 }
 
-uint64_t make_datetime (const ReadableDate &rd, const ReadableTime &rt) throw ()
+uint64_t make_datetime (const ReadableDate &rd, const ReadableTime &rt) noexcept
 {
 	return make_datetime (make_date (rd), make_time (rt));
 }
 
-uint64_t make_datetime (const ReadableDateTime &rdt) throw ()
+uint64_t make_datetime (const ReadableDateTime &rdt) noexcept
 {
 	return make_datetime (rdt, rdt);
 }
 
-uint64_t make_datetime_local (time_t t) throw ()
+uint64_t make_datetime_local (time_t t) noexcept
 {
 #if 0 //def TIARY_HAVE_LOCALTIME_R_AND_GMTIME_R
 	struct tm tmbuf;
@@ -194,7 +194,7 @@ uint64_t make_datetime_local (time_t t) throw ()
 	return make_datetime (rd, rt);
 }
 
-uint64_t make_datetime_utc (time_t t) throw ()
+uint64_t make_datetime_utc (time_t t) noexcept
 {
 #if 0 //def TIARY_HAVE_LOCALTIME_R_AND_GMTIME_R
 	struct tm tmbuf;
@@ -208,7 +208,7 @@ uint64_t make_datetime_utc (time_t t) throw ()
 }
 
 
-ReadableDate extract_date (uint32_t v) throw ()
+ReadableDate extract_date (uint32_t v) noexcept
 {
 	unsigned y, m, d, w;
 	unsigned tmp;
@@ -242,7 +242,7 @@ ReadableDate extract_date (uint32_t v) throw ()
 	return rd;
 }
 
-ReadableTime extract_time (uint32_t v) throw ()
+ReadableTime extract_time (uint32_t v) noexcept
 {
 	ReadableTime rt;
 
@@ -253,17 +253,17 @@ ReadableTime extract_time (uint32_t v) throw ()
 	return rt;
 }
 
-uint32_t extract_date_from_datetime (uint64_t v) throw ()
+uint32_t extract_date_from_datetime (uint64_t v) noexcept
 {
 	return uint32_t (v / SECONDS_PER_DAY);
 }
 
-uint32_t extract_time_from_datetime (uint64_t v) throw ()
+uint32_t extract_time_from_datetime (uint64_t v) noexcept
 {
 	return uint32_t (v % SECONDS_PER_DAY);
 }
 
-ReadableDateTime extract_datetime (uint64_t v) throw ()
+ReadableDateTime extract_datetime (uint64_t v) noexcept
 {
 	ReadableDateTime ret;
 

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -24,11 +24,11 @@ namespace tiary {
 /**
  * @brief	Returns whether a year is leap under the Gregorian calendar
  */
-bool is_leap_year (unsigned) throw ();
+bool is_leap_year (unsigned) noexcept;
 /**
  * @brief	Returns the number of days in a given month under the Gregorian calendar
  */
-unsigned day_of_month (unsigned y, unsigned m) throw ();
+unsigned day_of_month (unsigned y, unsigned m) noexcept;
 
 /*
  * Date is represented in a 32-bit unsigned integer number
@@ -64,11 +64,11 @@ struct ReadableDateTime : ReadableDate, ReadableTime
  *
  * This function allows "loose representations" like 1989-5-35
  */
-uint32_t make_date (const ReadableDate &) throw ();
+uint32_t make_date (const ReadableDate &) noexcept;
 /**
  * This function disallows "loose representations" like 1989-5-35
  */
-uint32_t make_date_strict (const ReadableDate &) throw ();
+uint32_t make_date_strict (const ReadableDate &) noexcept;
 
 /**
  * @brief	Make a 32-bit unsigned integer representing the specified time
@@ -76,31 +76,31 @@ uint32_t make_date_strict (const ReadableDate &) throw ();
  * There is no make_time_strict counterpart. Always allow substandard times
  * like 25:00:00
  */
-uint32_t make_time (const ReadableTime &) throw ();
+uint32_t make_time (const ReadableTime &) noexcept;
 
 /**
  * @brief	Make a 64-bit unsigned integer representing the specified date and time.
  * @result	INVALID_DATETIME = Error
  */
-uint64_t make_datetime_strict (const ReadableDate &, const ReadableTime &) throw ();
-uint64_t make_datetime_strict (const ReadableDateTime &) throw ();
+uint64_t make_datetime_strict (const ReadableDate &, const ReadableTime &) noexcept;
+uint64_t make_datetime_strict (const ReadableDateTime &) noexcept;
 /**
  * This function allows representations like 1989-5-35
  */
-uint64_t make_datetime (const ReadableDate &, const ReadableTime &) throw ();
-uint64_t make_datetime (const ReadableDateTime &) throw ();
-uint64_t make_datetime (uint32_t date, uint32_t time) throw ();
-uint64_t make_datetime_utc (time_t = ::time (0)) throw ();
-uint64_t make_datetime_local (time_t = ::time (0)) throw ();
+uint64_t make_datetime (const ReadableDate &, const ReadableTime &) noexcept;
+uint64_t make_datetime (const ReadableDateTime &) noexcept;
+uint64_t make_datetime (uint32_t date, uint32_t time) noexcept;
+uint64_t make_datetime_utc (time_t = ::time (0)) noexcept;
+uint64_t make_datetime_local (time_t = ::time (0)) noexcept;
 
 
-ReadableDate extract_date (uint32_t) throw ();
-ReadableTime extract_time (uint32_t) throw ();
+ReadableDate extract_date (uint32_t) noexcept;
+ReadableTime extract_time (uint32_t) noexcept;
 
-uint32_t extract_date_from_datetime (uint64_t) throw ();
-uint32_t extract_time_from_datetime (uint64_t) throw ();
+uint32_t extract_date_from_datetime (uint64_t) noexcept;
+uint32_t extract_time_from_datetime (uint64_t) noexcept;
 
-ReadableDateTime extract_datetime (uint64_t) throw ();
+ReadableDateTime extract_datetime (uint64_t) noexcept;
 
 /*
  * %Y	4-digit year (1989)
