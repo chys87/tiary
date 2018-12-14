@@ -48,9 +48,7 @@ public:
 	typedef RichTextLineList LineList;
 
 	RichText (Window &, const std::wstring &, const LineList &);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	RichText (Window &, const std::wstring &, LineList &&);
-#endif
 	~RichText ();
 
 	void redraw ();

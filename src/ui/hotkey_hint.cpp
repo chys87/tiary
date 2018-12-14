@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -154,7 +154,6 @@ HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, c
 	return *this;
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Action &&action)
 {
 	APPEND_ITEM (std::move (action));
@@ -166,7 +165,6 @@ HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, c
 	APPEND_ITEM (std::move (signal));
 	return *this;
 }
-#endif
 
 
 } // namespace tiary::ui

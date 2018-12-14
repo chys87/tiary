@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -56,7 +56,6 @@ void Hotkeys::register_hotkey (wchar_t c, const Action &sig, int options)
 	register_hotkey (c, sig);
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 void Hotkeys::register_hotkey (wchar_t c, Action &&sig)
 {
 	hotkey_list[c] = std::move (sig);
@@ -82,7 +81,6 @@ void Hotkeys::register_hotkey (wchar_t c, Action &&sig, int options)
 	}
 	register_hotkey (c, std::move (sig));
 }
-#endif
 
 bool Hotkeys::emit_hotkey (wchar_t c)
 {

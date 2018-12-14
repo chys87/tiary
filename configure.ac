@@ -130,13 +130,6 @@ AX_CHECK_COMPILE_FLAG([-std=gnu++14],[
 	AC_MSG_ERROR(["-std=gnu++14" is not supported. You need a modern compiler.])
 ])
 
-dnl Now we assume these C++14 features are always present
-AC_DEFINE([TIARY_HAVE_RVALUE_REFERENCES], [1], [Always define to 1 since we now assume C++14 support])
-AC_DEFINE([TIARY_HAVE_DEFAULT_DELETE_FUNCTIONS], [1], [Always define to 1 since we now assume C++14 support])
-AC_DEFINE([TIARY_HAVE_INITIALIZER_LIST], [1], [Always define to 1 since we now assume C++14 support])
-AC_DEFINE([TIARY_HAVE_TUPLES], [1], [Always define to 1 since we now assume C++14 support])
-AC_DEFINE([TIARY_HAVE_DECLTYPE], [1], [Always define to 1 since we now assume C++14 support])
-
 dnl Let's always include config.h
 CFLAGS="$CFLAGS -include config.h"
 CXXFLAGS="$CXXFLAGS -include config.h"

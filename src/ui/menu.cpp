@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -69,7 +69,6 @@ MenuItem &MenuItem::operator = (const MenuItem &other)
 	return *this;
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 MenuItem::MenuItem (const std::wstring &text_, Signal &&sig_)
 	: text (text_)
 	, action (std::move (sig_))
@@ -94,7 +93,6 @@ MenuItem::MenuItem (MenuItem &&other)
 {
 	other.submenu = 0;
 }
-#endif
 
 void MenuItem::swap (MenuItem &other)
 {
@@ -135,7 +133,6 @@ MenuItem &Menu::add (const wchar_t *text, const Action &act)
 	return *item_list.insert (item_list.end (), MenuItem (text, act));
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 MenuItem &Menu::add (const wchar_t *text, Signal &&sig)
 {
 	return *item_list.insert (item_list.end (), MenuItem (text, std::forward<Signal> (sig)));
@@ -145,7 +142,6 @@ MenuItem &Menu::add (const wchar_t *text, Action &&act)
 {
 	return *item_list.insert (item_list.end (), MenuItem (text, std::move (act)));
 }
-#endif
 
 Menu &Menu::add_submenu (const wchar_t *text)
 {

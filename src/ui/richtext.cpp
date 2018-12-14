@@ -27,7 +27,6 @@ RichText::RichText (Window &win, const std::wstring &txt, const LineList &lst)
 	set_cursor_visibility (false);
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 RichText::RichText (Window &win, const std::wstring &txt, LineList &&lst)
 	: Control (win)
 	, text (txt)
@@ -38,7 +37,6 @@ RichText::RichText (Window &win, const std::wstring &txt, LineList &&lst)
 {
 	set_cursor_visibility (false);
 }
-#endif
 
 RichText::~RichText ()
 {

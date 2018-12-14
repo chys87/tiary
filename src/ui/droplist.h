@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -28,9 +28,7 @@ public:
 	typedef std::vector<std::wstring> ItemList;
 
 	DropList (Window &, const ItemList &, size_t default_select);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	DropList (Window &, ItemList &&, size_t default_select);
-#endif
 	~DropList ();
 
 	size_t get_select () const { return select; }

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -54,14 +54,12 @@ void ListBox::set_items (const ItemList &new_items, size_t new_select, bool emit
 	set_select (new_select, emit_signal);
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 void ListBox::set_items (ItemList &&new_items, size_t new_select, bool emit_signal)
 {
 	items = std::forward<ItemList> (new_items);
 	Scroll::modify_number (items.size ());
 	set_select (new_select, emit_signal);
 }
-#endif
 
 void ListBox::set_select (size_t new_select, bool emit_signal, bool scroll_to_top)
 {

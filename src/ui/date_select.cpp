@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -92,13 +92,11 @@ void DateSelect::set_date (Date date, const SelectableDates &selectable, bool em
 	set_date (date, emit_signal);
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 void DateSelect::set_date (Date date, SelectableDates &&selectable, bool emit_signal)
 {
 	selectable_dates = std::forward <SelectableDates> (selectable);
 	set_date (date, emit_signal);
 }
-#endif
 
 Date DateSelect::get_date () const
 {
