@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -16,9 +16,9 @@
 #define TIARY_COMMON_STRING_MATCH_H
 
 #include "common/pcre.h"
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory> // std::auto_ptr
 
 namespace tiary {
 
@@ -68,7 +68,7 @@ public:
 private:
 	std::wstring pattern;
 #ifdef TIARY_USE_PCRE
-	std::auto_ptr<PcRe> regex; ///< PcRe object related to search_text, if it is a regular expression
+	std::unique_ptr<PcRe> regex; ///< PcRe object related to search_text, if it is a regular expression
 #endif
 
 };
