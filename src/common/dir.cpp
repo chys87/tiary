@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,7 +22,6 @@
 #include "common/unicode.h"
 #include "common/string.h"
 #include "common/algorithm.h"
-#include "common/callback.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <limits.h> // PATH_MAX
@@ -407,7 +406,7 @@ std::wstring combine_pathname (const std::wstring &path, const std::wstring &bas
 
 namespace {
 
-class DefaultDirEntComparator : public BinaryCallback<const DirEnt &, const DirEnt &, bool>
+class DefaultDirEntComparator
 {
 	std::locale loc;
 public:
@@ -429,8 +428,8 @@ bool DefaultDirEntComparator::operator () (const DirEnt &a, const DirEnt &b) con
 
 DirEntList list_dir (
 			const std::wstring &directory,
-			const UnaryCallback <const DirEnt &, bool> &filter,
-			const BinaryCallback <const DirEnt &, const DirEnt &, bool> &comp
+			const std::function<bool(const DirEnt &)> &filter,
+			const std::function<bool(const DirEnt &, const DirEnt &)> &comp
 		)
 {
 	DirEntList filelist;
@@ -451,12 +450,12 @@ DirEntList list_dir (
 		}
 		closedir (dir);
 		// Sort them
-		filelist.sort (wrap (comp));
+		filelist.sort(comp);
 	}
 	return filelist;
 }
 
-DirEntList list_dir (const std::wstring &directory, const UnaryCallback <const DirEnt &, bool> &filter)
+DirEntList list_dir(const std::wstring &directory, const std::function<bool(const DirEnt &)> &filter)
 {
 	return list_dir (directory, filter, DefaultDirEntComparator ());
 }

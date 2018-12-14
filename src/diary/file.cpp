@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2016, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2016, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -67,7 +67,6 @@
 #include "common/unicode.h"
 #include "common/md5.h"
 #include "common/format.h"
-#include "common/callback.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -431,7 +430,7 @@ LoadFileRet load_global_options (GlobalOptionGroup &options, RecentFileList &rec
 
 LoadFileRet load_file (
 		const char *filename,
-		const NoArgCallback<std::wstring> &enter_password,
+		const std::function<std::wstring()> &enter_password,
 		DiaryEntryList &entries,
 		PerFileOptionGroup &options,
 		std::wstring &password)

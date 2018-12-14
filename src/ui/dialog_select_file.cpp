@@ -26,7 +26,6 @@
 #include "common/format.h"
 #include "common/algorithm.h"
 #include "ui/checkbox_label.h"
-#include "common/callback.h"
 #include <list>
 
 namespace tiary {
@@ -202,7 +201,7 @@ void WindowSelectFile::slot_refresh ()
 	slot_input ();
 }
 
-struct FilterDots : public UnaryCallback<const DirEnt &, bool>
+struct FilterDots
 {
 	bool is_root;
 	bool show_hidden;

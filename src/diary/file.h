@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -16,6 +16,7 @@
 #define TIARY_DIARY_FILE_H
 
 #include "diary/config.h"
+#include <functional>
 #include <string>
 #include <vector>
 #include <list>
@@ -40,8 +41,6 @@ enum LoadFileRet {
 // Read global options from ~/.tiary
 LoadFileRet load_global_options (GlobalOptionGroup &, std::list <RecentFile> &);
 
-template <typename> struct NoArgCallback;
-
 /**
  * @brief	Load tiary file
  *
@@ -56,7 +55,7 @@ template <typename> struct NoArgCallback;
  */
 LoadFileRet load_file (
 		const char *filename, ///< Filename
-		const NoArgCallback<std::wstring> &foo, ///< A callback function that asks the user for password
+		const std::function<std::wstring()> &foo, ///< A callback function that asks the user for password
 		std::vector <DiaryEntry *> &entries,
 		PerFileOptionGroup &,
 		std::wstring &password ///< Empty = no password

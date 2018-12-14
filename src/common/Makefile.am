@@ -22,7 +22,6 @@ libcommon_a_SOURCES = \
 	bswap.h \
 	bzip2.h \
 	bzip2.cpp \
-	callback.h \
 	condition.h \
 	condition.cpp \
 	containers.h \

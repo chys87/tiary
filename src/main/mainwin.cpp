@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2011, 2016 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2011, 2016, 2018 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -25,7 +25,6 @@
 #include "ui/search_info.h"
 #include "common/unicode.h"
 #include "common/format.h"
-#include "common/callback.h"
 #include "diary/file.h"
 #include "diary/diary.h"
 #include "diary/config.h"
@@ -329,7 +328,7 @@ bool MainWin::unavailable_filtered ()
 
 namespace {
 
-struct EnterPassword : NoArgCallback<std::wstring>
+struct EnterPassword
 {
 	const std::wstring &filename;
 	EnterPassword (const std::wstring &fname) : filename (fname) { }
