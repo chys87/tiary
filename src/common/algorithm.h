@@ -198,39 +198,28 @@ template <typename T, typename T2> T* linear_search_null (T *lo, T *hi, T2 v)
 }
 
 
-/*
- * Used to store a mapping structure. For example:
- *
- * static const MapStruct<char,char> upper_map[] = {
+/* Map transform using binary search. For example:
+ * static const std::pair<char,char> upper_map[] = {
  *   { 'a', 'A' },
  *   { 'b', 'B' },
  *   .....
  *   { 'z', 'Z' }
  * };
- * Then binary_transform(upper_map, ch, ch) is equivalent to toupper(ch) (in C locale)
+ * Then binary_transform(upper_map, array_end(upper_map), ch, ch) is equivalent to toupper(ch) (in C locale)
  */
-template <typename A, typename B> struct MapStruct
-{
-	A from;
-	B to;
-};
-
-// Map transform using binary search
 template <typename A, typename B>
-B binary_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from, B defto)
-{
-	if (const MapStruct<A,B> *p = binary_search_null (lo, hi, from, get_member_fun (&MapStruct<A,B>::from))) {
-		return p->to;
+B binary_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, A from, B defto) {
+	if (const std::pair<A, B> *p = binary_search_null(lo, hi, from, get_member_fun(&std::pair<A, B>::first))) {
+		return p->second;
 	}
 	return defto;
 }
 
 // Map transform using linear search
 template <typename A, typename B>
-B linear_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from, B defto)
-{
-	if (const MapStruct<A,B> *p = linear_search_null (lo, hi, from, get_member_fun (&MapStruct<A,B>::from))) {
-		return p->to;
+B linear_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, A from, B defto) {
+	if (const std::pair<A, B> *p = linear_search_null(lo, hi, from, get_member_fun(&std::pair<A, B>::first))) {
+		return p->second;
 	}
 	return defto;
 }
@@ -239,12 +228,11 @@ B linear_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from, 
 
 // Transform between two bit-wise schemes
 template <typename A, typename B>
-B bitwise_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from)
-{
+B bitwise_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, A from) {
 	B to = 0;
 	while (lo < hi) {
-		if (from & lo->from) {
-			to |= lo->to;
+		if (from & lo->first) {
+			to |= lo->second;
 		}
 		++lo;
 	}
@@ -253,12 +241,11 @@ B bitwise_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, A from)
 
 // The other way
 template <typename A, typename B>
-A bitwise_reverse_transform (const MapStruct<A,B> *lo, const MapStruct<A,B> *hi, B to)
-{
+A bitwise_reverse_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, B to) {
 	A from = 0;
 	while (lo < hi) {
-		if (to & lo->to) {
-			from |= lo->from;
+		if (to & lo->second) {
+			from |= lo->first;
 		}
 		++lo;
 	}

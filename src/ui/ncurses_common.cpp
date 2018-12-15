@@ -22,7 +22,7 @@ namespace ui {
 
 namespace {
 
-const tiary::MapStruct<tiary::ui::MouseMask, mmask_t> mouse_mask_map [] = {
+const std::pair<tiary::ui::MouseMask, mmask_t> mouse_mask_map[] = {
 	{ LEFT_PRESS,     BUTTON1_PRESSED },
 	{ LEFT_RELEASE,   BUTTON1_RELEASED },
 	{ LEFT_CLICK,     BUTTON1_CLICKED },

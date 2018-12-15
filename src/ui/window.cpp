@@ -226,7 +226,7 @@ wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 #endif // TIARY_USE_MOUSE && KEY_MOUSE
 
 			// Other keys - look into the table
-			static const MapStruct<wint_t,wchar_t> map [] = {
+			static const std::pair<wint_t,wchar_t> map[] = {
 				{ KEY_UP, UP }, { KEY_DOWN, DOWN }, { KEY_LEFT, LEFT }, { KEY_RIGHT, RIGHT },
 				{ KEY_HOME, HOME }, { KEY_END, END },
 				{ KEY_NPAGE, PAGEDOWN }, { KEY_PPAGE, PAGEUP },
