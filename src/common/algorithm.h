@@ -66,8 +66,7 @@ template <typename T> inline const T *c (T *r)
  * Can be used as arguments of for_each, etc.
  */
 template <typename T>
-struct DeleteFunctor : public std::unary_function <T *, void>
-{
+struct DeleteFunctor {
 	void operator () (T *ptr) const
 	{
 		delete ptr;
@@ -83,8 +82,7 @@ template <typename T> inline DeleteFunctor<T> delete_fun ()
  * A "cast functor" class
  */
 template <typename TO, typename TI>
-struct CastFunctor : public std::unary_function <TI, TO>
-{
+struct CastFunctor {
 	TO operator () (TI a) const
 	{
 		return a;
@@ -114,8 +112,7 @@ template <typename T> inline IdentityFunctor<T> identity_fun ()
  * A "get member functor" class
  */
 template <typename Class, typename Member>
-struct GetMemberFunctor : public std::unary_function<Class &, Member &>
-{
+struct GetMemberFunctor {
 	Member Class::*ptr;
 	GetMemberFunctor (Member Class::*p) : ptr (p) {}
 

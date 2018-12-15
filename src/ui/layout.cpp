@@ -118,8 +118,7 @@ Size move_resize_one (Layout::Item &item, Size pos, unsigned this_size, unsigned
  * If it is a spacer, return the if_spacer member.
  */
 template <unsigned Layout::Item::*if_ctrl, unsigned Layout::Item::*if_spacer>
-struct SelectMinMax : public std::unary_function <const Layout::Item &, unsigned>
-{
+struct SelectMinMax {
 	unsigned operator () (const Layout::Item &item) const
 	{
 		if (item.obj) { // Real object

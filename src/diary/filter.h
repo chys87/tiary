@@ -24,8 +24,7 @@ namespace tiary {
 
 struct DiaryEntry;
 
-struct Filter : public std::unary_function <const DiaryEntry &, bool>
-{
+struct Filter {
 	/**
 	 * @brief	Whether the given entry should be displayed
 	 * @result	Returns @c true if the entry should be displayed

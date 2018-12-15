@@ -38,10 +38,8 @@ namespace {
 
 // This template is a trick:
 // HotkeyHint::HotkeyItem is inaccessible here
-template <typename HotkeyItem>
-struct LargerWeight :
-	public std::binary_function <const HotkeyItem *, const HotkeyItem *, bool>
-{
+struct LargerWeight {
+	template <typename HotkeyItem>
 	bool operator () (const HotkeyItem *a, const HotkeyItem *b) const
 	{
 		return (a->weight > b->weight);
@@ -59,7 +57,7 @@ void HotkeyHint::construct_sorted_list ()
 			it != e; ++it) {
 		*iw++ = &*it;
 	}
-	std::sort (sorted_list.begin (), iw, LargerWeight <HotkeyItem> ());
+	std::sort(sorted_list.begin(), iw, LargerWeight());
 }
 
 void HotkeyHint::redraw ()
