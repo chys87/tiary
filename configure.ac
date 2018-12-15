@@ -107,9 +107,15 @@ m4_foreach_w([f],[
 ])
 
 dnl Check for sizeof(wchar_t) (Must be 4)
-AC_CHECK_SIZEOF([wchar_t],[],[#include <wchar.h>])
+AC_CHECK_SIZEOF([wchar_t],[],[])
 if ! test x"$ac_cv_sizeof_wchar_t" = x4; then
 	AC_MSG_ERROR([*** sizeof(wchar_t) must be 4!])
+fi
+
+dnl We plan to migrate to char32_t for Unicode strings
+AC_CHECK_SIZEOF([char32_t], [], [])
+if ! test x"$ac_cv_sizeof_char32_t" = x4; then
+	AC_MSG_ERROR([*** char32_t type not found!])
 fi
 
 dnl Check for required header stdint.h
@@ -122,12 +128,12 @@ dnl Add several useful flags if supported by compiler
 AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fno-exceptions])
 AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
 
-dnl Check whether the compiler has some support for C++14
-AX_CHECK_COMPILE_FLAG([-std=gnu++14],[
+dnl Check whether the compiler has some support for C++17
+AX_CHECK_COMPILE_FLAG([-std=gnu++17],[
 	have_some_cxx0x=yes
-	AX_APPEND_FLAG([-std=gnu++14])
+	AX_APPEND_FLAG([-std=gnu++17])
 ],[
-	AC_MSG_ERROR(["-std=gnu++14" is not supported. You need a modern compiler.])
+	AC_MSG_ERROR(["-std=gnu++17" is not supported. You need a modern compiler.])
 ])
 
 dnl Let's always include config.h
