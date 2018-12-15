@@ -96,9 +96,8 @@ ColorAttr palette_table[NUMBER_PALETTES];
 
 void set_palettes ()
 {
-	std::fill_n (palette_table, NUMBER_PALETTES, ColorAttr::make_default ());
-	for (unsigned i=0; i<sizeof mapping/sizeof *mapping; ++i) {
-		palette_table[mapping[i].id] = mapping[i].a;
+	for (const PaletteMap &m: mapping) {
+		palette_table[m.id] = m.a;
 	}
 }
 
@@ -108,7 +107,7 @@ ColorAttr get_palette (PaletteID id)
 		return palette_table[id];
 	}
 	else {
-		return ColorAttr::make_default ();
+		return ColorAttr{};
 	}
 }
 
