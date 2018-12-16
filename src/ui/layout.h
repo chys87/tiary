@@ -17,7 +17,7 @@
 
 #include "ui/direction.h"
 #include "ui/movable_object.h"
-#include <list>
+#include <vector>
 
 /**
  * @file	ui/layout.h
@@ -62,28 +62,25 @@ public:
 
 	class Adder {
 	public:
-		explicit Adder (Layout *p_) : p (p_) {}
-		Adder (const Adder &other) : p (other.p) {}
-		Adder & operator = (const Adder &other) { p = other.p; return *this; }
+		explicit constexpr Adder(Layout *p) : p_(p) {}
+		Adder(const Adder &other) = default;
+		Adder &operator = (const Adder &other) = default;
 
-		Adder operator () (MovableObject *ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
-		{
-			p->add_impl (ctrl, min, max, other, align_other);
+		Adder &operator () (MovableObject *ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1) {
+			p_->add_impl (ctrl, min, max, other, align_other);
 			return *this;
 		}
-		Adder operator () (MovableObject &ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
-		{
-			p->add_impl (&ctrl, min, max, other, align_other);
+		Adder &operator () (MovableObject &ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1) {
+			p_->add_impl (&ctrl, min, max, other, align_other);
 			return *this;
 		}
 		/** Add spacing */
-		Adder operator () (unsigned min, unsigned max)
-		{
-			p->add_impl (0, min, max, UNLIMITED, -1);
+		Adder &operator () (unsigned min, unsigned max) {
+			p_->add_impl (0, min, max, UNLIMITED, -1);
 			return *this;
 		}
 	private:
-		Layout *p;
+		Layout *p_;
 	};
 
 	Adder add ()
@@ -110,9 +107,7 @@ public:
 	void move_resize (Size pos, Size size);
 
 private:
-
-	typedef std::list <Item> ItemList;
-	ItemList lst;
+	std::vector<Item> lst;
 	unsigned min_sum; ///< Sum of all "min"s of controls
 	unsigned mid_sum; ///< Controls counted as max, spacing counted as min
 	unsigned max_sum; ///< Sum of all "max"s of controls. If any one of them is UNLIMITED, this is UNLIMITED

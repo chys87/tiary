@@ -57,13 +57,7 @@ void Layout::add_impl (MovableObject *obj, unsigned min, unsigned max, unsigned 
 			max_sum += max;
 		}
 	}
-	Item item;
-	item.obj = obj;
-	item.min = min;
-	item.max = max;
-	item.other = other;
-	item.align_other = align_other;
-	lst.push_back (item);
+	lst.push_back({obj, min, max, other, align_other});
 }
 
 namespace {
@@ -151,8 +145,8 @@ void Layout::move_resize (Size pos, Size size)
 	if (total_this <= min_sum) {
 		// Ooops! We don't have enough space. (if total_this < min_sum)
 		// But we have to work!
-		for (ItemList::iterator it = lst.begin (); it != lst.end (); ++it) {
-			pos = move_resize_one (*it, pos, it->min, total_other, direction);
+		for (Item &item: lst) {
+			pos = move_resize_one(item, pos, item.min, total_other, direction);
 		}
 	}
 	else if (total_this <= max_sum) {
@@ -173,8 +167,8 @@ void Layout::move_resize (Size pos, Size size)
 			result = std::transform (lst.begin (), lst.end (), max, get_member_fun (&Item::max));
 		}
 		min_max_programming(result, min.get(), max, n, total_this);
-		for (ItemList::iterator it = lst.begin (); it != lst.end (); ++it) {
-			pos = move_resize_one (*it, pos, *result++, total_other, direction);
+		for (Item &item: lst) {
+			pos = move_resize_one(item, pos, *result++, total_other, direction);
 		}
 	}
 	else {
@@ -187,8 +181,8 @@ void Layout::move_resize (Size pos, Size size)
 			pos.x += (total_this - max_sum) / 2;
 		}
 
-		for (ItemList::iterator it = lst.begin (); it != lst.end (); ++it) {
-			pos = move_resize_one (*it, pos, it->max, total_other, direction);
+		for (Item &item: lst) {
+			pos = move_resize_one(item, pos, item.max, total_other, direction);
 		}
 	}
 }
