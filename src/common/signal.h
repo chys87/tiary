@@ -21,8 +21,8 @@
  * @brief	Declares the class tiary::Signal
  */
 
-#include <list>
 #include <utility> // std::forward
+#include <vector>
 
 namespace tiary {
 
@@ -30,8 +30,8 @@ class Signal;
 
 namespace detail {
 
-struct SignalBase
-{
+class SignalBase {
+public:
 	virtual void emit () = 0;
 	virtual SignalBase *copy () const = 0;
 	virtual ~SignalBase () {}
@@ -146,7 +146,7 @@ public:
 	Signal (Signal *sig, int) :
 		info (new detail::SignalRecursive (*sig)) {}
 	// Connect to a group of signals
-	Signal (const std::list<Signal> &);
+	Signal(const std::vector<Signal> &);
 
 	template<typename R> void connect (R (*f)())
 	{
@@ -197,7 +197,7 @@ public:
 		}
 	}
 	// Connect to a list of Signals
-	void connect (const std::list<Signal> &);
+	void connect(const std::vector<Signal> &);
 	// Copy from another Signal
 	void copy_from (const Signal &sig);
 
@@ -206,8 +206,8 @@ public:
 	Signal (Signal &&sig) : info (sig.info) { sig.info = 0; }
 	void copy_from (Signal &&sig) { swap (sig); }
 	Signal &operator = (Signal &&sig) { swap (sig); return *this; }
-	Signal (std::list<Signal> &&);
-	void connect (std::list<Signal> &&);
+	Signal(std::vector<Signal> &&);
+	void connect(std::vector<Signal> &&);
 
 	// disconnect
 	void disconnect () { delete info; info = 0; }
@@ -232,39 +232,39 @@ namespace detail {
 
 // Connect to a group of other signals. The order is guaranteed
 // This class must be defined after Signal is complete
-struct SignalGroup : SignalBase
-{
-	std::list <Signal> obj;
-
-	SignalGroup (const std::list <Signal> &lst) : obj (lst) {}
+class SignalGroup : public SignalBase {
+public:
+	SignalGroup(const std::vector<Signal> &lst) : obj_(lst) {}
 	~SignalGroup ();
 	void emit ();
 	SignalGroup *copy () const;
-	SignalGroup (std::list <Signal> &&lst) : obj (std::forward<std::list<Signal> > (lst)) {}
+	SignalGroup(std::vector<Signal> &&lst) : obj_(std::move(lst)) {}
+
+	auto begin() const { return obj_.begin(); }
+	auto end() const { return obj_.end(); }
+
+private:
+	std::vector<Signal> obj_;
 };
 
 } // namespace detail
 
-inline Signal::Signal (const std::list<Signal> &lst)
-	: info (new detail::SignalGroup (lst))
-{
+inline Signal::Signal(const std::vector<Signal> &lst)
+	: info(new detail::SignalGroup(lst)) {
 }
 
-inline void Signal::connect (const std::list<Signal> &lst)
-{
+inline void Signal::connect(const std::vector<Signal> &lst) {
 	delete info;
 	info = new detail::SignalGroup (lst);
 }
 
-inline Signal::Signal (std::list<Signal> &&lst)
-	: info (new detail::SignalGroup (std::forward<std::list<Signal> > (lst)))
-{
+inline Signal::Signal(std::vector<Signal> &&lst)
+	: info(new detail::SignalGroup(std::move(lst))) {
 }
 
-inline void Signal::connect (std::list<Signal> &&lst)
-{
+inline void Signal::connect(std::vector<Signal> &&lst) {
 	delete info;
-	info = new detail::SignalGroup (std::forward<std::list<Signal> > (lst));
+	info = new detail::SignalGroup(std::move(lst));
 }
 
 } // namespace tiary

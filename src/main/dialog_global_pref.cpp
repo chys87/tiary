@@ -217,7 +217,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 
 	// Set up signals
 
-	lbl_default_file.sig_hotkey.connect(std::list<Signal>{
+	lbl_default_file.sig_hotkey.connect(std::vector<Signal>{
 		Signal(this, &Window::set_focus_ptr, &btn_default_file, 0),
 		Signal(btn_default_file, &Button::slot_clicked)
 	});

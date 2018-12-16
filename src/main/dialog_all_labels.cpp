@@ -112,7 +112,7 @@ WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
 
 	lst_labels.register_hotkey (DELETE, btn_delete.sig_clicked);
 	lst_labels.sig_select_changed.connect (
-			std::list<Signal>{
+			std::vector<Signal>{
 				Signal (btn_rename, &Button::redraw),
 				Signal (btn_delete, &Button::redraw)
 			}

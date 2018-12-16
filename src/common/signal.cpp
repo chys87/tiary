@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -40,14 +40,14 @@ SignalGroup::~SignalGroup ()
 
 void SignalGroup::emit ()
 {
-	for (std::list<Signal>::iterator it = obj.begin ();  it != obj.end (); ++it) {
-		it->emit ();
+	for (Signal &signal: obj_) {
+		signal.emit ();
 	}
 }
 
 SignalGroup *SignalGroup::copy () const
 {
-	return new SignalGroup (obj);
+	return new SignalGroup(obj_);
 }
 
 } // namespace detail
@@ -67,9 +67,8 @@ bool Signal::is_really_connected () const
 		p = rec->obj.info;
 	}
 	if (const detail::SignalGroup *grp = dynamic_cast <const detail::SignalGroup *> (p)) {
-		for (std::list<Signal>::const_iterator it = grp->obj.begin ();
-				it != grp->obj.end (); ++it) {
-			if (it->is_really_connected ()) {
+		for (const Signal &signal: *grp) {
+			if (signal.is_really_connected ()) {
 				return true;
 			}
 		}
