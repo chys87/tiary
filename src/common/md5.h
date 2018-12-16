@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -44,10 +44,10 @@ struct MD5Context
 };
 
 // C-style interfaces
-void md5_init (MD5Context *pms) throw ();
-void md5_append (MD5Context *pms, const void *data, size_t nbytes) throw ();
-void md5_finish (MD5Context *pms) throw ();
-void md5_finish (MD5Context *pms, void *result) throw ();
+void md5_init (MD5Context *pms) noexcept;
+void md5_append (MD5Context *pms, const void *data, size_t nbytes) noexcept;
+void md5_finish (MD5Context *pms) noexcept;
+void md5_finish (MD5Context *pms, void *result) noexcept;
 
 
 

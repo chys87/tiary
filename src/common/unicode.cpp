@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -19,6 +19,7 @@
  */
 #include "common/unicode.h"
 #include "common/algorithm.h"
+#include <memory>
 #include <wchar.h>
 #include <wctype.h>
 #include <stdint.h>
@@ -259,12 +260,11 @@ std::wstring mbs_to_wstring (const char *src)
 	// mbstowcs always starts at initial shift state,
 	// needless to use mbsrtowcs here
 	size_t len = strlen (src);
-	wchar_t *buffer = new wchar_t[len+1];
-	if (mbstowcs (buffer, src, len+1) == size_t(-1)) {
+	std::unique_ptr<wchar_t[]> buffer{new wchar_t[len+1]};
+	if (mbstowcs(buffer.get(), src, len+1) == size_t(-1)) {
 		buffer[0] = L'\0';
 	}
-	std::wstring ret = buffer;
-	delete [] buffer;
+	std::wstring ret = buffer.get();
 	return ret;
 }
 
@@ -276,12 +276,11 @@ std::wstring mbs_to_wstring (const char *src, size_t len)
 std::wstring mbs_to_wstring (const std::string &src)
 {
 	size_t len = src.size ();
-	wchar_t *buffer = new wchar_t[len+1];
-	if (mbstowcs (buffer, src.c_str (), len+1) == size_t(-1)) {
+	std::unique_ptr<wchar_t[]> buffer{new wchar_t[len+1]};
+	if (mbstowcs(buffer.get(), src.c_str (), len+1) == size_t(-1)) {
 		buffer[0] = L'\0';
 	}
-	std::wstring ret = buffer;
-	delete [] buffer;
+	std::wstring ret = buffer.get();
 	return ret;
 }
 

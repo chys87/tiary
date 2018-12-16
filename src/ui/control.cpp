@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -25,7 +25,7 @@ Control::Control (Window &win_)
 	: MovableObject ()
 	, Hotkeys ()
 	, win (win_)
-	, curpos (make_size ())
+	, curpos{}
 	, cursor_visible (true)
 	, ctrl_left (0)
 	, ctrl_right (0)

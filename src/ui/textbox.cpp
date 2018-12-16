@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -96,7 +96,7 @@ bool TextBox::on_mouse (MouseEvent mouse_event)
 		return false;
 	}
 	Scroll::modify_focus_pos (mouse_event.p.x);
-	move_cursor (make_size (Scroll::get_info ().focus_pos, 0));
+	move_cursor({Scroll::get_info().focus_pos, 0});
 	return true;
 }
 
@@ -115,12 +115,11 @@ void TextBox::redraw ()
 	clear ();
 	Scroll::Info scroll_info = Scroll::get_info ();
 	if (attributes & PASSWORD_BOX) {
-		fill (make_size (), make_size(scroll_info.len,1), L'*');
+		fill(Size{}, Size{scroll_info.len, 1}, L'*');
+	} else {
+		put(Size{}, text.data() + scroll_info.first, scroll_info.len);
 	}
-	else {
-		put (make_size (), text.data() + scroll_info.first, scroll_info.len);
-	}
-	move_cursor (make_size (scroll_info.focus_pos, 0));
+	move_cursor({scroll_info.focus_pos, 0});
 }
 
 unsigned TextBox::get_item_screen_size (unsigned j) const

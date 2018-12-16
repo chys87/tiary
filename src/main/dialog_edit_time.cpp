@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -104,7 +104,7 @@ WindowTime::WindowTime (ReadableDateTime date_time)
 
 	set_default_button (btn_ok);
 
-	FixedWindow::resize (make_size (33, 15));
+	FixedWindow::resize({33, 15});
 
 	layout_time.add
 		(drp_hour, 2, 2)
@@ -126,7 +126,7 @@ WindowTime::WindowTime (ReadableDateTime date_time)
 		(layout_buttons, 3, 3)
 		;
 
-	layout_main.move_resize (make_size (2, 1), make_size (29, 13));
+	layout_main.move_resize({2, 1}, {29, 13});
 
 	btn_now.sig_clicked.connect (this, &WindowTime::slot_now);
 	btn_ok.sig_clicked.connect (this, &WindowTime::slot_ok);

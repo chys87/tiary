@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2011, 2016 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2011, 2016, 2018 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -25,7 +25,6 @@
 #include "ui/search_info.h"
 #include "common/unicode.h"
 #include "common/format.h"
-#include "common/callback.h"
 #include "diary/file.h"
 #include "diary/diary.h"
 #include "diary/config.h"
@@ -274,11 +273,11 @@ MainWin::~MainWin ()
 void MainWin::redraw ()
 {
 	ui::Size scrsize = ui::get_screen_size ();
-	scrsize -= ui::make_size (1, 0);
-	move_resize (ui::make_size (), scrsize);
-	menu_bar.move_resize (ui::make_size (), ui::make_size (scrsize.x, 1));
-	main_ctrl.move_resize (ui::make_size (0, 1), scrsize - ui::make_size (0, 2));
-	hotkey_hint.move_resize (ui::make_size (0, scrsize.y-1), ui::make_size (scrsize.x, 1));
+	scrsize -= ui::Size{1, 0};
+	move_resize(ui::Size{}, scrsize);
+	menu_bar.move_resize(ui::Size{}, ui::Size{scrsize.x, 1});
+	main_ctrl.move_resize(ui::Size{0, 1}, scrsize - ui::Size{0, 2});
+	hotkey_hint.move_resize(ui::Size{0, scrsize.y - 1}, ui::Size{scrsize.x, 1});
 	Window::redraw ();
 }
 
@@ -329,7 +328,7 @@ bool MainWin::unavailable_filtered ()
 
 namespace {
 
-struct EnterPassword : NoArgCallback<std::wstring>
+struct EnterPassword
 {
 	const std::wstring &filename;
 	EnterPassword (const std::wstring &fname) : filename (fname) { }

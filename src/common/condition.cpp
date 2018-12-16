@@ -20,8 +20,7 @@ namespace tiary {
 Condition &Condition::operator = (const Condition &other)
 {
 	if (this != &other) {
-		delete info;
-		info = other.info ? other.info->copy () : 0;
+		info.reset(other.info ? other.info->copy() : nullptr);
 	}
 	return *this;
 }

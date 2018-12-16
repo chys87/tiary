@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -39,11 +39,13 @@ class Label : public UnfocusableControl
 {
 public:
 	Label (Window &, const std::wstring &, unsigned = 0 /**< UIString options */);
+	Label(Window &, std::wstring &&, unsigned = 0 /**< UIString options */);
 	~Label ();
 
 	void redraw ();
 
 	void set_text (const std::wstring &, unsigned = 0 /**< UIString options */);
+	void set_text(std::wstring &&, unsigned = 0 /**< UIString options */);
 	const UIString &get_uistring () const { return text; }
 	const std::wstring &get_text () const { return text.get_text (); }
 

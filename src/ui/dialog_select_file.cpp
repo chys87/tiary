@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,8 +26,6 @@
 #include "common/format.h"
 #include "common/algorithm.h"
 #include "ui/checkbox_label.h"
-#include "common/container_of.h"
-#include "common/callback.h"
 #include <list>
 
 namespace tiary {
@@ -136,10 +134,10 @@ WindowSelectFile::~WindowSelectFile()
 void WindowSelectFile::redraw ()
 {
 	Size scrsize = get_screen_size ();
-	Size size = scrsize & make_size (100, 40);
+	Size size = scrsize & Size{100, 40};
 	move_resize ((scrsize - size) / 2, size);
 
-	layout_main.move_resize (make_size (2,1), size - make_size (4, 2));
+	layout_main.move_resize({2, 1}, size - Size{4, 2});
 
 	Window::redraw ();
 }
@@ -203,7 +201,7 @@ void WindowSelectFile::slot_refresh ()
 	slot_input ();
 }
 
-struct FilterDots : public UnaryCallback<const DirEnt &, bool>
+struct FilterDots
 {
 	bool is_root;
 	bool show_hidden;

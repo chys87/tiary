@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -33,7 +33,6 @@ DropList::DropList (Window &win, const ItemList &items_, size_t default_select)
 {
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 DropList::DropList (Window &win, ItemList &&items_, size_t default_select)
 	: Control (win)
 	, FocusColorControl (win)
@@ -41,7 +40,6 @@ DropList::DropList (Window &win, ItemList &&items_, size_t default_select)
 	, select (default_select < items.size () ? default_select : 0)
 {
 }
-#endif
 
 DropList::~DropList ()
 {
@@ -128,7 +126,7 @@ void DropList::redraw ()
 {
 	choose_palette (is_focus () ? PALETTE_ID_DROPLIST_FOCUS : PALETTE_ID_DROPLIST);
 	clear ();
-	put (make_size (), items[select]);
+	put({}, items[select]);
 }
 
 } // namespace tiary::ui

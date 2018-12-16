@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -35,7 +35,6 @@
 #include "ui/layout.h"
 #include "ui/chain.h"
 #include "common/format.h"
-#include "common/container_of.h"
 
 namespace tiary {
 
@@ -222,9 +221,9 @@ DialogFilter::~DialogFilter ()
 
 void DialogFilter::redraw ()
 {
-	Size size = make_size (40, 13) & get_screen_size ();
+	Size size = Size{40, 13} & get_screen_size ();
 	FixedWindow::resize (size);
-	layout_main.move_resize (make_size (2, 1), size - make_size (4, 2));
+	layout_main.move_resize({2, 1}, size - Size{4, 2});
 	Window::redraw ();
 }
 

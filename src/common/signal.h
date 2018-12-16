@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -203,13 +203,11 @@ public:
 
 	Signal &operator = (const Signal &sig) { copy_from (sig); return *this; }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES // Rvalue reference. Move semantics
 	Signal (Signal &&sig) : info (sig.info) { sig.info = 0; }
 	void copy_from (Signal &&sig) { swap (sig); }
 	Signal &operator = (Signal &&sig) { swap (sig); return *this; }
 	Signal (std::list<Signal> &&);
 	void connect (std::list<Signal> &&);
-#endif
 
 	// disconnect
 	void disconnect () { delete info; info = 0; }
@@ -242,9 +240,7 @@ struct SignalGroup : SignalBase
 	~SignalGroup ();
 	void emit ();
 	SignalGroup *copy () const;
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	SignalGroup (std::list <Signal> &&lst) : obj (std::forward<std::list<Signal> > (lst)) {}
-#endif
 };
 
 } // namespace detail
@@ -260,7 +256,6 @@ inline void Signal::connect (const std::list<Signal> &lst)
 	info = new detail::SignalGroup (lst);
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 inline Signal::Signal (std::list<Signal> &&lst)
 	: info (new detail::SignalGroup (std::forward<std::list<Signal> > (lst)))
 {
@@ -271,7 +266,6 @@ inline void Signal::connect (std::list<Signal> &&lst)
 	delete info;
 	info = new detail::SignalGroup (std::forward<std::list<Signal> > (lst));
 }
-#endif
 
 } // namespace tiary
 

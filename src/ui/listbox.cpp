@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -54,14 +54,12 @@ void ListBox::set_items (const ItemList &new_items, size_t new_select, bool emit
 	set_select (new_select, emit_signal);
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 void ListBox::set_items (ItemList &&new_items, size_t new_select, bool emit_signal)
 {
 	items = std::forward<ItemList> (new_items);
 	Scroll::modify_number (items.size ());
 	set_select (new_select, emit_signal);
 }
-#endif
 
 void ListBox::set_select (size_t new_select, bool emit_signal, bool scroll_to_top)
 {
@@ -246,33 +244,33 @@ void ListBox::redraw ()
 	for (unsigned i=0; i<info.len; ++i) {
 		const std::wstring &str = items[info.first+i];
 		choose_palette ((select_any && i==info.focus_pos) ? PALETTE_ID_LISTBOX_SELECT : PALETTE_ID_LISTBOX);
-		Size pos = make_size (0, i);
+		Size pos{0, i};
 		unsigned strwid = ucs_width (str);
 		// Are we going to overflow?
 		if (strwid <= disp_wid) {
 			//NO:
 			pos = put (pos, str);
 			if (select_any && i==info.focus_pos) // Focus? Highlight the whole line
-				clear (pos, make_size (disp_wid - pos.x, 1));
+				clear(pos, {disp_wid - pos.x, 1});
 		}
 		else {
 			// YES: Cannot display all
 			size_t display_wchars = max_chars_in_width (str, maxS (disp_wid - 4, 0));
 			put (pos, str.c_str (), display_wchars);
 			choose_palette (PALETTE_ID_LISTBOX);
-			pos = put (make_size (maxS(disp_wid-4,0),i), L' ');
+			pos = put(Size(maxS(disp_wid - 4, 0), i), L' ');
 			attribute_toggle (REVERSE);
 			pos = put (pos, L"...");
 		}
 	}
 	// Display the scroll bar
 	choose_palette (PALETTE_ID_LISTBOX);
-	clear (make_size (disp_wid,0), make_size (1, disp_hgt));
+	clear({disp_wid, 0}, {1, disp_hgt});
 	attribute_toggle (REVERSE);
 	ScrollBarInfo scrollbar = scrollbar_info (disp_hgt, items.size(), info.first);
-	clear (make_size (disp_wid,scrollbar.pos), make_size (1, scrollbar.size));
+	clear({disp_wid, scrollbar.pos}, {1, scrollbar.size});
 
-	move_cursor (make_size (0, info.focus_pos));
+	move_cursor({0, info.focus_pos});
 }
 
 } // namespace tiary::ui

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -36,7 +36,7 @@ protected:
 	Size size;
 
 public:
-	MovableObject () : pos (make_size ()), size (make_size ()) {}
+	MovableObject() : pos{}, size{} {}
 
 	virtual void move_resize (Size newpos, Size newsize) = 0;
 

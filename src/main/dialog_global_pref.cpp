@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -32,7 +32,6 @@
 #include "common/algorithm.h"
 #include "common/unicode.h"
 #include "common/dir.h"
-#include "common/container_of.h"
 
 
 
@@ -131,7 +130,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 	, layout_buttons (HORIZONTAL)
 	, layout_main (VERTICAL)
 {
-	FixedWindow::resize (get_screen_size () & make_size (80, 18));
+	FixedWindow::resize(get_screen_size() & Size{80, 18});
 
 	// Set up layouts
 
@@ -198,7 +197,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 		(1, 1)
 		(layout_buttons, 3, 3);
 
-	layout_main.move_resize (make_size (2, 1), get_size () - make_size (4, 2));
+	layout_main.move_resize({2, 1}, get_size() - Size{4, 2});
 
 
 	// Chain
@@ -218,12 +217,10 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 
 	// Set up signals
 
-	lbl_default_file.sig_hotkey.connect (
-			TIARY_LIST_OF(Signal)
-				Signal (this, &Window::set_focus_ptr, &btn_default_file, 0),
-				Signal (btn_default_file, &Button::slot_clicked)
-			TIARY_LIST_OF_END
-			);
+	lbl_default_file.sig_hotkey.connect(std::list<Signal>{
+		Signal(this, &Window::set_focus_ptr, &btn_default_file, 0),
+		Signal(btn_default_file, &Button::slot_clicked)
+	});
 	btn_default_file.sig_clicked.connect (this, &WindowGlobalOptions::slot_default_file);
 	btn_default_file_current.sig_clicked.connect (this, &WindowGlobalOptions::slot_default_file_current);
 	btn_ok.sig_clicked.connect (this, &WindowGlobalOptions::slot_ok);

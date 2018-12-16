@@ -76,8 +76,7 @@ RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *linec, s
 
 namespace {
 
-struct SplitStringLine2RichTextLine : public std::unary_function <const SplitStringLine &, RichTextLine>
-{
+struct SplitStringLine2RichTextLine {
 	PaletteID id;
 	explicit SplitStringLine2RichTextLine (PaletteID &id_) : id(id_) {}
 	RichTextLine operator () (const SplitStringLine &in) const

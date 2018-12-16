@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -46,10 +46,8 @@ public:
 	 */
 	void register_hotkey (wchar_t, const Action &);
 	void register_hotkey (wchar_t, const Action &, int options);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	void register_hotkey (wchar_t, Action &&);
 	void register_hotkey (wchar_t, Action &&, int options);
-#endif
 
 	bool emit_hotkey (wchar_t);
 

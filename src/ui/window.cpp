@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -226,7 +226,7 @@ wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 #endif // TIARY_USE_MOUSE && KEY_MOUSE
 
 			// Other keys - look into the table
-			static const MapStruct<wint_t,wchar_t> map [] = {
+			static const std::pair<wint_t,wchar_t> map[] = {
 				{ KEY_UP, UP }, { KEY_DOWN, DOWN }, { KEY_LEFT, LEFT }, { KEY_RIGHT, RIGHT },
 				{ KEY_HOME, HOME }, { KEY_END, END },
 				{ KEY_NPAGE, PAGEDOWN }, { KEY_PPAGE, PAGEUP },
@@ -325,7 +325,7 @@ Window::Window (unsigned options_, const std::wstring &title_)
 	: MovableObject ()
 	, Hotkeys ()
 	, requests (0)
-	, cur_attr (ColorAttr::make_default ())
+	, cur_attr()
 	, char_table (0)
 	, status (STATUS_NORMAL)
 	, options (options_)
@@ -341,6 +341,29 @@ Window::Window (unsigned options_, const std::wstring &title_)
 		bottommost_window = this;
 	}
 	else {
+		topmost_window->top_window = this;
+	}
+	topmost_window = this;
+}
+
+Window::Window (unsigned options_, std::wstring &&title_)
+	: MovableObject()
+	, Hotkeys()
+	, requests(0)
+	, cur_attr()
+	, char_table(0)
+	, status(STATUS_NORMAL)
+	, options(options_)
+	, title(std::move(title_))
+	, title_scr_width(ucs_width(title))
+	, dummy_ctrl(*this)
+	, focus_ctrl(0) {
+	reallocate_char_table();
+	top_window = 0;
+	bottom_window = topmost_window;
+	if (topmost_window == 0) {
+		bottommost_window = this;
+	} else {
 		topmost_window->top_window = this;
 	}
 	topmost_window = this;
@@ -682,7 +705,7 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 		ptr->c = L' ';
 	}
 #endif
-	return make_size (x, y);
+	return {x, y};
 }
 
 Size Window::put (Size blkpos, Size blksize, Size relpos, const std::wstring &s)
@@ -692,22 +715,22 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const std::wstring &s)
 
 Size Window::put (Size relpos, wchar_t ch)
 {
-	return put (make_size (), size, relpos, ch);
+	return put({}, size, relpos, ch);
 }
 
 Size Window::put (Size relpos, const wchar_t *s)
 {
-	return put (make_size (), size, relpos, s);
+	return put({}, size, relpos, s);
 }
 
 Size Window::put (Size relpos, const wchar_t *s, size_t n)
 {
-	return put (make_size (), size, relpos, s, n);
+	return put({}, size, relpos, s, n);
 }
 
 Size Window::put (Size relpos, const std::wstring & s)
 {
-	return put (make_size (), size, relpos, s);
+	return put({}, size, relpos, s);
 }
 
 void Window::touch_screen ()
@@ -983,33 +1006,33 @@ void Window::redraw ()
 
 	Size size = get_size ();
 	// Draw the border
-	if (!(options & WINDOW_NO_BORDER) && both (size >= make_size (2, 2))) {
+	if (!(options & WINDOW_NO_BORDER) && both(size >= Size{2, 2})) {
 
 		if (status == STATUS_MOVING) {
 			choose_palette (PALETTE_ID_MOVING_BORDER);
 		}
 
-		put (make_size (), BORDER_1); // Top, left
-		fill (make_size (1, 0), make_size (size.x-2, 1), BORDER_H); // Up
-		put (make_size (size.x-1, 0), BORDER_2); // Top, right
-		fill (make_size (0, 1), make_size (1, size.y-2), BORDER_V); // Left
-		fill (make_size (size.x-1, 1), make_size (1, size.y-2), BORDER_V); // Right
-		put (make_size (0, size.y-1), BORDER_3); // Bottom, left
-		fill (make_size (1, size.y-1), make_size (size.x-2, 1), BORDER_H); // Down
-		put (make_size (size.x-1, size.y-1), BORDER_4); // Bottom, right
+		put({}, BORDER_1); // Top, left
+		fill({1, 0}, {size.x - 2, 1}, BORDER_H); // Up
+		put({size.x - 1, 0}, BORDER_2); // Top, right
+		fill({0, 1}, {1, size.y - 2}, BORDER_V); // Left
+		fill({size.x - 1, 1}, {1, size.y - 2}, BORDER_V); // Right
+		put({0, size.y - 1}, BORDER_3); // Bottom, left
+		fill({1, size.y - 1}, {size.x - 2, 1}, BORDER_H); // Down
+		put({size.x - 1, size.y - 1}, BORDER_4); // Bottom, right
 
 		// Show the title
 		if (!title.empty ()) {
 			unsigned left = (size.x - title_scr_width - 2) / 2;
-			Size pos = make_size (left, 0);
+			Size pos{left, 0};
 			pos = put (pos, L' ');
-			pos = put (make_size (), make_size (size.x, 1), pos, title);
+			pos = put({}, {size.x, 1}, pos, title);
 			pos = put (pos, L' ');
 		}
 
 		// Show the close button
 		if (!(options & WINDOW_NO_CLOSE_BUTTON) && size.x>=4) {
-			Size pos = make_size (size.x - 4, 0);
+			Size pos{size.x - 4, 0};
 			// u00d7 is multiplication sign
 			put (pos, terminal_emulator_correct_wcwidth () ? L"[\u00d7]" : L"[x]");
 		}
@@ -1025,7 +1048,7 @@ Size Window::get_cursor_pos () const
 	if (Control *ctrl = get_focus ()) {
 		return ctrl->get_cursor_pos () + ctrl->get_pos ();
 	}
-	return make_size ();
+	return Size{};
 }
 
 bool Window::get_cursor_visibility () const

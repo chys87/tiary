@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -254,16 +254,11 @@ struct ColorAttr
 {
 	Color fore, back;
 	Attr attr;
-	unsigned char padding___;
+	unsigned char padding___ = 0;
 
-	static ColorAttr make_default ();
+	constexpr ColorAttr() : fore(DEFAULT_FORECOLOR), back(DEFAULT_BACKCOLOR), attr(0) {}
+	constexpr ColorAttr(Color f, Color b, Attr a) : fore(f), back(b), attr(a) {}
 };
-
-inline ColorAttr ColorAttr::make_default ()
-{
-	ColorAttr r = { DEFAULT_FORECOLOR, DEFAULT_BACKCOLOR, 0 };
-	return r;
-}
 
 struct CharColorAttr
 {

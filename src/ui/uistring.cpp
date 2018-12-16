@@ -25,18 +25,23 @@ namespace ui {
 
 
 UIString::UIString (const std::wstring &s, unsigned options)
-	: UIStringBase (s, options)
-	, lines (0)
-	, max_width (0)
-	, split_cache_wid (0)
-	, split_cache ()
-{
+	: UIStringBase (s, options) {
 	update ();
+}
+
+UIString::UIString(std::wstring &&s, unsigned options)
+	: UIStringBase(std::move(s), options) {
+	update();
 }
 
 void UIString::set_text (const std::wstring &s, unsigned options)
 {
 	UIStringBase::set_text (s, options);
+	update ();
+}
+
+void UIString::set_text(std::wstring &&s, unsigned options) {
+	UIStringBase::set_text(std::move(s), options);
 	update ();
 }
 

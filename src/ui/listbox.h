@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -36,9 +36,7 @@ public:
 	bool is_valid_select () const { return select_any; }
 
 	void set_items (const ItemList &, size_t new_select = size_t(-1), bool emit_signal = true);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	void set_items (ItemList &&, size_t = size_t(-1), bool emit_signal = true);
-#endif
 
 	void set_select (size_t /* -1 = none */, bool emit_signal = true, bool scroll_to_top = false);
 

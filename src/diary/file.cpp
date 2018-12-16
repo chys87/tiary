@@ -61,7 +61,6 @@
 #include "common/unicode.h"
 #include "common/md5.h"
 #include "common/format.h"
-#include "common/callback.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -425,7 +424,7 @@ LoadFileRet load_global_options (GlobalOptionGroup &options, RecentFileList &rec
 
 LoadFileRet load_file (
 		const char *filename,
-		const NoArgCallback<std::wstring> &enter_password,
+		const std::function<std::wstring()> &enter_password,
 		DiaryEntryList &entries,
 		PerFileOptionGroup &options,
 		std::wstring &password)

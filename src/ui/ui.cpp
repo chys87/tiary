@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -117,7 +117,7 @@ void finalize ()
 
 Size get_screen_size ()
 {
-	return make_size (COLS, LINES);
+	return Size(COLS, LINES);
 }
 
 unsigned get_screen_width ()

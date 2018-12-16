@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -92,7 +92,7 @@ void MenuBar::redraw ()
 	choose_palette (PALETTE_ID_MENUBAR);
 	clear ();
 	for (ItemList::iterator it=item_list.begin(); it!=item_list.end(); ++it) {
-		it->text.output (*this, make_size (it->w, 0), it->text.get_width ());
+		it->text.output(*this, {it->w, 0}, it->text.get_width ());
 	}
 	unsigned x = 0;
 	if (!item_list.empty ()) {
@@ -102,7 +102,7 @@ void MenuBar::redraw ()
 		// Align to the right
 		unsigned w = minU (get_size ().x - x, text.get_width ());
 		x = get_size ().x - w;
-		text.output (*this, make_size (x, 0), w);
+		text.output(*this, {x, 0}, w);
 	}
 }
 
@@ -118,17 +118,17 @@ void MenuBar::slot_clicked (size_t k)
 
 		// Highlight the selected item
 		choose_palette (PALETTE_ID_MENUBAR_SELECT);
-		item.text.output (*this, make_size (item.w, 0), item.text.get_width ());
+		item.text.output(*this, {item.w, 0}, item.text.get_width());
 
-		Size left = win.get_pos () + get_pos () + make_size (item.w, 1);
-		Size right = make_size (get_screen_width (), left.y);
+		Size left = win.get_pos() + get_pos () + Size{item.w, 1};
+		Size right{get_screen_width(), left.y};
 
 		// Pop out sub menu
 		MenuItem *chosen_item = item.menu.show (left, right);
 
 		// Restore display
 		choose_palette (PALETTE_ID_MENUBAR);
-		item.text.output (*this, make_size (item.w, 0), item.text.get_width ());
+		item.text.output(*this, {item.w, 0}, item.text.get_width());
 
 		// Deal with the result
 		if (chosen_item) {

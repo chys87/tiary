@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -38,10 +38,8 @@ namespace {
 
 // This template is a trick:
 // HotkeyHint::HotkeyItem is inaccessible here
-template <typename HotkeyItem>
-struct LargerWeight :
-	public std::binary_function <const HotkeyItem *, const HotkeyItem *, bool>
-{
+struct LargerWeight {
+	template <typename HotkeyItem>
 	bool operator () (const HotkeyItem *a, const HotkeyItem *b) const
 	{
 		return (a->weight > b->weight);
@@ -59,7 +57,7 @@ void HotkeyHint::construct_sorted_list ()
 			it != e; ++it) {
 		*iw++ = &*it;
 	}
-	std::sort (sorted_list.begin (), iw, LargerWeight <HotkeyItem> ());
+	std::sort(sorted_list.begin(), iw, LargerWeight());
 }
 
 void HotkeyHint::redraw ()
@@ -102,7 +100,7 @@ void HotkeyHint::redraw ()
 		it->x = x;
 		// Display this item
 		Size pos = this
-			<< make_size (x, 0)
+			<< Size{x, 0}
 			<< PALETTE_ID_HOTKEY_HINT_KEY
 			<< it->key_name
 			<< PALETTE_ID_HOTKEY_HINT
@@ -154,7 +152,6 @@ HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, c
 	return *this;
 }
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Action &&action)
 {
 	APPEND_ITEM (std::move (action));
@@ -166,7 +163,6 @@ HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, c
 	APPEND_ITEM (std::move (signal));
 	return *this;
 }
-#endif
 
 
 } // namespace tiary::ui

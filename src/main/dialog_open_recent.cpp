@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,7 +22,6 @@
 #include "common/unicode.h"
 #include "common/algorithm.h"
 #include "common/dir.h"
-#include "common/container_of.h"
 
 namespace tiary {
 
@@ -107,12 +106,10 @@ WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
 	ChainControlsHorizontalO () (btn_ok) (btn_cancel) (btn_remove) (btn_remove_all);
 
 	lst_files.sig_double_clicked.connect (this, &WindowRecentFiles::slot_ok);
-	lst_files.sig_select_changed.connect (
-			TIARY_LIST_OF(Signal)
-				Signal (btn_ok, &Button::redraw),
-				Signal (btn_remove, &Button::redraw)
-			TIARY_LIST_OF_END
-		);
+	lst_files.sig_select_changed.connect(std::list<Signal>{
+		Signal(btn_ok, &Button::redraw),
+		Signal(btn_remove, &Button::redraw)
+	});
 	btn_ok.sig_clicked = btn_remove.sig_clicked = Condition (lst_files, &ListBox::is_valid_select);
 	btn_ok.sig_clicked.connect (this, &WindowRecentFiles::slot_ok);
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
@@ -134,12 +131,12 @@ void WindowRecentFiles::redraw ()
 {
 	unsigned items = lst_files.get_items ().size ();
 
-	Size winsize = (make_size (max_width+10, items+6) | make_size (50, 12))
+	Size winsize = (Size{max_width + 10, items + 6} | Size{50, 12})
 		& get_screen_size ();
 
 	FixedWindow::resize (winsize);
 
-	layout_main.move_resize (make_size (2, 1), winsize - make_size (4, 2));
+	layout_main.move_resize({2, 1}, winsize - Size{4, 2});
 
 	Window::redraw ();
 }

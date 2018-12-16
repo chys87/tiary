@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -45,17 +45,13 @@ struct MenuItem
 	// valid_foo is not frequently used, so we do not initialize it in the constructor
 	MenuItem (const std::wstring &, const Signal &);
 	MenuItem (const std::wstring &, const Action &);
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	MenuItem (const std::wstring &, Signal &&);
 	MenuItem (const std::wstring &, Action &&);
-#endif
 
 	MenuItem (const MenuItem &); ///< Deep copy...
 	MenuItem &operator = (const MenuItem &); ///< Deep copy...
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	MenuItem (MenuItem &&);
 	MenuItem &operator = (MenuItem &&other) { swap (other); return *this; }
-#endif
 
 	void swap (MenuItem &);
 
@@ -84,13 +80,9 @@ struct Menu
 	size_t size () const { return item_list.size (); }
 
 	MenuItem &add (); ///< Add a separator
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	MenuItem &add (const wchar_t *text, const Signal &sig);
 	MenuItem &add (const wchar_t *text, Action &&act);
 	MenuItem &add (const wchar_t *text, Signal &&sig = Signal ());
-#else
-	MenuItem &add (const wchar_t *text, const Signal &sig = Signal ());
-#endif
 	MenuItem &add (const wchar_t *text, const Action &act);
 
 	// operator () is identical to add (), except that it returns *this
@@ -99,7 +91,6 @@ struct Menu
 		add ();
 		return *this;
 	}
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	Menu &operator () (const wchar_t *text, Signal &&sig = Signal ())
 	{
 		add (text, std::move (sig));
@@ -110,13 +101,8 @@ struct Menu
 		add (text, std::move (act));
 		return *this;
 	}
-#endif
 
-#ifdef TIARY_HAVE_RVALUE_REFERENCES
 	Menu &operator () (const wchar_t *text, const Signal &sig)
-#else
-	Menu &operator () (const wchar_t *text, const Signal &sig = Signal ())
-#endif
 	{
 		add (text, sig);
 		return *this;

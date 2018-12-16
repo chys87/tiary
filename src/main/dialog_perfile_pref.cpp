@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -74,7 +74,7 @@ WindowPerFileOptions::WindowPerFileOptions (PerFileOptionGroup &options_)
 	, layout_buttons (HORIZONTAL)
 	, layout_main (VERTICAL)
 {
-	FixedWindow::resize (get_screen_size () & make_size (80, 10));
+	FixedWindow::resize (get_screen_size () & Size{80, 10});
 
 	// Set up layouts
 	layout_buttons.add
@@ -93,7 +93,7 @@ WindowPerFileOptions::WindowPerFileOptions (PerFileOptionGroup &options_)
 		(layout_buttons, 3, 3)
 		;
 
-	layout_main.move_resize (make_size (2, 1), get_size () - make_size (4, 2));
+	layout_main.move_resize({2, 1}, get_size () - Size{4, 2});
 
 	// Set up chains
 	ChainControlsVerticalNC ()
