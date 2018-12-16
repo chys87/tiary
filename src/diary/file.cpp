@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2016, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2016, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,16 +22,10 @@
  * </tiary>
  *
  *
- * Diary file format (old):
+ * Diary file format (unencrypted file):
  *
  * The file is compressed with bzip2.
- * When decompressed, the format is as follows:
- *
- * (1) If there's no password, it's simply an XML;
- * (2) If there is a password, the first few bytes are:
- *     0000 ~ 000F  All zeroes. (Reserved, and in order to differ from "<?xml ...")
- *     0010 ~ 001F  MD5(password + salt1)
- *     0020 ~ ....  encrypt (XML, password)
+ * When decompressed, the format is an XML:
  *
  * <?xml version="1.0" encoding="UTF-8" ?>
  * <tiary>
@@ -50,7 +44,7 @@
  * </tiary>
  *
  *
- * Diary file format (new) for compressed file:
+ * Diary file format (encrypted file):
  * 0000~000F Signature
  * 0010~001F MD5(passwoord+salt1)
  * 0020~     encrypt (bzip2 (XML), password)
@@ -455,7 +449,7 @@ LoadFileRet load_file (
 
 	password.clear ();
 
-	// New compressed format?
+	// Encrypted?
 	if (everything.size()>=32 && !memcmp (&everything[0], new_format_signature, 16)) {
 		// Second 16 bytes: MD5(password+salt1)
 		password = enter_password ();
@@ -473,45 +467,11 @@ LoadFileRet load_file (
 		decrypt (&everything[32], everything.size()-32, mbs_password.data(), mbs_password.length());
 		// Decompress
 		everything = bunzip2 (&everything[32], everything.size () - 32);
-	}
-	else {
-		// Old format; or not compressed
+	} else {
+		// Not encrypted
 		everything = bunzip2 (&everything[0], everything.size ());
 		if (everything.empty ()) {
 			return LOAD_FILE_BUNZIP2;
-		}
-
-
-		// Is there a password?
-		if (everything[0] != '<') {
-			// We have a password.
-			if (everything.size () < 32) {
-				return LOAD_FILE_CONTENT;
-			}
-
-			uint64_t zeroes[] = { 0, 0 };
-
-			// First 16 bytes must be zeroes
-			if (memcmp (&everything[0], zeroes, 16) != 0) {
-				return LOAD_FILE_CONTENT;
-			}
-
-			// Second 16 bytes: MD5(password + salt1)
-			password = enter_password ();
-			if (password.empty ()) { // User cancelation
-				return LOAD_FILE_PASSWORD;
-			}
-			if (memcmp (md5 (wstring_to_mbs (password)) (password_salt1, sizeof password_salt1).result (),
-						&everything[16], 16) != 0) { // Password incorrect
-				password.clear ();
-				return LOAD_FILE_PASSWORD;
-			}
-
-			// Password correct. Decrypt now
-			decrypt (&everything[32], everything.size()-32, password.data(), password.length());
-			// Here we are passing password instead of wstring_to_mbs(password)
-			// This is because of a bug in the encryption code in the old version
-			offset = 32;
 		}
 	}
 
