@@ -21,9 +21,9 @@
 #define TIARY_COMMON_DIR_H
 
 #include <functional>
-#include <list>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace tiary {
 
@@ -118,7 +118,7 @@ struct DirEnt
 	unsigned attr; ///< Attribute. Currently only supports FIILE_ATTR_DIRECTORY
 };
 
-typedef std::list<DirEnt> DirEntList;
+typedef std::vector<DirEnt> DirEntList;
 
 /**
  * @brief	List all files/directories in a directory

@@ -450,7 +450,7 @@ DirEntList list_dir (
 		}
 		closedir (dir);
 		// Sort them
-		filelist.sort(comp);
+		std::sort(filelist.begin(), filelist.end(), comp);
 	}
 	return filelist;
 }
