@@ -62,7 +62,8 @@ public:
 	static const unsigned WINDOW_NO_CLOSE_BUTTON = 2;
 	static const unsigned WINDOW_NONMOVABLE = 4;
 
-	explicit Window (unsigned = 0, const std::wstring &title = std::wstring ());
+	explicit Window(unsigned, const std::wstring &title);
+	explicit Window(unsigned = 0, std::wstring &&title = std::wstring());
 	virtual ~Window ();
 
 	/**

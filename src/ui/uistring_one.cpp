@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -29,10 +29,21 @@ UIStringOne::UIStringOne (const std::wstring &s, unsigned options)
 {
 }
 
+UIStringOne::UIStringOne(std::wstring &&s, unsigned options)
+	: UIStringBase(std::move(s), options)
+	, width(ucs_width(get_text()))
+{
+}
+
 void UIStringOne::set_text (const std::wstring &s, unsigned options)
 {
 	UIStringBase::set_text (s, options);
 	width = ucs_width (get_text ());
+}
+
+void UIStringOne::set_text(std::wstring &&s, unsigned options) {
+	UIStringBase::set_text(std::move(s), options);
+	width = ucs_width(get_text());
 }
 
 Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid) const

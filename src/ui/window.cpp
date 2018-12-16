@@ -346,6 +346,29 @@ Window::Window (unsigned options_, const std::wstring &title_)
 	topmost_window = this;
 }
 
+Window::Window (unsigned options_, std::wstring &&title_)
+	: MovableObject()
+	, Hotkeys()
+	, requests(0)
+	, cur_attr()
+	, char_table(0)
+	, status(STATUS_NORMAL)
+	, options(options_)
+	, title(std::move(title_))
+	, title_scr_width(ucs_width(title))
+	, dummy_ctrl(*this)
+	, focus_ctrl(0) {
+	reallocate_char_table();
+	top_window = 0;
+	bottom_window = topmost_window;
+	if (topmost_window == 0) {
+		bottommost_window = this;
+	} else {
+		topmost_window->top_window = this;
+	}
+	topmost_window = this;
+}
+
 Window::~Window ()
 {
 	touch_lines (pos.y, size.y);

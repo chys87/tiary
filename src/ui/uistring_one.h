@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -34,8 +34,10 @@ class Control;
 class UIStringOne : public UIStringBase
 {
 public:
-	explicit UIStringOne (const std::wstring & = std::wstring (), unsigned options = 0);
+	explicit UIStringOne(const std::wstring &, unsigned options = 0);
+	explicit UIStringOne(std::wstring && = std::wstring(), unsigned options = 0);
 	void set_text (const std::wstring &, unsigned options = 0);
+	void set_text(std::wstring &&, unsigned options = 0);
 
 	/**
 	 * @brief	Output text to a control, highlighting hotkey character

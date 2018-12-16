@@ -28,7 +28,8 @@ class Button : public virtual Control, public FocusColorControl
 public:
 	// The text must be a single line
 	// Otherwise, the behavior is undefined
-	Button (Window &, const std::wstring &);
+	Button(Window &, const std::wstring &);
+	Button(Window &, std::wstring &&);
 	~Button ();
 
 	bool on_key (wchar_t);

@@ -34,6 +34,19 @@ Button::Button (Window &win, const std::wstring &str)
 	}
 }
 
+Button::Button (Window &win, std::wstring &&str)
+	: Control(win)
+	, FocusColorControl(win)
+	, text(std::move(str))
+	, attributes(0)
+{
+	// Register hotkey
+	if (wchar_t c = text.get_hotkey()) {
+		win.register_hotkey(c, Signal(this, &Button::slot_clicked),
+				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
+	}
+}
+
 Button::~Button ()
 {
 }

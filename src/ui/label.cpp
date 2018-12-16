@@ -34,6 +34,18 @@ Label::Label (Window &win, const std::wstring &str, unsigned options)
 	}
 }
 
+Label::Label(Window &win, std::wstring &&str, unsigned options)
+	: Control(win)
+	, UnfocusableControl(win)
+	, text(std::move(str), options) {
+	// Register hotkey
+	if (wchar_t c = text.get_hotkey ()) {
+		win.register_hotkey (c, Signal (sig_hotkey, 0),
+				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
+		sig_hotkey.connect (win, &Window::set_focus_ptr, this, 1);
+	}
+}
+
 Label::~Label ()
 {
 }
@@ -49,6 +61,11 @@ void Label::set_text (const std::wstring &str, unsigned options)
 {
 	text.set_text (str, options);
 	Label::redraw ();
+}
+
+void Label::set_text(std::wstring &&str, unsigned options) {
+	text.set_text(std::move(str), options);
+	Label::redraw();
 }
 
 
