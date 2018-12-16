@@ -25,92 +25,30 @@
 namespace tiary {
 namespace ui {
 
-MenuItem::MenuItem ()
-	: text ()
-	, action ()
-	, hidden (false)
-	, submenu (0)
-{
-}
-
 MenuItem::MenuItem (const std::wstring &text_, const Signal &sig_)
 	: text (text_)
-	, action (sig_)
-	, hidden (false)
-	, submenu (0)
-{
+	, action(sig_) {
 }
 
 MenuItem::MenuItem (const std::wstring &text_, const Action &act_)
 	: text (text_)
-	, action (act_)
-	, hidden (false)
-	, submenu (0)
-{
-}
-
-MenuItem::MenuItem (const MenuItem &other)
-	: text (other.text)
-	, action (other.action)
-	, hidden (other.hidden)
-	, submenu (other.submenu ? new Menu (*other.submenu) : 0)
-{
-}
-
-MenuItem &MenuItem::operator = (const MenuItem &other)
-{
-	if (this != &other) {
-		text = other.text;
-		action = other.action;
-		hidden = other.hidden;
-		delete submenu;
-		submenu = other.submenu ? new Menu (*other.submenu) : 0;
-	}
-	return *this;
+	, action(act_) {
 }
 
 MenuItem::MenuItem (const std::wstring &text_, Signal &&sig_)
 	: text (text_)
-	, action (std::move (sig_))
-	, hidden (false)
-	, submenu (0)
-{
+	, action(std::move(sig_)) {
 }
 
 MenuItem::MenuItem (const std::wstring &text_, Action &&act_)
 	: text (text_)
-	, action (std::move (act_))
-	, hidden (false)
-	, submenu (0)
-{
-}
-
-MenuItem::MenuItem (MenuItem &&other)
-	: text (std::forward<std::wstring> (other.text))
-	, action (std::move (other.action))
-	, hidden (other.hidden)
-	, submenu (other.submenu)
-{
-	other.submenu = 0;
-}
-
-void MenuItem::swap (MenuItem &other)
-{
-	text.swap (other.text);
-	action.swap (other.action);
-	std::swap (hidden, other.hidden);
-	std::swap (submenu, other.submenu);
-}
-
-MenuItem::~MenuItem ()
-{
-	delete submenu;
+	, action(std::move(act_)) {
 }
 
 Menu &MenuItem::get_submenu ()
 {
-	if (submenu == 0) {
-		submenu = new Menu;
+	if (submenu == nullptr) {
+		submenu.reset(new Menu);
 	}
 	return *submenu;
 }
@@ -118,29 +56,29 @@ Menu &MenuItem::get_submenu ()
 
 
 
-MenuItem &Menu::add ()
-{
-	return *item_list.insert (item_list.end (), MenuItem ());
+MenuItem &Menu::add() {
+	item_list.emplace_back(new MenuItem);
+	return *item_list.back();
 }
 
-MenuItem &Menu::add (const wchar_t *text, const Signal &sig)
-{
-	return *item_list.insert (item_list.end (), MenuItem (text, sig));
+MenuItem &Menu::add(const wchar_t *text, const Signal &sig) {
+	item_list.emplace_back(new MenuItem(text, sig));
+	return *item_list.back();
 }
 
-MenuItem &Menu::add (const wchar_t *text, const Action &act)
-{
-	return *item_list.insert (item_list.end (), MenuItem (text, act));
+MenuItem &Menu::add(const wchar_t *text, const Action &act) {
+	item_list.emplace_back(new MenuItem(text, act));
+	return *item_list.back();
 }
 
-MenuItem &Menu::add (const wchar_t *text, Signal &&sig)
-{
-	return *item_list.insert (item_list.end (), MenuItem (text, std::forward<Signal> (sig)));
+MenuItem &Menu::add(const wchar_t *text, Signal &&sig) {
+	item_list.emplace_back(new MenuItem(text, std::move(sig)));
+	return *item_list.back();
 }
 
-MenuItem &Menu::add (const wchar_t *text, Action &&act)
-{
-	return *item_list.insert (item_list.end (), MenuItem (text, std::move (act)));
+MenuItem &Menu::add(const wchar_t *text, Action &&act) {
+	item_list.emplace_back(new MenuItem(text, std::move(act)));
+	return *item_list.back();
 }
 
 Menu &Menu::add_submenu (const wchar_t *text)
@@ -329,10 +267,10 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	ItemControl **pi = ctrls;
 	ItemControl **pv = valid_ctrls;
 	unsigned maxwid = 0;
-	for (Menu::const_iterator it = menu_.begin (); it != menu_.end (); ++it) {
-		if (!it->hidden) {
-			bool validity = it->action.call_condition (true);
-			ItemControl *p = *pi++ = new ItemControl (*this, *it, validity);
+	for (const std::unique_ptr<MenuItem> &pmi: menu_) {
+		if (!pmi->hidden) {
+			bool validity = pmi->action.call_condition (true);
+			ItemControl *p = *pi++ = new ItemControl (*this, *pmi, validity);
 			if (validity && !p->text.get_text ().empty ()) {
 				*pv++ = p;
 			}

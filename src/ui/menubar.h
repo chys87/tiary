@@ -19,7 +19,7 @@
 #include "ui/uistring_one.h"
 #include "ui/menu.h"
 #include <string>
-#include <list>
+#include <vector>
 
 namespace tiary {
 namespace ui {
@@ -53,15 +53,10 @@ private:
 	struct Item
 	{
 		UIStringOne text;
-		unsigned w; // X coordinate relative to containing MenuBar
-		Menu menu;
+		unsigned w; ///< X coordinate relative to containing MenuBar
+		std::unique_ptr<Menu> menu{new Menu}; ///< Menu object. Use unique_ptr to avoid pointer invalidation.
 	};
-	/*
-	 * IMPORTANT: Cannot use other containers
-	 * It is important for our program that adding new items to the
-	 * list does not invalidate existing references to other items.
-	 */
-	typedef std::list<Item> ItemList;
+	typedef std::vector<Item> ItemList;
 	ItemList item_list;
 
 	UIStringOne text;

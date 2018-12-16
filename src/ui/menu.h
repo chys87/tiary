@@ -16,8 +16,8 @@
 #define TIARY_UI_MENU_H
 
 #include "common/action.h"
-#include <list>
 #include <string>
+#include <vector>
 
 /*
  * Because we want to put tiary::ui::MenuItem and tiary::ui::Menu in containers,
@@ -37,10 +37,10 @@ struct MenuItem
 {
 	std::wstring text; ///< Empty string indicates a separator
 	Action action; ///< An action associated with this item
-	bool hidden; ///< Don't display this item. Can be useful in some contexts, i.e. a Recent File list
-	Menu *submenu; ///< Submenu
+	bool hidden = false; ///< Don't display this item. Can be useful in some contexts, i.e. a Recent File list
+	std::unique_ptr<Menu> submenu; ///< Submenu
 
-	MenuItem (); ///< Initialize to a separator
+	MenuItem() = default; ///< Initialize to a separator
 
 	// valid_foo is not frequently used, so we do not initialize it in the constructor
 	MenuItem (const std::wstring &, const Signal &);
@@ -48,14 +48,8 @@ struct MenuItem
 	MenuItem (const std::wstring &, Signal &&);
 	MenuItem (const std::wstring &, Action &&);
 
-	MenuItem (const MenuItem &); ///< Deep copy...
-	MenuItem &operator = (const MenuItem &); ///< Deep copy...
-	MenuItem (MenuItem &&);
-	MenuItem &operator = (MenuItem &&other) { swap (other); return *this; }
-
-	void swap (MenuItem &);
-
-	~MenuItem ();
+	MenuItem (MenuItem &&) = default;
+	MenuItem &operator = (MenuItem &&other) = default;
 
 	Menu &get_submenu (); ///< Returns a reference to the submenu (create if necessary)
 };
@@ -63,11 +57,9 @@ struct MenuItem
 struct Menu
 {
 	/*
-	 * IMPORTANT: Cannot use other containers
-	 * It is important for our program that adding new items to the
-	 * list does not invalidate existing references to other items.
+	 * Use unique_ptr to avoid pointer invalidation.
 	 */
-	typedef std::list<MenuItem> MenuItemList;
+	typedef std::vector<std::unique_ptr<MenuItem>> MenuItemList;
 	MenuItemList item_list;
 
 	// Add some functions to make it behave like a container

@@ -18,9 +18,7 @@
 #include "ui/window.h"
 #include "ui/mouse.h"
 #include "common/algorithm.h"
-#include <utility> // std::forward
 #include <stack>
-#include <iterator> // std::advance
 #include <assert.h>
 
 namespace tiary {
@@ -45,7 +43,8 @@ MenuBar::~MenuBar ()
 
 Menu &MenuBar::add (const std::wstring &text)
 {
-	Item &item = *item_list.insert (item_list.end (), Item ());
+	item_list.emplace_back();
+	Item &item = item_list.back();
 	item.text.set_text (text);
 	size_t n = item_list.size ();
 	if (n == 1) {
@@ -61,7 +60,7 @@ Menu &MenuBar::add (const std::wstring &text)
 				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
 	}
 
-	return item.menu;
+	return *item.menu;
 }
 
 Menu &MenuBar::add (const wchar_t *text)
@@ -112,9 +111,7 @@ void MenuBar::slot_clicked (size_t k)
 		assert (k < item_list.size ());
 
 		// Get the item
-		ItemList::iterator it = item_list.begin ();
-		std::advance (it, k);
-		Item &item = *it;
+		Item &item = item_list[k];
 
 		// Highlight the selected item
 		choose_palette (PALETTE_ID_MENUBAR_SELECT);
@@ -124,7 +121,7 @@ void MenuBar::slot_clicked (size_t k)
 		Size right{get_screen_width(), left.y};
 
 		// Pop out sub menu
-		MenuItem *chosen_item = item.menu.show (left, right);
+		MenuItem *chosen_item = item.menu->show (left, right);
 
 		// Restore display
 		choose_palette (PALETTE_ID_MENUBAR);
