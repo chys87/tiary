@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -42,7 +42,7 @@ void Label::redraw ()
 {
 	choose_palette (PALETTE_ID_LABEL);
 	clear ();
-	text.output (*this, make_size(), get_size());
+	text.output(*this, Size{}, get_size());
 }
 
 void Label::set_text (const std::wstring &str, unsigned options)

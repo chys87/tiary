@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -87,12 +87,12 @@ void Button::redraw ()
 	}
 
 	choose_palette (id);
-	Size pos = make_size (x,y);
+	Size pos{x, y};
 	clear ();
 	move_cursor (pos);
 	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL && id != PALETTE_ID_BUTTON_INVALID) ? L"> " : L"  ");
 	pos = text.output (*this, pos, w-4);
-	pos = make_size (x+w-2, y);
+	pos = {x + w - 2, y};
 	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL && id != PALETTE_ID_BUTTON_INVALID) ? L" <" : L"  ");
 }
 

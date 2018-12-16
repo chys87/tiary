@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -254,7 +254,7 @@ void view_entry (DiaryEntry &ent, const std::wstring &longtime_format)
 			ent.title,
 			text,
 			text_list,
-			make_size (view_line_width + 3, 0));
+			Size{view_line_width + 3, 0});
 }
 
 void view_all_entries (const DiaryEntryList &entries, const std::wstring &longtime_format)
@@ -279,7 +279,7 @@ void view_all_entries (const DiaryEntryList &entries, const std::wstring &longti
 			L"View all entries",
 			text,
 			text_list,
-			make_size (view_line_width + 3, 0));
+			Size{view_line_width + 3, 0});
 }
 
 } // namespace tairy

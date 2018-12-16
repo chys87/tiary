@@ -131,12 +131,12 @@ void WindowRecentFiles::redraw ()
 {
 	unsigned items = lst_files.get_items ().size ();
 
-	Size winsize = (make_size (max_width+10, items+6) | make_size (50, 12))
+	Size winsize = (Size{max_width + 10, items + 6} | Size{50, 12})
 		& get_screen_size ();
 
 	FixedWindow::resize (winsize);
 
-	layout_main.move_resize (make_size (2, 1), winsize - make_size (4, 2));
+	layout_main.move_resize({2, 1}, winsize - Size{4, 2});
 
 	Window::redraw ();
 }

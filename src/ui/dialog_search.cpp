@@ -80,13 +80,13 @@ WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 	chk_regex.checkbox.set_status (regex, false);
 #endif
 
-	FixedWindow::resize (make_size (40, 7));
-	box_input.move_resize (make_size (2, 1), make_size (36, 1));
-	chk_backward.move_resize (make_size (2, 3), make_size (15, 1));
+	FixedWindow::resize({40, 7});
+	box_input.move_resize({2, 1}, {36, 1});
+	chk_backward.move_resize({2, 3}, {15, 1});
 #ifdef TIARY_USE_PCRE
-	chk_regex.move_resize (make_size (2, 4), make_size (25, 1));
+	chk_regex.move_resize({2, 4}, {25, 1});
 #endif
-	btn_ok.move_resize (make_size (28, 3), make_size (10, 3));
+	btn_ok.move_resize({28, 3}, {10, 3});
 
 	ChainControlsVertical ()
 		(box_input)

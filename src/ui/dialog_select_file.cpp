@@ -134,10 +134,10 @@ WindowSelectFile::~WindowSelectFile()
 void WindowSelectFile::redraw ()
 {
 	Size scrsize = get_screen_size ();
-	Size size = scrsize & make_size (100, 40);
+	Size size = scrsize & Size{100, 40};
 	move_resize ((scrsize - size) / 2, size);
 
-	layout_main.move_resize (make_size (2,1), size - make_size (4, 2));
+	layout_main.move_resize({2, 1}, size - Size{4, 2});
 
 	Window::redraw ();
 }

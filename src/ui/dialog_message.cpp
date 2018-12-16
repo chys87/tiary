@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -150,12 +150,12 @@ void WindowMessage::redraw ()
 	width = minU (maxU (n_buttons * 12, width), scr_size.x);
 	unsigned height = minU (lbl_text.split_line (width - 4).size () + 6, scr_size.y);
 
-	Size win_size = make_size (width, height);
+	Size win_size{width, height};
 	move_resize ((scr_size - win_size) / 2, win_size);
-	lbl_text.move_resize (make_size (2, 1), win_size - make_size (4, 6));
+	lbl_text.move_resize({2, 1}, win_size - Size{4, 6});
 
-	const Size button_size = make_size (10, 3);
-	Size button_pos = make_size (width / 2 - n_buttons * 6 + 1, height - 4);
+	const Size button_size{10, 3};
+	Size button_pos{width / 2 - n_buttons * 6 + 1, height - 4};
 
 	for (unsigned i=0; i<n_buttons; ++i) {
 		p_buttons[i]->move_resize (button_pos, button_size);

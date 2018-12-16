@@ -1,3 +1,16 @@
+// -*- mode:c++; tab-width:4; -*-
+// vim:ft=cpp ts=4
+
+/***************************************************************************
+ *
+ * Tiary, a terminal-based diary keeping system for Unix-like systems
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ *
+ * This software is licensed under the 3-clause BSD license.
+ * See LICENSE in the source package and/or online info for details.
+ *
+ **************************************************************************/
+
 /**
  * @file	ui/richtext.cpp
  * @author	chys <admin@chys.info>
@@ -52,9 +65,9 @@ void RichText::redraw ()
 	unsigned show_lines = minU (hgt, line_list.size () - top_line);
 
 	for (unsigned i=0; i<show_lines; ++i) {
-		Size pos = make_size (0, i);
+		Size pos{0, i};
 		choose_palette (line_list[top_line+i].id);
-		clear (pos, make_size (wid, 1));
+		clear(pos, {wid, 1});
 		size_t offset = line_list[top_line+i].offset;
 		size_t end_offset = line_list[top_line+i].len + offset;
 		HighlightList::const_iterator lower = highlight_list.lower_bound (offset);
@@ -83,20 +96,20 @@ void RichText::redraw ()
 	}
 	if (show_lines < hgt) {
 		choose_palette (PALETTE_ID_RICHTEXT);
-		clear (make_size (0, show_lines), make_size (wid, hgt - show_lines));
+		clear({0, show_lines}, {wid, hgt - show_lines});
 	}
 	// Status bar
 	choose_palette (PALETTE_ID_BACKGROUND);
-	clear (make_size (0, hgt), make_size (wid, 1));
-	put (make_size (0, hgt),
+	clear({0, hgt}, {wid, 1});
+	put({0, hgt},
 			format (L"Lines %a-%b/%c") << top_line+1 << top_line+show_lines
 				<< unsigned (line_list.size ())
 			);
 	// Scroll bar
-	clear (make_size (wid, 0), make_size (1, hgt+1));
+	clear({wid, 0}, {1, hgt + 1});
 	attribute_toggle (REVERSE);
 	ScrollBarInfo scrollbar = scrollbar_info (hgt, line_list.size (), top_line);
-	clear (make_size (wid, scrollbar.pos), make_size (1, scrollbar.size));
+	clear({wid, scrollbar.pos}, {1, scrollbar.size});
 }
 
 bool RichText::on_mouse (MouseEvent mouse_event)

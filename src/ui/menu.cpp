@@ -271,7 +271,7 @@ void ItemControl::redraw ()
 		// Separator
 
 		choose_palette (PALETTE_ID_MENU);
-		fill (make_size (), get_size (), BORDER_H);
+		fill(Size{}, get_size (), BORDER_H);
 
 	}
 	else {
@@ -289,9 +289,9 @@ void ItemControl::redraw ()
 		}
 		choose_palette (id);
 		clear ();
-		text.output (*this, make_size (), get_size ().x);
+		text.output(*this, Size{}, get_size().x);
 		if (item.submenu) {
-			put (make_size (get_size ().x-1, 0), L'>');
+			put(Size{get_size().x - 1, 0}, L'>');
 		}
 
 	}
@@ -308,7 +308,7 @@ void ItemControl::slot_trigger ()
 	else {
 		// Has submenu
 		Size right = win.get_pos () + get_pos ();
-		Size left = right + make_size (get_size ().x, 0);
+		Size left = right + Size{get_size().x, 0};
 		MenuWindow subwin (*item.submenu, left, right, false);
 		subwin.event_loop ();
 		if (MenuItem *subret = subwin.get_result ()) {
@@ -347,7 +347,7 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	delete [] valid_ctrls;
 
 	// Now determine the proper position and size
-	Size size = make_size (maxwid+2/*Border*/+1/*>*/+3/*Space*/, actual_size + 2);
+	Size size{maxwid+2/*Border*/+1/*>*/+3/*Space*/, unsigned(actual_size) + 2};
 	Size scrsize = get_screen_size ();
 	Size pos;
 	if (both (left + size <= scrsize)) {
@@ -359,9 +359,9 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	}
 	move_resize (pos, size);
 	// Position controls
-	size = make_size (size.x-1, 1); // Control size
+	size = {size.x - 1, 1}; // Control size
 	for (size_t i=0; i<actual_size; ++i) {
-		ctrls[i]->move_resize (make_size (1, i+1), make_size (size.x-1, 1));
+		ctrls[i]->move_resize({1, unsigned(i) + 1}, {size.x - 1, 1});
 	}
 	delete [] ctrls;
 	MenuWindow::redraw ();

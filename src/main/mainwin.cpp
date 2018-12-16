@@ -273,11 +273,11 @@ MainWin::~MainWin ()
 void MainWin::redraw ()
 {
 	ui::Size scrsize = ui::get_screen_size ();
-	scrsize -= ui::make_size (1, 0);
-	move_resize (ui::make_size (), scrsize);
-	menu_bar.move_resize (ui::make_size (), ui::make_size (scrsize.x, 1));
-	main_ctrl.move_resize (ui::make_size (0, 1), scrsize - ui::make_size (0, 2));
-	hotkey_hint.move_resize (ui::make_size (0, scrsize.y-1), ui::make_size (scrsize.x, 1));
+	scrsize -= ui::Size{1, 0};
+	move_resize(ui::Size{}, scrsize);
+	menu_bar.move_resize(ui::Size{}, ui::Size{scrsize.x, 1});
+	main_ctrl.move_resize(ui::Size{0, 1}, scrsize - ui::Size{0, 2});
+	hotkey_hint.move_resize(ui::Size{0, scrsize.y - 1}, ui::Size{scrsize.x, 1});
 	Window::redraw ();
 }
 

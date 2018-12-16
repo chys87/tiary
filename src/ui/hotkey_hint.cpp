@@ -100,7 +100,7 @@ void HotkeyHint::redraw ()
 		it->x = x;
 		// Display this item
 		Size pos = this
-			<< make_size (x, 0)
+			<< Size{x, 0}
 			<< PALETTE_ID_HOTKEY_HINT_KEY
 			<< it->key_name
 			<< PALETTE_ID_HOTKEY_HINT

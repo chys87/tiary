@@ -117,10 +117,10 @@ void DateSelect::move_resize (Size new_pos, Size new_size)
 {
 	pos = new_pos;
 	size = new_size;
-	year.move_resize (new_pos + make_size (1, 0), make_size (4, 1));
-	month.move_resize (new_pos + make_size (0, 1), make_size (7, 6));
-	lbl_weekday.move_resize (new_pos + make_size (8, 0), make_size (21, 1));
-	day.move_resize (new_pos + make_size (8, 1), make_size (21, 6));
+	year.move_resize(new_pos + Size{1, 0}, {4, 1});
+	month.move_resize(new_pos + Size{0, 1}, {7, 6});
+	lbl_weekday.move_resize(new_pos + Size{8, 0}, {21, 1});
+	day.move_resize(new_pos + Size{8, 1}, {21, 6});
 }
 
 void DateSelect::redraw ()

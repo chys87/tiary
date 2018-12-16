@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -77,18 +77,18 @@ void MainCtrl::redraw ()
 	clear ();
 
 	if (w().entries.empty ()) {
-		put (ui::make_size (), L"No entry yet.");
-		put (ui::make_size (0, 1), L"Press \"a\" to create one; press Esc for the menu.");
+		put(ui::Size{}, L"No entry yet.");
+		put(ui::Size{0, 1}, L"Press \"a\" to create one; press Esc for the menu.");
 #ifdef TIARY_USE_MOUSE
-		put (ui::make_size (0, 2), L"You can also use your mouse.");
+		put(ui::Size{0, 2}, L"You can also use your mouse.");
 #endif
 		return;
 	}
 
 	if (w().filtered_entries.get () && w().filtered_entries->empty ()) {
-		put (ui::make_size (), L"This is in filtered mode.");
-		put (ui::make_size (0, 1), L"But no entry satisfies your requirement.");
-		put (ui::make_size (0, 2), L"Press Ctrl-G to modify your filter; or LEFT to see all entries.");
+		put(ui::Size{}, L"This is in filtered mode.");
+		put(ui::Size{0, 1}, L"But no entry satisfies your requirement.");
+		put(ui::Size{0, 2}, L"Press Ctrl-G to modify your filter; or LEFT to see all entries.");
 		return;
 	}
 
@@ -97,7 +97,7 @@ void MainCtrl::redraw ()
 
 	Scroll::Info info = Scroll::get_info ();
 
-	ui::Size pos = ui::make_size ();
+	ui::Size pos{};
 
 	std::wstring date_format = w().global_options.get_wstring (GLOBAL_OPTION_DATETIME_FORMAT);
 
@@ -117,7 +117,7 @@ void MainCtrl::redraw ()
 
 		if (i == info.focus_pos) {
 			move_cursor (pos);
-			clear (pos, ui::make_size (get_size().x, expand_lines));
+			clear(pos, ui::Size{get_size().x, expand_lines});
 		}
 		const DiaryEntry &entry = *ent_lst[i+info.first];
 
@@ -168,7 +168,7 @@ void MainCtrl::redraw ()
 			// [Date] [Title] [Labels]
 			// [...]
 			for (unsigned j=1; j<expand_lines; ++j) {
-				pos = ui::make_size (0, pos.y+1);
+				pos = ui::Size{0, pos.y + 1};
 				offset = split_line (split_info, get_size().x, text, offset,
 						SPLIT_NEWLINE_AS_SPACE);
 				wchar_t *bufend = std::replace_copy_if (
@@ -187,7 +187,7 @@ void MainCtrl::redraw ()
 					disp_buffer, std::not1 (std::ptr_fun (iswprint)), L' ');
 			pos = put (pos, disp_buffer, bufend-disp_buffer);
 		}
-		pos = ui::make_size (0, pos.y+1);
+		pos = ui::Size{0, pos.y + 1};
 	}
 	delete [] disp_buffer;
 }

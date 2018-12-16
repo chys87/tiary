@@ -221,9 +221,9 @@ DialogFilter::~DialogFilter ()
 
 void DialogFilter::redraw ()
 {
-	Size size = make_size (40, 13) & get_screen_size ();
+	Size size = Size{40, 13} & get_screen_size ();
 	FixedWindow::resize (size);
-	layout_main.move_resize (make_size (2, 1), size - make_size (4, 2));
+	layout_main.move_resize({2, 1}, size - Size{4, 2});
 	Window::redraw ();
 }
 

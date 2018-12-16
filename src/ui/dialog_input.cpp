@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -67,10 +67,10 @@ WindowInput::WindowInput (const std::wstring &title,
 	, result (result_)
 {
 	unsigned hint_height = lbl_hint.split_line (text_box_width).size ();
-	FixedWindow::resize (make_size (text_box_width + 4, hint_height + 8));
-	lbl_hint.move_resize (make_size (2, 1), make_size (text_box_width, hint_height));
-	box_input.move_resize (make_size (2, hint_height+2), make_size (text_box_width, 1));
-	btn_ok.move_resize (make_size (maxS (0, (text_box_width+4-10)/2), hint_height+4), make_size (10, 3));
+	FixedWindow::resize(Size(text_box_width + 4, hint_height + 8));
+	lbl_hint.move_resize({2, 1}, Size(text_box_width, hint_height));
+	box_input.move_resize(Size(2, hint_height + 2), Size(text_box_width, 1));
+	btn_ok.move_resize(Size(maxS (0, (text_box_width + 4 - 10) / 2), hint_height + 4), {10, 3});
 
 	ChainControlsVertical () (box_input) (btn_ok);
 

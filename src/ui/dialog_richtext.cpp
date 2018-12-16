@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -76,12 +76,12 @@ void WindowRichText::redraw ()
 	if (ideal_size.y < text.get_list ().size ()) {
 		ideal_size.y = text.get_list ().size () + 3;
 	}
-	ideal_size += make_size (4, 2); // Border
+	ideal_size += Size{4, 2}; // Border
 	Size scrsize = get_screen_size ();
 	ideal_size &= scrsize;
 
 	Window::move_resize ((scrsize - ideal_size)/2, ideal_size);
-	text.move_resize (make_size (2, 1), ideal_size - make_size (4, 2));
+	text.move_resize({2, 1}, ideal_size - Size{4, 2});
 	Window::redraw ();
 }
 

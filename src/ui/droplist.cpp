@@ -126,7 +126,7 @@ void DropList::redraw ()
 {
 	choose_palette (is_focus () ? PALETTE_ID_DROPLIST_FOCUS : PALETTE_ID_DROPLIST);
 	clear ();
-	put (make_size (), items[select]);
+	put({}, items[select]);
 }
 
 } // namespace tiary::ui

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -77,11 +77,11 @@ void GridSelect::redraw ()
 {
 	choose_palette (PALETTE_ID_GRID);
 	clear ();
-	move_cursor (make_size ());
+	move_cursor(Size{});
 
 	for (unsigned y = 0; y < rows; ++y) {
 		for (unsigned x = 0; x < cols; ++x) {
-			Size pos = make_size (x * grid_width, y);
+			Size pos{x * grid_width, y};
 			unsigned i = y * cols + x;
 			const Item &item = items[i];
 			PaletteID id = PALETTE_ID_GRID;

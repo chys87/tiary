@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -125,9 +125,9 @@ WindowLabels::~WindowLabels ()
 void WindowLabels::redraw ()
 {
 	Size scrsize = get_screen_size ();
-	Size size = scrsize & make_size (80, 25);
+	Size size = scrsize & Size{80, 25};
 	move_resize ((scrsize - size) / 2, size);
-	layout_main.move_resize (make_size (2,1), size - make_size (4,2));
+	layout_main.move_resize({2,1}, size - Size{4,2});
 	Window::redraw ();
 }
 

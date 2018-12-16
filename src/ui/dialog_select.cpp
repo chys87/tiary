@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -108,12 +108,12 @@ void DialogSelect::redraw ()
 {
 	unsigned items = lst_items.get_items ().size ();
 
-	Size winsize = (make_size (max_text_width+10, items+6) | make_size (30, 12))
+	Size winsize = (Size{max_text_width + 10, items + 6} | Size{30, 12})
 		& get_screen_size ();
 
 	FixedWindow::resize (winsize);
 
-	layout_main.move_resize (make_size (2, 1), winsize - make_size (4, 2));
+	layout_main.move_resize({2, 1}, winsize - Size{4, 2});
 
 	Window::redraw ();
 }
