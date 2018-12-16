@@ -21,8 +21,7 @@
 
 namespace tiary {
 
-std::wstring format_dec (unsigned x, unsigned width, wchar_t fill)
-{
+void format_dec(std::wstring *pres, unsigned x, unsigned width, wchar_t fill) {
 	const size_t BUFFER_SIZE = 3 * sizeof (unsigned);
 	wchar_t buffer [BUFFER_SIZE];
 	wchar_t *p = buffer + BUFFER_SIZE;
@@ -36,13 +35,17 @@ std::wstring format_dec (unsigned x, unsigned width, wchar_t fill)
 				*--p = fill;
 			}
 		}
-		return std::wstring (p, buffer + BUFFER_SIZE);
+		pres->append(p, buffer + BUFFER_SIZE);
+	} else {
+		pres->append(width - (buffer + BUFFER_SIZE - p), fill);
+		pres->append(p, buffer + BUFFER_SIZE);
 	}
-	else {
-		std::wstring ret (width - (buffer + BUFFER_SIZE - p), fill);
-		ret.append (p, buffer + BUFFER_SIZE);
-		return ret;
-	}
+}
+
+std::wstring format_dec(unsigned x, unsigned width, wchar_t fill) {
+	std::wstring res;
+	format_dec(&res, x, width, fill);
+	return res;
 }
 
 std::string format_dec_narrow (unsigned x)
@@ -56,8 +59,7 @@ std::string format_dec_narrow (unsigned x)
 	return std::string (p, buffer + BUFFER_SIZE);
 }
 
-std::wstring format_hex (unsigned x)
-{
+void format_hex(std::wstring *pres, unsigned x) {
 	const size_t BUFFER_SIZE = 2 * sizeof (unsigned);
 	wchar_t buffer [BUFFER_SIZE];
 	wchar_t *p = buffer + BUFFER_SIZE;
@@ -66,7 +68,13 @@ std::wstring format_hex (unsigned x)
 		x /= 16;
 		*--p = (tmp < 10) ? (L'0'+tmp) : (L'a'-10+tmp);
 	} while (x);
-	return std::wstring (p, buffer + BUFFER_SIZE);
+	pres->append(p, buffer + BUFFER_SIZE);
+}
+
+std::wstring format_hex(unsigned x) {
+	std::wstring res;
+	format_hex(&res, x);
+	return res;
 }
 
 std::string format_hex_narrow (unsigned x)
@@ -100,7 +108,7 @@ std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
 	std::wstring ret = format_dec (quo, int_digits, L' ');
 	if (frac_digits) {
 		ret += L'.';
-		ret += format_dec (rem, frac_digits, L'0');
+		format_dec(&ret, rem, frac_digits, L'0');
 	}
 	return ret;
 }
@@ -139,7 +147,7 @@ Format &Format::operator << (const std::wstring &s)
 Format &Format::operator << (unsigned x)
 {
 	if (nargs < MAX_ARGS) {
-		args += format_dec (x);
+		format_dec(&args, x);
 		offset[++nargs] = args.size ();
 	}
 	return *this;
@@ -148,7 +156,7 @@ Format &Format::operator << (unsigned x)
 Format &Format::operator << (HexTag a)
 {
 	if (nargs < MAX_ARGS) {
-		args += format_hex (a.val);
+		format_hex(&args, static_cast<unsigned>(a));
 		offset[++nargs] = args.size ();
 	}
 	return *this;

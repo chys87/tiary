@@ -46,23 +46,20 @@
 
 namespace tiary {
 
-struct HexTag
-{
-	unsigned val;
-};
+enum struct HexTag: unsigned {};
 
-inline HexTag hex (unsigned v)
-{
-	HexTag ret = { v };
-	return ret;
+inline constexpr HexTag hex(unsigned v) {
+	return static_cast<HexTag>(v);
 }
 
 
 // Format one decimal number
 std::wstring format_dec (unsigned x, unsigned wid = 0, wchar_t fill = L' ');
+void format_dec(std::wstring *, unsigned x, unsigned wid = 0, wchar_t fill = L' ');
 std::string format_dec_narrow (unsigned x);
 // Format one hexadecimal number
 std::wstring format_hex (unsigned x);
+void format_hex(std::wstring *, unsigned x);
 std::string format_hex_narrow (unsigned x);
 
 // Format floating point numbers, currently not suppoted by Format class
