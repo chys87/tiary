@@ -144,9 +144,8 @@ bool strip (std::string &str)
 namespace {
 
 template <typename T> inline
-std::list <std::basic_string <T> > split_string_impl (const T *str, T delimiter)
-{
-	std::list <std::basic_string <T> > ret_list;
+std::vector<std::basic_string<T>> split_string_impl(const T *str, T delimiter) {
+	std::vector<std::basic_string<T>> ret_list;
 	for (;;) {
 		while (*str == delimiter) {
 			++str;
@@ -155,7 +154,7 @@ std::list <std::basic_string <T> > split_string_impl (const T *str, T delimiter)
 			break;
 		}
 		const T *del = strchrnul (str, delimiter);
-		ret_list.push_back (std::basic_string <T> (str, del));
+		ret_list.emplace_back(str, del);
 		if (*del != delimiter) {
 			break;
 		}
@@ -166,12 +165,10 @@ std::list <std::basic_string <T> > split_string_impl (const T *str, T delimiter)
 
 } // anonymous namespace
 
-std::list <std::string> split_string (const char *str, char delimiter)
-{
+std::vector<std::string> split_string(const char *str, char delimiter) {
 	return split_string_impl<char> (str, delimiter);
 }
-std::list <std::wstring> split_string (const wchar_t *str, wchar_t delimiter)
-{
+std::vector<std::wstring> split_string(const wchar_t *str, wchar_t delimiter) {
 	return split_string_impl (str, delimiter);
 }
 

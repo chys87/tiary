@@ -181,27 +181,28 @@ template <> std::basic_string<wchar_t> get_current_dir <wchar_t> ()
 
 std::wstring get_full_pathname (const std::wstring &name)
 {
-	std::list <std::wstring> split = split_string (
+	std::vector<std::wstring> split = split_string (
 			(name[0] != L'/' ? get_current_dir <wchar_t> () + L'/' + name : name),
 			L'/');
 	// Empty tokens are eliminated by split_string, effectively
 	// getting "//" replaced by "/"
 
 	// Eliminate single dots and double dots
-	for (std::list <std::wstring>::iterator it = split.begin (); it != split.end (); ) {
+	auto iw = split.begin();
+	for (auto it = iw; it != split.end(); ++it) {
 		if (*it == L".") {
-			it = split.erase (it);
-		}
-		else if (*it == L"..") {
-			if (it != split.begin ()) {
-				--it;
-				it = split.erase (it);
+		} else if (*it == L"..") {
+			if (iw != split.begin()) {
+				--iw;
 			}
-			it = split.erase (it);
+		} else if (iw != it) {
+			*iw++ = std::move(*it);
+		} else {
+			++iw;
 		}
-		else {
-			++it;
-		}
+	}
+	if (iw != split.end()) {
+		split.resize(iw - split.begin());
 	}
 
 	if (split.empty ()) {
@@ -209,7 +210,7 @@ std::wstring get_full_pathname (const std::wstring &name)
 	}
 
 	std::wstring ret;
-	for (std::list <std::wstring>::const_iterator it = split.begin (); it != split.end (); ++it) {
+	for (auto it = split.begin (); it != split.end (); ++it) {
 		ret += L'/';
 		ret += *it;
 	}

@@ -78,14 +78,12 @@ bool strip (std::wstring &);
 
 
 // Split a string into tokens
-std::list <std::string> split_string (const char *, char delimiter);
-std::list <std::wstring> split_string (const wchar_t *, wchar_t delimiter);
-inline std::list <std::string> split_string (const std::string &str, char delimiter)
-{
+std::vector<std::string> split_string(const char *, char delimiter);
+std::vector<std::wstring> split_string(const wchar_t *, wchar_t delimiter);
+inline std::vector<std::string> split_string(const std::string &str, char delimiter) {
 	return split_string (str.c_str (), delimiter);
 }
-inline std::list <std::wstring> split_string (const std::wstring &str, wchar_t delimiter)
-{
+inline std::vector<std::wstring> split_string(const std::wstring &str, wchar_t delimiter) {
 	return split_string (str.c_str (), delimiter);
 }
 
