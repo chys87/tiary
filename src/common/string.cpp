@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -31,7 +31,7 @@ namespace {
 template <typename T> inline
 T *stpcpy_impl (T *dst, const T *src)
 {
-	size_t len = strlen (src);
+	size_t len = strlen(src) + 1;
 	return -1 + (T*) mempcpy (dst, src, len * sizeof (T));
 }
 

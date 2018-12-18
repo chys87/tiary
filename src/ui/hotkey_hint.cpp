@@ -34,21 +34,6 @@ HotkeyHint::~HotkeyHint ()
 {
 }
 
-namespace {
-
-// This template is a trick:
-// HotkeyHint::HotkeyItem is inaccessible here
-struct LargerWeight {
-	template <typename HotkeyItem>
-	bool operator () (const HotkeyItem *a, const HotkeyItem *b) const
-	{
-		return (a->weight > b->weight);
-	}
-};
-
-
-} // anonymous namespace
-
 void HotkeyHint::construct_sorted_list ()
 {
 	sorted_list.resize (key_list.size ());
@@ -57,7 +42,7 @@ void HotkeyHint::construct_sorted_list ()
 			it != e; ++it) {
 		*iw++ = &*it;
 	}
-	std::sort(sorted_list.begin(), iw, LargerWeight());
+	std::sort(sorted_list.begin(), iw, [](const auto *a, const auto *b) { return a->weight > b->weight; });
 }
 
 void HotkeyHint::redraw ()

@@ -387,7 +387,7 @@ std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &name, b
 		}
 	}
 
-	return std::pair<std::wstring,std::wstring> (dirname, basename);
+	return {std::move(dirname), std::move(basename)};
 }
 
 std::wstring combine_pathname (const std::wstring &path, const std::wstring &basename)
@@ -458,7 +458,8 @@ DirEntList list_dir (
 
 DirEntList list_dir(const std::wstring &directory, const std::function<bool(const DirEnt &)> &filter)
 {
-	return list_dir (directory, filter, DefaultDirEntComparator ());
+	static const DefaultDirEntComparator comp;
+	return list_dir(directory, filter, std::ref(comp));
 }
 
 // Explicit instantiations (char)
