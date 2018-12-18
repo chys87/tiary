@@ -76,8 +76,6 @@ public:
 	Condition(Condition &&other) = default;
 	Condition &operator = (Condition &&other) = default;
 
-	void swap(Condition &other) { std::swap(info, other.info); }
-
 	template <typename D> Condition (D &obj, bool (D::*foo)()) : info (new detail::CondMV <D> (&obj, foo)) {}
 	template <typename D> Condition (D *obj, bool (D::*foo)()) : info (new detail::CondMV <D> (obj, foo)) {}
 	template <typename D> Condition (const D &obj, bool (D::*foo)() const) : info (new detail::CondCMV <D> (&obj, foo)) {}

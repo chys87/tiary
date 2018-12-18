@@ -28,7 +28,7 @@ CheckBoxLabel::CheckBoxLabel (Window &win, const std::wstring &text, bool initia
 			Signal(win, &Window::set_focus_ptr, &checkbox, 0),
 			Signal(checkbox, &CheckBox::toggle, true)
 		});
-	label.sig_hotkey = label.sig_clicked.signal;
+	label.sig_hotkey = label.sig_clicked.signal();
 }
 
 CheckBoxLabel::CheckBoxLabel(Window &win, std::wstring &&text, bool initial_status)
@@ -38,7 +38,7 @@ CheckBoxLabel::CheckBoxLabel(Window &win, std::wstring &&text, bool initial_stat
 			Signal(win, &Window::set_focus_ptr, &checkbox, 0),
 			Signal(checkbox, &CheckBox::toggle, true)
 		});
-	label.sig_hotkey = label.sig_clicked.signal;
+	label.sig_hotkey = label.sig_clicked.signal();
 }
 
 CheckBoxLabel::~CheckBoxLabel ()

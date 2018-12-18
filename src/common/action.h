@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,41 +26,46 @@ namespace tiary {
  *
  * An Action is a Signal plus a Condition to verify its current usability
  */
-struct Action
-{
-	Signal signal;
-	Condition condition;
+class Action {
+public:
+	Action() = default;
+	Action(const Signal &sig) : signal_(sig), condition_() {}
+	Action(const Condition &cond) : signal_(), condition_(cond) {}
+	Action(const Signal &sig, const Condition &cond) : signal_(sig), condition_(cond) {}
+	Action(const Action &act) = default;
+	Signal &operator = (const Signal &sig) { return signal_ = sig; }
+	Condition &operator = (const Condition &cond) { return condition_ = cond; }
+	Action &operator = (const Action &act) = default;
 
-	Action () : signal (), condition () {}
-	~Action () {}
-	Action (const Signal &sig) : signal (sig), condition () {}
-	Action (const Condition &cond) : signal (), condition (cond) {}
-	Action (const Signal &sig, const Condition &cond) : signal (sig), condition (cond) {}
-	Action (const Action &act) : signal (act.signal), condition (act.condition) {}
-	Signal &operator = (const Signal &sig) { return signal = sig; }
-	Condition &operator = (const Condition &cond) { return condition = cond; }
-	Action &operator = (const Action &act) { signal = act.signal; condition = act.condition; return *this; }
-
-	Action (Signal &&sig) : signal (std::move (sig)), condition () {}
-	Action (Condition &&cond) : signal (), condition (std::move (cond)) {}
-	Action (Signal &&sig, const Condition &cond) : signal (std::move (sig)), condition (cond) {}
-	Action (const Signal &sig, Condition &&cond) : signal (sig), condition (std::move (cond)) {}
-	Action (Signal &&sig, Condition &&cond) : signal (std::move (sig)), condition (std::move (cond)) {}
-	Signal &operator = (Signal &&sig) { return signal = std::move (sig); }
-	Condition &operator = (Condition &&cond) { return condition = std::move (cond); }
-	Action &operator = (Action &&act) { signal = std::move (act.signal); condition = std::move (act.condition); return *this; }
+	Action(Signal &&sig) : signal_(std::move(sig)), condition_() {}
+	Action(Condition &&cond) : signal_(), condition_(std::move(cond)) {}
+	Action(Signal &&sig, const Condition &cond) : signal_(std::move(sig)), condition_(cond) {}
+	Action(const Signal &sig, Condition &&cond) : signal_(sig), condition_(std::move(cond)) {}
+	Action(Signal &&sig, Condition &&cond) : signal_(std::move(sig)), condition_(std::move(cond)) {}
+	Action(Action &&) = default;
+	Signal &operator = (Signal &&sig) { return signal_ = std::move(sig); }
+	Condition &operator = (Condition &&cond) { return condition_ = std::move(cond); }
+	Action &operator = (Action &&act) = default;
 
 	// Forward is_connected and is_really_connected to signal
-	bool is_connected () const { return signal.is_connected (); }
-	bool is_really_connected () const { return signal.is_really_connected (); }
+	bool is_connected () const { return signal_.is_connected (); }
+	bool is_really_connected () const { return signal_.is_really_connected (); }
 	// Forward all calls to connect to signal
-	template <typename... Args> void connect (Args &&...args)
-	{
-		signal.connect (std::forward <Args> (args)...);
+	template <typename... Args> void connect (Args &&...args) {
+		signal_.connect(std::forward<Args>(args)...);
 	}
 
-	void emit () { signal.emit (); }
-	bool call_condition (bool default_return) const { return condition.call (default_return); }
+	void emit() { signal_.emit (); }
+	bool call_condition(bool default_return) const { return condition_.call (default_return); }
+
+	Signal &signal() { return signal_; }
+	Condition &condition() { return condition_; }
+	const Signal &signal() const { return signal_; }
+	const Condition &condition() const { return condition_; }
+
+private:
+	Signal signal_;
+	Condition condition_;
 };
 
 } // namespace tiary
