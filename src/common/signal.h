@@ -21,6 +21,7 @@
  * @brief	Declares the class tiary::Signal
  */
 
+#include <memory>
 #include <utility> // std::forward
 #include <vector>
 
@@ -116,115 +117,83 @@ struct SignalGroup;
  */
 class Signal
 {
-	detail::SignalBase *info;
-
 public:
-	~Signal () { delete info; }
-	Signal () : info(0) {}
+	Signal() = default;
+	Signal(Signal &&) = default;
+	Signal &operator = (Signal &&sig) = default;
 
 	template<typename R> explicit Signal (R (*f)()) :
-		info (new detail::SignalNV<R>(f)) {}
+		f_(new detail::SignalNV<R>(f)) {}
 	template<typename R, typename T, typename Ta> Signal (R (*f)(T), Ta a) :
-		info (new detail::SignalN1<R,T>(f,a)) {}
+		f_(new detail::SignalN1<R,T>(f,a)) {}
 	template<typename R, typename C, typename D> Signal (C &o, R (D::*f)()) :
-		info (new detail::SignalMV<R,D>(&o, f)) {}
+		f_(new detail::SignalMV<R,D>(&o, f)) {}
 	template<typename R, typename C, typename D> Signal (C *o, R (D::*f)()) :
-		info (new detail::SignalMV<R,D>(o, f)) {}
+		f_(new detail::SignalMV<R,D>(o, f)) {}
 	template<typename R, typename C, typename D, typename T, typename Ta> Signal (C &o, R (D::*f)(T), Ta a) :
-		info (new detail::SignalM1<R, D,T>(&o, f, a)) {}
+		f_(new detail::SignalM1<R, D,T>(&o, f, a)) {}
 	template<typename R, typename C, typename D, typename T, typename Ta> Signal (C *o, R (D::*f)(T), Ta a) :
-		info (new detail::SignalM1<R, D,T>(o, f, a)) {}
+		f_(new detail::SignalM1<R, D,T>(o, f, a)) {}
 	template<typename R, typename C, typename D, typename T1, typename T2, typename Ta, typename Tb> Signal (C &o, R (D::*f)(T1,T2), Ta a, Tb b)
-		: info (new detail::SignalM2<R, D, T1, T2>(&o, f, a, b)) {}
+		: f_(new detail::SignalM2<R, D, T1, T2>(&o, f, a, b)) {}
 	template<typename R, typename C, typename D, typename T1, typename T2, typename Ta, typename Tb> Signal (C *o, R (D::*f)(T1,T2), Ta a, Tb b)
-		: info (new detail::SignalM2<R, D, T1, T2>(o, f, a, b)) {}
-	Signal (const Signal &sig) :
-		info (sig.info ? sig.info->copy() : 0) {}
+		: f_(new detail::SignalM2<R, D, T1, T2>(o, f, a, b)) {}
+	Signal(const Signal &sig) : f_(sig.f_ ? sig.f_->copy() : nullptr) {}
 	// Note the second parameter.
-	Signal (Signal &sig, int) :
-		info (new detail::SignalRecursive (sig)) {}
-	Signal (Signal *sig, int) :
-		info (new detail::SignalRecursive (*sig)) {}
+	Signal(Signal &sig, int) : f_(new detail::SignalRecursive(sig)) {}
+	Signal(Signal *sig, int) : f_(new detail::SignalRecursive(*sig)) {}
 	// Connect to a group of signals
 	Signal(const std::vector<Signal> &);
 
-	template<typename R> void connect (R (*f)())
-	{
-		delete info;
-		info = new detail::SignalNV<R>(f);
+	template<typename R> void connect(R (*f)()) {
+		f_.reset(new detail::SignalNV<R>(f));
 	}
-	template<typename R, typename T, typename Ta> void connect (R (*f)(T), Ta a)
-	{
-		delete info;
-		info = new detail::SignalN1<R,T>(f,a);
+	template<typename R, typename T, typename Ta> void connect (R (*f)(T), Ta a) {
+		f_.reset(new detail::SignalN1<R,T>(f,a));
 	}
-	template<typename R, typename C, typename D> void connect (C &o, R (D::*f)())
-	{
-		delete info;
-		info = new detail::SignalMV<R,D>(&o, f);
+	template<typename R, typename C, typename D> void connect (C &o, R (D::*f)()) {
+		f_.reset(new detail::SignalMV<R,D>(&o, f));
 	}
-	template<typename R, typename C, typename D> void connect (C *o, R (D::*f)())
-	{
-		delete info;
-		info = new detail::SignalMV<R,D>(o, f);
+	template<typename R, typename C, typename D> void connect (C *o, R (D::*f)()) {
+		f_.reset(new detail::SignalMV<R,D>(o, f));
 	}
-	template<typename R, typename C, typename D, typename T, typename Ta> void connect (C &o, R (D::*f)(T), Ta a)
-	{
-		delete info;
-		info = new detail::SignalM1<R,D,T>(&o, f, a);
+	template<typename R, typename C, typename D, typename T, typename Ta> void connect (C &o, R (D::*f)(T), Ta a) {
+		f_.reset(new detail::SignalM1<R,D,T>(&o, f, a));
 	}
-	template<typename R, typename C, typename D, typename T, typename Ta> void connect (C *o, R (D::*f)(T), Ta a)
-	{
-		delete info;
-		info = new detail::SignalM1<R,D,T>(o, f, a);
+	template<typename R, typename C, typename D, typename T, typename Ta> void connect (C *o, R (D::*f)(T), Ta a) {
+		f_.reset(new detail::SignalM1<R,D,T>(o, f, a));
 	}
-	template<typename R, typename C, typename D, typename T1, typename T2, typename Ta, typename Tb> void connect (C &o, R (D::*f)(T1,T2), Ta a, Tb b)
-	{
-		delete info;
-		info = new detail::SignalM2<R,D,T1,T2>(&o, f, a, b);
+	template<typename R, typename C, typename D, typename T1, typename T2, typename Ta, typename Tb> void connect (C &o, R (D::*f)(T1,T2), Ta a, Tb b) {
+		f_.reset(new detail::SignalM2<R,D,T1,T2>(&o, f, a, b));
 	}
-	template<typename R, typename C, typename D, typename T1, typename T2, typename Ta, typename Tb> void connect (C *o, R (D::*f)(T1,T2), Ta a, Tb b)
-	{
-		delete info;
-		info = new detail::SignalM2<R,D,T1,T2>(o, f, a, b);
+	template<typename R, typename C, typename D, typename T1, typename T2, typename Ta, typename Tb> void connect (C *o, R (D::*f)(T1,T2), Ta a, Tb b) {
+		f_.reset(new detail::SignalM2<R,D,T1,T2>(o, f, a, b));
 	}
 	// Connect to another Signal
-	void connect (Signal &sig)
-	{
+	void connect (Signal &sig) {
 		if (this != &sig) {
-			delete info;
-			info = new detail::SignalRecursive (sig);
+			f_.reset(new detail::SignalRecursive(sig));
 		}
 	}
 	// Connect to a list of Signals
 	void connect(const std::vector<Signal> &);
-	// Copy from another Signal
-	void copy_from (const Signal &sig);
 
-	Signal &operator = (const Signal &sig) { copy_from (sig); return *this; }
+	Signal &operator = (const Signal &sig) { f_.reset(sig.f_ ? sig.f_->copy() : nullptr); return *this; }
 
-	Signal (Signal &&sig) : info (sig.info) { sig.info = 0; }
-	void copy_from (Signal &&sig) { swap (sig); }
-	Signal &operator = (Signal &&sig) { swap (sig); return *this; }
 	Signal(std::vector<Signal> &&);
 	void connect(std::vector<Signal> &&);
 
 	// disconnect
-	void disconnect () { delete info; info = 0; }
+	void disconnect () { f_.reset(); }
 	// emit
-	void emit () { if(info) info->emit(); }
+	void emit () { if (f_) f_->emit(); }
 	// Check if the signal is connected
-	bool is_connected () const { return info; }
+	bool is_connected () const { return static_cast<bool>(f_); }
 	// Check recursively if the signal is "really" connected
 	bool is_really_connected () const;
 
-	// Efficiently swap two Signal objects
-	void swap (Signal &sig)
-	{
-		detail::SignalBase *bak_info = info;
-		info = sig.info;
-		sig.info = bak_info;
-	}
+private:
+	std::unique_ptr<detail::SignalBase> f_;
 };
 
 
@@ -250,21 +219,19 @@ private:
 } // namespace detail
 
 inline Signal::Signal(const std::vector<Signal> &lst)
-	: info(new detail::SignalGroup(lst)) {
+	: f_(new detail::SignalGroup(lst)) {
 }
 
 inline void Signal::connect(const std::vector<Signal> &lst) {
-	delete info;
-	info = new detail::SignalGroup (lst);
+	f_.reset(new detail::SignalGroup(lst));
 }
 
 inline Signal::Signal(std::vector<Signal> &&lst)
-	: info(new detail::SignalGroup(std::move(lst))) {
+	: f_(new detail::SignalGroup(std::move(lst))) {
 }
 
 inline void Signal::connect(std::vector<Signal> &&lst) {
-	delete info;
-	info = new detail::SignalGroup(std::move(lst));
+	f_.reset(new detail::SignalGroup(std::move(lst)));
 }
 
 } // namespace tiary

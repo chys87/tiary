@@ -52,19 +52,11 @@ SignalGroup *SignalGroup::copy () const
 
 } // namespace detail
 
-void Signal::copy_from (const Signal &sig)
-{
-	if (this != &sig) {
-		delete info;
-		info = sig.info ? sig.info->copy () : 0;
-	}
-}
-
 bool Signal::is_really_connected () const
 {
-	const detail::SignalBase *p = info;
+	const detail::SignalBase *p = f_.get();
 	while (const detail::SignalRecursive *rec = dynamic_cast <const detail::SignalRecursive *> (p)) {
-		p = rec->obj.info;
+		p = rec->obj.f_.get();
 	}
 	if (const detail::SignalGroup *grp = dynamic_cast <const detail::SignalGroup *> (p)) {
 		for (const Signal &signal: *grp) {

@@ -50,8 +50,6 @@ struct Action
 	Condition &operator = (Condition &&cond) { return condition = std::move (cond); }
 	Action &operator = (Action &&act) { signal = std::move (act.signal); condition = std::move (act.condition); return *this; }
 
-	void swap (Action &other) { signal.swap (other.signal); condition.swap (other.condition); }
-
 	// Forward is_connected and is_really_connected to signal
 	bool is_connected () const { return signal.is_connected (); }
 	bool is_really_connected () const { return signal.is_really_connected (); }
