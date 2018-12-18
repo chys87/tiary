@@ -16,9 +16,10 @@
 #define TIARY_DIARY_FILTER_H
 
 #include "common/string_match.h"
+#include <functional>
+#include <memory>
 #include <string>
 #include <vector>
-#include <functional>
 
 namespace tiary {
 
@@ -76,7 +77,7 @@ struct FilterByTitle : public Filter, public StringMatch
 
 
 
-typedef std::vector <Filter *> FilterList;
+typedef std::vector<std::unique_ptr<Filter>> FilterList;
 
 /**
  * @brief	Complex filter
@@ -90,19 +91,13 @@ public:
 	using FilterList::const_iterator;
 	using FilterList::begin;
 	using FilterList::end;
+	using FilterList::emplace_back;
 	using FilterList::push_back;
 	using FilterList::empty;
+	using FilterList::clear;
 
 	enum Relation { AND, OR };
-
-	Relation relation;
-
-	FilterGroup ();
-	~FilterGroup ();
-
-	void clear ();
-
-	void swap (FilterGroup &);
+	Relation relation = AND;
 
 	bool operator () (const DiaryEntry &) const;
 };

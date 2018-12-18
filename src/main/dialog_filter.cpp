@@ -115,16 +115,16 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 {
 	// Assign control values
 	for (FilterGroup::const_iterator it = result_.begin (); it != result_.end (); ++it) {
-		if (FilterByLabel *filter_lbl = dynamic_cast <FilterByLabel *> (*it)) {
+		if (FilterByLabel *filter_lbl = dynamic_cast<FilterByLabel *>(it->get())) {
 			txt_label.set_text (filter_lbl->label, false, filter_lbl->label.length ());
 		}
-		else if (FilterByTitle *filter_title = dynamic_cast <FilterByTitle *> (*it)) {
+		else if (FilterByTitle *filter_title = dynamic_cast<FilterByTitle *>(it->get())) {
 			txt_title.set_text (filter_title->get_pattern (), false, filter_title->get_pattern ().length ());
 #ifdef TIARY_USE_PCRE
 			chk_title_regex.checkbox.set_status (filter_title->get_use_regex ());
 #endif
 		}
-		else if (FilterByText *filter_text = dynamic_cast <FilterByText *> (*it)) {
+		else if (FilterByText *filter_text = dynamic_cast<FilterByText *>(it->get())) {
 			txt_text.set_text (filter_text->get_pattern (), false, filter_text->get_pattern ().length ());
 #ifdef TIARY_USE_PCRE
 			chk_text_regex.checkbox.set_status (filter_text->get_use_regex ());
@@ -234,7 +234,7 @@ void DialogFilter::slot_ok ()
 	if (!txt_label.get_text ().empty ()) {
 		FilterByLabel *filter = new FilterByLabel;
 		filter->label = txt_label.get_text ();
-		new_filter.push_back (filter);
+		new_filter.emplace_back(filter);
 	}
 	if (!txt_title.get_text ().empty ()) {
 		FilterByTitle *filter = new FilterByTitle;
@@ -250,7 +250,7 @@ void DialogFilter::slot_ok ()
 			return;
 		}
 #endif
-		new_filter.push_back (filter);
+		new_filter.emplace_back(filter);
 	}
 	if (!txt_text.get_text ().empty ()) {
 		FilterByText *filter = new FilterByText;
@@ -266,12 +266,12 @@ void DialogFilter::slot_ok ()
 			return;
 		}
 #endif
-		new_filter.push_back (filter);
+		new_filter.emplace_back(filter);
 	}
 
 	new_filter.relation = FilterGroup::AND;
 
-	result.swap (new_filter);
+	result = std::move(new_filter);
 
 	Window::request_close ();
 }

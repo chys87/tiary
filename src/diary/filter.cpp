@@ -67,29 +67,6 @@ FilterByTitle::~FilterByTitle ()
 
 
 
-FilterGroup::FilterGroup ()
-	: FilterList ()
-	, relation (AND)
-{
-}
-
-FilterGroup::~FilterGroup ()
-{
-	clear ();
-}
-
-void FilterGroup::clear ()
-{
-	std::for_each (begin (), end (), delete_fun <Filter> ());
-	FilterList::clear ();
-}
-
-void FilterGroup::swap (FilterGroup &other)
-{
-	FilterList::swap (other);
-	std::swap (relation, other.relation);
-}
-
 bool FilterGroup::operator () (const DiaryEntry &entry) const
 {
 	if (relation == AND) {
