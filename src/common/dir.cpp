@@ -35,6 +35,7 @@
 #include <functional>
 #include <algorithm>
 #include <locale>
+#include <string_view>
 #include <stdint.h>
 
 #ifndef PATH_MAX
@@ -97,19 +98,18 @@ template <> const std::basic_string<wchar_t> &get_home_dir <wchar_t> ()
 
 std::string get_home_dir (const char *user)
 {
-	const char *result = 0;
+	std::string_view result;
 	if (!user || !*user) {
-		result = get_home_dir <char> ().c_str ();
-	}
-	else {
+		result = get_home_dir<char>();
+	} else {
 		if (struct passwd *data = getpwnam (user)) {
 			result = data->pw_dir;
 		}
 	}
-	if (result == 0 || *result != '/') {
+	if (result.empty() || result[0] != '/') {
 		result = "/";
 	}
-	return result;
+	return std::string(result);
 }
 
 std::wstring get_home_dir (const wchar_t *user)
