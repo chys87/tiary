@@ -61,23 +61,6 @@ template <typename T> inline const T *c (T *r)
 	return r;
 }
 
-
-/*
- * Can be used as arguments of for_each, etc.
- */
-template <typename T>
-struct DeleteFunctor {
-	void operator () (T *ptr) const
-	{
-		delete ptr;
-	}
-};
-
-template <typename T> inline DeleteFunctor<T> delete_fun ()
-{
-	return DeleteFunctor<T>();
-}
-
 /*
  * A "cast functor" class
  */

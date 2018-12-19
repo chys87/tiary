@@ -267,7 +267,9 @@ MainWin::MainWin (const std::wstring &initial_filename)
 
 MainWin::~MainWin ()
 {
-	std::for_each (entries.begin (), entries.end (), delete_fun <DiaryEntry> ());
+	for (DiaryEntry *entry: entries) {
+		delete entry;
+	}
 }
 
 void MainWin::redraw ()
@@ -801,7 +803,9 @@ void MainWin::reset_file ()
 	per_file_options.reset ();
 	current_filename.clear ();
 	password.clear ();
-	std::for_each (entries.begin (), entries.end (), delete_fun <DiaryEntry> ());
+	for (DiaryEntry *entry: entries) {
+		delete entry;
+	}
 	entries.clear ();
 }
 
