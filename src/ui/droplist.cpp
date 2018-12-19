@@ -98,13 +98,13 @@ bool DropList::on_key (wchar_t key)
 			// (In case of an empty string; Per C++ Standard)
 			// Convert key to wint_t to suppress a warning
 			for (size_t k = select+1; k<items.size(); ++k) {
-				if (towlower (c(items[k])[0]) == wint_t(key)) {
+				if (towlower(items[k][0]) == wint_t(key)) {
 					set_select (k);
 					return true;
 				}
 			}
 			for (size_t k = 0; k <= select; ++k) {
-				if (towlower (c(items[k])[0]) == wint_t(key)) {
+				if (towlower(items[k][0]) == wint_t(key)) {
 					set_select (k);
 					return true;
 				}

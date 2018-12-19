@@ -152,7 +152,7 @@ void WindowSelectFile::slot_select ()
 	size_t select = list_files.get_select ();
 	if (select < list_files.get_items (). size()) {
 		std::wstring tmp = list_dir;
-		if (tmp.empty() || *c(tmp).rbegin () != L'/') {
+		if (tmp.empty() || *tmp.rbegin() != L'/') {
 			tmp += L'/';
 		}
 		const std::wstring &file = list_files.get_items()[select];

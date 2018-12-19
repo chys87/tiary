@@ -226,7 +226,7 @@ std::basic_string<ChT> home_fold_pathname_impl (const std::basic_string<ChT> &na
 	const std::basic_string <ChT> &homedir = get_home_dir <ChT> ();
 	size_t homelen = homedir.length ();
 	if (fullname.length () >= homelen) {
-		if (fullname.length() == homelen || c(fullname)[homelen] == ChT('/')) {
+		if (fullname.length() == homelen || fullname[homelen] == ChT('/')) {
 			if (fullname.compare (0, homelen, homedir) == 0) {
 				fullname.replace (0, homelen, 1, ChT('~'));
 			}
@@ -302,15 +302,15 @@ std::wstring get_nice_pathname (const std::wstring &name)
 	unsigned y;
 	size_t ox;
 	std::wstring::const_iterator ox_it = std::mismatch (
-			c(fullname).begin (), c(fullname).end (),
+			fullname.begin(), fullname.end(),
 			curdir.c_str () // Not to be replaced by begin() (Not all implementations always maintain a null at the end!)
 			).first;
 	while (*(ox_it-1) != L'/') {
 		--ox_it;
 	}
-	ox = ox_it - c(fullname).begin ();
+	ox = ox_it - fullname.begin();
 
-	y = std::count (c(curdir).begin () + ox, c(curdir).end (), L'/');
+	y = std::count(curdir.begin() + ox, curdir.end(), L'/');
 	// Use either dot-dots or fullnames. These codes also apply to things under current directory
 	unsigned dotdotlen = y*3;
 	if ((y<3 && dotdotlen<ox) || (y==3 && dotdotlen*2<ox) || dotdotlen*4<ox) {
@@ -395,7 +395,7 @@ std::wstring combine_pathname (const std::wstring &path, const std::wstring &bas
 	std::wstring ret;
 	if (path.length() != 1 || path[0] != L'.') {
 		ret = path;
-		if (ret.empty() || *c(ret).rbegin()!=L'/') {
+		if (ret.empty() || *ret.rbegin()!=L'/') {
 			ret += L'/';
 		}
 	}
@@ -439,7 +439,7 @@ DirEntList list_dir (
 
 	if (DIR *dir = ::opendir (dirname.c_str ())) {
 		DirEnt tmp_ent;
-		if (*c(dirname).rbegin() != '/') {
+		if (*dirname.rbegin() != '/') {
 			dirname += '/';
 		}
 		while (struct dirent *ent = readdir (dir)) {

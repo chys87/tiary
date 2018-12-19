@@ -37,30 +37,6 @@ inline int minS (int a, int b) { return (a<b) ? a : b; }
 inline size_t maxSize (size_t a, size_t b) { return (a<b) ? b : a; }
 inline size_t minSize (size_t a, size_t b) { return (a<b) ? a : b; }
 
-/**
- * @brief	Makes a reference const
- *
- * For some classes, const and non-const instances have different behaviors.
- * This can be helpful in such situations.
- *
- * For example, if std::string has a reference-counted implementation, this
- * can be helpful to eliminate or defer deep copies sometimes.
- */
-template <typename T> inline const T &c (T &r)
-{
-	return r;
-}
-
-/**
- * @brief	Makes a pointer const
- *
- * Same reason
- */
-template <typename T> inline const T *c (T *r)
-{
-	return r;
-}
-
 /*
  * Same as std::identity in C++20
  */

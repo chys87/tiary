@@ -122,7 +122,7 @@ void reformat_content (std::wstring &title, std::wstring &text, const char *s)
 	text = mbs_to_wstring (s);
 	std::wstring::iterator iw = text.begin ();
 	std::wstring::const_iterator ir = iw;
-	std::wstring::const_iterator end = c(text).end ();
+	std::wstring::const_iterator end = text.end();
 	wchar_t last = L'\0', cur;
 	while (ir != end) {
 		cur = *ir++;

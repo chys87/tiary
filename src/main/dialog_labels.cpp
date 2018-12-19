@@ -148,7 +148,7 @@ void WindowLabels::slot_add ()
 		WStringLocaleOrderedSet current_set = set_from_text (txt_selected.get_text ());
 		if (current_set.find (label) == current_set.end ()) {
 			std::wstring new_text = txt_selected.get_text ();
-			if (!new_text.empty () && *c(new_text).rbegin () != L',') {
+			if (!new_text.empty () && *new_text.rbegin () != L',') {
 				new_text += L',';
 			}
 			new_text += label;
