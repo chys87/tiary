@@ -25,6 +25,7 @@
 #include <string.h>
 #include <list>
 #include <string>
+#include <string_view>
 #include <iterator>
 
 namespace tiary {
@@ -69,7 +70,7 @@ std::wstring strlower (const std::wstring &);
  * We return the length in the result to align with PcRe::match
  */
 std::vector <std::pair <size_t, size_t> >
-	find_all (const std::wstring &haystack, const std::wstring &needle);
+	find_all(std::wstring_view haystack, std::wstring_view needle);
 
 // Remove spaces at the beginning and the end
 // Returns if the string was changed

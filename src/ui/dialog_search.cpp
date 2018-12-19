@@ -38,7 +38,7 @@ class WindowSearch : public FixedWindow, private ButtonDefault
 
 	ui::TextBox box_input;
 	ui::CheckBoxLabel chk_backward;
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	ui::CheckBoxLabel chk_regex;
 #endif
 	ui::Button btn_ok;
@@ -66,7 +66,7 @@ WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 	, FixedWindow ()
 	, box_input (*this, 0)
 	, chk_backward (*this, L"&Backward", bkwd)
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	, chk_regex (*this, L"&Regular expression", regex)
 #endif
 	, btn_ok (*this, L"&Go!")
@@ -76,14 +76,14 @@ WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 {
 	box_input.set_text (text, false, text.size ());
 	chk_backward.checkbox.set_status (bkwd, false);
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	chk_regex.checkbox.set_status (regex, false);
 #endif
 
 	FixedWindow::resize({40, 7});
 	box_input.move_resize({2, 1}, {36, 1});
 	chk_backward.move_resize({2, 3}, {15, 1});
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	chk_regex.move_resize({2, 4}, {25, 1});
 #endif
 	btn_ok.move_resize({28, 3}, {10, 3});
@@ -91,12 +91,12 @@ WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 	ChainControlsVertical ()
 		(box_input)
 		(chk_backward.checkbox)
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 		(chk_regex.checkbox)
 #endif
 		;
 	ChainControlsHorizontal () (chk_backward.checkbox) (btn_ok);
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	chk_regex.checkbox.ctrl_left = chk_regex.checkbox.ctrl_right = &btn_ok;
 #endif
 	btn_ok.ctrl_up = btn_ok.ctrl_down = &box_input;
@@ -119,7 +119,7 @@ void WindowSearch::slot_ok ()
 {
 	o_text = box_input.get_text ();
 	o_bkwd = chk_backward.get_status ();
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	o_regex = chk_regex.get_status ();
 #else
 	o_regex = false;

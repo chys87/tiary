@@ -76,11 +76,12 @@ PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.6.0],[
 					LIBS="$LIBS $pkg_cv_libxml2_LIBS"
 					],[AC_MSG_ERROR([*** libxml2 >= 2.7.0 is required.])])
 
-dnl Check for pcre (Optional)
-AC_CHECK_HEADER([pcre.h],
-				[AC_CHECK_LIB([pcre], [pcre_compile2],
-							  [LIBS="$LIBS -lpcre"
-							   AC_DEFINE([TIARY_USE_PCRE],[1],[Define to 1 if pcre is available])])])
+dnl Check for RE2 (Optional)
+PKG_CHECK_MODULES([re2], [re2 >= 0.0.0], [
+					CXXFLAGS="$CXXFLAGS $pkg_cv_re2_CFLAGS"
+					LIBS="$LIBS $pkg_cv_re2_LIBS"
+					AC_DEFINE([TIARY_USE_RE2], [1], [Define to 1 if re2 is available])
+					], [])
 
 dnl Check for wcwidth function (Optional)
 AC_CHECK_FUNCS([wcwidth])

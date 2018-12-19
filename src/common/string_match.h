@@ -15,7 +15,7 @@
 #ifndef TIARY_COMMON_STRING_MATCH_H
 #define TIARY_COMMON_STRING_MATCH_H
 
-#include "common/pcre.h"
+#include "common/re.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -58,7 +58,7 @@ public:
 	const std::wstring &get_pattern () const { return pattern; }
 	bool get_use_regex () const
 	{
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 		return regex.get ();
 #else
 		return false;
@@ -67,8 +67,8 @@ public:
 
 private:
 	std::wstring pattern;
-#ifdef TIARY_USE_PCRE
-	std::unique_ptr<PcRe> regex; ///< PcRe object related to search_text, if it is a regular expression
+#ifdef TIARY_USE_RE2
+	std::unique_ptr<Re> regex; ///< Re object related to search_text, if it is a regular expression
 #endif
 
 };
