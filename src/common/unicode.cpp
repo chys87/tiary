@@ -375,13 +375,11 @@ unsigned ucs_width (const wchar_t *s, size_t n)
 	return w;
 }
 
-unsigned ucs_width (const std::wstring &s)
-{
+unsigned ucs_width(std::wstring_view s) {
 	return ucs_width (s.data(), s.length());
 }
 
-size_t max_chars_in_width (const std::wstring &s, unsigned scrwid)
-{
+size_t max_chars_in_width(std::wstring_view s, unsigned scrwid) {
 	return max_chars_in_width (s.data (), s.length (), scrwid);
 }
 

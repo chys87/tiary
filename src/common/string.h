@@ -61,7 +61,7 @@ inline wchar_t *strchrnul (wchar_t *str, wchar_t ch) { return const_cast <wchar_
 
 
 /// @brief	Make a string lowercase
-std::wstring strlower (const std::wstring &);
+std::wstring strlower(std::wstring_view);
 
 /**
  * @brief	Find all occurrences of a substring

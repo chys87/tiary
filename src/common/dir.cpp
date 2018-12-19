@@ -390,8 +390,7 @@ std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &name, b
 	return {std::move(dirname), std::move(basename)};
 }
 
-std::wstring combine_pathname (const std::wstring &path, const std::wstring &basename)
-{
+std::wstring combine_pathname(std::wstring_view path, std::wstring_view basename) {
 	std::wstring ret;
 	if (path.length() != 1 || path[0] != L'.') {
 		ret = path;

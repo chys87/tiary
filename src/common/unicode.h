@@ -170,13 +170,13 @@ unsigned ucs_width (const wchar_t *str, size_t len);
  * @result	The total on-screen width of str. \n
  *			Abnormal and nonprintable characters are counted as 1.
  */
-unsigned ucs_width (const std::wstring &str);
+unsigned ucs_width(std::wstring_view str);
 /**
  * @brief	Returns the maximum number of characters to fit in the specified screen width
  * @param	str	The given wide (Unicode) string
  * @param	scrwid	The given screen width
  */
-size_t max_chars_in_width (const std::wstring &str, unsigned scrwid);
+size_t max_chars_in_width(std::wstring_view str, unsigned scrwid);
 size_t max_chars_in_width (const wchar_t *, unsigned scrwid);
 size_t max_chars_in_width (const wchar_t *, size_t, unsigned scrwid);
 

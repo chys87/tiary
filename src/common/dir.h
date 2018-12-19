@@ -22,6 +22,7 @@
 
 #include <functional>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -110,7 +111,7 @@ std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &, bool 
 /**
  * @brief	Combine a directory name and basename to a full name
  */
-std::wstring combine_pathname (const std::wstring &, const std::wstring &);
+std::wstring combine_pathname(std::wstring_view, std::wstring_view);
 
 struct DirEnt
 {
