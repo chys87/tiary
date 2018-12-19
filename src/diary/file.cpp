@@ -455,15 +455,15 @@ LoadFileRet load_file (
 		if (password.empty ()) { // User cancelation
 			return LOAD_FILE_PASSWORD;
 		}
-		std::string mbs_password = wstring_to_mbs (password);
-		if (memcmp (md5 (mbs_password) (password_salt1, sizeof password_salt1).result (),
+		std::string utf8_password = wstring_to_utf8(password);
+		if (memcmp(md5(utf8_password)(password_salt1, sizeof password_salt1).result(),
 					&everything[16], 16) != 0) { // Password incorrect
 			password.clear ();
 			return LOAD_FILE_PASSWORD;
 		}
 
 		// Password correct. Decrypt now
-		decrypt (&everything[32], everything.size()-32, mbs_password.data(), mbs_password.length());
+		decrypt(&everything[32], everything.size() - 32, utf8_password.data(), utf8_password.length());
 		// Decompress
 		everything = bunzip2 (&everything[32], everything.size () - 32);
 	} else {
@@ -644,14 +644,14 @@ bool save_file (const char *filename,
 	// Is there a password?
 	if (!password.empty ()) {
 		// Yes. Encrypt
-		std::string mbs_password = wstring_to_mbs (password);
-		encrypt (&everything[0], everything.size(),
-				mbs_password.data(), mbs_password.length());
+		std::string utf8_password = wstring_to_utf8(password);
+		encrypt(&everything[0], everything.size(),
+				utf8_password.data(), utf8_password.length());
 
 		// Encrypted file header
 		char header[32];
 		memcpy (header, new_format_signature, 16);
-		md5 (mbs_password) (password_salt1, sizeof password_salt1).result (&header[16]);
+		md5(utf8_password)(password_salt1, sizeof password_salt1).result (&header[16]);
 
 		// Write to file
 		return safe_write_file (filename, header, 32, &everything[0], everything.size());
