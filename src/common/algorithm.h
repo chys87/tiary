@@ -62,33 +62,14 @@ template <typename T> inline const T *c (T *r)
 }
 
 /*
- * A "cast functor" class
+ * Same as std::identity in C++20
  */
-template <typename TO, typename TI>
-struct CastFunctor {
-	TO operator () (TI a) const
-	{
-		return a;
+struct identity {
+	template <typename T>
+	constexpr T &&operator()(T &&t) const {
+		return std::forward<T>(t);
 	}
 };
-
-template <typename TO, typename TI> inline CastFunctor <TO, TI> cast_fun ()
-{
-	return CastFunctor <TO, TI> ();
-}
-
-/*
- * An "identity functor" class
- */
-template <typename T>
-struct IdentityFunctor : public CastFunctor <T,T>
-{
-};
-
-template <typename T> inline IdentityFunctor<T> identity_fun ()
-{
-	return IdentityFunctor<T> ();
-}
 
 
 /*
@@ -159,7 +140,7 @@ T *binary_search_null (T *lo, T *hi, T2 v, K key)
 // No key necessary
 template <typename T, typename T2> T* binary_search_null (T *lo, T *hi, T2 v)
 {
-	return binary_search_null (lo, hi, v, identity_fun<const T &>());
+	return binary_search_null(lo, hi, v, identity());
 }
 
 // Performs a linear search. Returns 0 if not found
@@ -177,7 +158,7 @@ template <typename T, typename T2, typename K> T* linear_search_null (T *lo, T *
 // No key necessary
 template <typename T, typename T2> T* linear_search_null (T *lo, T *hi, T2 v)
 {
-	return linear_search_null (lo, hi, v, identity_fun<const T &> ());
+	return linear_search_null(lo, hi, v, identity());
 }
 
 
