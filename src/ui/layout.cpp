@@ -157,14 +157,14 @@ void Layout::move_resize (Size pos, Size size)
 		if (total_this <= mid_sum) {
 			// All controls have size between min and max
 			// All spacers have min size
-			max = std::transform(lst.begin(), lst.end(), min.get(), get_member_fun(&Item::min));
+			max = std::transform(lst.begin(), lst.end(), min.get(), std::mem_fn(&Item::min));
 			result = std::transform (lst.begin (), lst.end (), max, SelectMinMax<&Item::max, &Item::min>());
 		}
 		else {
 			// All controls have max size
 			// All spacers have size between min and max
 			max = std::transform(lst.begin(), lst.end(), min.get(), SelectMinMax<&Item::max, &Item::min>());
-			result = std::transform (lst.begin (), lst.end (), max, get_member_fun (&Item::max));
+			result = std::transform(lst.begin(), lst.end(), max, std::mem_fn(&Item::max));
 		}
 		min_max_programming(result, min.get(), max, n, total_this);
 		for (Item &item: lst) {

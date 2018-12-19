@@ -72,32 +72,6 @@ struct identity {
 };
 
 
-/*
- * A "get member functor" class
- */
-template <typename Class, typename Member>
-struct GetMemberFunctor {
-	Member Class::*ptr;
-	GetMemberFunctor (Member Class::*p) : ptr (p) {}
-
-	Member &operator () (Class &a) const
-	{
-		return a.*ptr;
-	}
-	const Member &operator () (const Class &a) const
-	{
-		return a.*ptr;
-	}
-};
-
-template <typename Class, typename Member> inline
-GetMemberFunctor<Class,Member> get_member_fun (Member Class::*ptr)
-{
-	return GetMemberFunctor<Class,Member>(ptr);
-}
-
-
-
 namespace detail {
 
 template <typename A, typename B> inline
@@ -173,7 +147,7 @@ template <typename T, typename T2> T* linear_search_null (T *lo, T *hi, T2 v)
  */
 template <typename A, typename B>
 B binary_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, A from, B defto) {
-	if (const std::pair<A, B> *p = binary_search_null(lo, hi, from, get_member_fun(&std::pair<A, B>::first))) {
+	if (const std::pair<A, B> *p = binary_search_null(lo, hi, from, std::mem_fn(&std::pair<A, B>::first))) {
 		return p->second;
 	}
 	return defto;
@@ -182,7 +156,7 @@ B binary_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, A from,
 // Map transform using linear search
 template <typename A, typename B>
 B linear_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, A from, B defto) {
-	if (const std::pair<A, B> *p = linear_search_null(lo, hi, from, get_member_fun(&std::pair<A, B>::first))) {
+	if (const std::pair<A, B> *p = linear_search_null(lo, hi, from, std::mem_fn(&std::pair<A, B>::first))) {
 		return p->second;
 	}
 	return defto;
