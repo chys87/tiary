@@ -74,8 +74,8 @@ std::wstring home_fold_pathname (const std::wstring &);
 /**
  * @brief	Expands "~" and "~user" with actual dir names
  */
-std::string home_expand_pathname (const std::string &);
-std::wstring home_expand_pathname (const std::wstring &);
+std::string home_expand_pathname(std::string_view);
+std::wstring home_expand_pathname(std::wstring_view);
 
 /**
  * @brief	Return the "nice" name of the argument
@@ -139,7 +139,7 @@ DirEntList list_dir(const std::wstring &dir, const std::function<bool(const DirE
  * @brief	Find the specified executable in $PATH
  * @result	Full path of the executable or empty string if failed
  */
-std::string find_executable (const std::string &);
+std::string find_executable(std::string_view exe);
 
 /**
  * @brief	Create and open a temporary file, similar with mkstemp

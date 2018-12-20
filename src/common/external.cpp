@@ -42,17 +42,16 @@ std::string make_external_command_line (const char *prog, const char *extra_para
 	std::string command = "false";
 
 	// Split prog into tokens deliminated by pipe strings
-	std::vector<std::string> progs = split_string(prog, '|');
-	for (auto it = progs.begin(); it != progs.end(); ++it) {
-		environment_expand (*it);
-		strip (*it);
-		if (it->empty ()) {
+	for (std::string &exe: split_string(prog, '|')) {
+		environment_expand(exe);
+		strip(exe);
+		if (exe.empty ()) {
 			continue;
 		}
-		const char *p = it->c_str ();
+		const char *p = exe.c_str ();
 		size_t tokenlen = strchrnul (p, ' ') - p;
-		if (!find_executable (std::string (p, tokenlen)).empty ()) {
-			command = *it + ' ' + extra_param;
+		if (!find_executable({p, tokenlen}).empty()) {
+			command = std::move(exe) + ' ' + extra_param;
 			break;
 		}
 	}

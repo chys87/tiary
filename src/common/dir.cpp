@@ -250,29 +250,25 @@ std::wstring home_fold_pathname (const std::wstring &name)
 namespace {
 
 template <typename ChT> inline
-std::basic_string<ChT> home_expand_pathname_impl (const std::basic_string<ChT> &name)
-{
-	if (name[0] == ChT('~')) {
-		typename std::basic_string<ChT>::const_iterator it =
-			std::find (name.begin () + 1, name.end (), ChT('/'));
+std::basic_string<ChT> home_expand_pathname_impl(std::basic_string_view<ChT> name) {
+	if (!name.empty() && name[0] == ChT('~')) {
+		auto it = std::find(name.begin() + 1, name.end(), ChT('/'));
 		std::basic_string<ChT> homedir = get_home_dir (std::basic_string <ChT> (name.begin ()+1, it));
 		if (!homedir.empty ()) {
 			homedir.append (it, name.end ());
 			return homedir;
 		}
 	}
-	return name;
+	return std::basic_string<ChT>(name);
 }
 
 } // anonymous namespace
 
-std::string home_expand_pathname (const std::string &name)
-{
+std::string home_expand_pathname(std::string_view name) {
 	return home_expand_pathname_impl (name);
 }
 
-std::wstring home_expand_pathname (const std::wstring &name)
-{
+std::wstring home_expand_pathname(std::wstring_view name) {
 	return home_expand_pathname_impl (name);
 }
 
@@ -471,20 +467,14 @@ template std::basic_string<wchar_t> get_current_dir<wchar_t> ();
 
 
 
-std::string find_executable (const std::string &exe)
-{
+std::string find_executable(std::string_view exe) {
 	std::string result;
 	if (exe.empty ()) {
 		// Empty input. Return empty string
 	}
 	else if (memchr (exe.data (), '/', exe.length ())) {
 		// exe is a full/relative pathname
-		if (exe[0] == '~') {
-			result = home_expand_pathname (exe);
-		}
-		else {
-			result = exe;
-		}
+		result = home_expand_pathname (exe);
 		if ((get_file_attr (result) & (FILE_ATTR_DIRECTORY|FILE_ATTR_EXECUTABLE))
 				!= FILE_ATTR_EXECUTABLE) {
 			result.clear ();
