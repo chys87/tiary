@@ -114,39 +114,33 @@ bool HotkeyHint::on_mouse (MouseEvent mouse_event)
 	return false;
 }
 
-#define APPEND_ITEM(action__)	\
-	do {\
-		HotkeyList::iterator it = key_list.insert (key_list.end (), HotkeyItem ());\
-		it->key_name = key_name;\
-		it->fun_name = fun_name;\
-		it->wid = ucs_width (key_name) + ucs_width (fun_name);\
-		it->action = action__;\
-		it->weight = weight;\
-		it->x = unsigned (-1);\
-	} while (0)
+template <typename... Args>
+HotkeyHint &HotkeyHint::add(unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Args&&...args) {
+	key_list.push_back({
+			key_name, fun_name, Action(std::forward<Args>(args)...),
+			unsigned(ucs_width(key_name) + ucs_width(fun_name)), weight, unsigned(-1),
+		});
+	return *this;
+}
 
 HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Action &action)
 {
-	APPEND_ITEM (action);
-	return *this;
+	return add(weight, key_name, fun_name, action);
 }
 
 HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Signal &signal)
 {
-	APPEND_ITEM (signal);
-	return *this;
+	return add(weight, key_name, fun_name, signal);
 }
 
 HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Action &&action)
 {
-	APPEND_ITEM (std::move (action));
-	return *this;
+	return add(weight, key_name, fun_name, std::move(action));
 }
 
 HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Signal &&signal)
 {
-	APPEND_ITEM (std::move (signal));
-	return *this;
+	return add(weight, key_name, fun_name, std::move(signal));
 }
 
 

@@ -39,6 +39,10 @@ public:
 	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Signal &&sig);
 
 private:
+	template <typename... Args>
+	HotkeyHint &add(unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Args&&...args);
+
+private:
 	struct HotkeyItem
 	{
 		const wchar_t *key_name; ///< Name of the key, expected to be a string literal
