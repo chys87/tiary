@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -18,6 +18,7 @@
 #include "common/datetime.h"
 #include "common/containers.h"
 #include <string>
+#include <string_view>
 #include <vector>
 #include <list>
 
@@ -45,8 +46,7 @@ struct RecentFile
 	std::wstring filename;
 	unsigned focus_entry;
 
-	bool operator == (const std::wstring &name) const
-	{
+	bool operator == (std::wstring_view name) const {
 		return (filename == name);
 	}
 };

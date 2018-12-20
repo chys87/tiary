@@ -30,7 +30,7 @@
 
 #include <stdint.h>
 #include <string>
-#include <string.h> // ::memcpy
+#include <string_view>
 #include <stddef.h> // ::size_t
 
 namespace tiary {
@@ -64,9 +64,8 @@ public:
 		md5_append (&context, data, len);
 		return *this;
 	}
-	MD5 &operator () (const std::string &s)
-	{
-		return operator () (s.data (), s.length ());
+	MD5 &operator()(std::string_view s) {
+		return operator()(s.data(), s.length());
 	}
 
 	MD5 &reset ()
@@ -78,9 +77,8 @@ public:
 	{
 		return reset () (data, len);
 	}
-	MD5 &reset (const std::string &s)
-	{
-		return reset () (s);
+	MD5 &reset(std::string_view s) {
+		return reset()(s);
 	}
 
 	/// Note that the pointed memory is invalidated after the class is destructed
@@ -111,8 +109,7 @@ inline MD5 md5 (const void *data, size_t len)
 	return ret;
 }
 
-inline MD5 md5 (const std::string &s)
-{
+inline MD5 md5(std::string_view s) {
 	MD5 ret;
 	ret (s);
 	return ret;

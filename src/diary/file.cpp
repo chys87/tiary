@@ -326,8 +326,7 @@ bool general_analyze_xml (const XMLNode *root,
 }
 
 
-void encrypt (void *data, size_t datalen, const void *pass, size_t passlen)
-{
+void encrypt(void *data, size_t datalen, std::string_view pass) {
 	union {
 		uint64_t xor_u64[32]; // For alignment only
 		uint8_t xor_byte[256];
@@ -341,7 +340,7 @@ void encrypt (void *data, size_t datalen, const void *pass, size_t passlen)
 	((void) xor_u64);
 	((void) xor_u64_2);
 
-	MD5 md5_tmp = md5 (pass, passlen);
+	MD5 md5_tmp = md5(pass);
 	(MD5 (md5_tmp)) (password_salt2, sizeof password_salt2).result (xor_byte+240);
 	md5_tmp (password_salt3, sizeof password_salt3).result (xor_byte2+240);
 	for (int i=28; i>=0; i-=2) {
@@ -386,10 +385,9 @@ void encrypt (void *data, size_t datalen, const void *pass, size_t passlen)
 	}
 }
 
-inline void decrypt (void *data, size_t datalen, const void *pass, size_t passlen)
-{
+inline void decrypt(void *data, size_t datalen, std::string_view pass) {
 	// The same
-	encrypt (data, datalen, pass, passlen);
+	encrypt(data, datalen, pass);
 }
 
 
@@ -463,7 +461,7 @@ LoadFileRet load_file (
 		}
 
 		// Password correct. Decrypt now
-		decrypt(&everything[32], everything.size() - 32, utf8_password.data(), utf8_password.length());
+		decrypt(&everything[32], everything.size() - 32, utf8_password);
 		// Decompress
 		everything = bunzip2 (&everything[32], everything.size () - 32);
 	} else {
@@ -645,8 +643,7 @@ bool save_file (const char *filename,
 	if (!password.empty ()) {
 		// Yes. Encrypt
 		std::string utf8_password = wstring_to_utf8(password);
-		encrypt(&everything[0], everything.size(),
-				utf8_password.data(), utf8_password.length());
+		encrypt(&everything[0], everything.size(), utf8_password);
 
 		// Encrypted file header
 		char header[32];
