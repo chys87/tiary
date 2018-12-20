@@ -47,11 +47,11 @@ CheckBoxLabel::~CheckBoxLabel ()
 
 void CheckBoxLabel::move_resize (Size new_pos, Size new_size)
 {
-	pos = new_pos;
-	size = new_size;
-	if (both(size >= Size{4, 1})) {
+	set_pos(new_pos);
+	set_size(new_size);
+	if (get_size() >= Size{4, 1}) {
 		checkbox.move_resize(new_pos, {3, 1});
-		label.move_resize(new_pos + Size{4, 0}, size - Size{4, 0});
+		label.move_resize(new_pos + Size{4, 0}, get_size() - Size{4, 0});
 	}
 }
 

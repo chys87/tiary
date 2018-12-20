@@ -128,8 +128,8 @@ struct SelectMinMax {
 
 void Layout::move_resize (Size pos, Size size)
 {
-	this->pos = pos;
-	this->size = size;
+	set_pos(pos);
+	set_size(size);
 
 	unsigned total_this, total_other;
 	if (direction == VERTICAL) {

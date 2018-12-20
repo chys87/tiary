@@ -87,7 +87,7 @@ void Button::redraw ()
 	else if (is_focus ()) {
 		id = PALETTE_ID_BUTTON_FOCUS;
 	}
-	else if (ButtonDefault *def_chooser = dynamic_cast <ButtonDefault *> (&win)) {
+	else if (ButtonDefault *def_chooser = dynamic_cast<ButtonDefault *>(&window())) {
 		if (def_chooser->get_current_default_button () == this) {
 			id = PALETTE_ID_BUTTON_DEFAULT;
 		}

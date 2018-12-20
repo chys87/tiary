@@ -56,7 +56,7 @@ Menu &MenuBar::add (const std::wstring &text)
 		item.w = it->w + it->text.get_width () + 2 /* Space */;
 	}
 	if (wchar_t c = item.text.get_hotkey ()) {
-		win.register_hotkey (c, Signal (this, &MenuBar::slot_clicked, n-1),
+		window().register_hotkey(c, Signal(this, &MenuBar::slot_clicked, n - 1),
 				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
 	}
 
@@ -117,7 +117,7 @@ void MenuBar::slot_clicked (size_t k)
 		choose_palette (PALETTE_ID_MENUBAR_SELECT);
 		item.text.output(*this, {item.w, 0}, item.text.get_width());
 
-		Size left = win.get_pos() + get_pos () + Size{item.w, 1};
+		Size left = window().get_pos() + get_pos() + Size{item.w, 1};
 		Size right{get_screen_width(), left.y};
 
 		// Pop out sub menu
@@ -135,7 +135,7 @@ void MenuBar::slot_clicked (size_t k)
 
 		// LEFT/RIGHT key?
 		MouseEvent me_buf;
-		wchar_t c = win.get_noblock (&me_buf);
+		wchar_t c = window().get_noblock(&me_buf);
 		if (c == LEFT) {
 			k = (k + item_list.size () - 1) % item_list.size ();
 		}
@@ -145,10 +145,10 @@ void MenuBar::slot_clicked (size_t k)
 		else {
 			if (c) {
 				if (c == MOUSE) {
-					win.unget (me_buf);
+					window().unget(me_buf);
 				}
 				else {
-					win.unget (c);
+					window().unget(c);
 				}
 			}
 			break;

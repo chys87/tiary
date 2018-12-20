@@ -31,7 +31,7 @@ struct MouseEvent;
 /**
  * @brief	Window: An object-oriented event-driven portion of the screen
  */
-class Window : public MovableObject, public Hotkeys
+class Window : public MovableObject
 {
 
 
@@ -164,7 +164,12 @@ public:
 	static Window *get_topmost_window () { return topmost_window; }
 	static Window *get_bottommost_window () { return bottommost_window; }
 
+	template <typename... Args>
+	void register_hotkey(wchar_t c, Args&&... args) { hotkeys_.register_hotkey(c, std::forward<Args>(args)...); }
+
 private:
+	Hotkeys hotkeys_;
+
 	/// A "request" is a signal sent by a derivative class or a control
 	/// to a Window (the base class).
 	/// Currently there is only one type of "request": close window

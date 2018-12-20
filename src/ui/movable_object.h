@@ -31,17 +31,19 @@ class Control;
  */
 class MovableObject : public Object
 {
-protected:
-	Size pos;
-	Size size;
-
 public:
-	MovableObject() : pos{}, size{} {}
-
 	virtual void move_resize (Size newpos, Size newsize) = 0;
 
-	Size get_pos () const { return pos; }
-	Size get_size () const { return size; }
+	Size get_pos() const { return pos_; }
+	Size get_size() const { return size_; }
+
+protected:
+	void set_pos(Size pos) { pos_ = pos; }
+	void set_size(Size size) { size_ = size; }
+
+private:
+	Size pos_ {};
+	Size size_ {};
 };
 
 } // namespace ui

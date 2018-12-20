@@ -138,8 +138,8 @@ private:
 };
 
 
-inline MainWin &MainCtrl::w () { return static_cast<MainWin &>(win); }
-inline const MainWin &MainCtrl::w () const { return static_cast<const MainWin &>(win); }
+inline MainWin &MainCtrl::w () { return static_cast<MainWin &>(window()); }
+inline const MainWin &MainCtrl::w () const { return static_cast<const MainWin &>(window()); }
 
 
 } // namespace tiary
