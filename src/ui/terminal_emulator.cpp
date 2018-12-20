@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -41,8 +41,11 @@ TerminalEmulator detect_terminal_emulator ()
 		if (strcmp (term_env, "Eterm") == 0) {
 			return ETERM;
 		}
-		if (memcmp (term_env, "screen", 6) == 0) {
-			return UNKNOWN_TERMINAL;
+		if (strcmp(term_env, "screen") == 0 || memcmp(term_env, "screen-", 7) == 0) {
+			return SCREEN_TMUX;
+		}
+		if (strcmp(term_env, "tmux") == 0 || memcmp(term_env, "tmux-", 5) == 0) {
+			return SCREEN_TMUX;
 		}
 	}
 
@@ -117,15 +120,16 @@ TerminalEmulator detect_terminal_emulator ()
 
 	} while (pid >= 2); // 0 = Nothing; 1 = init
 
-	if (term_env && strcmp (term_env, "xterm") == 0) {
-		return GENERAL_XTERM;
+	if (term_env) {
+		if (strcmp(term_env, "xterm") == 0 || memcmp(term_env, "xterm-", 6) == 0) {
+			return GENERAL_XTERM;
+		} else if (strcmp(term_env, "linux") == 0 || memcmp(term_env, "linux-", 6) == 0) {
+			return LINUX_CONSOLE;
+		}
+
 	}
-	else if (term_env && strcmp (term_env, "linux") == 0) {
-		return LINUX_CONSOLE;
-	}
-	else {
-		return UNKNOWN_TERMINAL;
-	}
+
+	return UNKNOWN_TERMINAL;
 }
 
 bool is_locale_utf8 ()
@@ -158,6 +162,7 @@ bool terminal_emulator_correct_wcwidth ()
 		case KONSOLE:
 		case ETERM:
 		case MLTERM:
+		case SCREEN_TMUX: // Let's trust tmux
 			return true;
 		default:
 			return false;
