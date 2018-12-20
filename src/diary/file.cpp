@@ -295,7 +295,8 @@ bool general_analyze_xml (const XMLNode *root,
 		}
 		else if (recent_files && main_child->name == "recent") {
 			if (const char *file_name = map_query (main_child->properties, "file")) {
-				RecentFile &item = *recent_files->insert (recent_files->end (), RecentFile ());
+				recent_files->emplace_back();
+				RecentFile &item = recent_files->back();
 				item.filename = utf8_to_wstring (file_name);
 				if (const char *line_number = map_query (main_child->properties, "line")) {
 					item.focus_entry = strtoul (line_number, 0, 10);

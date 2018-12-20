@@ -39,7 +39,7 @@ enum LoadFileRet {
 
 
 // Read global options from ~/.tiary
-LoadFileRet load_global_options (GlobalOptionGroup &, std::list <RecentFile> &);
+LoadFileRet load_global_options(GlobalOptionGroup &, std::vector<RecentFile> &);
 
 /**
  * @brief	Load tiary file
@@ -63,7 +63,7 @@ LoadFileRet load_file (
 
 
 
-bool save_global_options (const GlobalOptionGroup &, const std::list <RecentFile> &);
+bool save_global_options(const GlobalOptionGroup &, const std::vector<RecentFile> &);
 
 bool save_file (const char *filename, const std::vector<DiaryEntry *> &entries, const PerFileOptionGroup &, const std::wstring &password);
 

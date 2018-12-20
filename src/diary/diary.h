@@ -20,7 +20,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include <list>
 
 
 namespace tiary {
@@ -52,7 +51,7 @@ struct RecentFile
 };
 
 // New files are in the front
-typedef std::list <RecentFile> RecentFileList;
+typedef std::vector<RecentFile> RecentFileList;
 
 
 } // namespace tiary
