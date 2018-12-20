@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -35,8 +35,7 @@ class MainWin;
  *
  * The menu is not part of this control.
  */
-class MainCtrl : public ui::Control, private ui::Scroll
-{
+class MainCtrl final : public ui::Control, private ui::Scroll {
 private:
 	// Everything is private.
 	// Only friend class MainWin can instantiate MainCtrl

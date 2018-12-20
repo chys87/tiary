@@ -39,8 +39,7 @@ namespace {
 
 using namespace ui;
 
-class WindowAllLabels : public virtual Window, public FixedWindow, private ButtonDefault
-{
+class WindowAllLabels final : public virtual Window, public FixedWindow, private ButtonDefault {
 
 	ListBox lst_labels;
 

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -23,8 +23,7 @@ namespace tiary {
 namespace ui {
 
 
-class Button : public virtual Control, public FocusColorControl
-{
+class Button final : public virtual Control, public FocusColorControl {
 public:
 	// The text must be a single line
 	// Otherwise, the behavior is undefined

@@ -42,8 +42,7 @@ namespace {
 
 using namespace ui;
 
-class DialogFilter : public FixedWindow, private ButtonDefault
-{
+class DialogFilter final : public FixedWindow, private ButtonDefault {
 	const DiaryEntry::LabelList &all_labels;
 	FilterGroup &result;
 

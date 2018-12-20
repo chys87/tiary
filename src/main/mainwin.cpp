@@ -301,20 +301,20 @@ void MainWin::on_ready ()
 		status += get_nice_pathname (current_filename);
 	}
 	menu_bar.set_text (std::move (status));
-	hotkey_hint.HotkeyHint::redraw ();
+	hotkey_hint.redraw ();
 }
 
 void MainWin::updated_filter ()
 {
 	if (filter.get ()) {
 		filtered_entries.reset (new DiaryEntryList (filter->filter (entries)));
-		main_ctrl.ui::Scroll::modify_number (filtered_entries->size ());
+		main_ctrl.modify_number(filtered_entries->size ());
 	}
 	else {
 		filtered_entries.reset ();
-		main_ctrl.ui::Scroll::modify_number (entries.size ());
+		main_ctrl.modify_number(entries.size ());
 	}
-	MainWin::redraw ();
+	redraw ();
 }
 
 bool MainWin::unavailable_filtered ()
@@ -858,7 +858,7 @@ void MainWin::edit_global_options ()
 {
 	tiary::edit_global_options (global_options, current_filename);
 	save_global_options (global_options, recent_files);
-	main_ctrl.MainCtrl::redraw ();
+	main_ctrl.redraw();
 }
 
 void MainWin::edit_perfile_options ()

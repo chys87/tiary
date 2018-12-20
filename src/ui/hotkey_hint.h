@@ -23,8 +23,7 @@
 namespace tiary {
 namespace ui {
 
-class HotkeyHint : public UnfocusableControl
-{
+class HotkeyHint final : public UnfocusableControl {
 public:
 	HotkeyHint (Window &);
 	~HotkeyHint ();

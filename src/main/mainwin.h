@@ -37,8 +37,7 @@ namespace tiary {
 // Defined in main/filter.h
 struct FilterGroup;
 
-class MainWin : public ui::Window
-{
+class MainWin final : public ui::Window {
 public:
 	// Constructor & destructor
 	explicit MainWin (const std::wstring &initial_filename);

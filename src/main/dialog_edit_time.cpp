@@ -36,8 +36,7 @@ namespace {
 
 using namespace ui;
 
-class WindowTime : public FixedWindow, private ButtonDefault
-{
+class WindowTime final : public FixedWindow, private ButtonDefault {
 
 	DateSelect date_select;
 

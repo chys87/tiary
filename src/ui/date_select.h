@@ -28,8 +28,7 @@ namespace tiary {
 namespace ui {
 
 
-class DateSelect : public MovableObject
-{
+class DateSelect final : public MovableObject {
 public:
 	DropList year;
 	GridSelect month;
