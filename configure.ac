@@ -84,7 +84,7 @@ PKG_CHECK_MODULES([re2], [re2 >= 0.0.0], [
 					], [AC_MSG_WARN([*** re2 is unavailable.])])
 
 dnl Check for wcwidth function (Optional)
-AC_CHECK_FUNCS([wcwidth])
+AC_CHECK_FUNCS([wcwidth], [], [AC_MSG_ERROR([*** wcwidth not found])])
 
 dnl Check for optional libc functions ***at
 AC_CHECK_FUNCS([openat fstatat])

@@ -330,8 +330,7 @@ std::string wstring_to_mbs (const std::wstring &src, char substitute)
 }
 
 /**
- * This function is implemented with
- * </code>wcwidth</code> on systems where it is available.
+ * This function is implemented with </code>wcwidth</code>,
  * But be aware of the return value for abnormal and nonprintable characters.
  */
 unsigned ucs_width (wchar_t c)
@@ -339,22 +338,12 @@ unsigned ucs_width (wchar_t c)
 	if (uint32_t (c) < 0x80) {
 		return 1;
 	}
-#ifdef HAVE_WCWIDTH
 	if (wcwidth (c) > 1) {
 		return 2;
 	}
 	else {
 		return 1;
 	}
-#else
-	static const WcharInterval table[] = {
-		{0x1100, 0x1160}, {0x2329, 0x232B}, {0x2E80, 0x2FFC}, {0x3000, 0x303F},
-		{0x3041, 0x4DB6}, {0x4E00, 0x9FBC}, {0xA000, 0xA4C7}, {0xAC00, 0xD7A4},
-		{0xF900, 0xFADA}, {0xFE10, 0xFE1A}, {0xFE30, 0xFE6C}, {0xFF01, 0xFF61},
-		{0xFFE0, 0xFFE7}, {0x20000, 0x2FFFE}, {0x30000, 0x3FFFE}
-	};
-	return find(table,array_end(table),c) ? 2 : 1;
-#endif // !HAVE_WCWIDTH
 }
 
 unsigned ucs_width (const wchar_t *s)
