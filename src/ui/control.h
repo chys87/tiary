@@ -36,11 +36,10 @@ struct MouseEvent;
 /**
  * @brief	The base class for all controls
  */
-class Control : public MovableObject, public Hotkeys
+class Control : public MovableObject
 {
 public:
 	explicit Control (Window &);
-	virtual ~Control ();
 
 	// move_resize does not imply redraw
 	void move_resize (Size pos, Size size);
@@ -89,12 +88,18 @@ public:
 	void clear (Size, Size);
 	void fill (Size, Size, wchar_t);
 
-	Window &win; // The window containing the control
-
 	Control *get_prev () { return prev; }
 	Control *get_next () { return next; }
 
+	Window &window() { return win_; }
+	const Window &window() const { return win_; }
+
+	template <typename... Args>
+	void register_hotkey(wchar_t c, Args&&... args) { hotkeys_.register_hotkey(c, std::forward<Args>(args)...); }
+
 private:
+	Window &win_; // The window containing the control
+	Hotkeys hotkeys_;
 	Size curpos; ///< Cursor position
 	bool cursor_visible; ///< Whether the cursor should be visible
 
@@ -124,9 +129,8 @@ public:
 class UnfocusableControl : public virtual Control
 {
 public:
-	UnfocusableControl (Window &win) : Control (win) {}
-	~UnfocusableControl ();
-	bool on_focus ();
+	using Control::Control;
+	bool on_focus() override;
 };
 
 /**
@@ -138,10 +142,9 @@ public:
 class FocusColorControl : public virtual Control
 {
 public:
-	FocusColorControl (Window &win) : Control (win) {}
-	~FocusColorControl ();
-	bool on_focus ();
-	void on_defocus ();
+	using Control::Control;
+	bool on_focus() override;
+	void on_defocus() override;
 };
 
 } // namespace tiary::ui

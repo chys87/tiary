@@ -42,8 +42,8 @@ libcommon_a_SOURCES = \
 	md5.cpp \
 	misc.h \
 	misc.cpp \
-	pcre.h \
-	pcre.cpp \
+	re.h \
+	re.cpp \
 	signal.h \
 	signal.cpp \
 	split_line.h \

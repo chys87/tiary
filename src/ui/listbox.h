@@ -22,8 +22,7 @@
 namespace tiary {
 namespace ui {
 
-class ListBox : public Control, private Scroll
-{
+class ListBox final : public Control, private Scroll {
 public:
 
 	typedef std::vector<std::wstring> ItemList;

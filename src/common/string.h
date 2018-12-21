@@ -25,6 +25,7 @@
 #include <string.h>
 #include <list>
 #include <string>
+#include <string_view>
 #include <iterator>
 
 namespace tiary {
@@ -60,7 +61,7 @@ inline wchar_t *strchrnul (wchar_t *str, wchar_t ch) { return const_cast <wchar_
 
 
 /// @brief	Make a string lowercase
-std::wstring strlower (const std::wstring &);
+std::wstring strlower(std::wstring_view);
 
 /**
  * @brief	Find all occurrences of a substring
@@ -69,7 +70,7 @@ std::wstring strlower (const std::wstring &);
  * We return the length in the result to align with PcRe::match
  */
 std::vector <std::pair <size_t, size_t> >
-	find_all (const std::wstring &haystack, const std::wstring &needle);
+	find_all(std::wstring_view haystack, std::wstring_view needle);
 
 // Remove spaces at the beginning and the end
 // Returns if the string was changed

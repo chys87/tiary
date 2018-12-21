@@ -219,7 +219,7 @@ void ItemControl::redraw ()
 		if (!valid) {
 			id = PALETTE_ID_MENU_INVALID;
 		}
-		else if (win.get_focus () == this) {
+		else if (window().get_focus() == this) {
 			id = PALETTE_ID_MENU_SELECT;
 		}
 		else {
@@ -240,18 +240,18 @@ void ItemControl::slot_trigger ()
 	focus ();
 	if (item.submenu == 0) {
 		// No submenu
-		static_cast <MenuWindow &>(win).result = const_cast <MenuItem *>(&item);
-		win.request_close ();
+		static_cast<MenuWindow &>(window()).result = const_cast<MenuItem *>(&item);
+		window().request_close ();
 	}
 	else {
 		// Has submenu
-		Size right = win.get_pos () + get_pos ();
+		Size right = window().get_pos () + get_pos ();
 		Size left = right + Size{get_size().x, 0};
 		MenuWindow subwin (*item.submenu, left, right, false);
 		subwin.event_loop ();
 		if (MenuItem *subret = subwin.get_result ()) {
-			static_cast<MenuWindow&>(win).result = subret;
-			win.request_close ();
+			static_cast<MenuWindow&>(window()).result = subret;
+			window().request_close();
 		}
 	}
 }

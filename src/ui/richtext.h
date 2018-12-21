@@ -40,8 +40,7 @@ namespace ui {
  *
  * The contents cannot be modified
  */
-class RichText : public Control
-{
+class RichText final : public Control {
 public:
 
 	typedef RichTextLine Line;

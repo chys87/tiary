@@ -301,20 +301,20 @@ void MainWin::on_ready ()
 		status += get_nice_pathname (current_filename);
 	}
 	menu_bar.set_text (std::move (status));
-	hotkey_hint.HotkeyHint::redraw ();
+	hotkey_hint.redraw ();
 }
 
 void MainWin::updated_filter ()
 {
 	if (filter.get ()) {
 		filtered_entries.reset (new DiaryEntryList (filter->filter (entries)));
-		main_ctrl.ui::Scroll::modify_number (filtered_entries->size ());
+		main_ctrl.modify_number(filtered_entries->size ());
 	}
 	else {
 		filtered_entries.reset ();
-		main_ctrl.ui::Scroll::modify_number (entries.size ());
+		main_ctrl.modify_number(entries.size ());
 	}
-	MainWin::redraw ();
+	redraw ();
 }
 
 bool MainWin::unavailable_filtered ()
@@ -653,23 +653,18 @@ void MainWin::update_recent_files ()
 	if (current_filename.empty ())
 		return;
 	bool changed = true; // Whether any change was made to recent_files
+	unsigned current_focus = main_ctrl.get_current_focus ();
 	RecentFileList::iterator it = std::find (recent_files.begin (), recent_files.end (),
 			current_filename);
 	if (it == recent_files.end ()) {
-		recent_files.push_front (RecentFile ());
-		it = recent_files.begin ();
-		it->filename = current_filename;
-		it->focus_entry = main_ctrl.get_current_focus ();
+		recent_files.insert(recent_files.begin(), {current_filename, current_focus});
 		changed = true;
-	}
-	else {
+	} else {
 		if (it != recent_files.begin ()) {
-			// C++ standard explicitly allows splicing from the list itself
-			recent_files.splice (recent_files.begin (), recent_files, it);
+			std::rotate(recent_files.begin(), it, it + 1);
 			it = recent_files.begin ();
 			changed = true;
 		}
-		unsigned current_focus = main_ctrl.get_current_focus ();
 		if (current_focus != it->focus_entry) {
 			it->focus_entry = current_focus;
 			changed = true;
@@ -677,11 +672,8 @@ void MainWin::update_recent_files ()
 	}
 
 	unsigned n_files = global_options.get_num (GLOBAL_OPTION_RECENT_FILES);
-	unsigned extra = recent_files.size () - n_files;
-	if (int (extra) > 0) {
-		for (; extra; --extra) {
-			recent_files.pop_back ();
-		}
+	if (recent_files.size() > n_files) {
+		recent_files.resize(n_files);
 		changed = true;
 	}
 	if (changed) {
@@ -866,7 +858,7 @@ void MainWin::edit_global_options ()
 {
 	tiary::edit_global_options (global_options, current_filename);
 	save_global_options (global_options, recent_files);
-	main_ctrl.MainCtrl::redraw ();
+	main_ctrl.redraw();
 }
 
 void MainWin::edit_perfile_options ()

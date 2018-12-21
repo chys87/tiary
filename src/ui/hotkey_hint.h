@@ -23,8 +23,7 @@
 namespace tiary {
 namespace ui {
 
-class HotkeyHint : public UnfocusableControl
-{
+class HotkeyHint final : public UnfocusableControl {
 public:
 	HotkeyHint (Window &);
 	~HotkeyHint ();
@@ -37,6 +36,10 @@ public:
 	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Signal &sig);
 	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Action &&act);
 	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Signal &&sig);
+
+private:
+	template <typename... Args>
+	HotkeyHint &add(unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Args&&...args);
 
 private:
 	struct HotkeyItem

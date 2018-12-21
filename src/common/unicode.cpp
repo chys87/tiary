@@ -200,6 +200,19 @@ std::wstring utf8_to_wstring (const std::string &s, wchar_t substitute)
 			s.length (), substitute);
 }
 
+size_t utf8_count_chars(std::string_view str) {
+	const char *s = str.data();
+	const char *e = s + str.length();
+	size_t ret = 0;
+	while (s < e) {
+		int n = utf8_len_by_first_byte(*s++);
+		if (n > 1)
+			s += n - 1;
+		++ret;
+	}
+	return ret;
+}
+
 char *wchar_to_utf8 (char *dst, wchar_t w)
 {
 	uint32_t u = w;
@@ -362,13 +375,11 @@ unsigned ucs_width (const wchar_t *s, size_t n)
 	return w;
 }
 
-unsigned ucs_width (const std::wstring &s)
-{
+unsigned ucs_width(std::wstring_view s) {
 	return ucs_width (s.data(), s.length());
 }
 
-size_t max_chars_in_width (const std::wstring &s, unsigned scrwid)
-{
+size_t max_chars_in_width(std::wstring_view s, unsigned scrwid) {
 	return max_chars_in_width (s.data (), s.length (), scrwid);
 }
 

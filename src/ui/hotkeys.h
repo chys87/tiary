@@ -27,9 +27,6 @@ namespace ui {
 class Hotkeys
 {
 public:
-	Hotkeys ();
-	~Hotkeys ();
-
 	static const int CASE_INSENSITIVE = 1;
 	/**
 	 * If the key is a letter, also registers Alt + Key
@@ -49,7 +46,7 @@ public:
 	void register_hotkey (wchar_t, Action &&);
 	void register_hotkey (wchar_t, Action &&, int options);
 
-	bool emit_hotkey (wchar_t);
+	bool emit(wchar_t);
 
 private:
 	typedef std::map<wchar_t, Action> HotkeyList;

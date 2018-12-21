@@ -115,8 +115,8 @@ Date DateSelect::get_date () const
 
 void DateSelect::move_resize (Size new_pos, Size new_size)
 {
-	pos = new_pos;
-	size = new_size;
+	set_pos(new_pos);
+	set_size(new_size);
 	year.move_resize(new_pos + Size{1, 0}, {4, 1});
 	month.move_resize(new_pos + Size{0, 1}, {7, 6});
 	lbl_weekday.move_resize(new_pos + Size{8, 0}, {21, 1});

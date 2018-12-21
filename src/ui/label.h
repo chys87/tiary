@@ -35,8 +35,7 @@ namespace ui {
  * If you use '&' and then modify the text, the hotkey is _not_ re-registered
  * (Behavior may change in the future.)
  */
-class Label : public UnfocusableControl
-{
+class Label final : public UnfocusableControl {
 public:
 	Label (Window &, const std::wstring &, unsigned = 0 /**< UIString options */);
 	Label(Window &, std::wstring &&, unsigned = 0 /**< UIString options */);

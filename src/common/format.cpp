@@ -135,8 +135,7 @@ Format &Format::operator << (const wchar_t *s)
 	return *this;
 }
 
-Format &Format::operator << (const std::wstring &s)
-{
+Format &Format::operator << (std::wstring_view s) {
 	if (nargs < MAX_ARGS) {
 		args += s;
 		offset[++nargs] = args.size ();

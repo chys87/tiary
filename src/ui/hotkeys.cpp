@@ -21,15 +21,6 @@
 namespace tiary {
 namespace ui {
 
-Hotkeys::Hotkeys ()
-	: hotkey_list ()
-{
-}
-
-Hotkeys::~Hotkeys ()
-{
-}
-
 void Hotkeys::register_hotkey (wchar_t c, const Action &sig)
 {
 	hotkey_list[c] = sig;
@@ -47,7 +38,6 @@ void Hotkeys::register_hotkey (wchar_t c, const Action &sig, int options)
 	if (options & ALLOW_ALT) {
 		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26) {
 			register_hotkey (ALT_BASE + c, sig);
-			hotkey_list[ALT_BASE + c] = sig;
 			if (d != c) {
 				register_hotkey (ALT_BASE + d, sig);
 			}
@@ -73,7 +63,6 @@ void Hotkeys::register_hotkey (wchar_t c, Action &&sig, int options)
 	if (options & ALLOW_ALT) {
 		if (unsigned (c - L'A') < 26 || unsigned (c - L'a') < 26) {
 			register_hotkey (ALT_BASE + c, sig);
-			hotkey_list[ALT_BASE + c] = sig;
 			if (d != c) {
 				register_hotkey (ALT_BASE + d, sig);
 			}
@@ -82,8 +71,7 @@ void Hotkeys::register_hotkey (wchar_t c, Action &&sig, int options)
 	register_hotkey (c, std::move (sig));
 }
 
-bool Hotkeys::emit_hotkey (wchar_t c)
-{
+bool Hotkeys::emit(wchar_t c) {
 	HotkeyList::iterator it = hotkey_list.find (c);
 	if (it != hotkey_list.end ()) {
 		Action &act = it->second;

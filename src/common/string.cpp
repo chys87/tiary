@@ -68,8 +68,7 @@ const wchar_t *strchrnul (const wchar_t *str, wchar_t ch)
 	return str;
 }
 
-std::wstring strlower (const std::wstring &str)
-{
+std::wstring strlower(std::wstring_view str) {
 	std::wstring result;
 	result.resize (str.length ());
 	std::transform (str.begin (), str.end (), result.begin (), towlower);
@@ -77,7 +76,7 @@ std::wstring strlower (const std::wstring &str)
 }
 
 std::vector <std::pair <size_t, size_t> >
-find_all (const std::wstring &haystack, const std::wstring &needle)
+find_all(std::wstring_view haystack, std::wstring_view needle)
 {
 	std::vector <std::pair <size_t, size_t> > ret;
 	size_t neelen = needle.length ();
@@ -85,7 +84,7 @@ find_all (const std::wstring &haystack, const std::wstring &needle)
 	size_t offset = 0;
 	while (haylen - offset >= neelen) {
 		size_t found = haystack.find (needle, offset);
-		if (found == std::wstring::npos) {
+		if (found == std::wstring_view::npos) {
 			break;
 		}
 		ret.push_back (std::make_pair (found, neelen));

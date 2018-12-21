@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -31,7 +31,7 @@ struct MouseEvent;
 /**
  * @brief	Window: An object-oriented event-driven portion of the screen
  */
-class Window : public MovableObject, public Hotkeys
+class Window : public MovableObject
 {
 
 
@@ -40,8 +40,7 @@ class Window : public MovableObject, public Hotkeys
 	 *
 	 * This control is used internally by tiary::ui::Window,
 	 */
-	class DummyControl : public Control
-	{
+	class DummyControl final : public Control {
 	public:
 		DummyControl (Window &win) : Control (win) {}
 		~DummyControl ();
@@ -165,7 +164,12 @@ public:
 	static Window *get_topmost_window () { return topmost_window; }
 	static Window *get_bottommost_window () { return bottommost_window; }
 
+	template <typename... Args>
+	void register_hotkey(wchar_t c, Args&&... args) { hotkeys_.register_hotkey(c, std::forward<Args>(args)...); }
+
 private:
+	Hotkeys hotkeys_;
+
 	/// A "request" is a signal sent by a derivative class or a control
 	/// to a Window (the base class).
 	/// Currently there is only one type of "request": close window

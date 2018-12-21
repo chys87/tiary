@@ -323,7 +323,7 @@ Window *Window::bottommost_window = 0;
 
 Window::Window (unsigned options_, const std::wstring &title_)
 	: MovableObject ()
-	, Hotkeys ()
+	, hotkeys_()
 	, requests (0)
 	, cur_attr()
 	, char_table (0)
@@ -348,7 +348,7 @@ Window::Window (unsigned options_, const std::wstring &title_)
 
 Window::Window (unsigned options_, std::wstring &&title_)
 	: MovableObject()
-	, Hotkeys()
+	, hotkeys_()
 	, requests(0)
 	, cur_attr()
 	, char_table(0)
@@ -371,7 +371,7 @@ Window::Window (unsigned options_, std::wstring &&title_)
 
 Window::~Window ()
 {
-	touch_lines (pos.y, size.y);
+	touch_lines(get_pos().y, get_size().y);
 
 	deallocate_char_table ();
 
@@ -393,8 +393,8 @@ Window::~Window ()
 void Window::reallocate_char_table ()
 {
 	deallocate_char_table ();
-	unsigned width = size.x;
-	unsigned height = size.y;
+	unsigned width = get_size().x;
+	unsigned height = get_size().y;
 	if (width && height) {
 		// If we allow height==0 and allocate, we will have problem at deallocate_char_table
 		char_table = new CharColorAttr * [height];
@@ -452,6 +452,8 @@ void Window::event_loop ()
 		c = get (&mouse_event);
 
 		if (status == STATUS_MOVING) {
+			Size pos = get_pos();
+			Size size = get_size();
 			switch (c) {
 				case LEFT:
 					if (pos.x) {
@@ -494,8 +496,8 @@ void Window::event_loop ()
 		else if (c == MOUSE) {
 			// Is the position within this window?
 			MouseEvent mouse_event_relative = mouse_event;
-			mouse_event_relative.p -= pos;
-			if (both (mouse_event_relative.p < size)) {
+			mouse_event_relative.p -= get_pos();
+			if (mouse_event_relative.p < get_size()) {
 				on_mouse (mouse_event_relative);
 			}
 			else {
@@ -570,21 +572,21 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, wchar_t ch)
 
 void Window::move_resize (Size newpos, Size newsize)
 {
-	if (newsize == size) {
-		if (newpos == pos) {
+	if (newsize == get_size()) {
+		if (newpos == get_pos()) {
 			return;
 		}
 		// If the old position still makes the window fit on screen,
 		// do not move it.
 		// (This is in order to implement user-initiated window moving.)
-		if (both (pos + newsize <= get_screen_size ())) {
-			newpos = pos;
+		if (get_pos() + newsize <= get_screen_size ()) {
+			newpos = get_pos();
 		}
 	}
-	unsigned touch_begin = minU (pos.y, newpos.y);
-	unsigned touch_height = maxU (pos.y + size.y, newpos.y + newsize.y) - touch_begin;
-	pos = newpos;
-	size = newsize;
+	unsigned touch_begin = minU(get_pos().y, newpos.y);
+	unsigned touch_height = maxU(get_pos().y + get_size().y, newpos.y + newsize.y) - touch_begin;
+	set_pos(newpos);
+	set_size(newsize);
 	touch_lines (touch_begin, touch_height);
 	reallocate_char_table ();
 }
@@ -594,8 +596,8 @@ void Window::clear ()
 	CharColorAttr val;
 	val.c = L' ';
 	val.a = cur_attr;
-	std::fill_n (char_table[0], size.x*size.y, val);
-	touch_lines (pos.y, size.y);
+	std::fill_n(char_table[0], get_size().x * get_size().y, val);
+	touch_lines(get_pos().y, get_size().y);
 }
 
 void Window::clear (Size fill_pos, Size fill_size)
@@ -611,8 +613,8 @@ void Window::fill (Size top_left, Size fill_size, wchar_t ch)
 	unsigned fill_left = top_left.x;
 	unsigned fill_width = fill_size.x;
 	unsigned fill_height = fill_size.y;
-	unsigned width = size.x;
-	unsigned height = size.y;
+	unsigned width = get_size().x;
+	unsigned height = get_size().y;
 
 	if (fill_left>=width || fill_top>=height) {
 		return;
@@ -621,7 +623,7 @@ void Window::fill (Size top_left, Size fill_size, wchar_t ch)
 	fill_width = minU (fill_width, width - fill_left);
 	fill_height = minU (fill_height, height - fill_top);
 
-	touch_lines (pos.y + fill_top, fill_height);
+	touch_lines(get_pos().y + fill_top, fill_height);
 
 	CharColorAttr val;
 	val.a = cur_attr;
@@ -640,10 +642,10 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s)
 
 Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size_t n)
 {
-	if (either (blkpos >= size)) {
+	if (either (blkpos >= get_size())) {
 		return relpos;
 	}
-	if (either (blkpos + blksize > size)) {
+	if (either (blkpos + blksize > get_size())) {
 		return relpos;
 	}
 	if (either (relpos >= blksize)) {
@@ -657,7 +659,7 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 	unsigned winx = blkpos.x + x;
 	unsigned winy = blkpos.y + y;
 
-	touch_line (pos.y + winy);
+	touch_line(get_pos().y + winy);
 	CharColorAttr *ptr = char_table[winy] + winx;
 
 #if 0 // Caller's responsibility
@@ -715,22 +717,22 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const std::wstring &s)
 
 Size Window::put (Size relpos, wchar_t ch)
 {
-	return put({}, size, relpos, ch);
+	return put({}, get_size(), relpos, ch);
 }
 
 Size Window::put (Size relpos, const wchar_t *s)
 {
-	return put({}, size, relpos, s);
+	return put({}, get_size(), relpos, s);
 }
 
 Size Window::put (Size relpos, const wchar_t *s, size_t n)
 {
-	return put({}, size, relpos, s, n);
+	return put({}, get_size(), relpos, s, n);
 }
 
 Size Window::put (Size relpos, const std::wstring & s)
 {
-	return put({}, size, relpos, s);
+	return put({}, get_size(), relpos, s);
 }
 
 void Window::touch_screen ()
@@ -802,7 +804,7 @@ void Window::request_close ()
 
 void Window::add_control (Control *ctrl)
 {
-	assert (&ctrl->win == this);
+	assert(&ctrl->window() == this);
 
 	// The "dummy" of this Window.
 	// Always the first one added to the window
@@ -906,14 +908,14 @@ bool Window::on_mouse (MouseEvent mouse_event)
 
 	// First decide which control this event happens on
 	for (Control *ctrl = dummy_ctrl.next; ctrl != &dummy_ctrl; ctrl = ctrl->next) {
-		if (both (mouse_event.p - ctrl->pos < ctrl->size)) {
+		if (mouse_event.p - ctrl->get_pos() < ctrl->get_size()) {
 			// If it's any mouse key event, we should first try to focus it
 			// Otherwise, we do not.
 			if (mouse_event.m & MOUSE_ALL_BUTTON) {
 				set_focus_ptr (ctrl, 0); // Regardless whether it's successful or not
 			}
 			MouseEvent rel_mouse_event = mouse_event;
-			rel_mouse_event.p -= ctrl->pos;
+			rel_mouse_event.p -= ctrl->get_pos();
 			processed = ctrl->on_mouse (rel_mouse_event);
 			if (!processed) {
 				if ((mouse_event.m&LEFT_CLICK) &&
@@ -952,12 +954,12 @@ bool Window::on_key (wchar_t c)
 		processed = focus_ctrl->on_key (c);
 		// Not processed? How about local hotkeys?
 		if (!processed) {
-			processed = focus_ctrl->emit_hotkey (c);
+			processed = focus_ctrl->hotkeys_.emit(c);
 		}
 	}
 	// Not processed? How about dialog hotkeys?
 	if (!processed) {
-		processed = emit_hotkey (c);
+		processed = hotkeys_.emit(c);
 	}
 	// Still not processed? Interpret it ourselves
 	if (!processed) {

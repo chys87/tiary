@@ -26,8 +26,7 @@ namespace ui {
 /*
  * Single-line text editor.
  */
-class TextBox : public virtual Control, public FocusColorControl, private Scroll
-{
+class TextBox final : public virtual Control, public FocusColorControl, private Scroll {
 public:
 
 	explicit TextBox (Window &, unsigned attr = 0);

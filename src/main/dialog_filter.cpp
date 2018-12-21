@@ -42,8 +42,7 @@ namespace {
 
 using namespace ui;
 
-class DialogFilter : public FixedWindow, private ButtonDefault
-{
+class DialogFilter final : public FixedWindow, private ButtonDefault {
 	const DiaryEntry::LabelList &all_labels;
 	FilterGroup &result;
 
@@ -55,7 +54,7 @@ class DialogFilter : public FixedWindow, private ButtonDefault
 	Label lbl_title;
 	TextBox txt_title;
 	Layout layout_title;
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	CheckBoxLabel chk_title_regex;
 	Layout layout_title_regex;
 #endif
@@ -63,7 +62,7 @@ class DialogFilter : public FixedWindow, private ButtonDefault
 	Label lbl_text;
 	TextBox txt_text;
 	Layout layout_text;
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	CheckBoxLabel chk_text_regex;
 	Layout layout_text_regex;
 #endif
@@ -97,14 +96,14 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 	, lbl_title (*this, L"&Title")
 	, txt_title (*this)
 	, layout_title (HORIZONTAL)
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	, chk_title_regex (*this, L"&Regular expression", false)
 	, layout_title_regex (HORIZONTAL)
 #endif
 	, lbl_text (*this, L"&Content:")
 	, txt_text (*this)
 	, layout_text (HORIZONTAL)
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	, chk_text_regex (*this, L"Regular e&xpression", false)
 	, layout_text_regex (HORIZONTAL)
 #endif
@@ -120,13 +119,13 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 		}
 		else if (FilterByTitle *filter_title = dynamic_cast<FilterByTitle *>(it->get())) {
 			txt_title.set_text (filter_title->get_pattern (), false, filter_title->get_pattern ().length ());
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 			chk_title_regex.checkbox.set_status (filter_title->get_use_regex ());
 #endif
 		}
 		else if (FilterByText *filter_text = dynamic_cast<FilterByText *>(it->get())) {
 			txt_text.set_text (filter_text->get_pattern (), false, filter_text->get_pattern ().length ());
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 			chk_text_regex.checkbox.set_status (filter_text->get_use_regex ());
 #endif
 		}
@@ -145,7 +144,7 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 		(1, 1)
 		(txt_title, 1, Layout::UNLIMITED)
 		;
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	layout_title_regex.add
 		(11, 11)
 		(chk_title_regex, 3, Layout::UNLIMITED)
@@ -156,7 +155,7 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 		(1, 1)
 		(txt_text, 1, Layout::UNLIMITED)
 		;
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 	layout_text_regex.add
 		(11, 11)
 		(chk_text_regex, 3, Layout::UNLIMITED)
@@ -172,12 +171,12 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 		(layout_label, 1, 1)
 		(1, 1)
 		(layout_title, 1, 1)
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 		(layout_title_regex, 1, 1)
 #endif
 		(1, 1)
 		(layout_text, 1, 1)
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 		(layout_text_regex, 1, 1)
 #endif
 		(1, 1)
@@ -188,11 +187,11 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 	ChainControlsVertical ()
 		(txt_label)
 		(txt_title)
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 		(chk_title_regex.checkbox)
 #endif
 		(txt_text)
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 		(chk_text_regex.checkbox)
 #endif
 		(btn_ok)
@@ -239,11 +238,11 @@ void DialogFilter::slot_ok ()
 	if (!txt_title.get_text ().empty ()) {
 		FilterByTitle *filter = new FilterByTitle;
 		bool assign_ret = filter->assign (txt_title.get_text ()
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 				, chk_title_regex.get_status ()
 #endif
 				);
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 		if (!assign_ret) {
 			dialog_message (format (L"Invalid regular expression: \"%a\"") << txt_title.get_text ());
 			set_focus_ptr (&txt_title);
@@ -255,11 +254,11 @@ void DialogFilter::slot_ok ()
 	if (!txt_text.get_text ().empty ()) {
 		FilterByText *filter = new FilterByText;
 		bool assign_ret = filter->assign (txt_text.get_text ()
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 				, chk_text_regex.get_status ()
 #endif
 				);
-#ifdef TIARY_USE_PCRE
+#ifdef TIARY_USE_RE2
 		if (!assign_ret) {
 			dialog_message (format (L"Invalid regular expression: \"%a\"") << txt_text.get_text ());
 			set_focus_ptr (&txt_text);

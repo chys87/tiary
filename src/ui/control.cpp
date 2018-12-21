@@ -21,10 +21,10 @@ namespace tiary {
 namespace ui {
 
 
-Control::Control (Window &win_)
+Control::Control(Window &win)
 	: MovableObject ()
-	, Hotkeys ()
-	, win (win_)
+	, win_(win)
+	, hotkeys_()
 	, curpos{}
 	, cursor_visible (true)
 	, ctrl_left (0)
@@ -36,17 +36,13 @@ Control::Control (Window &win_)
 	win_.add_control (this);
 }
 
-Control::~Control ()
-{
-}
-
 void Control::move_resize (Size newpos, Size newsize)
 {
-	if ((pos != newpos) || (size != newsize)) {
-		win.choose_palette (PALETTE_ID_BACKGROUND);
-		win.clear (pos, size);
-		pos = newpos;
-		size = newsize;
+	if ((get_pos() != newpos) || (get_size() != newsize)) {
+		win_.choose_palette(PALETTE_ID_BACKGROUND);
+		win_.clear(get_pos(), get_size());
+		set_pos(newpos);
+		set_size(newsize);
 	}
 }
 
@@ -73,12 +69,12 @@ bool Control::on_focus ()
 
 bool Control::is_focus () const
 {
-	return (win.get_focus () == this);
+	return (win_.get_focus() == this);
 }
 
 void Control::focus ()
 {
-	win.set_focus (this, 0);
+	win_.set_focus(this, 0);
 }
 
 void Control::move_cursor (Size newpos)
@@ -88,72 +84,72 @@ void Control::move_cursor (Size newpos)
 
 void Control::choose_palette (PaletteID id)
 {
-	win.choose_palette (id);
+	win_.choose_palette(id);
 }
 
 void Control::choose_fore_color (Color fore)
 {
-	win.choose_fore_color (fore);
+	win_.choose_fore_color(fore);
 }
 
 void Control::choose_back_color (Color back)
 {
-	win.choose_back_color (back);
+	win_.choose_back_color(back);
 }
 
 void Control::choose_color (Color fore, Color back)
 {
-	win.choose_color (fore, back);
+	win_.choose_color(fore, back);
 }
 
 void Control::attribute_on (Attr attr)
 {
-	win.attribute_on (attr);
+	win_.attribute_on(attr);
 }
 
 void Control::attribute_off (Attr attr)
 {
-	win.attribute_off (attr);
+	win_.attribute_off(attr);
 }
 
 void Control::attribute_toggle (Attr attr)
 {
-	win.attribute_toggle (attr);
+	win_.attribute_toggle(attr);
 }
 
 ColorAttr Control::get_attr () const
 {
-	return win.get_attr ();
+	return win_.get_attr();
 }
 
 void Control::set_attr (ColorAttr at)
 {
-	win.set_attr (at);
+	win_.set_attr(at);
 }
 
 Size Control::put (Size xy, wchar_t c)
 {
-	return win.put (pos, size, xy, c);
+	return win_.put(get_pos(), get_size(), xy, c);
 }
 
 Size Control::put (Size xy, const wchar_t *s)
 {
-	return win.put (pos, size, xy, s);
+	return win_.put(get_pos(), get_size(), xy, s);
 }
 
 Size Control::put (Size xy, const wchar_t *s, size_t n)
 {
-	return win.put (pos, size, xy, s, n);
+	return win_.put(get_pos(), get_size(), xy, s, n);
 }
 
 Size Control::put (Size xy, const std::wstring &s)
 {
-	return win.put (pos, size, xy, s);
+	return win_.put(get_pos(), get_size(), xy, s);
 }
 
 void Control::clear ()
 {
-	win.clear (pos, size);
+	win_.clear(get_pos(), get_size());
 }
 
 void Control::clear (Size fill_pos, Size fill_size)
@@ -163,24 +159,16 @@ void Control::clear (Size fill_pos, Size fill_size)
 
 void Control::fill (Size fill_pos, Size fill_size, wchar_t ch)
 {
-	if (both (size > fill_pos)) {
-		fill_size &= size - fill_pos;
-		win.fill (fill_pos + pos, fill_size, ch);
+	if (get_size() > fill_pos) {
+		fill_size &= get_size() - fill_pos;
+		win_.fill(fill_pos + get_pos(), fill_size, ch);
 	}
 }
 
 
-UnfocusableControl::~UnfocusableControl ()
-{
-}
-
 bool UnfocusableControl::on_focus ()
 {
 	return false;
-}
-
-FocusColorControl::~FocusColorControl ()
-{
 }
 
 bool FocusColorControl::on_focus ()

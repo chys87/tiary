@@ -80,7 +80,7 @@ public:
 
 	Format &operator << (wchar_t);
 	Format &operator << (const wchar_t *);
-	Format &operator << (const std::wstring &);
+	Format &operator << (std::wstring_view);
 
 	// Decimal
 	Format &operator << (unsigned);

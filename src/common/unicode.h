@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -23,6 +23,7 @@
 
 #include <stddef.h> // ::size_t
 #include <string>
+#include <string_view>
 #include <wchar.h>
 
 #define TIARY_WIDIFY(s) TIARY_WIDIFY_IMPL(s)
@@ -77,6 +78,13 @@ std::wstring utf8_to_wstring (const char *str, wchar_t substitute = L'?');
  * @result	The converted wide (Unicode) string
  */
 std::wstring utf8_to_wstring (const std::string &str, wchar_t substitute = L'?');
+
+/**
+ * @brief	Count the number of Unicode characters in a UTF-8 string
+ * @param	str	Input UTF-8 string
+ * @result	The number of Unicode characters.  The result is unspecified if @c str is invalid UTF-8
+ */
+size_t utf8_count_chars(std::string_view str);
 
 /**
  * @brief	Converts one single wide (Unicode) character to UTF-8
@@ -162,13 +170,13 @@ unsigned ucs_width (const wchar_t *str, size_t len);
  * @result	The total on-screen width of str. \n
  *			Abnormal and nonprintable characters are counted as 1.
  */
-unsigned ucs_width (const std::wstring &str);
+unsigned ucs_width(std::wstring_view str);
 /**
  * @brief	Returns the maximum number of characters to fit in the specified screen width
  * @param	str	The given wide (Unicode) string
  * @param	scrwid	The given screen width
  */
-size_t max_chars_in_width (const std::wstring &str, unsigned scrwid);
+size_t max_chars_in_width(std::wstring_view str, unsigned scrwid);
 size_t max_chars_in_width (const wchar_t *, unsigned scrwid);
 size_t max_chars_in_width (const wchar_t *, size_t, unsigned scrwid);
 

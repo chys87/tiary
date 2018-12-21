@@ -32,7 +32,7 @@ namespace ui {
  *
  * We also allows displaying some texts on the right side of the menubar.
  */
-class MenuBar : public UnfocusableControl
+class MenuBar final : public UnfocusableControl
 {
 public:
 

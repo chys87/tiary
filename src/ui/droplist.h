@@ -21,8 +21,7 @@
 namespace tiary {
 namespace ui {
 
-class DropList : public virtual Control, public FocusColorControl
-{
+class DropList final : public virtual Control, public FocusColorControl {
 public:
 
 	typedef std::vector<std::wstring> ItemList;

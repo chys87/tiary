@@ -37,8 +37,7 @@ namespace tiary {
 // Defined in main/filter.h
 struct FilterGroup;
 
-class MainWin : public ui::Window
-{
+class MainWin final : public ui::Window {
 public:
 	// Constructor & destructor
 	explicit MainWin (const std::wstring &initial_filename);
@@ -139,8 +138,8 @@ private:
 };
 
 
-inline MainWin &MainCtrl::w () { return static_cast<MainWin &>(win); }
-inline const MainWin &MainCtrl::w () const { return static_cast<const MainWin &>(win); }
+inline MainWin &MainCtrl::w () { return static_cast<MainWin &>(window()); }
+inline const MainWin &MainCtrl::w () const { return static_cast<const MainWin &>(window()); }
 
 
 } // namespace tiary
