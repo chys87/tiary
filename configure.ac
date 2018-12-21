@@ -88,9 +88,6 @@ AC_CHECK_FUNCS([wcwidth], [], [AC_MSG_ERROR([*** wcwidth not found])])
 
 dnl Check for optional libc functions ***at
 AC_CHECK_FUNCS([openat fstatat])
-if test x"$ac_cv_func_openat" != xyes || test x"$ac_cv_func_fstatat" != xyes; then
-	AC_DEFINE([TIARY_HAVE_AT_FILE],[1],[Define if it appears **at functions are supported.])
-fi
 
 dnl Check for a bunch of optional libc functions
 AC_CHECK_FUNCS([faccessat euidaccess eaccess mempcpy])
