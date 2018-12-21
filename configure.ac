@@ -81,7 +81,7 @@ PKG_CHECK_MODULES([re2], [re2 >= 0.0.0], [
 					CXXFLAGS="$CXXFLAGS $pkg_cv_re2_CFLAGS"
 					LIBS="$LIBS $pkg_cv_re2_LIBS"
 					AC_DEFINE([TIARY_USE_RE2], [1], [Define to 1 if re2 is available])
-					], [])
+					], [AC_MSG_WARN([*** re2 is unavailable.])])
 
 dnl Check for wcwidth function (Optional)
 AC_CHECK_FUNCS([wcwidth])
