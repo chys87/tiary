@@ -95,8 +95,6 @@ const unsigned FILE_ATTR_NONEXIST   = 0x8000u;
 
 /**
  * @brief	Get the attributes of a given file/directory
- *
- * Currently only supports ui::FILE_ATTR_DIRECTORY and ui::FILE_ATTR_NONEXIST
  */
 unsigned get_file_attr (const char *);
 unsigned get_file_attr (const wchar_t *);
@@ -116,7 +114,7 @@ std::wstring combine_pathname(std::wstring_view, std::wstring_view);
 struct DirEnt
 {
 	std::wstring name; ///< "Bare" filename (without path)
-	unsigned attr; ///< Attribute. Currently only supports FIILE_ATTR_DIRECTORY
+	unsigned attr; ///< Attribute
 };
 
 typedef std::vector<DirEnt> DirEntList;

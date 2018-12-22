@@ -50,17 +50,14 @@
 # endif
 #endif
 
+// We no longer attempt to implement euidaccess with faccessat, which is not
+// faster under Linux
 #ifndef HAVE_EUIDACCESS
 # ifdef HAVE_EACCESS
 #  define euidaccess eaccess
 # else
 #  define euidaccess access
 # endif
-#endif
-
-#if defined HAVE_FACCESSAT && defined AT_FDCWD && defined AT_EACCESS
-# undef euidaccess
-# define euidaccess(name,mode) faccessat(AT_FDCWD,name,mode,AT_EACCESS)
 #endif
 
 
@@ -451,10 +448,9 @@ DirEntList list_dir (
 	return filelist;
 }
 
-DirEntList list_dir(const std::wstring &directory, const std::function<bool(const DirEnt &)> &filter)
-{
-	static const DefaultDirEntComparator comp;
-	return list_dir(directory, filter, std::ref(comp));
+DirEntList list_dir(const std::wstring &directory, const std::function<bool(const DirEnt &)> &filter) {
+	static const std::function<bool(const DirEnt &, const DirEnt &)> comp{DefaultDirEntComparator()};
+	return list_dir(directory, filter, comp);
 }
 
 // Explicit instantiations (char)
@@ -475,7 +471,7 @@ std::string find_executable(std::string_view exe) {
 	else if (memchr (exe.data (), '/', exe.length ())) {
 		// exe is a full/relative pathname
 		result = home_expand_pathname (exe);
-		if ((get_file_attr (result) & (FILE_ATTR_DIRECTORY|FILE_ATTR_EXECUTABLE))
+		if ((get_file_attr(result) & (FILE_ATTR_NONEXIST | FILE_ATTR_DIRECTORY | FILE_ATTR_EXECUTABLE))
 				!= FILE_ATTR_EXECUTABLE) {
 			result.clear ();
 		}
@@ -492,7 +488,7 @@ std::string find_executable(std::string_view exe) {
 			}
 			result += '/';
 			result += exe;
-			if ((get_file_attr (result) & (FILE_ATTR_DIRECTORY|FILE_ATTR_EXECUTABLE))
+			if ((get_file_attr(result) & (FILE_ATTR_NONEXIST | FILE_ATTR_DIRECTORY | FILE_ATTR_EXECUTABLE))
 					== FILE_ATTR_EXECUTABLE) {
 				break;
 			}
