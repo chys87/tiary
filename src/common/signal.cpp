@@ -32,6 +32,10 @@ SignalRecursive *SignalRecursive::copy () const
 	return new SignalRecursive (obj);
 }
 
+bool SignalRecursive::is_really_connected() const {
+	return obj.is_really_connected();
+}
+
 
 
 SignalGroup::~SignalGroup ()
@@ -55,18 +59,7 @@ SignalGroup *SignalGroup::copy () const
 bool Signal::is_really_connected () const
 {
 	const detail::SignalBase *p = f_.get();
-	while (const detail::SignalRecursive *rec = dynamic_cast <const detail::SignalRecursive *> (p)) {
-		p = rec->obj.f_.get();
-	}
-	if (const detail::SignalGroup *grp = dynamic_cast <const detail::SignalGroup *> (p)) {
-		for (const Signal &signal: *grp) {
-			if (signal.is_really_connected ()) {
-				return true;
-			}
-		}
-		return false;
-	}
-	return p;
+	return (p && p->is_really_connected());
 }
 
 } // namespace tiary

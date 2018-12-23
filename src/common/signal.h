@@ -36,6 +36,7 @@ public:
 	virtual void emit () = 0;
 	virtual SignalBase *copy () const = 0;
 	virtual ~SignalBase () {}
+	virtual bool is_really_connected() const { return true; }
 };
 
 template <typename R> struct SignalNV : SignalBase
@@ -88,6 +89,7 @@ struct SignalRecursive : SignalBase
 	~SignalRecursive ();
 	void emit ();
 	SignalRecursive *copy () const;
+	bool is_really_connected() const override;
 };
 
 // Cannot be defined until Signal is a complete type
@@ -211,6 +213,14 @@ public:
 
 	auto begin() const { return obj_.begin(); }
 	auto end() const { return obj_.end(); }
+
+	bool is_really_connected() const override {
+		for (const Signal &sig: obj_) {
+			if (sig.is_really_connected())
+				return true;
+		}
+		return false;
+	}
 
 private:
 	std::vector<Signal> obj_;
