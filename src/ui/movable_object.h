@@ -21,8 +21,6 @@
 namespace tiary {
 namespace ui {
 
-class Control;
-
 /**
  * @brief	A class for a movable/resizable object
  *
