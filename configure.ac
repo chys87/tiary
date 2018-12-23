@@ -152,7 +152,6 @@ AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
 
 dnl Check whether the compiler has some support for C++17
 AX_CHECK_COMPILE_FLAG([-std=gnu++17],[
-	have_some_cxx0x=yes
 	AX_APPEND_FLAG([-std=gnu++17])
 ],[
 	AC_MSG_ERROR(["-std=gnu++17" is not supported. You need a modern compiler.])
