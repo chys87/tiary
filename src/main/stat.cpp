@@ -19,10 +19,10 @@
 #include "common/containers.h"
 #include "common/format.h"
 #include "common/unicode.h"
-#include "common/hash64.h"
 #include "common/algorithm.h"
 #include <wctype.h>
 #include <math.h>
+#include <unordered_set>
 
 namespace tiary {
 
@@ -211,12 +211,12 @@ void display_statistics (const DiaryEntryList &all_entries,
 	// Count the number of distinct labels
 	{
 		// This set stores only the hash64 values of labels
-		std::set<uint64_t> all_labels;
+		std::unordered_set<std::wstring_view> all_labels;
 		for (DiaryEntryList::const_iterator it=all_entries.begin(), e=all_entries.end();
 				it != e; ++it) {
 			n_labels += (*it)->labels.size ();
 			for (const auto &s: (*it)->labels)
-				all_labels.insert(hash64_wstring(s));
+				all_labels.insert(s);
 		}
 		n_distinct_labels = all_labels.size ();
 	}

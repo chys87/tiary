@@ -36,8 +36,6 @@ libcommon_a_SOURCES = \
 	external.cpp \
 	format.h \
 	format.cpp \
-	hash64.h \
-	hash64.cpp \
 	md5.h \
 	md5.cpp \
 	misc.h \
