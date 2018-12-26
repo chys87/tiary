@@ -16,7 +16,6 @@
 
 #include "common/re.h"
 #include "common/unicode.h"
-#include <pcre.h>
 
 namespace tiary {
 namespace {
