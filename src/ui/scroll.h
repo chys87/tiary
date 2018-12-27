@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -66,7 +66,6 @@ public:
 	 * constructor.
 	 */
 	Scroll (unsigned height_, bool allow_focus_end_);
-	virtual ~Scroll ();
 
 	Info get_info () const;
 
@@ -97,6 +96,9 @@ public:
 	unsigned get_first () const { return first; }
 	unsigned get_number () const { return number; }
 	unsigned get_focus () const { return focus; }
+
+protected:
+	~Scroll();
 
 private:
 	unsigned height; // Screen height
