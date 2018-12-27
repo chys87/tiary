@@ -49,11 +49,10 @@ public:
 	bool basic_match (const std::wstring &) const;
 
 
-	struct BooleanConvert { int valid; };
 	/**
 	 * @brief	Whether this class contains valid search info
 	 */
-	operator int BooleanConvert::* () const { return !pattern.empty () ? &BooleanConvert::valid : 0; }
+	explicit operator bool() const { return !pattern.empty(); }
 
 	const std::wstring &get_pattern () const { return pattern; }
 	bool get_use_regex () const
