@@ -123,7 +123,7 @@ public:
 	Size put (Size, wchar_t);
 	Size put (Size, const wchar_t *);
 	Size put (Size, const wchar_t *, size_t);
-	Size put (Size, const std::wstring &);
+	Size put(Size, std::wstring_view);
 
 	// These functions are designed to facilitate the implementation of dialogs and controls
 	// put (Size blk_pos, Size blk_size, Size pos, ...)
@@ -133,7 +133,7 @@ public:
 	Size put (Size, Size, Size, wchar_t);
 	Size put (Size, Size, Size, const wchar_t *);
 	Size put (Size, Size, Size, const wchar_t *, size_t);
-	Size put (Size, Size, Size, const std::wstring &);
+	Size put(Size, Size, Size, std::wstring_view);
 
 	// Touches (but not updates) the whole screen.
 	// Next time refresh is called, the whole screen is redrawn (like ^L in many apps)

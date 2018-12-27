@@ -56,15 +56,13 @@ Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid) const
 	}
 	if (get_hotkey_pos () < end) {
 		pos = ctrl << pos
-			<< str (get_text().data(), get_hotkey_pos ())
+			<< std::wstring_view{get_text().data(), get_hotkey_pos()}
 			<< toggle (UNDERLINE)
 			<< get_text().data()[get_hotkey_pos()]
 			<< toggle (UNDERLINE)
-			<< str (get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
-	}
-	else {
-		pos = ctrl << pos
-			<< str (get_text().data (), end);
+			<< std::wstring_view{get_text().data()+get_hotkey_pos() + 1, end - get_hotkey_pos () - 1};
+	} else {
+		pos = ctrl << pos << std::wstring_view{get_text().data(), end};
 	}
 	return pos;
 }
@@ -79,15 +77,13 @@ Size UIStringOne::output (Window &win, Size pos, unsigned wid) const
 	}
 	if (get_hotkey_pos () < end) {
 		pos = win << pos
-			<< str (get_text().data(), get_hotkey_pos ())
+			<< std::wstring_view{get_text().data(), get_hotkey_pos()}
 			<< toggle (UNDERLINE)
 			<< get_text().data()[get_hotkey_pos()]
 			<< toggle (UNDERLINE)
-			<< str (get_text().data()+get_hotkey_pos()+1, end - get_hotkey_pos () - 1);
-	}
-	else {
-		pos = win << pos
-			<< str (get_text().data (), end);
+			<< std::wstring_view{get_text().data() + get_hotkey_pos() + 1, end - get_hotkey_pos () - 1};
+	} else {
+		pos = win << pos << std::wstring_view{get_text().data(), end};
 	}
 	return pos;
 }

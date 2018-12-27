@@ -33,20 +33,20 @@ public:
 	void redraw ();
 
 	// Does not automatically call redraw
-	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Action &act);
-	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Signal &sig);
-	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Action &&act);
-	HotkeyHint &operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Signal &&sig);
+	HotkeyHint &operator () (unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, const Action &act);
+	HotkeyHint &operator () (unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, const Signal &sig);
+	HotkeyHint &operator () (unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, Action &&act);
+	HotkeyHint &operator () (unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, Signal &&sig);
 
 private:
 	template <typename... Args>
-	HotkeyHint &add(unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Args&&...args);
+	HotkeyHint &add(unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, Args&&...args);
 
 private:
 	struct HotkeyItem
 	{
-		const wchar_t *key_name; ///< Name of the key, expected to be a string literal
-		const wchar_t *fun_name; ///< Function of the key, expected to be a string literal
+		std::wstring_view key_name; ///< Name of the key, expected to be a string literal
+		std::wstring_view fun_name; ///< Function of the key, expected to be a string literal
 		Action action;
 		unsigned wid; ///< ucs_width (key_name) + ucs_width (fun_name)
 		unsigned weight; ///< The larger, the more important

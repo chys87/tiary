@@ -34,12 +34,6 @@ inline detail::Output<Control> operator << (Control &, Size);
 
 namespace detail {
 
-struct LenStr
-{
-	const wchar_t *s;
-	size_t len;
-};
-
 struct AttributeToggle
 {
 	Attr attr;
@@ -55,58 +49,53 @@ public:
 	// Change output position
 	Output &operator << (Size newpos)
 	{
-		pos = newpos;
+		pos_ = newpos;
 		return *this;
 	}
 	// Change palette
-	Output &operator << (PaletteID id)
-	{
-		obj.choose_palette (id);
+	Output &operator << (PaletteID id) {
+		obj_.choose_palette(id);
 		return *this;
 	}
 	// Toggle attributes
-	Output &operator << (AttributeToggle toggle)
-	{
-		obj.attribute_toggle (toggle.attr);
+	Output &operator << (AttributeToggle toggle) {
+		obj_.attribute_toggle(toggle.attr);
 		return *this;
 	}
-	Output &operator << (wchar_t c)
-	{
-		pos = obj.put (pos, c);
+	Output &operator << (wchar_t c) {
+		pos_ = obj_.put(pos_, c);
 		return *this;
 	}
-	Output &operator << (const wchar_t *s)
-	{
-		pos = obj.put (pos, s);
+	Output &operator << (const wchar_t *s) {
+		pos_ = obj_.put(pos_, s);
 		return *this;
 	}
-	Output &operator << (LenStr s)
-	{
-		pos = obj.put (pos, s.s, s.len);
+	Output &operator << (std::wstring_view s) {
+		pos_ = obj_.put(pos_, s);
 		return *this;
 	}
-	Output &operator << (const std::wstring &s)
-	{
-		pos = obj.put (pos, s);
+	Output &operator << (const std::wstring &s) {
+		pos_ = obj_.put(pos_, s);
 		return *this;
 	}
 
 	operator Size () const
 	{
-		return pos;
+		return pos_;
 	}
 
 private:
-	C &obj;
-	Size pos;
+	C &obj_;
+	Size pos_;
 
-	void operator = (const Output &);
 	// Constructor is intentionally private,
 	// thus it's only callable from friend functions
-	Output (C &obj_, Size pos_)
-		: obj (obj_), pos (pos_)
+	constexpr Output(C &obj, Size pos)
+		: obj_(obj), pos_(pos)
 	{
 	}
+
+	Output &operator = (const Output &) = delete;
 
 	friend Output<Window> ui::operator << (Window &, Size);
 	friend Output<Control> ui::operator << (Control &, Size);
@@ -114,16 +103,8 @@ private:
 
 } // namespace detail
 
-inline detail::LenStr str (const wchar_t *s, size_t len)
-{
-	detail::LenStr ret = { s, len };
-	return ret;
-}
-
-inline detail::AttributeToggle toggle (Attr attr)
-{
-	detail::AttributeToggle ret = { attr };
-	return ret;
+inline constexpr detail::AttributeToggle toggle(Attr attr) {
+	return {attr};
 }
 
 inline detail::Output<Window> operator << (Window &win, Size pos)

@@ -64,15 +64,13 @@ void UIString::output (Control &ctrl, Size pos, Size size) const
 	for (unsigned n=minU(height,lst.size()); n; --n) {
 		if (get_hotkey_pos () - ptr->begin < ptr->len) {
 			ctrl << pos
-				<< str (get_text().data()+ptr->begin, get_hotkey_pos() - ptr->begin)
+				<< std::wstring_view{get_text().data() + ptr->begin, get_hotkey_pos() - ptr->begin}
 				<< toggle (UNDERLINE)
 				<< get_text().data()[get_hotkey_pos ()]
 				<< toggle (UNDERLINE)
-				<< str (get_text().data()+get_hotkey_pos()+1, ptr->len - (get_hotkey_pos () - ptr->begin + 1));
-		}
-		else {
-			ctrl << pos
-				<< str (get_text().data()+ptr->begin, ptr->len);
+				<< std::wstring_view{get_text().data() + get_hotkey_pos() + 1, ptr->len - (get_hotkey_pos () - ptr->begin + 1)};
+		} else {
+			ctrl << pos << std::wstring_view{get_text().data() + ptr->begin, ptr->len};
 		}
 		pos.y++;
 		++ptr;

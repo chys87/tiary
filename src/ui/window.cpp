@@ -710,8 +710,7 @@ Size Window::put (Size blkpos, Size blksize, Size relpos, const wchar_t *s, size
 	return {x, y};
 }
 
-Size Window::put (Size blkpos, Size blksize, Size relpos, const std::wstring &s)
-{
+Size Window::put(Size blkpos, Size blksize, Size relpos, std::wstring_view s) {
 	return put (blkpos, blksize, relpos, s.data(), s.length ());
 }
 
@@ -730,8 +729,7 @@ Size Window::put (Size relpos, const wchar_t *s, size_t n)
 	return put({}, get_size(), relpos, s, n);
 }
 
-Size Window::put (Size relpos, const std::wstring & s)
-{
+Size Window::put(Size relpos, std::wstring_view s) {
 	return put({}, get_size(), relpos, s);
 }
 

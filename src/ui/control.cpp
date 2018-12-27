@@ -147,6 +147,11 @@ Size Control::put (Size xy, const std::wstring &s)
 	return win_.put(get_pos(), get_size(), xy, s);
 }
 
+
+Size Control::put(Size xy, std::wstring_view s) {
+	return win_.put(get_pos(), get_size(), xy, s);
+}
+
 void Control::clear ()
 {
 	win_.clear(get_pos(), get_size());

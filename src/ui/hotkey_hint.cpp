@@ -115,7 +115,7 @@ bool HotkeyHint::on_mouse (MouseEvent mouse_event)
 }
 
 template <typename... Args>
-HotkeyHint &HotkeyHint::add(unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Args&&...args) {
+HotkeyHint &HotkeyHint::add(unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, Args&&...args) {
 	key_list_.push_back({
 			key_name, fun_name, Action(std::forward<Args>(args)...),
 			unsigned(ucs_width(key_name) + ucs_width(fun_name)), weight, unsigned(-1),
@@ -123,22 +123,22 @@ HotkeyHint &HotkeyHint::add(unsigned weight, const wchar_t *key_name, const wcha
 	return *this;
 }
 
-HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Action &action)
+HotkeyHint &HotkeyHint::operator () (unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, const Action &action)
 {
 	return add(weight, key_name, fun_name, action);
 }
 
-HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, const Signal &signal)
+HotkeyHint &HotkeyHint::operator () (unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, const Signal &signal)
 {
 	return add(weight, key_name, fun_name, signal);
 }
 
-HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Action &&action)
+HotkeyHint &HotkeyHint::operator () (unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, Action &&action)
 {
 	return add(weight, key_name, fun_name, std::move(action));
 }
 
-HotkeyHint &HotkeyHint::operator () (unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Signal &&signal)
+HotkeyHint &HotkeyHint::operator () (unsigned weight, std::wstring_view key_name, std::wstring_view fun_name, Signal &&signal)
 {
 	return add(weight, key_name, fun_name, std::move(signal));
 }

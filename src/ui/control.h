@@ -84,6 +84,7 @@ public:
 	Size put (Size xy, const wchar_t *);
 	Size put (Size xy, const wchar_t *, size_t);
 	Size put (Size xy, const std::wstring &);
+	Size put(Size xy, std::wstring_view);
 	void clear ();
 	void clear (Size, Size);
 	void fill (Size, Size, wchar_t);
