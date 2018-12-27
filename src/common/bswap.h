@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -27,19 +27,29 @@ namespace tiary {
 
 // Bswap: Reverse byte order (little <==> big)
 
-inline uint16_t bswap16 (uint16_t x) { return (x << 8) | (x >> 8); }
+inline constexpr uint16_t bswap16(uint16_t x) {
+#ifdef HAVE___BUILTIN_BSWAP16
+	return __builtin_bswap16(x);
+#endif
+	return (x << 8) | (x >> 8);
+}
 
-inline uint32_t bswap32 (uint32_t x)
-{
+inline constexpr uint32_t bswap32(uint32_t x) {
+#ifdef HAVE___BUILTIN_BSWAP32
+	return __builtin_bswap32(x);
+#else
 	                              // AABBCCDD
 	x = (x >> 16) | (x << 16);    // CCDDAABB
 	x = ((x >> 8) & (0x00FF00FFu)) | // 00CC00AA
 		((x << 8) & (0xFF00FF00u));  // DD00BB00
 	return x;
+#endif
 }
 
-inline uint64_t bswap64 (uint64_t x)
-{
+inline constexpr uint64_t bswap64(uint64_t x) {
+#ifdef HAVE___BUILTIN_BSWAP64
+	return __builtin_bswap64(x);
+#endif
 	                                                       // AABBCCDD EEFFGGHH
 	x = (x >> 32) | (x << 32);                             // EEFFGGHH AABBCCDD
 	x = ((x >> 16) & 0x0000ffff0000ffffull) | // 0000EEFF 0000AABB

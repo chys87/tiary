@@ -122,6 +122,30 @@ if test -z "$ac_cv_header_stdint_h"; then
 	AC_MSG_ERROR([*** <stdint.h> missing on your system.])
 fi
 
+dnl Check for builtins
+AC_MSG_CHECKING([if the compiler supports __builtin_bswap16])
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(, [[return __builtin_bswap16(0xabcd) == 0xcdab ? 0 : 1;]])],
+	[
+		AC_MSG_RESULT([yes]);
+		AC_DEFINE([HAVE___BUILTIN_BSWAP16], [1], [Define to 1 if the compiler supports __builtin_bswap16])
+], [AC_MSG_RESULT([no])])
+AC_MSG_CHECKING([if the compiler supports __builtin_bswap32])
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(, [[return __builtin_bswap32(0xabcd1234) == 0x3412cdab ? 0 : 1;]])],
+	[
+		AC_MSG_RESULT([yes]);
+		AC_DEFINE([HAVE___BUILTIN_BSWAP32], [1], [Define to 1 if the compiler supports __builtin_bswap32])
+], [AC_MSG_RESULT([no])])
+AC_MSG_CHECKING([if the compiler supports __builtin_bswap64])
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(, [[return __builtin_bswap64(0x12345678abcdabcdULL) == 0xcdabcdab78563412ULL ? 0 : 1;]])],
+	[
+		AC_MSG_RESULT([yes]);
+		AC_DEFINE([HAVE___BUILTIN_BSWAP64], [1], [Define to 1 if the compiler supports __builtin_bswap64])
+], [AC_MSG_RESULT([no])])
+
+
 dnl Add several useful flags if supported by compiler
 AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fno-exceptions])
 AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
