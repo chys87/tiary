@@ -23,12 +23,13 @@
 namespace tiary {
 namespace ui {
 
-class HotkeyHint final : public UnfocusableControl {
+class HotkeyHint final : public Control {
 public:
 	HotkeyHint (Window &);
 	~HotkeyHint ();
 
 	bool on_mouse (MouseEvent);
+	bool on_focus() override;
 	void redraw ();
 
 	// Does not automatically call redraw
@@ -52,11 +53,9 @@ private:
 		unsigned x; ///< Actually position displayed at
 	};
 	// Holds all HotkeyItem objects
-	typedef std::list <HotkeyItem> HotkeyList;
-	HotkeyList key_list;
+	std::list <HotkeyItem> key_list_;
 	// Sorted by weight, from largest to smallest
-	typedef std::vector <HotkeyItem *> SortedList;
-	SortedList sorted_list;
+	std::vector <HotkeyItem *> sorted_list_;
 
 	void construct_sorted_list ();
 };

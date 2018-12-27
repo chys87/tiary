@@ -24,9 +24,8 @@ namespace ui {
 
 HotkeyHint::HotkeyHint (Window &win)
 	: Control (win)
-	, UnfocusableControl (win)
-	, key_list ()
-	, sorted_list ()
+	, key_list_()
+	, sorted_list_()
 {
 }
 
@@ -36,19 +35,22 @@ HotkeyHint::~HotkeyHint ()
 
 void HotkeyHint::construct_sorted_list ()
 {
-	sorted_list.resize (key_list.size ());
-	SortedList::iterator iw = sorted_list.begin ();
-	for (HotkeyList::iterator it=key_list.begin(), e=key_list.end();
-			it != e; ++it) {
+	sorted_list_.resize(key_list_.size());
+	auto iw = sorted_list_.begin();
+	for (auto it = key_list_.begin(), e = key_list_.end(); it != e; ++it) {
 		*iw++ = &*it;
 	}
-	std::sort(sorted_list.begin(), iw, [](const auto *a, const auto *b) { return a->weight > b->weight; });
+	std::sort(sorted_list_.begin(), iw, [](const auto *a, const auto *b) { return a->weight > b->weight; });
+}
+
+bool HotkeyHint::on_focus() {
+	return false;
 }
 
 void HotkeyHint::redraw ()
 {
 	// First check if sorted_list has been properly constructed
-	if (sorted_list.size () != key_list.size ()) {
+	if (sorted_list_.size() != key_list_.size()) {
 		construct_sorted_list ();
 	}
 
@@ -56,18 +58,16 @@ void HotkeyHint::redraw ()
 
 	// Mark items to be displayed at position 0, and those not to be displayed
 	// at position -1
-	for (SortedList::iterator it = sorted_list.begin(), e=sorted_list.end();
-			it != e; ++it) {
-		unsigned required_width = (*it)->wid + 1;
-		if ((left_width >= required_width) && (*it)->action.call_condition (true)) {
+	for (HotkeyItem *item: sorted_list_) {
+		unsigned required_width = item->wid + 1;
+		if ((left_width >= required_width) && item->action.call_condition (true)) {
 			left_width -= required_width;
 			if (left_width) {
 				--left_width;
 			}
-			(*it)->x = 0;
-		}
-		else {
-			(*it)->x = unsigned (-1);
+			item->x = 0;
+		} else {
+			item->x = unsigned (-1);
 		}
 	}
 
@@ -77,7 +77,7 @@ void HotkeyHint::redraw ()
 	clear ();
 
 	unsigned x = 0;
-	for (HotkeyList::iterator it = key_list.begin (); it != key_list.end (); ++it) {
+	for (auto it = key_list_.begin(); it != key_list_.end(); ++it) {
 		if (it->x) {
 			continue;
 		}
@@ -105,7 +105,7 @@ bool HotkeyHint::on_mouse (MouseEvent mouse_event)
 		return false;
 	}
 	unsigned x = mouse_event.p.x;
-	for (HotkeyList::iterator it = key_list.begin (); it != key_list.end (); ++it) {
+	for (auto it = key_list_.begin(); it != key_list_.end(); ++it) {
 		if ((it->x != unsigned (-1)) && (x - it->x <= it->wid)) {
 			it->action.emit ();
 			return true;
@@ -116,7 +116,7 @@ bool HotkeyHint::on_mouse (MouseEvent mouse_event)
 
 template <typename... Args>
 HotkeyHint &HotkeyHint::add(unsigned weight, const wchar_t *key_name, const wchar_t *fun_name, Args&&...args) {
-	key_list.push_back({
+	key_list_.push_back({
 			key_name, fun_name, Action(std::forward<Args>(args)...),
 			unsigned(ucs_width(key_name) + ucs_width(fun_name)), weight, unsigned(-1),
 		});
