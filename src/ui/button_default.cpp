@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -32,8 +32,8 @@ namespace ui {
 
 ButtonDefault::ButtonDefault ()
 	: Window ()
-	, default_default (0)
-	, current_default (0)
+	, default_default_(nullptr)
+	, current_default_(0)
 {
 	Action sig_tmp (Signal (this, &ButtonDefault::slot_default_button),
 			Condition (this, &ButtonDefault::cond_default_button));
@@ -41,19 +41,15 @@ ButtonDefault::ButtonDefault ()
 	Window::register_hotkey (NEWLINE, std::move (sig_tmp));
 }
 
-ButtonDefault::~ButtonDefault ()
-{
-}
-
 void ButtonDefault::on_focus_changed ()
 {
-	Button *default_button = dynamic_cast <Button *> (Window::get_focus ());
+	Button *default_button = dynamic_cast<Button *>(get_focus());
 	if (default_button == 0) {
-		default_button = default_default;
+		default_button = default_default_;
 	}
 
-	if (default_button != current_default) {
-		current_default = default_button;
+	if (default_button != current_default_) {
+		current_default_ = default_button;
 		redraw_all_buttons ();
 	}
 }
@@ -63,14 +59,14 @@ void ButtonDefault::redraw_all_buttons ()
 	for (Control *ctrl = get_dummy_ctrl ()->get_next ();
 			ctrl != get_dummy_ctrl (); ctrl = ctrl->get_next ()) {
 		if (Button *btn = dynamic_cast <Button *> (ctrl)) {
-			btn->Button::redraw ();
+			btn->redraw();
 		}
 	}
 }
 
 void ButtonDefault::set_default_button (Button *btn)
 {
-	default_default = btn;
+	default_default_ = btn;
 }
 
 void ButtonDefault::slot_default_button ()
@@ -92,36 +88,26 @@ bool ButtonDefault::cond_default_button () const
 
 
 
-ButtonDefaultExtended::ButtonDefaultExtended ()
-	: ButtonDefault ()
-	, special_map ()
-{
-}
-
-ButtonDefaultExtended::~ButtonDefaultExtended ()
-{
-}
-
 void ButtonDefaultExtended::set_special_default_button (Control *focus, Button *btn)
 {
-	special_map.insert (std::make_pair (focus, btn));
+	special_map_.emplace(focus, btn);
 }
 
 void ButtonDefaultExtended::on_focus_changed ()
 {
-	Button *default_button = dynamic_cast <Button *> (Window::get_focus ());
+	Button *default_button = dynamic_cast<Button *>(get_focus());
 	if (default_button == 0) {
-		SpecialMap::const_iterator it = special_map.find (Window::get_focus ());
-		if (it == special_map.end ()) {
-			default_button = default_default;
+		auto it = special_map_.find(get_focus());
+		if (it == special_map_.end ()) {
+			default_button = default_default_;
 		}
 		else {
 			default_button = it->second;
 		}
 	}
 
-	if (default_button != current_default) {
-		current_default = default_button;
+	if (default_button != current_default_) {
+		current_default_ = default_button;
 		redraw_all_buttons ();
 	}
 }

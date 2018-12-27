@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -36,9 +36,8 @@ class ButtonDefault : public virtual Window
 {
 public:
 	ButtonDefault ();
-	~ButtonDefault ();
 
-	void on_focus_changed ();
+	void on_focus_changed() override;
 
 	/**
 	 * @brief	Set the default "default button"
@@ -46,12 +45,12 @@ public:
 	void set_default_button (Button * = 0);
 	void set_default_button (Button &btn) { set_default_button (&btn); }
 
-	Button *get_current_default_button () const { return current_default; }
+	Button *get_current_default_button () const { return current_default_; }
 
 private:
-	Button *default_default;
+	Button *default_default_;
 
-	Button *current_default; // Updated by on_focus_changed
+	Button *current_default_; // Updated by on_focus_changed
 
 	void slot_default_button ();
 	bool cond_default_button () const; // Whether the default button is usable
@@ -69,9 +68,6 @@ private:
 class ButtonDefaultExtended : public ButtonDefault
 {
 public:
-	ButtonDefaultExtended ();
-	~ButtonDefaultExtended ();
-
 	/**
 	 * @brief	Set a pair of focus-default controls
 	 */
@@ -80,13 +76,11 @@ public:
 	void set_special_default_button (Control &ctrl, Button *btn) { set_special_default_button (&ctrl, btn); }
 	void set_special_default_button (Control &ctrl, Button &btn) { set_special_default_button (&ctrl, &btn); }
 
-	void on_focus_changed ();
+	void on_focus_changed() override;
 
 private:
 
-	typedef std::map <Control *, Button *> SpecialMap;
-
-	SpecialMap special_map;
+	std::map <Control *, Button *> special_map_;
 };
 
 
