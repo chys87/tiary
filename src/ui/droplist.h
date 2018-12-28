@@ -30,8 +30,8 @@ public:
 	DropList (Window &, ItemList &&, size_t default_select);
 	~DropList ();
 
-	size_t get_select () const { return select; }
-	const ItemList &get_items () const { return items; }
+	size_t get_select() const { return select_; }
+	const ItemList &get_items() const { return items_; }
 
 	void set_select (size_t, bool emit_signal = true);
 
@@ -43,8 +43,8 @@ public:
 	Signal sig_select_changed;
 
 private:
-	const ItemList items;
-	size_t select;
+	const ItemList items_;
+	size_t select_;
 };
 
 } // namespace tiary::ui

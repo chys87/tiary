@@ -25,19 +25,19 @@ namespace tiary {
 namespace ui {
 
 
-DropList::DropList (Window &win, const ItemList &items_, size_t default_select)
+DropList::DropList (Window &win, const ItemList &items, size_t default_select)
 	: Control (win)
 	, FocusColorControl (win)
-	, items (items_.empty () ? ItemList (1) : items_)
-	, select (default_select < items_.size () ? default_select : 0)
+	, items_(items.empty() ? ItemList(1) : items)
+	, select_(default_select < items_.size () ? default_select : 0)
 {
 }
 
-DropList::DropList (Window &win, ItemList &&items_, size_t default_select)
+DropList::DropList(Window &win, ItemList &&items, size_t default_select)
 	: Control (win)
 	, FocusColorControl (win)
-	, items (items_.empty () ? ItemList (1) : std::forward<ItemList> (items_))
-	, select (default_select < items.size () ? default_select : 0)
+	, items_(items.empty() ? ItemList(1) : std::move(items))
+	, select_(default_select < items_.size () ? default_select : 0)
 {
 }
 
@@ -47,8 +47,8 @@ DropList::~DropList ()
 
 void DropList::set_select (size_t new_select, bool emit_signal)
 {
-	if (new_select != select && new_select < items.size ()) {
-		select = new_select;
+	if (new_select != select_ && new_select < items_.size()) {
+		select_ = new_select;
 		if (emit_signal) {
 			sig_select_changed.emit ();
 		}
@@ -72,11 +72,11 @@ bool DropList::on_key (wchar_t key)
 {
 	switch (key) {
 		case UP:
-			set_select (select - 1);
+			set_select(select_ - 1);
 			return true;
 
 		case DOWN:
-			set_select (select + 1);
+			set_select(select_ + 1);
 			return true;
 
 		case HOME:
@@ -84,7 +84,7 @@ bool DropList::on_key (wchar_t key)
 			return true;
 
 		case END:
-			set_select (items.size () - 1);
+			set_select (items_.size () - 1);
 			return true;
 
 		case L' ':
@@ -93,18 +93,18 @@ bool DropList::on_key (wchar_t key)
 
 		default:
 			key = towlower (key);
-			// Convert items[k] to const to that it is guaranteed
-			// that items[k][0] is meaningful.
+			// Convert items_[k] to const to that it is guaranteed
+			// that items_[k][0] is meaningful.
 			// (In case of an empty string; Per C++ Standard)
 			// Convert key to wint_t to suppress a warning
-			for (size_t k = select+1; k<items.size(); ++k) {
-				if (towlower(items[k][0]) == wint_t(key)) {
+			for (size_t k = select_ + 1; k < items_.size(); ++k) {
+				if (towlower(items_[k][0]) == wint_t(key)) {
 					set_select (k);
 					return true;
 				}
 			}
-			for (size_t k = 0; k <= select; ++k) {
-				if (towlower(items[k][0]) == wint_t(key)) {
+			for (size_t k = 0; k <= select_; ++k) {
+				if (towlower(items_[k][0]) == wint_t(key)) {
 					set_select (k);
 					return true;
 				}
@@ -126,7 +126,7 @@ void DropList::redraw ()
 {
 	choose_palette (is_focus () ? PALETTE_ID_DROPLIST_FOCUS : PALETTE_ID_DROPLIST);
 	clear ();
-	put({}, items[select]);
+	put({}, items_[select_]);
 }
 
 } // namespace tiary::ui

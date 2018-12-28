@@ -34,8 +34,7 @@ namespace ui {
 
 namespace {
 
-class DialogSelect : public FixedWindow, private ButtonDefault
-{
+class DialogSelect final : public FixedWindow, private ButtonDefault {
 	ListBox lst_items;
 	Button btn_ok;
 	Button btn_cancel;
@@ -86,8 +85,8 @@ DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::w
 		(layout_buttons, 3, 3)
 		;
 
-	ChainControlsHorizontal () (btn_ok) (btn_cancel);
-	ChainControlsVertical () (lst_items) (btn_ok);
+	ChainControlsHorizontal{&btn_ok, &btn_cancel};
+	ChainControlsVertical{&lst_items, &btn_ok};
 	btn_cancel.ctrl_up = btn_cancel.ctrl_down = &lst_items;
 
 	lst_items.sig_double_clicked.connect (this, &DialogSelect::slot_ok);
@@ -97,7 +96,7 @@ DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::w
 	set_default_button (btn_ok);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
 
-	DialogSelect::redraw ();
+	redraw();
 }
 
 DialogSelect::~DialogSelect ()
@@ -111,7 +110,7 @@ void DialogSelect::redraw ()
 	Size winsize = (Size{max_text_width + 10, items + 6} | Size{30, 12})
 		& get_screen_size ();
 
-	FixedWindow::resize (winsize);
+	resize(winsize);
 
 	layout_main.move_resize({2, 1}, winsize - Size{4, 2});
 
@@ -121,7 +120,7 @@ void DialogSelect::redraw ()
 void DialogSelect::slot_ok ()
 {
 	result = lst_items.get_select ();
-	Window::request_close ();
+	request_close();
 }
 
 } // anonymous namespace
