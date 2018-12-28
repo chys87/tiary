@@ -91,18 +91,18 @@ WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
 	}
 	refresh_list ();
 
-	layout_right.add
-		(btn_rename, 3, 3)
-		(1, 1)
-		(btn_delete, 3, 3)
-		(1, Layout::UNLIMITED)
-		(btn_ok, 3, 3)
-		;
-	layout_main.add
-		(lst_labels, 1, Layout::UNLIMITED)
-		(1, 1)
-		(layout_right, 10, 10)
-		;
+	layout_right.add({
+			{btn_rename, 3, 3},
+			{1, 1},
+			{btn_delete, 3, 3},
+			{1, Layout::UNLIMITED},
+			{btn_ok, 3, 3},
+		});
+	layout_main.add({
+			{lst_labels, 1, Layout::UNLIMITED},
+			{1, 1},
+			{layout_right, 10, 10},
+		});
 
 	btn_rename.sig_clicked = btn_delete.sig_clicked = Condition (lst_labels, &ListBox::is_valid_select);
 	btn_rename.sig_clicked.connect (this, &WindowAllLabels::slot_rename);

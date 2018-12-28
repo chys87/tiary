@@ -35,29 +35,28 @@ Layout::~Layout ()
 {
 }
 
-void Layout::add_impl (MovableObject *obj, unsigned min, unsigned max, unsigned other, int align_other)
-{
-	min_sum += min;
+void Layout::add(Item item) {
+	min_sum += item.min;
 	if (mid_sum != UNLIMITED) {
-		if (obj == 0) {
-			mid_sum += min;
+		if (item.obj == nullptr) {
+			mid_sum += item.min;
 		}
-		else if (max == UNLIMITED) {
+		else if (item.max == UNLIMITED) {
 			mid_sum = UNLIMITED;
 		}
 		else {
-			mid_sum += max;
+			mid_sum += item.max;
 		}
 	}
 	if (max_sum != UNLIMITED) {
-		if (max == UNLIMITED) {
+		if (item.max == UNLIMITED) {
 			max_sum = UNLIMITED;
 		}
 		else {
-			max_sum += max;
+			max_sum += item.max;
 		}
 	}
-	lst.push_back({obj, min, max, other, align_other});
+	lst.push_back(item);
 }
 
 namespace {
@@ -111,7 +110,7 @@ Size move_resize_one (Layout::Item &item, Size pos, unsigned this_size, unsigned
  * If it is a real object, return the if_ctrl member.
  * If it is a spacer, return the if_spacer member.
  */
-template <unsigned Layout::Item::*if_ctrl, unsigned Layout::Item::*if_spacer>
+template <uint16_t Layout::Item::*if_ctrl, uint16_t Layout::Item::*if_spacer>
 struct SelectMinMax {
 	unsigned operator () (const Layout::Item &item) const
 	{

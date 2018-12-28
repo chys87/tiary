@@ -74,16 +74,16 @@ DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::w
 		max_text_width = maxU (max_text_width, ucs_width (*it));
 	}
 
-	layout_buttons.add
-		(btn_ok, 10, 10)
-		(1, 1)
-		(btn_cancel, 10, 10)
-		;
-	layout_main.add
-		(lst_items, 1, Layout::UNLIMITED)
-		(1, 1)
-		(layout_buttons, 3, 3)
-		;
+	layout_buttons.add({
+			{btn_ok, 10, 10},
+			{1, 1},
+			{btn_cancel, 10, 10},
+		});
+	layout_main.add({
+			{lst_items, 1, Layout::UNLIMITED},
+			{1, 1},
+			{layout_buttons, 3, 3},
+		});
 
 	ChainControlsHorizontal{&btn_ok, &btn_cancel};
 	ChainControlsVertical{&lst_items, &btn_ok};

@@ -106,19 +106,21 @@ WindowSelectFile::WindowSelectFile (const std::wstring &hint, const std::wstring
 
 //	register_hotkey (F5, Signal (this, &WindowSelectFile::slot_refresh));
 
-	layout_buttons.add
-		(check_hidden_files, 4+len_show_hidden_files, 4+len_show_hidden_files, 1, 0)
-		(0, 3)
-		(btn_ok, 10, 10, 3)
-		(0, 2)
-		(btn_cancel, 10, 10, 3);
+	layout_buttons.add({
+			{check_hidden_files, 4 + len_show_hidden_files, 4 + len_show_hidden_files, 1, 0},
+			{0, 3},
+			{btn_ok, 10, 10, 3},
+			{0, 2},
+			{btn_cancel, 10, 10, 3},
+		});
 
-	layout_main.add
-		(text_input, 1, 1)
-		(1, 1)
-		(list_files, 2, Layout::UNLIMITED)
-		(1, 1)
-		(layout_buttons, 3, 3);
+	layout_main.add({
+			{text_input, 1, 1},
+			{1, 1},
+			{list_files, 2, Layout::UNLIMITED},
+			{1, 1},
+			{layout_buttons, 3, 3},
+		});
 
 	// redraw before set_text so that the focus is properly positioned
 	// (redraw guarantees that list_files has a non-zero height)

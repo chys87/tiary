@@ -132,72 +132,71 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 	}
 
 	// Setting up layouts
-	layout_label.add
-		(lbl_label, 10, 10)
-		(1, 1)
-		(txt_label, 1, Layout::UNLIMITED)
-		(1, 1)
-		(btn_label, 10, 10)
-		;
-	layout_title.add
-		(lbl_title, 10, 10)
-		(1, 1)
-		(txt_title, 1, Layout::UNLIMITED)
-		;
+	layout_label.add({
+			{lbl_label, 10, 10},
+			{1, 1},
+			{txt_label, 1, Layout::UNLIMITED},
+			{1, 1},
+			{btn_label, 10, 10},
+		});
+	layout_title.add({
+			{lbl_title, 10, 10},
+			{1, 1},
+			{txt_title, 1, Layout::UNLIMITED},
+		});
 #ifdef TIARY_USE_RE2
-	layout_title_regex.add
-		(11, 11)
-		(chk_title_regex, 3, Layout::UNLIMITED)
-		;
+	layout_title_regex.add({
+			{11, 11},
+			{chk_title_regex, 3, Layout::UNLIMITED},
+		});
 #endif
-	layout_text.add
-		(lbl_text, 10, 10)
-		(1, 1)
-		(txt_text, 1, Layout::UNLIMITED)
-		;
+	layout_text.add({
+			{lbl_text, 10, 10},
+			{1, 1},
+			{txt_text, 1, Layout::UNLIMITED},
+		});
 #ifdef TIARY_USE_RE2
-	layout_text_regex.add
-		(11, 11)
-		(chk_text_regex, 3, Layout::UNLIMITED)
-		;
+	layout_text_regex.add({
+			{11, 11},
+			{chk_text_regex, 3, Layout::UNLIMITED},
+		});
 #endif
-	layout_buttons.add
-		(btn_ok, 10, 10)
-		(1, 1)
-		(btn_cancel, 10, 10)
-		;
+	layout_buttons.add({
+			{btn_ok, 10, 10},
+			{1, 1},
+			{btn_cancel, 10, 10},
+		});
 
-	layout_main.add
-		(layout_label, 1, 1)
-		(1, 1)
-		(layout_title, 1, 1)
+	layout_main.add({
+			{layout_label, 1, 1},
+			{1, 1},
+			{layout_title, 1, 1},
 #ifdef TIARY_USE_RE2
-		(layout_title_regex, 1, 1)
+			{layout_title_regex, 1, 1},
 #endif
-		(1, 1)
-		(layout_text, 1, 1)
+			{1, 1},
+			{layout_text, 1, 1},
 #ifdef TIARY_USE_RE2
-		(layout_text_regex, 1, 1)
+			{layout_text_regex, 1, 1},
 #endif
-		(1, 1)
-		(layout_buttons, 3, 3)
-		;
+			{1, 1},
+			{layout_buttons, 3, 3},
+		});
 
 	// Setting up chains
-	ChainControlsVertical ()
-		(txt_label)
-		(txt_title)
+	ChainControlsVertical{
+		&txt_label,
+		&txt_title,
 #ifdef TIARY_USE_RE2
-		(chk_title_regex.checkbox)
+		&chk_title_regex.checkbox,
 #endif
-		(txt_text)
+		&txt_text,
 #ifdef TIARY_USE_RE2
-		(chk_text_regex.checkbox)
+		&chk_text_regex.checkbox,
 #endif
-		(btn_ok)
-		;
-	ChainControlsHorizontal () (txt_label) (btn_label);
-	ChainControlsHorizontal () (btn_ok) (btn_cancel);
+		&btn_ok};
+	ChainControlsHorizontal{&txt_label, &btn_label};
+	ChainControlsHorizontal{&btn_ok, &btn_cancel};
 
 	btn_label.ctrl_up = txt_label.ctrl_up;
 	btn_label.ctrl_down = txt_label.ctrl_down;
