@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -23,10 +23,12 @@
 
 #include "ui/control.h"
 #include "ui/direction.h"
+#include <initializer_list>
+#include <type_traits>
 
 namespace tiary {
 namespace ui {
-namespace detail {
+namespace chain_detail {
 
 /**
  * @brief	Helps "chaining" controls
@@ -106,6 +108,10 @@ public:
 		}
 	}
 
+	ChainControls(std::initializer_list<Control *> il)
+		: ChainControls(il.begin(), il.size()) {
+	}
+
 	~ChainControls ()
 	{
 		if (circle && nonempty) {
@@ -173,16 +179,16 @@ private:
 	}
 };
 
-} // namespace detail
+} // namespace chain_detail
 
-typedef detail::ChainControls<VERTICAL,  true,  false> ChainControlsVertical;
-typedef detail::ChainControls<HORIZONTAL,true,  false> ChainControlsHorizontal;
-typedef detail::ChainControls<VERTICAL,  false, false> ChainControlsVerticalNC;
-typedef detail::ChainControls<HORIZONTAL,false, false> ChainControlsHorizontalNC;
-typedef detail::ChainControls<VERTICAL,  true,  true > ChainControlsVerticalO;
-typedef detail::ChainControls<HORIZONTAL,true,  true > ChainControlsHorizontalO;
-typedef detail::ChainControls<VERTICAL,  false, true > ChainControlsVerticalNCO;
-typedef detail::ChainControls<HORIZONTAL,false, true > ChainControlsHorizontalNCO;
+typedef chain_detail::ChainControls<VERTICAL,  true,  false> ChainControlsVertical;
+typedef chain_detail::ChainControls<HORIZONTAL,true,  false> ChainControlsHorizontal;
+typedef chain_detail::ChainControls<VERTICAL,  false, false> ChainControlsVerticalNC;
+typedef chain_detail::ChainControls<HORIZONTAL,false, false> ChainControlsHorizontalNC;
+typedef chain_detail::ChainControls<VERTICAL,  true,  true > ChainControlsVerticalO;
+typedef chain_detail::ChainControls<HORIZONTAL,true,  true > ChainControlsHorizontalO;
+typedef chain_detail::ChainControls<VERTICAL,  false, true > ChainControlsVerticalNCO;
+typedef chain_detail::ChainControls<HORIZONTAL,false, true > ChainControlsHorizontalNCO;
 
 
 

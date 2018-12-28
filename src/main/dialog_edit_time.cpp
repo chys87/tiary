@@ -95,9 +95,9 @@ WindowTime::WindowTime (ReadableDateTime date_time)
 {
 	date_select.set_date (Date (date_time));
 
-	ChainControlsHorizontal () (date_select.year) (date_select.month) (date_select.day)
-		(drp_hour) (drp_minute) (drp_second)
-		(btn_now) (btn_ok);
+	ChainControlsHorizontal{&date_select.year, &date_select.month, &date_select.day,
+		&drp_hour, &drp_minute, &drp_second,
+		&btn_now, &btn_ok};
 
 	btn_now.ctrl_up = btn_ok.ctrl_up = &drp_hour;
 
