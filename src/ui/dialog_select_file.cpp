@@ -88,8 +88,8 @@ WindowSelectFile::WindowSelectFile (const std::wstring &hint, const std::wstring
 	, list_dir ()
 	, options (options_)
 {
-	ChainControlsHorizontal () (check_hidden_files.checkbox) (btn_ok) (btn_cancel);
-	ChainControlsVerticalNC () (text_input) (list_files) (btn_ok);
+	ChainControlsHorizontal{&check_hidden_files.checkbox, &btn_ok, &btn_cancel};
+	ChainControlsVerticalNC{&text_input, &list_files, &btn_ok};
 	check_hidden_files.checkbox.ctrl_up = btn_cancel.ctrl_up = &list_files;
 	check_hidden_files.checkbox.ctrl_down = btn_cancel.ctrl_down = &text_input;
 

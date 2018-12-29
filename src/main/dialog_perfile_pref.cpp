@@ -77,34 +77,27 @@ WindowPerFileOptions::WindowPerFileOptions (PerFileOptionGroup &options_)
 	FixedWindow::resize (get_screen_size () & Size{80, 10});
 
 	// Set up layouts
-	layout_buttons.add
-		(btn_ok, 10, 10)
-		(2, 2)
-		(btn_cancel, 10, 10)
-		(2, 2)
-		(btn_reset, 10, 10)
-		(2, 2)
-		(btn_help, 10, 10)
-		;
+	layout_buttons.add({
+			{btn_ok, 10, 10},
+			{2, 2},
+			{btn_cancel, 10, 10},
+			{2, 2},
+			{btn_reset, 10, 10},
+			{2, 2},
+			{btn_help, 10, 10},
+		});
 
-	layout_main.add
-		(chk_modtime, 1, 1)
-		(1, 1)
-		(layout_buttons, 3, 3)
-		;
+	layout_main.add({
+			{chk_modtime, 1, 1},
+			{1, 1},
+			{layout_buttons, 3, 3},
+		});
 
 	layout_main.move_resize({2, 1}, get_size () - Size{4, 2});
 
 	// Set up chains
-	ChainControlsVerticalNC ()
-		(chk_modtime.checkbox)
-		(btn_ok)
-		;
-	ChainControlsHorizontalO ()
-		(btn_ok)
-		(btn_cancel)
-		(btn_reset)
-		(btn_help);
+	ChainControlsVerticalNC{&chk_modtime.checkbox, &btn_ok};
+	ChainControlsHorizontalO{&btn_ok, &btn_cancel, &btn_reset, &btn_help};
 
 	// Set up signals
 	btn_ok.sig_clicked.connect (this, &WindowPerFileOptions::slot_ok);

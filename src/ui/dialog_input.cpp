@@ -72,7 +72,7 @@ WindowInput::WindowInput (const std::wstring &title,
 	box_input.move_resize(Size(2, hint_height + 2), Size(text_box_width, 1));
 	btn_ok.move_resize(Size(maxS (0, (text_box_width + 4 - 10) / 2), hint_height + 4), {10, 3});
 
-	ChainControlsVertical () (box_input) (btn_ok);
+	ChainControlsVertical{&box_input, &btn_ok};
 
 	box_input.set_text (default_text, false, default_text.length ());
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));

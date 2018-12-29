@@ -87,23 +87,23 @@ WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
 		lst_files.set_items (std::move (lst_display), 0, false);
 	}
 
-	layout_buttons.add
-		(btn_ok, 10, 10)
-		(1, 1)
-		(btn_cancel, 10, 10)
-		(1, 1)
-		(btn_remove, 10, 10)
-		(1, 1)
-		(btn_remove_all, 13, 13)
-		;
-	layout_main.add
-		(lst_files, 1, Layout::UNLIMITED)
-		(1, 1)
-		(layout_buttons, 3, 3)
-		;
+	layout_buttons.add({
+			{btn_ok, 10, 10},
+			{1, 1},
+			{btn_cancel, 10, 10},
+			{1, 1},
+			{btn_remove, 10, 10},
+			{1, 1},
+			{btn_remove_all, 13, 13},
+		});
+	layout_main.add({
+			{lst_files, 1, Layout::UNLIMITED},
+			{1, 1},
+			{layout_buttons, 3, 3},
+		});
 
-	ChainControlsVertical () (lst_files) (btn_ok);
-	ChainControlsHorizontalO () (btn_ok) (btn_cancel) (btn_remove) (btn_remove_all);
+	ChainControlsVertical{&lst_files, &btn_ok};
+	ChainControlsHorizontalO{&btn_ok, &btn_cancel, &btn_remove, &btn_remove_all};
 
 	lst_files.sig_double_clicked.connect (this, &WindowRecentFiles::slot_ok);
 	lst_files.sig_select_changed.connect(std::vector<Signal>{

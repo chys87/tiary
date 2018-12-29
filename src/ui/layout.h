@@ -66,58 +66,11 @@ public:
 	explicit Layout (Direction);
 	~Layout ();
 
-public:
-	// New add interface
 	void add(Item item);
 	void add(std::initializer_list<Item> item_il) {
 		for (const Item &item: item_il) {
 			add(item);
 		}
-	}
-
-	// Old add interface
-	class Adder {
-	public:
-		explicit constexpr Adder(Layout *p) : p_(p) {}
-		Adder(const Adder &other) = default;
-		Adder &operator = (const Adder &other) = default;
-
-		Adder &operator () (MovableObject *ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1) {
-			p_->add(Item{ctrl, min, max, other, align_other});
-			return *this;
-		}
-		Adder &operator () (MovableObject &ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1) {
-			p_->add(Item{&ctrl, min, max, other, align_other});
-			return *this;
-		}
-		/** Add spacing */
-		Adder &operator () (unsigned min, unsigned max) {
-			p_->add(Item{min, max});
-			return *this;
-		}
-	private:
-		Layout *p_;
-	};
-
-	Adder add ()
-	{
-		return Adder (this);
-	}
-	Adder add (MovableObject *ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
-	{
-		add(Item{ctrl, min, max, other, align_other});
-		return Adder (this);
-	}
-	Adder add (MovableObject &ctrl, unsigned min, unsigned max, unsigned other = UNLIMITED, int align_other = -1)
-	{
-		add(Item{&ctrl, min, max, other, align_other});
-		return Adder (this);
-	}
-	/** Add spacing */
-	Adder add (unsigned min, unsigned max)
-	{
-		add({min, max});
-		return Adder (this);
 	}
 
 	void move_resize (Size pos, Size size);

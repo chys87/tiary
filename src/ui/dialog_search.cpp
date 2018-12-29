@@ -88,14 +88,14 @@ WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_
 #endif
 	btn_ok.move_resize({28, 3}, {10, 3});
 
-	ChainControlsVertical ()
-		(box_input)
-		(chk_backward.checkbox)
+	ChainControlsVertical{
+		&box_input,
+		&chk_backward.checkbox,
 #ifdef TIARY_USE_RE2
-		(chk_regex.checkbox)
+		&chk_regex.checkbox,
 #endif
-		;
-	ChainControlsHorizontal () (chk_backward.checkbox) (btn_ok);
+	};
+	ChainControlsHorizontal{&chk_backward.checkbox, &btn_ok};
 #ifdef TIARY_USE_RE2
 	chk_regex.checkbox.ctrl_left = chk_regex.checkbox.ctrl_right = &btn_ok;
 #endif

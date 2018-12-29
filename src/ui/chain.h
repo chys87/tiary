@@ -38,30 +38,6 @@ namespace chain_detail {
  * move focus among them using arrow keys. This is achieved by setting
  * the ctrl_{left,right,up,down} members of Controls.
  *
- * This function only provides an easier-to-use interface to set them.
- *
- * ChainControlsVertical () (first_control) (next_control) (third_control) ... (last_control)
- *
- * Lists are also supported, e.g.:
- *
- * ChainControlsHorizontal (controls, n_controls) (next_control) (controls,n_controls);
- *
- * The empty brackets "()" is recommended if the first argument is one single Control, not a list.
- * This is for technical reaons:
- *
- * ChainControlsVertical (control_a) (control_b);
- *
- * means
- *
- * ChainControlsVertical control_a (control_b);
- *
- * instead of
- *
- * ChainControlsVertical (control_a).operator () (control_b);
- *
- * When variadic template (C++0x feature) is widely available, we can
- * make more comfortable interfaces.
- *
  * If circle = true, the last control is connected to the first.
  *
  * If other = true, the relative controls on the other direction are
@@ -75,22 +51,6 @@ public:
 		: first_control (0)
 		, last_control (0)
 		, nonempty (false)
-	{
-	}
-
-	// "explicit" is intentionally missing. So that we can also write
-	// (ChainControls<..>)(first_control)(second_control);
-	ChainControls (Control *ctrl)
-		: first_control (ctrl)
-		, last_control (ctrl)
-		, nonempty (true)
-	{
-	}
-
-	ChainControls (Control &ctrl)
-		: first_control (&ctrl)
-		, last_control (&ctrl)
-		, nonempty (true)
 	{
 	}
 
@@ -117,36 +77,6 @@ public:
 		if (circle && nonempty) {
 			chain (last_control, first_control);
 		}
-	}
-
-	ChainControls & operator () (Control *next)
-	{
-		if (nonempty) {
-			chain (last_control, next);
-			if (other) {
-				copy_other (first_control, next);
-			}
-		}
-		else {
-			first_control = next;
-		}
-		last_control = next;
-		nonempty = true;
-		return *this;
-	}
-
-	ChainControls & operator () (Control &next)
-	{
-		return operator () (&next);
-	}
-
-	// T must be either Control or a derivative class of Control
-	template <typename T> ChainControls & operator () (T *const *lst, size_t n)
-	{
-		for (size_t i=0; i<n; ++i) {
-			operator () (lst[i]);
-		}
-		return *this;
 	}
 
 private:

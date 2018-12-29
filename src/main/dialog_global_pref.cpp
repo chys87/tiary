@@ -134,83 +134,84 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 
 	// Set up layouts
 
-	layout_default_file.add
-		(lbl_default_file, 20, 20)
-		(1, 1)
-		(lbl_default_file_name, 2, Layout::UNLIMITED)
-		;
+	layout_default_file.add({
+			{lbl_default_file, 20, 20},
+			{1, 1},
+			{lbl_default_file_name, 2, Layout::UNLIMITED},
+		});
 
-	layout_default_file_buttons.add
-		(21, 21)
-		(btn_default_file, 10, 10)
-		(1, 1)
-		(btn_default_file_current, 20, 20)
-		(0, Layout::UNLIMITED)
-		;
+	layout_default_file_buttons.add({
+			{21, 21},
+			{btn_default_file, 10, 10},
+			{1, 1},
+			{btn_default_file_current, 20, 20},
+			{0, Layout::UNLIMITED},
+		});
 
-	layout_expand_lines.add
-		(lbl_expand_lines, 20, 20)
-		(1, 1)
-		(drp_expand_lines, 1, 1)
-		(0, Layout::UNLIMITED)
-		;
+	layout_expand_lines.add({
+			{lbl_expand_lines, 20, 20},
+			{1, 1},
+			{drp_expand_lines, 1, 1},
+			{0, Layout::UNLIMITED},
+		});
 
-	layout_editor.add
-		(lbl_editor, 20, 20)
-		(1, 1)
-		(txt_editor, 2, Layout::UNLIMITED)
-		;
+	layout_editor.add({
+			{lbl_editor, 20, 20},
+			{1, 1},
+			{txt_editor, 2, Layout::UNLIMITED},
+		});
 
-	layout_datetime_format.add
-		(lbl_datetime_format, 20, 20)
-		(1, 1)
-		(txt_datetime_format, 2, Layout::UNLIMITED)
-		;
+	layout_datetime_format.add({
+			{lbl_datetime_format, 20, 20},
+			{1, 1},
+			{txt_datetime_format, 2, Layout::UNLIMITED},
+		});
 
-	layout_longtime_format.add
-		(lbl_longtime_format, 20, 20)
-		(1, 1)
-		(txt_longtime_format, 2, Layout::UNLIMITED)
-		;
+	layout_longtime_format.add({
+			{lbl_longtime_format, 20, 20},
+			{1, 1},
+			{txt_longtime_format, 2, Layout::UNLIMITED},
+		});
 
-	layout_buttons.add
-		(btn_ok, 10, 10)
-		(2, 2)
-		(btn_cancel, 10, 10)
-		(2, 2)
-		(btn_reset, 10, 10)
-		(2, 2)
-		(btn_help, 10, 10)
-		;
+	layout_buttons.add({
+			{btn_ok, 10, 10},
+			{2, 2},
+			{btn_cancel, 10, 10},
+			{2, 2},
+			{btn_reset, 10, 10},
+			{2, 2},
+			{btn_help, 10, 10},
+		});
 
-	layout_main.add
-		(layout_default_file, 1, 1)
-		(layout_default_file_buttons, 1, 1)
-		(1, 1)
-		(layout_expand_lines, 1, 1)
-		(1, 1)
-		(layout_editor, 1, 1)
-		(1, 1)
-		(layout_datetime_format, 1, 1)
-		(1, 1)
-		(layout_longtime_format, 1, 1)
-		(1, 1)
-		(layout_buttons, 3, 3);
+	layout_main.add({
+			{layout_default_file, 1, 1},
+			{layout_default_file_buttons, 1, 1},
+			{1, 1},
+			{layout_expand_lines, 1, 1},
+			{1, 1},
+			{layout_editor, 1, 1},
+			{1, 1},
+			{layout_datetime_format, 1, 1},
+			{1, 1},
+			{layout_longtime_format, 1, 1},
+			{1, 1},
+			{layout_buttons, 3, 3},
+		});
 
 	layout_main.move_resize({2, 1}, get_size() - Size{4, 2});
 
 
 	// Chain
 
-	ChainControlsHorizontal () (btn_default_file) (btn_default_file_current);
-	ChainControlsHorizontal () (btn_ok) (btn_cancel) (btn_reset) (btn_help);
-	ChainControlsVerticalNC ()
-		(btn_default_file)
-		(drp_expand_lines)
-		(txt_editor)
-		(txt_datetime_format)
-		(txt_longtime_format)
-		(btn_ok);
+	ChainControlsHorizontal{&btn_default_file, &btn_default_file_current};
+	ChainControlsHorizontal{&btn_ok, &btn_cancel, &btn_reset, &btn_help};
+	ChainControlsVerticalNC{
+		&btn_default_file,
+		&drp_expand_lines,
+		&txt_editor,
+		&txt_datetime_format,
+		&txt_longtime_format,
+		&btn_ok};
 	btn_default_file_current.ctrl_down = btn_default_file.ctrl_down;
 	btn_reset.ctrl_up = btn_cancel.ctrl_up = btn_help.ctrl_up = btn_ok.ctrl_up;
 

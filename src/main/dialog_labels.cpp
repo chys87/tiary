@@ -85,23 +85,23 @@ WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocal
 	ChainControlsVertical{&txt_selected, &lst_all, &btn_ok};
 	ChainControlsHorizontalO{&btn_ok, &btn_cancel, &btn_add};
 
-	layout_buttons.add
-		(btn_add, 10, 10)
-		(1, Layout::UNLIMITED)
-		(btn_ok, 10, 10)
-		(1, Layout::UNLIMITED)
-		(btn_cancel, 10, 10)
-		;
+	layout_buttons.add({
+			{btn_add, 10, 10},
+			{1, Layout::UNLIMITED},
+			{btn_ok, 10, 10},
+			{1, Layout::UNLIMITED},
+			{btn_cancel, 10, 10},
+		});
 
-	layout_main.add
-		(lbl_selected, 1, 1)
-		(txt_selected, 1, 1)
-		(1, 1)
-		(lbl_all, 1, 1)
-		(lst_all, 1, Layout::UNLIMITED)
-		(1, 1)
-		(layout_buttons, 3, 3)
-		;
+	layout_main.add({
+			{lbl_selected, 1, 1},
+			{txt_selected, 1, 1},
+			{1, 1},
+			{lbl_all, 1, 1},
+			{lst_all, 1, Layout::UNLIMITED},
+			{1, 1},
+			{layout_buttons, 3, 3},
+		});
 
 	set_default_button (btn_ok);
 	set_special_default_button (lst_all, btn_add);

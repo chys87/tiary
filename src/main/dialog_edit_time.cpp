@@ -105,25 +105,25 @@ WindowTime::WindowTime (ReadableDateTime date_time)
 
 	FixedWindow::resize({33, 15});
 
-	layout_time.add
-		(drp_hour, 2, 2)
-		(lbl_colon1, 1, 1)
-		(drp_minute, 2, 2)
-		(lbl_colon2, 1, 1)
-		(drp_second, 2, 2)
-		;
-	layout_buttons.add
-		(btn_now, 10, 10)
-		(2, 2)
-		(btn_ok, 10, 10)
-		;
-	layout_main.add
-		(date_select, 7, 7)
-		(1, 1)
-		(layout_time, 1, 1)
-		(1, 1)
-		(layout_buttons, 3, 3)
-		;
+	layout_time.add({
+			{drp_hour, 2, 2},
+			{lbl_colon1, 1, 1},
+			{drp_minute, 2, 2},
+			{lbl_colon2, 1, 1},
+			{drp_second, 2, 2},
+		});
+	layout_buttons.add({
+			{btn_now, 10, 10},
+			{2, 2},
+			{btn_ok, 10, 10},
+		});
+	layout_main.add({
+			{date_select, 7, 7},
+			{1, 1},
+			{layout_time, 1, 1},
+			{1, 1},
+			{layout_buttons, 3, 3},
+		});
 
 	layout_main.move_resize({2, 1}, {29, 13});
 
