@@ -21,6 +21,8 @@
 
 namespace tiary {
 
+constexpr unsigned SECONDS_PER_DAY = 24 * 60 * 60;
+
 /**
  * @brief	Returns whether a year is leap under the Gregorian calendar
  */
@@ -89,7 +91,9 @@ uint64_t make_datetime_strict (const ReadableDateTime &) noexcept;
  */
 uint64_t make_datetime (const ReadableDate &, const ReadableTime &) noexcept;
 uint64_t make_datetime (const ReadableDateTime &) noexcept;
-uint64_t make_datetime (uint32_t date, uint32_t time) noexcept;
+inline constexpr uint64_t make_datetime(uint32_t date, uint32_t time) noexcept {
+	return (date * uint64_t (SECONDS_PER_DAY) + time);
+}
 uint64_t make_datetime_utc (time_t = ::time (0)) noexcept;
 uint64_t make_datetime_local (time_t = ::time (0)) noexcept;
 
@@ -97,8 +101,12 @@ uint64_t make_datetime_local (time_t = ::time (0)) noexcept;
 ReadableDate extract_date (uint32_t) noexcept;
 ReadableTime extract_time (uint32_t) noexcept;
 
-uint32_t extract_date_from_datetime (uint64_t) noexcept;
-uint32_t extract_time_from_datetime (uint64_t) noexcept;
+inline constexpr uint32_t extract_date_from_datetime(uint64_t v) noexcept {
+	return uint32_t(v / SECONDS_PER_DAY);
+}
+inline constexpr uint32_t extract_time_from_datetime(uint64_t v) noexcept {
+	return uint32_t(v % SECONDS_PER_DAY);
+}
 
 ReadableDateTime extract_datetime (uint64_t) noexcept;
 
@@ -124,66 +132,66 @@ struct Date;
 struct Time;
 struct DateTime;
 
-struct Date
-{
-	uint32_t v;
+class Date {
+public:
+	constexpr Date() : v_(0) {}
+	Date(const ReadableDate &rd, bool strict = false) :
+		v_(strict ? make_date_strict(rd) : make_date(rd)) {}
+	Date(unsigned y, unsigned m, unsigned d, bool strict = false) :
+		Date({y, m, d}, strict) {}
+	explicit constexpr Date(uint32_t x) : v_(x) {}
+	ReadableDate extract() const { return extract_date(v_); }
+	constexpr uint32_t get_value() const { return v_; }
 
-	Date () : v (0) {}
-	Date (unsigned y, unsigned m, unsigned d, bool strict = false)
-	{
-		ReadableDate rd = { y, m, d };
-		v = strict ? make_date_strict (rd) : make_date (rd);
-	}
-	Date (const ReadableDate &rd, bool strict = false) : v (strict ? make_date_strict (rd) : make_date (rd)) {}
-	explicit Date (uint32_t x) : v(x) {}
-	ReadableDate extract () const { return extract_date (v); }
+private:
+	uint32_t v_;
 };
 
-struct Time
-{
-	uint32_t v;
-	Time () : v (0) {}
-	Time (unsigned H, unsigned M, unsigned S)
-	{
-		ReadableTime rt = { H, M, S };
-		v = make_time (rt);
-	}
-	Time (const ReadableTime &rd) : v (make_time (rd)) {}
-	explicit Time (uint32_t x) : v(x) {}
-	ReadableTime extract () const { return extract_time (v); }
+class Time {
+public:
+	constexpr Time() : v_(0) {}
+	Time(const ReadableTime &rd) : v_(make_time (rd)) {}
+	Time(unsigned H, unsigned M, unsigned S) : Time(ReadableTime{H, M, S}) {}
+	explicit constexpr Time(uint32_t x) : v_(x) {}
+	ReadableTime extract() const { return extract_time (v_); }
+	constexpr uint32_t get_value() const { return v_; }
+
+private:
+	uint32_t v_;
 };
 
-struct DateTime
-{
-
-	uint64_t v;
-
+class DateTime {
+public:
 	enum UTCLocal { UTC, LOCAL };
 
-	DateTime () : v(0) {}
-	DateTime (Date date, Time time) : v (make_datetime (date.v, time.v)) {}
+	constexpr DateTime() : v_(0) {}
+	constexpr DateTime(Date date, Time time) : v_(make_datetime(date.get_value(), time.get_value())) {}
 	DateTime (const ReadableDate &rd, const ReadableTime &rt, bool strict = false)
-		: v(strict ? make_datetime_strict (rd, rt) : make_datetime (rd, rt)) {}
+		: v_(strict ? make_datetime_strict(rd, rt) : make_datetime(rd, rt)) {}
 	DateTime (const ReadableDateTime &rdt, bool strict = false)
-		: v(strict ? make_datetime_strict (rdt) : make_datetime (rdt)) {}
-	explicit DateTime (uint64_t val) : v(val) {}
-	DateTime (UTCLocal ul, time_t tv = ::time (0)) : v (ul==UTC ? make_datetime_utc (tv) : make_datetime_local (tv)) {}
+		: v_(strict ? make_datetime_strict(rdt) : make_datetime(rdt)) {}
+	explicit constexpr DateTime(uint64_t val) : v_(val) {}
+	DateTime(UTCLocal ul, time_t tv = ::time(nullptr)) : v_(ul == UTC ? make_datetime_utc(tv) : make_datetime_local(tv)) {}
 
-	ReadableDateTime extract () const { return extract_datetime (v); }
+	ReadableDateTime extract() const { return extract_datetime(v_); }
+	constexpr uint64_t get_value() const { return v_; }
 
-	operator Date () const { return Date (extract_date_from_datetime (v)); }
-	operator Time () const { return Time (extract_time_from_datetime (v)); }
+	constexpr operator Date() const { return Date(extract_date_from_datetime(v_)); }
+	constexpr operator Time() const { return Time(extract_time_from_datetime(v_)); }
 
-	std::wstring format (const wchar_t *format) const { return format_datetime (v, format); }
-	std::wstring format (const std::wstring &format) const { return format_datetime (v, format.c_str ()); }
+	std::wstring format(const wchar_t *format) const { return format_datetime(v_, format); }
+	std::wstring format(const std::wstring &format) const { return format_datetime(v_, format.c_str()); }
+
+private:
+	uint64_t v_;
 };
 
-inline bool operator == (const DateTime &a, const DateTime &b) { return a.v == b.v; }
-inline bool operator != (const DateTime &a, const DateTime &b) { return a.v != b.v; }
-inline bool operator <= (const DateTime &a, const DateTime &b) { return a.v <= b.v; }
-inline bool operator >= (const DateTime &a, const DateTime &b) { return a.v >= b.v; }
-inline bool operator < (const DateTime &a, const DateTime &b) { return a.v < b.v; }
-inline bool operator > (const DateTime &a, const DateTime &b) { return a.v > b.v; }
+inline bool operator == (const DateTime &a, const DateTime &b) { return a.get_value() == b.get_value(); }
+inline bool operator != (const DateTime &a, const DateTime &b) { return a.get_value() != b.get_value(); }
+inline bool operator <= (const DateTime &a, const DateTime &b) { return a.get_value() <= b.get_value(); }
+inline bool operator >= (const DateTime &a, const DateTime &b) { return a.get_value() >= b.get_value(); }
+inline bool operator < (const DateTime &a, const DateTime &b) { return a.get_value() < b.get_value(); }
+inline bool operator > (const DateTime &a, const DateTime &b) { return a.get_value() > b.get_value(); }
 
 } // namespace tiary
 

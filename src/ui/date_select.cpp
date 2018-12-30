@@ -149,7 +149,7 @@ void DateSelect::update_day_list (bool emit_signal)
 	std::copy (day_names, day_names + dom, grid_items.begin () + offset);
 
 	if (!selectable_dates.empty ()) {
-		uint32_t dtv = first_day_of_month.v;
+		uint32_t dtv = first_day_of_month.get_value();
 		for (unsigned i=0; i<dom; ++i) {
 			if (selectable_dates.find (dtv) == selectable_dates.end ()) {
 				grid_items[i+offset].selectable = false;

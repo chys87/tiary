@@ -28,8 +28,6 @@ namespace tiary {
 
 namespace {
 
-const unsigned SECONDS_PER_DAY = 24*60*60;
-
 // Cumulative days of months in a pseudoyear
 const unsigned days[13] = {
 	0, 31, 61, 92, 122, 153, 184, 214, 245, 275, 306, 337, 366
@@ -148,11 +146,6 @@ uint32_t make_time (const ReadableTime &rt) noexcept
 	return ((rt.H*60 + rt.M)*60 + rt.S);
 }
 
-uint64_t make_datetime (uint32_t date, uint32_t time) noexcept
-{
-	return (date * uint64_t (SECONDS_PER_DAY) + time);
-}
-
 uint64_t make_datetime_strict (const ReadableDate &rd, const ReadableTime &rt) noexcept
 {
 	if (rt.H>=24 || rt.M>=60 || rt.S>=60) {
@@ -251,16 +244,6 @@ ReadableTime extract_time (uint32_t v) noexcept
 	rt.M = t % 60;
 	rt.H = t / 60;
 	return rt;
-}
-
-uint32_t extract_date_from_datetime (uint64_t v) noexcept
-{
-	return uint32_t (v / SECONDS_PER_DAY);
-}
-
-uint32_t extract_time_from_datetime (uint64_t v) noexcept
-{
-	return uint32_t (v % SECONDS_PER_DAY);
 }
 
 ReadableDateTime extract_datetime (uint64_t v) noexcept

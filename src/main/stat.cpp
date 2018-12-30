@@ -97,7 +97,7 @@ TimeSpan get_span (const DiaryEntryList &lst)
 	uint64_t max = 0;
 	for (DiaryEntryList::const_iterator it=lst.begin(), e=lst.end();
 			it != e; ++it) {
-		uint64_t v = (*it)->local_time.v;
+		uint64_t v = (*it)->local_time.get_value();
 		if (v < min) {
 			min = v;
 		}
