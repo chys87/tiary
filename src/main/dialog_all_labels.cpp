@@ -110,12 +110,10 @@ WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
 	btn_ok.sig_clicked.connect (this, &WindowAllLabels::slot_ok);
 
 	lst_labels.register_hotkey (DELETE, btn_delete.sig_clicked);
-	lst_labels.sig_select_changed.connect (
-			std::vector<Signal>{
-				Signal (btn_rename, &Button::redraw),
-				Signal (btn_delete, &Button::redraw)
-			}
-		);
+	lst_labels.sig_select_changed.connect([this] {
+			btn_rename.redraw();
+			btn_delete.redraw();
+		});
 
 	register_hotkey (ESCAPE, btn_ok.sig_clicked);
 	set_default_button (btn_ok);

@@ -24,34 +24,16 @@ SignalRecursive::~SignalRecursive ()
 
 void SignalRecursive::emit ()
 {
-	obj.emit ();
+	sig_.emit ();
 }
 
 SignalRecursive *SignalRecursive::copy () const
 {
-	return new SignalRecursive (obj);
+	return new SignalRecursive(sig_);
 }
 
 bool SignalRecursive::is_really_connected() const {
-	return obj.is_really_connected();
-}
-
-
-
-SignalGroup::~SignalGroup ()
-{
-}
-
-void SignalGroup::emit ()
-{
-	for (Signal &signal: obj_) {
-		signal.emit ();
-	}
-}
-
-SignalGroup *SignalGroup::copy () const
-{
-	return new SignalGroup(obj_);
+	return sig_.is_really_connected();
 }
 
 } // namespace detail

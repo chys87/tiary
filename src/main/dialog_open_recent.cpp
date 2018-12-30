@@ -106,9 +106,9 @@ WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
 	ChainControlsHorizontalO{&btn_ok, &btn_cancel, &btn_remove, &btn_remove_all};
 
 	lst_files.sig_double_clicked.connect (this, &WindowRecentFiles::slot_ok);
-	lst_files.sig_select_changed.connect(std::vector<Signal>{
-		Signal(btn_ok, &Button::redraw),
-		Signal(btn_remove, &Button::redraw)
+	lst_files.sig_select_changed.connect([this] {
+		btn_ok.redraw();
+		btn_remove.redraw();
 	});
 	btn_ok.sig_clicked = btn_remove.sig_clicked = Condition (lst_files, &ListBox::is_valid_select);
 	btn_ok.sig_clicked.connect (this, &WindowRecentFiles::slot_ok);
