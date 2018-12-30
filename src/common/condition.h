@@ -12,8 +12,8 @@
  **************************************************************************/
 
 
-#ifndef TIARY_COMMON_QUERY_H
-#define TIARY_COMMON_QUERY_H
+#ifndef TIARY_COMMON_CONDITION_H
+#define TIARY_COMMON_CONDITION_H
 
 /**
  * @file	common/condition.h
@@ -36,33 +36,35 @@ class Condition;
 
 namespace detail {
 
-struct CondBase
-{
-	virtual bool call (bool default_return) = 0;
+class CondBase {
+public:
+	virtual bool call(bool default_return) const = 0;
 	virtual CondBase *copy () const = 0;
 	virtual ~CondBase () {}
 };
 
 template <typename C>
-struct CondMV : CondBase
-{
-	C *obj;
-	bool (C::*foo)();
+class CondMV final : public CondBase {
+public:
+	CondMV(C *obj, bool (C::*foo)()) : obj_(obj), foo_(foo) {}
+	bool call(bool) const override { return (obj_->*foo_)(); }
+	CondMV *copy() const override { return new CondMV(obj_, foo_); }
 
-	CondMV (C *obj_, bool (C::*foo_)()) : obj(obj_), foo(foo_) {}
-	bool call (bool) { return (obj->*foo)(); }
-	CondMV *copy () const { return new CondMV (obj, foo); }
+private:
+	C *obj_;
+	bool (C::*foo_)();
 };
 
 template <typename C>
-struct CondCMV : CondBase
-{
-	const C *obj;
-	bool (C::*foo)() const;
+class CondCMV final : public CondBase {
+public:
+	CondCMV(const C *obj, bool (C::*foo)() const) : obj_(obj), foo_(foo) {}
+	bool call(bool) const override { return (obj_->*foo_)(); }
+	CondCMV *copy() const override { return new CondCMV(obj_, foo_); }
 
-	CondCMV (const C *obj_, bool (C::*foo_)() const) : obj(obj_), foo(foo_) {}
-	bool call (bool) { return (obj->*foo)(); }
-	CondCMV *copy () const { return new CondCMV (obj, foo); }
+private:
+	const C *obj_;
+	bool (C::*foo_)() const;
 };
 
 } // namespace detail
@@ -103,42 +105,35 @@ private:
 
 namespace detail {
 
-struct CondNot : public CondBase
-{
-	Condition obj;
-
-	explicit CondNot (const Condition &o) : obj(o) {}
-	explicit CondNot (Condition &&o) : obj(std::move (o)) {}
+class CondNot final : public CondBase {
+public:
+	explicit CondNot(const Condition &o) : obj_(o) {}
+	explicit CondNot(Condition &&o) : obj_(std::move (o)) {}
 	~CondNot ();
-	bool call (bool);
-	CondNot *copy () const;
+	bool call(bool) const override;
+	CondNot *copy() const override;
+
+private:
+	Condition obj_;
 };
 
-#define TIARY_COND_BIN_CLASS_HEADER(cname) \
-	struct cname : public CondBase {\
-		Condition obja;\
-		Condition objb;\
-		cname (const Condition &oa, const Condition &ob)\
-			: obja (oa), objb (ob) {}\
-
-#define TIARY_COND_BIN_CLASS_FOOTER(cname) \
-		~cname ();\
-		bool call (bool);\
-		cname *copy () const;\
-	};
-
 #define TIARY_COND_BIN_CLASS(cname) \
-		TIARY_COND_BIN_CLASS_HEADER(cname)\
-		cname (const Condition &oa, Condition &&ob) : obja(oa), objb(std::move(ob)) {}\
-		cname (Condition &&oa, const Condition &ob) : obja(std::move(oa)), objb(ob) {}\
-		cname (Condition &&oa, Condition &&ob) : obja(std::move(oa)), objb(std::move(ob)) {}\
-		TIARY_COND_BIN_CLASS_FOOTER(cname)
+	struct cname : public CondBase {\
+		Condition obja_;\
+		Condition objb_;\
+		cname (const Condition &oa, const Condition &ob)\
+			: obja_(oa), objb_(ob) {}\
+		cname(const Condition &oa, Condition &&ob) : obja_(oa), objb_(std::move(ob)) {}\
+		cname(Condition &&oa, const Condition &ob) : obja_(std::move(oa)), objb_(ob) {}\
+		cname(Condition &&oa, Condition &&ob) : obja_(std::move(oa)), objb_(std::move(ob)) {}\
+		~cname ();\
+		bool call(bool) const override;\
+		cname *copy () const override;\
+	};
 
 TIARY_COND_BIN_CLASS(CondAnd)
 TIARY_COND_BIN_CLASS(CondOr)
 
-#undef TIARY_COND_BIN_CLASS_HEADER
-#undef TIARY_COND_BIN_CLASS_FOOTER
 #undef TIARY_COND_BIN_CLASS
 
 } // namespace detail

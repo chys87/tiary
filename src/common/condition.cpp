@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -31,48 +31,45 @@ CondNot::~CondNot ()
 {
 }
 
-bool CondNot::call (bool default_return)
-{
-	return !obj.call (!default_return);
+bool CondNot::call(bool default_return) const {
+	return !obj_.call(!default_return);
 }
 
 CondNot *CondNot::copy () const
 {
-	return new CondNot (obj);
+	return new CondNot(obj_);
 }
 
 CondAnd::~CondAnd ()
 {
 }
 
-bool CondAnd::call (bool default_return)
-{
-	if (!obja.call (default_return)) {
+bool CondAnd::call(bool default_return) const {
+	if (!obja_.call (default_return)) {
 		return false;
 	}
-	return objb.call (default_return);
+	return objb_.call (default_return);
 }
 
 CondAnd *CondAnd::copy () const
 {
-	return new CondAnd (obja, objb);
+	return new CondAnd(obja_, objb_);
 }
 
 CondOr::~CondOr ()
 {
 }
 
-bool CondOr::call (bool default_return)
-{
-	if (obja.call (default_return)) {
+bool CondOr::call(bool default_return) const {
+	if (obja_.call (default_return)) {
 		return true;
 	}
-	return objb.call (default_return);
+	return objb_.call (default_return);
 }
 
 CondOr *CondOr::copy () const
 {
-	return new CondOr (obja, objb);
+	return new CondOr(obja_, objb_);
 }
 
 } // namespace tiary::detail
