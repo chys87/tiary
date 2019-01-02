@@ -15,6 +15,7 @@ config.log
 config.status
 *.vim
 *~
+*.bak
 *.o
 *.a
 /src/tiary
