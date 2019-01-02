@@ -18,102 +18,58 @@
 /**
  * @file	common/md5.h
  * @author	chys <admin@chys.info>
- * @brief	Header for the simple implementation of MD5
- *
- * We use the implementation written by L. Peter Deutsch <ghost@aladdin.com>,
- * which is licensed under a BSD-like license.
- *
- * I personally prefer the implementation in GNU coreutils, but that's
- * licensed under GPL-3. I want to license Tiary under a BSD-like
- * license. (--chys)
+ * @brief	Defines class MD5, wrapping MD5 routines from libcrypto (part of OpenSSL)
  */
 
+#include <stddef.h> // ::size_t
 #include <stdint.h>
+#include <array>
 #include <string>
 #include <string_view>
-#include <stddef.h> // ::size_t
+#include <openssl/md5.h>
 
 namespace tiary {
-
-/* Define the state of the MD5 Algorithm. */
-struct MD5Context
-{
-	uint64_t count;		/* message length in bits */
-	uint32_t abcd[4];	/* digest buffer */
-	uint8_t buf[64];	/* accumulate block */
-};
-
-// C-style interfaces
-void md5_init (MD5Context *pms) noexcept;
-void md5_append (MD5Context *pms, const void *data, size_t nbytes) noexcept;
-void md5_finish (MD5Context *pms) noexcept;
-void md5_finish (MD5Context *pms, void *result) noexcept;
-
 
 
 class MD5
 {
 public:
-	MD5 ()
-	{
-		md5_init (&context);
+	MD5() {
+		MD5_Init(&context_);
+	}
+	MD5(const void *data, size_t len) : MD5() {
+		update(data, len);
+	}
+	explicit MD5(std::string_view s) : MD5() {
+		update(s.data(), s.length());
 	}
 
-	MD5 &operator () (const void *data, size_t len)
-	{
-		md5_append (&context, data, len);
+	void update(const void *data, size_t len) {
+		MD5_Update(&context_, data, len);
+	}
+
+	MD5 &operator () (const void *data, size_t len) {
+		update(data, len);
 		return *this;
 	}
 	MD5 &operator()(std::string_view s) {
-		return operator()(s.data(), s.length());
-	}
-
-	MD5 &reset ()
-	{
-		md5_init (&context);
+		update(s.data(), s.length());
 		return *this;
 	}
-	MD5 &reset (const void *data, size_t len)
-	{
-		return reset () (data, len);
-	}
-	MD5 &reset(std::string_view s) {
-		return reset()(s);
+
+	std::array<unsigned char, MD5_DIGEST_LENGTH> result () {
+		std::array<unsigned char, MD5_DIGEST_LENGTH> res;
+		MD5_Final(res.data(), &context_);
+		return res;
 	}
 
-	/// Note that the pointed memory is invalidated after the class is destructed
-	const void *result ()
-	{
-		md5_finish (&context);
-		return context.abcd;
-	}
-
-	void result (void *buffer)
-	{
-		md5_finish (&context, buffer);
+	void result(void *buffer) {
+		MD5_Final(static_cast<unsigned char *>(buffer), &context_);
 	}
 
 private:
-	MD5Context context;
+	MD5_CTX context_;
 };
-
-inline MD5 md5 ()
-{
-	return MD5 ();
-}
-
-inline MD5 md5 (const void *data, size_t len)
-{
-	MD5 ret;
-	ret (data, len);
-	return ret;
-}
-
-inline MD5 md5(std::string_view s) {
-	MD5 ret;
-	ret (s);
-	return ret;
-}
 
 } // namespace tiary
 

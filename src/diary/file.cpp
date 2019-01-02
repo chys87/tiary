@@ -338,12 +338,14 @@ void encrypt(void *data, size_t datalen, std::string_view pass) {
 	((void) xor_u64);
 	((void) xor_u64_2);
 
-	MD5 md5_tmp = md5(pass);
-	(MD5 (md5_tmp)) (password_salt2, sizeof password_salt2).result (xor_byte+240);
-	md5_tmp (password_salt3, sizeof password_salt3).result (xor_byte2+240);
+	{
+		MD5 md5_tmp{pass};
+		(MD5(md5_tmp))(password_salt2, sizeof password_salt2).result(xor_byte + 240);
+		md5_tmp(password_salt3, sizeof password_salt3).result(xor_byte2 + 240);
+	}
 	for (int i=28; i>=0; i-=2) {
-		md5_tmp.reset (xor_byte+(i+2)*8, (30-i)*8) (password_salt2, sizeof password_salt2).result (xor_byte+i*8);
-		md5_tmp.reset (xor_byte2+(i+2)*8, (30-i)*8) (password_salt3, sizeof password_salt3).result (xor_byte2+i*8);
+		MD5(xor_byte + (i + 2) * 8, (30 - i) * 8)(password_salt2, sizeof password_salt2).result(xor_byte + i * 8);
+		MD5(xor_byte2 + (i + 2) * 8, (30 - i) * 8)(password_salt3, sizeof password_salt3).result(xor_byte2 + i * 8);
 	}
 
 	/*
@@ -452,7 +454,7 @@ LoadFileRet load_file (
 			return LOAD_FILE_PASSWORD;
 		}
 		std::string utf8_password = wstring_to_utf8(password);
-		if (memcmp(md5(utf8_password)(password_salt1, sizeof password_salt1).result(),
+		if (memcmp(MD5(utf8_password)(password_salt1, sizeof password_salt1).result().data(),
 					&everything[16], 16) != 0) { // Password incorrect
 			password.clear ();
 			return LOAD_FILE_PASSWORD;
@@ -646,7 +648,7 @@ bool save_file (const char *filename,
 		// Encrypted file header
 		char header[32];
 		memcpy (header, new_format_signature, 16);
-		md5(utf8_password)(password_salt1, sizeof password_salt1).result (&header[16]);
+		MD5()(utf8_password)(password_salt1, sizeof password_salt1).result (&header[16]);
 
 		// Write to file
 		return safe_write_file (filename, header, 32, &everything[0], everything.size());

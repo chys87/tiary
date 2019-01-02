@@ -83,6 +83,12 @@ PKG_CHECK_MODULES([re2], [re2 >= 0.0.0], [
 					AC_DEFINE([TIARY_USE_RE2], [1], [Define to 1 if re2 is available])
 					], [AC_MSG_WARN([*** re2 is unavailable.])])
 
+dnl Check for libcrypto from OpenSSL (Required)
+PKG_CHECK_MODULES([libcrypto], [libcrypto >= 1.0.2], [
+					CXXFLAGS="$CXXFLAGS $pkg_cv_libcrypto_CFLAGS"
+					LIBS="$LIBS $pkg_cv_libcrypto_LIBS"
+					], [AC_MSG_ERROR([*** libcrypto >= 1.0.2 is required.])])
+
 dnl Check for wcwidth function (Optional)
 AC_CHECK_FUNCS([wcwidth], [], [AC_MSG_ERROR([*** wcwidth not found])])
 
