@@ -29,10 +29,13 @@ typedef std::set<std::string, std::locale> StringLocaleOrderedSet;
 typedef std::map<std::wstring,std::wstring,std::locale> WStringLocaleOrderedMap;
 typedef std::map<std::string, std::string, std::locale> StringLocaleOrderedMap;
 
-typedef std::set<std::wstring> WStringOrderedSet;
-typedef std::set<std::string > StringOrderedSet;
-typedef std::map<std::wstring,std::wstring> WStringOrderedMap;
-typedef std::map<std::string, std::string > StringOrderedMap;
+// Explicitly use std::less<> so that we can take advantage of C++14 transparent comparators -
+// std::map<K, V, std::less<>>::find(const AnotherKey &) doesn't require AnotherKey is the
+// same as K
+typedef std::set<std::wstring, std::less<>> WStringOrderedSet;
+typedef std::set<std::string, std::less<>> StringOrderedSet;
+typedef std::map<std::wstring, std::wstring, std::less<>> WStringOrderedMap;
+typedef std::map<std::string, std::string, std::less<>> StringOrderedMap;
 
 } // namespace tiary
 
