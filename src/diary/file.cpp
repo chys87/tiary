@@ -156,10 +156,7 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 			}
 
 		}
-		else if (ptr->name == "tag" || ptr->name == "label") {
-			// A "label" used to be called a "tag".
-			// Older formats use "tag" instead of "label"
-
+		else if (ptr->name == "label") {
 			const char *name = map_query (ptr->properties, "name");
 			if (!name) {
 				return 0;
