@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -113,15 +113,7 @@ public:
 
 	bool operator == (const OptionGroup &other) const
 	{
-#if defined TIARY_HAVE_STD_UNORDERED_SET_MAP || defined TIARY_HAVE_TR1_UNORDERED_SET_MAP
-		// Unordered_map does not define operator == ...
-		if (get_data ().size () != other.get_data ().size ()) {
-			return false;
-		}
-		return std::equal (get_data ().begin (), get_data ().end (), other.get_data ().begin ());
-#else
 		return (get_data () == other.get_data ());
-#endif
 	}
 	bool operator != (const OptionGroup &other) const
 	{
