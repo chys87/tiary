@@ -15,24 +15,38 @@
 #ifndef TIARY_COMMON_MISC_H
 #define TIARY_COMMON_MISC_H
 
-#include <vector>
-#include <string>
 #include <stdio.h>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace tiary {
 
 bool read_whole_file (FILE *, std::vector<char> &, size_t estimated_size = 4096);
 
+namespace map_query_detail {
+
+template <typename T> struct char_type {};
+template <typename C, typename... T> struct char_type<std::basic_string<C, T...>> { using type = C; };
+
+} // namespace map_query_detail
+
 /*
- * Query the value from a string-to-string map. Returns 0 if not found
+ * Query the value from a string-to-string map. Returns nullptr if not found
  *
  * Only for:
  *   ChT = char/wchar_t
  *   MapType = corresponding std::map (locale/nolocale)/unordered_map
  */
-template <typename MapT>
-	const typename MapT::mapped_type::value_type *
-	map_query (const MapT &map, const typename MapT::key_type::value_type *key);
+template <typename MapT, typename K>
+const typename map_query_detail::char_type<typename MapT::mapped_type>::type *map_query(const MapT &map, const K &key) {
+	typename MapT::const_iterator it = map.find(key);
+	if (it != map.end()) {
+		return it->second.c_str();
+	} else {
+		return nullptr;
+	}
+}
 
 // Save or overwrite a file as safely as possible
 bool safe_write_file (const char *filename, const void *data, size_t datalen,

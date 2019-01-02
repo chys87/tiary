@@ -46,25 +46,6 @@ bool read_whole_file (FILE *fp, std::vector<char> &ret, size_t estimated_size)
 	return true;
 }
 
-template <typename MapT>
-	const typename MapT::mapped_type::value_type *
-	map_query (const MapT &map, const typename MapT::key_type::value_type *key)
-{
-	typename MapT::const_iterator it = map.find (key);
-	if (it != map.end ()) {
-		return it->second.c_str ();
-	}
-	else {
-		return 0;
-	}
-}
-
-// Explicit instantiations (C++98 standard syntax)
-template const char    *map_query <StringOrderedMap       > (const StringOrderedMap &,        const char *);
-template const wchar_t *map_query <WStringOrderedMap      > (const WStringOrderedMap &,       const wchar_t *);
-template const char    *map_query <StringLocaleOrderedMap > (const StringLocaleOrderedMap &,  const char *);
-template const wchar_t *map_query <WStringLocaleOrderedMap> (const WStringLocaleOrderedMap &, const wchar_t *);
-
 #ifndef S_ISREG
 # if defined S_IFMT && defined S_IFREG
 #  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
