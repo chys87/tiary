@@ -328,27 +328,6 @@ bool MainWin::unavailable_filtered ()
 	return true;
 }
 
-namespace {
-
-struct EnterPassword
-{
-	const std::wstring &filename;
-	EnterPassword (const std::wstring &fname) : filename (fname) { }
-	std::wstring operator () () const;
-};
-
-std::wstring EnterPassword::operator () () const
-{
-	return ui::dialog_input2 (
-			L"Enter password",
-			format (L"File \"%a\" is password protected. Please enter the password:") << filename,
-			std::wstring (),
-			35,
-			ui::INPUT_PASSWORD);
-}
-
-} // anonymous namespace
-
 void MainWin::load (const std::wstring &filename)
 {
 	// Clear everything that's been loaded.
@@ -357,11 +336,21 @@ void MainWin::load (const std::wstring &filename)
 	std::wstring full_filename = get_full_pathname (filename);
 	std::wstring nice_filename = get_nice_pathname (full_filename);
 	std::wstring error_info;
+
+	auto enter_password = [&nice_filename]() -> std::string {
+		return wstring_to_utf8(ui::dialog_input2(
+				L"Enter password",
+				format(L"File \"%a\" is password protected. Please enter the password:") << nice_filename,
+				std::wstring(),
+				35,
+				ui::INPUT_PASSWORD));
+	};
+
 	LoadFileRet load_ret = load_file (wstring_to_mbs (full_filename).c_str (),
-				EnterPassword (nice_filename),
+				enter_password,
 				entries,
 				per_file_options,
-				password);
+				password_);
 	switch (load_ret) {
 		case LOAD_FILE_DEPRECATED:
 		case LOAD_FILE_SUCCESS:
@@ -419,7 +408,7 @@ void MainWin::load (const std::wstring &filename)
 void MainWin::save (const std::wstring &filename)
 {
 	const wchar_t *fmt;
-	if (save_file (wstring_to_mbs (filename).c_str (), entries, per_file_options, password)) {
+	if (save_file(wstring_to_mbs(filename).c_str(), entries, per_file_options, password_)) {
 		current_filename = filename;
 		saved = true;
 		fmt = L"Successfully saved \"%a\".";
@@ -805,7 +794,7 @@ void MainWin::reset_file ()
 {
 	per_file_options.reset ();
 	current_filename.clear ();
-	password.clear ();
+	password_.clear();
 	for (DiaryEntry *entry: entries) {
 		delete entry;
 	}
@@ -814,13 +803,13 @@ void MainWin::reset_file ()
 
 void MainWin::edit_password ()
 {
-	if (!password.empty ()) {
+	if (!password_.empty ()) {
 		std::wstring old_password = ui::dialog_input (L"Please enter your old password:",
 				std::wstring (), 35, ui::INPUT_PASSWORD, std::wstring ());
 		if (old_password.empty ()) {
 			return;
 		}
-		if (old_password != password) {
+		if (wstring_to_utf8(old_password) != password_) {
 			ui::dialog_message (L"Incorrect password.");
 			return;
 		}
@@ -836,7 +825,7 @@ void MainWin::edit_password ()
 	if (new_password1.empty ()) {
 		if (ui::dialog_message (L"Are you sure you want to remove the password?",
 					ui::MESSAGE_YES|ui::MESSAGE_NO) == ui::MESSAGE_YES) {
-			password.clear ();
+			password_.clear ();
 			main_ctrl.touch ();
 			info = L"Password removed.";
 		}
@@ -845,7 +834,7 @@ void MainWin::edit_password ()
 		std::wstring new_password2 = ui::dialog_input (L"Please enter again:",
 				std::wstring (), 35, ui::INPUT_PASSWORD, std::wstring ());
 		if (new_password1 == new_password2) {
-			password.swap (new_password1);
+			password_ = wstring_to_utf8(new_password1);
 			main_ctrl.touch ();
 			info = L"Password changed.";
 		}

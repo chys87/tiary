@@ -433,10 +433,10 @@ LoadFileRet load_global_options (GlobalOptionGroup &options, RecentFileList &rec
 
 LoadFileRet load_file (
 		const char *filename,
-		const std::function<std::wstring()> &enter_password,
+		const std::function<std::string()> &enter_password,
 		DiaryEntryList &entries,
 		PerFileOptionGroup &options,
-		std::wstring &password)
+		std::string &password)
 {
 	FILE *fp = fopen (filename, "rb");
 	if (fp == 0) {
@@ -463,15 +463,14 @@ LoadFileRet load_file (
 		if (password.empty ()) { // User cancelation
 			return LOAD_FILE_PASSWORD;
 		}
-		std::string utf8_password = wstring_to_utf8(password);
-		if (memcmp(MD5(utf8_password)(password_salt1, sizeof password_salt1).result().data(),
+		if (memcmp(MD5(password)(password_salt1, sizeof password_salt1).result().data(),
 					&everything[16], 16) != 0) { // Password incorrect
 			password.clear ();
 			return LOAD_FILE_PASSWORD;
 		}
 
 		// Password correct. Decrypt now
-		decrypt_2009(&everything[32], everything.size() - 32, utf8_password);
+		decrypt_2009(&everything[32], everything.size() - 32, password);
 		// Decompress
 		everything = bunzip2 (&everything[32], everything.size () - 32);
 
@@ -483,14 +482,13 @@ LoadFileRet load_file (
 			return LOAD_FILE_PASSWORD;
 		}
 
-		std::string utf8_password = wstring_to_utf8(password);
-		if (memcmp(format_2018_password_digest(utf8_password).data(), &everything[16], 64) != 0) { // Password incorrect
+		if (memcmp(format_2018_password_digest(password).data(), &everything[16], 64) != 0) { // Password incorrect
 			password.clear ();
 			return LOAD_FILE_PASSWORD;
 		}
 
 		// Password correct. Decrypt now
-		everything = evp_aes_decrypt({&everything[16 + 64], everything.size() - 16 - 64}, utf8_password);
+		everything = evp_aes_decrypt({&everything[16 + 64], everything.size() - 16 - 64}, password);
 		if (everything.empty()) {
 			return LOAD_FILE_DECRYPTION;
 		}
@@ -598,7 +596,7 @@ bool save_global_options (const GlobalOptionGroup &options, const RecentFileList
 bool save_file (const char *filename,
 		const DiaryEntryList &entries,
 		const PerFileOptionGroup &options,
-		const std::wstring &password)
+		const std::string &password)
 {
 	// First create the XML tree
 	XMLNodeTree *root = make_xml_tree_from_options (options, PerFileOptionGroup ());
@@ -674,13 +672,12 @@ bool save_file (const char *filename,
 	// Is there a password?
 	if (!password.empty ()) {
 		// Yes. Encrypt
-		std::string utf8_password = wstring_to_utf8(password);
-		everything = evp_aes_encrypt(everything, utf8_password);
+		everything = evp_aes_encrypt(everything, password);
 
 		// Encrypted file header
 		char header[16 + 64];
 		memcpy(header, new_format_signature_2018, 16);
-		memcpy(header + 16, format_2018_password_digest(utf8_password).data(), 64);
+		memcpy(header + 16, format_2018_password_digest(password).data(), 64);
 
 		// Write to file
 		return safe_write_file(filename, header, sizeof(header), &everything[0], everything.size());

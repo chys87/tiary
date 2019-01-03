@@ -59,7 +59,7 @@ private:
 	PerFileOptionGroup per_file_options; ///< Per-file options
 
 	std::wstring current_filename; ///< Currently working filename. Empty = none
-	std::wstring password; ///< Password. Empty = none
+	std::string password_; ///< Password. Empty = none
 	std::vector<DiaryEntry *> entries; ///< Diary entries
 	RecentFileList recent_files; ///< Recent files
 	bool saved; ///< Whether all modifications have been saved

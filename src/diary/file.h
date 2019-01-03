@@ -57,17 +57,17 @@ LoadFileRet load_global_options(GlobalOptionGroup &, std::vector<RecentFile> &);
  */
 LoadFileRet load_file (
 		const char *filename, ///< Filename
-		const std::function<std::wstring()> &foo, ///< A callback function that asks the user for password
+		const std::function<std::string()> &foo, ///< A callback function that asks the user for password
 		std::vector <DiaryEntry *> &entries,
 		PerFileOptionGroup &,
-		std::wstring &password ///< Empty = no password
+		std::string &password ///< Empty = no password
 		);
 
 
 
 bool save_global_options(const GlobalOptionGroup &, const std::vector<RecentFile> &);
 
-bool save_file (const char *filename, const std::vector<DiaryEntry *> &entries, const PerFileOptionGroup &, const std::wstring &password);
+bool save_file(const char *filename, const std::vector<DiaryEntry *> &entries, const PerFileOptionGroup &, const std::string &password);
 
 
 } // namespace tiary
