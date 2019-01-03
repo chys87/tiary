@@ -44,15 +44,21 @@
  * </tiary>
  *
  *
- * Diary file format (encrypted file):
+ * Diary file format (encrypted file 2009):
  * 0000~000F Signature
  * 0010~001F MD5(passwoord+salt1)
  * 0020~     encrypt (bzip2 (XML), password)
+ *
+ * Diary file format (encrypted file 2018):
+ * 0000~000F Signature
+ * 0010~004F SHA512(salt_2018a + password + salt_2018b)
+ * 0050~     evp_aes_encrypt(bzip2(XML), password)
  */
 
 #include "diary/file.h"
 #include "diary/config.h"
 #include "diary/diary.h"
+#include "common/aes.h"
 #include "common/algorithm.h"
 #include "common/xml.h"
 #include "common/bzip2.h"
@@ -74,8 +80,11 @@ namespace {
 const char password_salt1[] = "Tiary, written by chys <admin@chys.info>";
 const char password_salt2[] = "tIARY, WRITTEN BY CHYS <ADMIN@CHYS.INFO>";
 const char password_salt3[] = "TiArY, WrItTeN By ChYs <AdMiN@ChYs.InFo>";
+const char password_salt2018a[] = "tIaRy, wRiTtEn bY cHyS <aDmIn@cHyS.iNfO>";
+const char password_salt2018b[] = "TIARY, WRITTEN BY CHYS <ADMIN@CHYS.INFO>";
 
-const char new_format_signature[16] = "TiaryEncrypted\0";
+const char new_format_signature_2009[16] = "TiaryEncrypted\0";
+const char new_format_signature_2018[16] = "TiaryEncrypted2";
 
 /**
  * Parse the time format used in the @c <time> tag
@@ -390,6 +399,13 @@ inline void decrypt(void *data, size_t datalen, std::string_view pass) {
 	encrypt(data, datalen, pass);
 }
 
+std::array<unsigned char, 64> format_2018_password_digest(std::string_view password) {
+	SHA512 h;
+	h(password_salt2018a, sizeof(password_salt2018a));
+	h(password);
+	h(password_salt2018b, sizeof(password_salt2018b));
+	return h.result();
+}
 
 } // Anonymous namespace
 
@@ -432,7 +448,7 @@ LoadFileRet load_file (
 		return LOAD_FILE_NOT_FOUND;
 	}
 
-	std::vector<char> everything;
+	std::string everything;
 
 	// Read everything out of file
 	bool bool_ret = read_whole_file (fp, everything);
@@ -442,12 +458,10 @@ LoadFileRet load_file (
 	}
 
 
-	size_t offset = 0; // For efficiency
-
 	password.clear ();
 
 	// Encrypted?
-	if (everything.size()>=32 && !memcmp (&everything[0], new_format_signature, 16)) {
+	if (everything.size() >= 32 && !memcmp(&everything[0], new_format_signature_2009, 16)) {
 		// Second 16 bytes: MD5(password+salt1)
 		password = enter_password ();
 		if (password.empty ()) { // User cancelation
@@ -464,6 +478,26 @@ LoadFileRet load_file (
 		decrypt(&everything[32], everything.size() - 32, utf8_password);
 		// Decompress
 		everything = bunzip2 (&everything[32], everything.size () - 32);
+	} else if (everything.size() >= 16 + 64 && !memcmp(&everything[0], new_format_signature_2018, 16)) {
+		// Second 64 bytes: SHA(salt_2018a + password + salt_2018b)
+		password = enter_password();
+		if (password.empty ()) { // User cancelation
+			return LOAD_FILE_PASSWORD;
+		}
+
+		std::string utf8_password = wstring_to_utf8(password);
+		if (memcmp(format_2018_password_digest(utf8_password).data(), &everything[16], 64) != 0) { // Password incorrect
+			password.clear ();
+			return LOAD_FILE_PASSWORD;
+		}
+
+		// Password correct. Decrypt now
+		everything = evp_aes_decrypt({&everything[16 + 64], everything.size() - 16 - 64}, utf8_password);
+		if (everything.empty()) {
+			return LOAD_FILE_DECRYPTION;
+		}
+		// Decompress
+		everything = bunzip2(everything);
 	} else {
 		// Not encrypted
 		everything = bunzip2 (&everything[0], everything.size ());
@@ -473,7 +507,7 @@ LoadFileRet load_file (
 	}
 
 	// Parse XML
-	XMLNode *root = xml_parse (&everything[offset], everything.size() - offset);
+	XMLNode *root = xml_parse(everything.data(), everything.size());
 	if (root == 0) {
 		return LOAD_FILE_XML;
 	}
@@ -636,22 +670,22 @@ bool save_file (const char *filename,
 
 	// Finished building the XML tree. Now make the XML text
 	// Make the data to everything that will finally be written to file
-	std::vector<char> everything = bzip2 (xml_make (root));
+	std::string everything = bzip2(xml_make(root));
 	xml_free (root);
 
 	// Is there a password?
 	if (!password.empty ()) {
 		// Yes. Encrypt
 		std::string utf8_password = wstring_to_utf8(password);
-		encrypt(&everything[0], everything.size(), utf8_password);
+		everything = evp_aes_encrypt(everything, utf8_password);
 
 		// Encrypted file header
-		char header[32];
-		memcpy (header, new_format_signature, 16);
-		MD5()(utf8_password)(password_salt1, sizeof password_salt1).result (&header[16]);
+		char header[16 + 64];
+		memcpy(header, new_format_signature_2018, 16);
+		memcpy(header + 16, format_2018_password_digest(utf8_password).data(), 64);
 
 		// Write to file
-		return safe_write_file (filename, header, 32, &everything[0], everything.size());
+		return safe_write_file(filename, header, sizeof(header), &everything[0], everything.size());
 	}
 	else {
 		// Write to file

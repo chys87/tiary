@@ -17,6 +17,8 @@ noinst_LIBRARIES = libcommon.a
 
 libcommon_a_SOURCES = \
 	action.h \
+	aes.h \
+	aes.cpp \
 	algorithm.h \
 	algorithm.cpp \
 	bswap.h \

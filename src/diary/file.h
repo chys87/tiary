@@ -32,6 +32,7 @@ enum LoadFileRet {
 	, LOAD_FILE_NOT_FOUND  // File not found
 	, LOAD_FILE_READ_ERROR // Reading error
 	, LOAD_FILE_PASSWORD   // Password error
+	, LOAD_FILE_DECRYPTION // Decryption error
 	, LOAD_FILE_BUNZIP2    // Decompression error
 	, LOAD_FILE_XML        // XML parsing error
 	, LOAD_FILE_CONTENT    // XML content error

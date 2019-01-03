@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -23,11 +23,10 @@
 
 #include <stddef.h>
 #include <vector>
+#include <string>
 #include <string_view>
 
 namespace tiary {
-
-typedef std::vector<char> BZip2Result;
 
 // If anything unexpected happens, returns an empty vector
 // We trust contemporary compilers, assuming that the returned vector will
@@ -37,10 +36,14 @@ typedef std::vector<char> BZip2Result;
 // the limit of signed int. (Sure, this could be fixed, which however
 // is unnecessary here.)
 
-BZip2Result bunzip2 (const void *, size_t);
-BZip2Result bzip2 (const void *, size_t);
+std::string bunzip2(const void *, size_t);
+std::string bzip2(const void *, size_t);
 
-inline BZip2Result bzip2(std::string_view s) {
+inline std::string bunzip2(std::string_view s) {
+	return bunzip2(s.data(), s.length());
+}
+
+inline std::string bzip2(std::string_view s) {
 	return bzip2 (s.data (), s.length ());
 }
 

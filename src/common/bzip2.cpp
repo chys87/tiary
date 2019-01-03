@@ -22,9 +22,8 @@
 
 namespace tiary {
 
-BZip2Result bunzip2 (const void *data, size_t len)
-{
-	BZip2Result ret;
+std::string bunzip2(const void *data, size_t len) {
+	std::string ret;
 	int bzret;
 
 	bz_stream stream = {}; // Initialize with all zeroes
@@ -51,11 +50,11 @@ BZip2Result bunzip2 (const void *data, size_t len)
 	return ret;
 }
 
-BZip2Result bzip2 (const void *data, size_t len)
-{
+std::string bzip2(const void *data, size_t len) {
 	unsigned destlen = len/64 + len + 650; // ref to libbzip2's documentation
 
-	BZip2Result ret (destlen);
+	std::string ret;
+	ret.resize(destlen);
 
 	unsigned newsize;
 

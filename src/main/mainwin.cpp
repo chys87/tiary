@@ -389,6 +389,9 @@ void MainWin::load (const std::wstring &filename)
 		case LOAD_FILE_XML:
 			error_info = format (L"File format error: %a") << nice_filename;
 			break;
+		case LOAD_FILE_DECRYPTION:
+			error_info = format (L"File decryption error: %a") << nice_filename;
+			break;
 		case LOAD_FILE_CONTENT:
 			error_info = format (L"File content error: %a\n"
 					L"This may be due to a bug. If possible, please send a copy of this file"
