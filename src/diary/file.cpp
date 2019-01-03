@@ -59,7 +59,7 @@
 #include "common/misc.h"
 #include "common/dir.h"
 #include "common/unicode.h"
-#include "common/md5.h"
+#include "common/digest.h"
 #include "common/format.h"
 #include <stdio.h>
 #include <string.h>

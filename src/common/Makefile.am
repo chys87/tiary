@@ -30,13 +30,13 @@ libcommon_a_SOURCES = \
 	datetime_format.cpp \
 	debuglog.h \
 	debuglog.cpp \
+	digest.h \
 	dir.h \
 	dir.cpp \
 	external.h \
 	external.cpp \
 	format.h \
 	format.cpp \
-	md5.h \
 	misc.h \
 	misc.cpp \
 	re.h \
