@@ -23,6 +23,7 @@
 namespace tiary {
 
 bool read_whole_file (FILE *, std::vector<char> &, size_t estimated_size = 4096);
+bool read_whole_file(FILE *, std::string &, size_t estimated_size = 4096);
 
 namespace map_query_detail {
 

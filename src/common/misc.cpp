@@ -46,6 +46,25 @@ bool read_whole_file (FILE *fp, std::vector<char> &ret, size_t estimated_size)
 	return true;
 }
 
+bool read_whole_file(FILE *fp, std::string &ret, size_t estimated_size)
+{
+	if (estimated_size < 128) {
+		estimated_size = 128;
+	}
+
+	ret.clear();
+	std::unique_ptr<char[]> buf{new char[estimated_size]};
+
+	size_t l;
+	while ((l = fread_unlocked(buf.get(), 1, estimated_size, fp)) != 0) {
+		ret.append(buf.get(), l);
+	}
+	if (ferror_unlocked(fp)) {
+		return false;
+	}
+	return true;
+}
+
 #ifndef S_ISREG
 # if defined S_IFMT && defined S_IFREG
 #  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
