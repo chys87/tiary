@@ -333,7 +333,7 @@ bool general_analyze_xml (const XMLNode *root,
 }
 
 
-void encrypt(void *data, size_t datalen, std::string_view pass) {
+void decrypt_2009(void *data, size_t datalen, std::string_view pass) {
 	union {
 		uint64_t xor_u64[32]; // For alignment only
 		uint8_t xor_byte[256];
@@ -394,11 +394,6 @@ void encrypt(void *data, size_t datalen, std::string_view pass) {
 	}
 }
 
-inline void decrypt(void *data, size_t datalen, std::string_view pass) {
-	// The same
-	encrypt(data, datalen, pass);
-}
-
 std::array<unsigned char, 64> format_2018_password_digest(std::string_view password) {
 	SHA512 h;
 	h(password_salt2018a, sizeof(password_salt2018a));
@@ -457,6 +452,7 @@ LoadFileRet load_file (
 		return LOAD_FILE_READ_ERROR;
 	}
 
+	LoadFileRet success_ret = LOAD_FILE_SUCCESS;
 
 	password.clear ();
 
@@ -475,9 +471,11 @@ LoadFileRet load_file (
 		}
 
 		// Password correct. Decrypt now
-		decrypt(&everything[32], everything.size() - 32, utf8_password);
+		decrypt_2009(&everything[32], everything.size() - 32, utf8_password);
 		// Decompress
 		everything = bunzip2 (&everything[32], everything.size () - 32);
+
+		success_ret = LOAD_FILE_DEPRECATED;
 	} else if (everything.size() >= 16 + 64 && !memcmp(&everything[0], new_format_signature_2018, 16)) {
 		// Second 64 bytes: SHA(salt_2018a + password + salt_2018b)
 		password = enter_password();
@@ -517,7 +515,7 @@ LoadFileRet load_file (
 	if (!bool_ret) {
 		return LOAD_FILE_CONTENT;
 	}
-	return LOAD_FILE_SUCCESS;
+	return success_ret;
 }
 
 

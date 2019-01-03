@@ -357,11 +357,13 @@ void MainWin::load (const std::wstring &filename)
 	std::wstring full_filename = get_full_pathname (filename);
 	std::wstring nice_filename = get_nice_pathname (full_filename);
 	std::wstring error_info;
-	switch (load_file (wstring_to_mbs (full_filename).c_str (),
+	LoadFileRet load_ret = load_file (wstring_to_mbs (full_filename).c_str (),
 				EnterPassword (nice_filename),
 				entries,
 				per_file_options,
-				password)) {
+				password);
+	switch (load_ret) {
+		case LOAD_FILE_DEPRECATED:
 		case LOAD_FILE_SUCCESS:
 			current_filename = full_filename;
 			main_ctrl.touch ();
@@ -372,6 +374,12 @@ void MainWin::load (const std::wstring &filename)
 				if (it != recent_files.end ()) {
 					main_ctrl.set_focus (it->focus_entry);
 				}
+			}
+			if (load_ret == LOAD_FILE_DEPRECATED) {
+				// Do it here so that the content has been drawn on screen
+				ui::dialog_message(L"This file is stored in a cryptographically non-secure format, dating back from 2009.\n"
+					L"Please re-save as soon as possible, but please note that the re-saved file cannot be read "
+					L"by old versions of tiary.");
 			}
 			return;
 

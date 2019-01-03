@@ -29,6 +29,7 @@ struct RecentFile; // Defined in diary.h
 enum LoadFileRet {
 	// We put the commas in the beginning of a line to make diff happy.
 	LOAD_FILE_SUCCESS
+	, LOAD_FILE_DEPRECATED // Deprecated format
 	, LOAD_FILE_NOT_FOUND  // File not found
 	, LOAD_FILE_READ_ERROR // Reading error
 	, LOAD_FILE_PASSWORD   // Password error
