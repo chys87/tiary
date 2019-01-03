@@ -90,8 +90,8 @@ PKG_CHECK_MODULES([libcrypto], [libcrypto >= 1.0.2], [
 					], [AC_MSG_ERROR([*** libcrypto >= 1.0.2 is required.])])
 
 dnl Check for required functions from libcrypto
-AC_CHECK_FUNCS([MD5_Update SHA512_Update EVP_CIPHER_CTX_new], [],
-				[AC_MSG_ERROR([*** MD5, SHA512, EVP are required])])
+AC_CHECK_FUNCS([MD5_Update SHA512_Update EVP_aes_256_cbc EVP_CIPHER_CTX_new], [],
+				[AC_MSG_ERROR([*** MD5, SHA512, EVP-AES-256-CBC are required])])
 
 dnl Check for wcwidth function (Optional)
 AC_CHECK_FUNCS([wcwidth], [], [AC_MSG_ERROR([*** wcwidth not found])])
