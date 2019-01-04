@@ -39,7 +39,6 @@ public:
 
 private:
 	UIStringOne text;
-	unsigned attributes;
 };
 
 

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -128,9 +128,9 @@ ReadableDateTime extract_datetime (uint64_t) noexcept;
  */
 std::wstring format_datetime (uint64_t, const wchar_t *format);
 
-struct Date;
-struct Time;
-struct DateTime;
+class Date;
+class Time;
+class DateTime;
 
 class Date {
 public:

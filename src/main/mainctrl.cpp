@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -137,7 +137,7 @@ void MainCtrl::redraw ()
 		pos = put (pos, disp_buffer,
 				std::replace_copy_if (
 						&title[split_info.begin], &title[split_info.begin+split_info.len],
-						disp_buffer, std::not1 (std::ptr_fun (iswprint)), L' ') - disp_buffer);
+						disp_buffer, [](auto x) { return !iswprint(x); }, L' ') - disp_buffer);
 		pos.x++;
 
 		// Labels
@@ -173,7 +173,7 @@ void MainCtrl::redraw ()
 						SPLIT_NEWLINE_AS_SPACE);
 				wchar_t *bufend = std::replace_copy_if (
 						&text[split_info.begin], &text[split_info.begin+split_info.len],
-						disp_buffer, std::not1 (std::ptr_fun (iswprint)), L' ');
+						disp_buffer, [](auto x) { return !iswprint(x); }, L' ');
 				pos = put (pos, disp_buffer, bufend-disp_buffer);
 			}
 		}
@@ -184,7 +184,7 @@ void MainCtrl::redraw ()
 					SPLIT_NEWLINE_AS_SPACE|SPLIT_CUT_WORD);
 			wchar_t *bufend = std::replace_copy_if (
 					&text[split_info.begin], &text[split_info.begin+split_info.len],
-					disp_buffer, std::not1 (std::ptr_fun (iswprint)), L' ');
+					disp_buffer, [](auto x) { return !iswprint(x); }, L' ');
 			pos = put (pos, disp_buffer, bufend-disp_buffer);
 		}
 		pos = ui::Size{0, pos.y + 1};

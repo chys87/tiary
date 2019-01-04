@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -39,7 +39,6 @@ class WindowLabels : public virtual Window, private ButtonDefaultExtended
 {
 
 	WStringLocaleOrderedSet &labels;
-	const WStringLocaleOrderedSet &all_labels;
 
 	Label lbl_selected;
 	TextBox txt_selected;
@@ -68,7 +67,6 @@ WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocal
 	: ui::Window (0, L"Labels")
 	, ButtonDefaultExtended ()
 	, labels (labels_)
-	, all_labels (all_labels_)
 	, lbl_selected (*this, L"&Labels for this entry:")
 	, txt_selected (*this)
 	, lbl_all (*this, L"All la&bels")
@@ -134,7 +132,9 @@ void WindowLabels::redraw ()
 WStringLocaleOrderedSet set_from_text (const std::wstring &text)
 {
 	std::vector<std::wstring> lst = split_string(text, L',');
-	std::for_each (lst.begin (), lst.end (), std::ptr_fun <std::wstring &, bool> (strip));
+	for (std::wstring &s : lst) {
+		strip(s);
+	}
 	WStringLocaleOrderedSet set (lst.begin (), lst.end ());
 	set.erase (std::wstring ());
 	return set;

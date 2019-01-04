@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -129,7 +129,6 @@ public:
 private:
 
 	MenuItem *result;
-	const Menu &menu;
 	bool unget_left;
 
 	friend class ItemControl;
@@ -259,7 +258,6 @@ void ItemControl::slot_trigger ()
 MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_left_)
 	: Window (Window::WINDOW_NO_CLOSE_BUTTON|Window::WINDOW_NONMOVABLE)
 	, result (0)
-	, menu (menu_)
 	, unget_left (unget_left_)
 {
 	ItemControl **ctrls = new ItemControl * [menu_.size ()];
