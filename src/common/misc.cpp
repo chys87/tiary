@@ -73,48 +73,53 @@ bool read_whole_file(FILE *fp, std::string &ret, size_t estimated_size)
 # endif
 #endif
 
-bool safe_write_file (const char *filename, const void *ptr, size_t len, const void *ptr2, size_t len2)
-{
-	// If we have to write a new file, then it's simple.
-	// If we have to overwite an existing file:
-	//   If the file has more than one links, there is only one choice;
-	//   Otherwise, rename the original file, write the new file, and unlink the original
-	std::string backup_name;
-	struct stat info;
-	if (stat (filename, &info) == 0 // Already exists
-			&& S_ISREG (info.st_mode) // And is a regular file
-			&& info.st_nlink == 1) { // And has only one link
-		backup_name = filename;
-		backup_name += ".tiary.bak";
-		unlink (backup_name.c_str ());
-		if (rename (filename, backup_name.c_str ()) != 0) { // Back up old file: failed
-			backup_name.clear ();
-		}
+namespace {
+
+bool direct_write(const char *filename, std::string_view data, std::string_view data2) {
+	FILE *fp = fopen(filename, "wb");
+	if (fp == nullptr) {
+		return false;
 	}
 
-	// Now write content to new file
-	if (FILE *fp = fopen (filename, "wb")) {
-		size_t fwrite_return = fwrite_unlocked (ptr, 1, len, fp);
-		size_t fwrite_return2 = 0;
-		if (ptr2 && len2) {
-			fwrite_return2 = fwrite_unlocked (ptr2, 1, len2, fp);
-		}
-		fclose (fp);
-		if (fwrite_return==len && fwrite_return2==len2) { // Successful. Remove backup file
-			if (!backup_name.empty ()) {
-				unlink (backup_name.c_str ());
-			}
-			return true;
-		}
-		// Failed. Remove partially written file
-		unlink (filename);
+	if (fwrite_unlocked(data.data(), 1, data.size(), fp) != data.size()) {
+		fclose(fp);
+		return false;
 	}
 
-	// Failed. Restore original file
-	if (!backup_name.empty ()) {
-		rename (backup_name.c_str (), filename);
+	if (!data2.empty() && fwrite_unlocked(data2.data(), 1, data2.size(), fp) != data2.size()) {
+		fclose(fp);
+		return false;
 	}
-	return false;
+
+	fclose(fp);
+	return true;
+}
+
+inline bool must_direct_write(const char *filename) {
+	struct stat st;
+	return (lstat(filename, &st) == 0 && (!S_ISREG(st.st_mode) || st.st_nlink != 1));
+}
+
+} // namespace
+
+bool safe_write_file(const char *filename, std::string_view data, std::string_view data2) {
+	if (must_direct_write(filename)) {
+		// If filename is not a regular file, or has multiple links, there is only one choice
+		return direct_write(filename, data, data2);
+	} else {
+		// Otherwise, write to a temporary file and rename it
+		std::string tmp_name = filename;
+		tmp_name += ".tiary.tmp";
+		if (!direct_write(tmp_name.c_str(), data, data2)) {
+			unlink(tmp_name.c_str());
+			return false;
+		}
+		if (rename(tmp_name.c_str(), filename) != 0) {
+			unlink(tmp_name.c_str());
+			return false;
+		}
+		return true;
+	}
 }
 
 

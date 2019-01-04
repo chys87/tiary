@@ -50,8 +50,7 @@ const typename map_query_detail::char_type<typename MapT::mapped_type>::type *ma
 }
 
 // Save or overwrite a file as safely as possible
-bool safe_write_file (const char *filename, const void *data, size_t datalen,
-		const void *data2 = 0, size_t datalen2 = 0);
+bool safe_write_file(const char *filename, std::string_view data, std::string_view data2 = {});
 
 // Expand environment variable representations like $param and ${param}
 // Returns the number of expansions

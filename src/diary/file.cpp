@@ -590,7 +590,7 @@ bool save_global_options (const GlobalOptionGroup &options, const RecentFileList
 	xml_free (root);
 
 	// Now write to file
-	return safe_write_file (make_home_dirname (GLOBAL_OPTION_FILE).c_str(), xml.data(), xml.length());
+	return safe_write_file(make_home_dirname(GLOBAL_OPTION_FILE).c_str(), xml);
 }
 
 bool save_file (const char *filename,
@@ -680,11 +680,11 @@ bool save_file (const char *filename,
 		memcpy(header + 16, format_2018_password_digest(password).data(), 64);
 
 		// Write to file
-		return safe_write_file(filename, header, sizeof(header), &everything[0], everything.size());
+		return safe_write_file(filename, {header, sizeof(header)}, everything);
 	}
 	else {
 		// Write to file
-		return safe_write_file (filename, &everything[0], everything.size());
+		return safe_write_file(filename, everything);
 	}
 }
 
