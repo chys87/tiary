@@ -412,13 +412,13 @@ LoadFileRet load_global_options (GlobalOptionGroup &options, RecentFileList &rec
 	}
 	XMLNode *root;
 	{
-		std::vector<char> data;
+		std::string data;
 		bool ret = read_whole_file (fp, data, 128*1024);
 		fclose (fp);
 		if (!ret) {
 			return LOAD_FILE_READ_ERROR;
 		}
-		root = xml_parse (&data[0], data.size ());
+		root = xml_parse(data);
 	}
 	if (root == 0) {
 		return LOAD_FILE_XML;

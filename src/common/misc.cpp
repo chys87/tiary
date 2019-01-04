@@ -23,29 +23,6 @@
 
 namespace tiary {
 
-bool read_whole_file (FILE *fp, std::vector<char> &ret, size_t estimated_size)
-{
-	if (estimated_size < 128) {
-		estimated_size = 128;
-	}
-	size_t used = 0;
-	std::vector<char> buf (estimated_size, '\0');
-	size_t l;
-	while ((l = fread_unlocked (&buf[used], 1, estimated_size-used, fp)) != 0) {
-		used += l;
-		if (estimated_size < used * 2) {
-			estimated_size = used * 2;
-			buf.resize (estimated_size);
-		}
-	}
-	if (ferror_unlocked (fp)) {
-		return false;
-	}
-	buf.resize (used);
-	buf.swap (ret);
-	return true;
-}
-
 bool read_whole_file(FILE *fp, std::string &ret, size_t estimated_size)
 {
 	if (estimated_size < 128) {

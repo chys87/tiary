@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -18,6 +18,7 @@
 #include "common/containers.h"
 #include <stddef.h>
 #include <string>
+#include <string_view>
 
 /**
  * @file	common/xml.h
@@ -68,8 +69,7 @@ struct XMLNodeText : XMLNode
 // Returns NULL on error
 XMLNode *xml_parse (const char *, size_t);
 
-inline XMLNode *xml_parse (const std::string &s)
-{
+inline XMLNode *xml_parse(std::string_view s) {
 	return xml_parse (s.data (), s.length ());
 }
 
