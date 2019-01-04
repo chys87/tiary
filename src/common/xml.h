@@ -17,6 +17,7 @@
 
 #include "common/containers.h"
 #include <stddef.h>
+#include <stdint.h>
 #include <string>
 #include <string_view>
 
@@ -30,39 +31,34 @@
 
 namespace tiary {
 
+enum struct XMLNodeType : uint8_t {
+	kTree,
+	kText,
+	kDummy,
+};
+
 struct XMLNode
 {
-	virtual ~XMLNode () {}
-	XMLNode () : next(0) {}
+	struct TreeTag {};
+	struct TextTag {};
 
-	XMLNode *next;     // Pointer to right sibling
+	XMLNodeType type = XMLNodeType::kDummy;
+	XMLNode *children = nullptr;
+	XMLNode *next = nullptr; // Pointer to right sibling
+	std::string name_or_text; ///< tag name (kTree) or content (kText)
+	StringOrderedMap properties;
 
-private:
-	XMLNode (const XMLNode &);
-	void operator = (const XMLNode &);
-};
+	const std::string &name() const { return name_or_text; }
+	const std::string &text() const { return name_or_text; }
+	std::string &text() { return name_or_text; }
 
-struct XMLNodeTree : XMLNode
-{
-	explicit XMLNodeTree (const char *name_);
-	~XMLNodeTree ();
+	XMLNode() = default;
+	XMLNode(TreeTag, const char *tag_name) : type(XMLNodeType::kTree), name_or_text(tag_name) {}
+	XMLNode(TextTag, const char *t) : type(XMLNodeType::kText), name_or_text(t) {}
+	XMLNode(TextTag, const std::string &t) : type(XMLNodeType::kText), name_or_text(t) {}
 
-	XMLNode *children; // Pointer to first child
-	const std::string name;
-
-	typedef StringOrderedMap PropertyList;
-
-	PropertyList properties;
-};
-
-struct XMLNodeText : XMLNode
-{
-	explicit XMLNodeText (const char *text_);
-	explicit XMLNodeText (const std::string &text_);
-	XMLNodeText () {}
-	~XMLNodeText ();
-
-	std::string text;
+	XMLNode(const XMLNode &) = delete;
+	XMLNode &operator = (const XMLNode &) = delete;
 };
 
 // Parses an XML string and returns the corresponding tree

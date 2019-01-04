@@ -67,6 +67,7 @@
 #include "common/unicode.h"
 #include "common/digest.h"
 #include "common/format.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -133,21 +134,23 @@ bool is_legal_label_name (const std::wstring &name)
  * Given an @c <entry> node, construct and return the corresponding DiaryEntry
  * If any error is encountered, returns 0
  */
-DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
-{
+DiaryEntry *analyze_entry_xml(const XMLNode *entry_node) {
 	uint64_t local_time = 0;
 //	uint64_t utc_time = 0;
 	const char *title = 0;
 	const char *text = 0;
 	DiaryEntry::LabelList labels;
 
-	for (const XMLNode *xptr = entry_node->children; xptr; xptr = xptr->next) {
-		const XMLNodeTree *ptr = dynamic_cast <const XMLNodeTree *>(xptr);
-		if (ptr == 0) {
+	if (entry_node->type != XMLNodeType::kTree) {
+		return nullptr;
+	}
+
+	for (const XMLNode *ptr = entry_node->children; ptr; ptr = ptr->next) {
+		if (ptr->type != XMLNodeType::kTree) {
 			// Wild text directly within <entry> - Never allowed
 			return 0;
 		}
-		if (ptr->name == "time") { // <time local="...." utc="...." />
+		if (ptr->name() == "time") { // <time local="...." utc="...." />
 
 			if (local_time/* | utc_time*/) {
 				// More than one <time> tags.
@@ -164,8 +167,7 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 				return 0;
 			}
 
-		}
-		else if (ptr->name == "label") {
+		} else if (ptr->name() == "label") {
 			const char *name = map_query (ptr->properties, "name");
 			if (!name) {
 				return 0;
@@ -177,8 +179,7 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 			}
 			labels.insert (wname);
 
-		}
-		else if (ptr->name == "title") {
+		} else if (ptr->name() == "title") {
 
 			if (title != 0) { // More than one <title> tags
 				return 0;
@@ -187,15 +188,14 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 			if (ptr->children == 0) { // Empty
 				title = "";
 			}
-			else if (const XMLNodeText *title_node = dynamic_cast<const XMLNodeText *>(ptr->children)) {
-				if (title_node->next != 0) {
+			else if (ptr->children->type == XMLNodeType::kText) {
+				if (ptr->children->next != 0) {
 					return 0;
 				}
-				title = title_node->text.c_str ();
+				title = ptr->children->text().c_str ();
 			}
 
-		}
-		else if (ptr->name == "text") {
+		} else if (ptr->name() == "text") {
 
 			if (text != 0) { // More than one <text> tags
 				return 0;
@@ -203,12 +203,11 @@ DiaryEntry *analyze_entry_xml (const XMLNodeTree *entry_node)
 
 			if (ptr->children == 0) { // Empty
 				text = "";
-			}
-			else if (const XMLNodeText *text_node = dynamic_cast<const XMLNodeText *>(ptr->children)) {
-				if (text_node->next != 0) {
+			} else if (ptr->children->type == XMLNodeType::kText) {
+				if (ptr->children->next != 0) {
 					return 0;
 				}
-				text = text_node->text.c_str ();
+				text = ptr->children->text().c_str ();
 			}
 			else {
 				return 0;
@@ -248,11 +247,10 @@ bool general_analyze_xml (const XMLNode *root,
 		bool strictest ///< Should be enabled for data file, and disabled for config files
 		)
 {
-	const XMLNodeTree *root_diary = dynamic_cast<const XMLNodeTree *>(root);
-	if (root_diary == 0) {
+	if (root->type != XMLNodeType::kTree) {
 		return false;
 	}
-	if (root_diary->name != "tiary") { // Root node must be <tiary>
+	if (root->name() != "tiary") { // Root node must be <tiary>
 		return false;
 	}
 	if (entries) {
@@ -262,9 +260,8 @@ bool general_analyze_xml (const XMLNode *root,
 		recent_files->clear ();
 	}
 	// OK. Now loop thru its children
-	for (const XMLNode *main_childx = root_diary->children; main_childx; main_childx = main_childx->next) {
-		const XMLNodeTree *main_child = dynamic_cast <const XMLNodeTree *>(main_childx);
-		if (main_child == 0) {
+	for (const XMLNode *main_child = root->children; main_child; main_child = main_child->next) {
+		if (main_child->type != XMLNodeType::kTree) {
 			// Wild text directly within <tiary> - must be an error
 			// But we choose to be as tolerant as possible in non-strict mode
 			if (strictest) {
@@ -275,7 +272,7 @@ bool general_analyze_xml (const XMLNode *root,
 			}
 		}
 
-		if (main_child->name == "option") { // An option
+		if (main_child->name() == "option") { // An option
 			if (const char *option_name = map_query (main_child->properties, "name")) {
 				if (const char *option_value = map_query (main_child->properties, "value")) {
 					opts.set (option_name, option_value);
@@ -289,8 +286,7 @@ bool general_analyze_xml (const XMLNode *root,
 				// <option> without "name" - Disallowed in strict mode
 				return false;
 			}
-		}
-		else if (entries && main_child->name == "entry") {
+		} else if (entries && main_child->name() == "entry") {
 
 			DiaryEntry *entry = analyze_entry_xml (main_child);
 			if (entry == 0) {
@@ -298,8 +294,7 @@ bool general_analyze_xml (const XMLNode *root,
 			}
 			entries->push_back (entry);
 			
-		}
-		else if (recent_files && main_child->name == "recent") {
+		} else if (recent_files && main_child->name() == "recent") {
 			if (const char *file_name = map_query (main_child->properties, "file")) {
 				recent_files->emplace_back();
 				RecentFile &item = recent_files->back();
@@ -519,8 +514,7 @@ LoadFileRet load_file (
 
 namespace {
 
-XMLNodeTree *make_xml_tree_from_options (const OptionGroupBase &opts, const OptionGroupBase &default_options)
-{
+XMLNode *make_xml_tree_from_options(const OptionGroupBase &opts, const OptionGroupBase &default_options) {
 	XMLNode node_dummy;
 	XMLNode *p = &node_dummy;
 
@@ -532,19 +526,19 @@ XMLNodeTree *make_xml_tree_from_options (const OptionGroupBase &opts, const Opti
 		}
 
 		// For readability, insert "\n\t" before each option
-		p = p->next = new XMLNodeText ("\n\t");
+		p = p->next = new XMLNode(XMLNode::TextTag(), "\n\t");
 
-		XMLNodeTree *newnode = new XMLNodeTree ("option");
+		XMLNode *newnode = new XMLNode(XMLNode::TreeTag(), "option");
 		p = p->next = newnode;
 		newnode->properties["name"] = it->first;
 		newnode->properties["value"] = it->second;
 	}
 
 	// Finally, insert an "\n" before closing tag </tiary>
-	p = p->next = new XMLNodeText ("\n");
+	p = p->next = new XMLNode(XMLNode::TextTag(), "\n");
 
 	// Create the <tiary> node last
-	XMLNodeTree *root = new XMLNodeTree ("tiary");
+	XMLNode *root = new XMLNode(XMLNode::TreeTag(), "tiary");
 	root->children = node_dummy.next;
 	return root;
 }
@@ -555,7 +549,8 @@ XMLNodeTree *make_xml_tree_from_options (const OptionGroupBase &opts, const Opti
 bool save_global_options (const GlobalOptionGroup &options, const RecentFileList &recent_files)
 {
 	// First create the XML tree
-	XMLNodeTree *root = make_xml_tree_from_options (options, GlobalOptionGroup ());
+	XMLNode *root = make_xml_tree_from_options (options, GlobalOptionGroup ());
+	assert(root->type == XMLNodeType::kTree);
 
 	// Find the last child of root node <tiary>
 	XMLNode *ptr = root->children;
@@ -569,21 +564,20 @@ bool save_global_options (const GlobalOptionGroup &options, const RecentFileList
 		// Insert a text node "\n\t" before each <recent>
 		// At the first loop, ptr should point to a text node "\n"
 		// Change that!
-		if (XMLNodeText *text_node = dynamic_cast <XMLNodeText *>(ptr)) {
-			text_node->text = "\n\t";
-		}
-		else {
-			ptr = ptr->next = new XMLNodeText ("\n\t");
+		if (ptr->type == XMLNodeType::kText) {
+			ptr->text() = "\n\t";
+		} else {
+			ptr = ptr->next = new XMLNode(XMLNode::TextTag(), "\n\t");
 		}
 
-		XMLNodeTree *recent_node = new XMLNodeTree ("recent");
+		XMLNode *recent_node = new XMLNode(XMLNode::TreeTag(), "recent");
 		ptr = ptr->next = recent_node;
 		recent_node->properties["file"] = wstring_to_utf8 (it->filename);
 		recent_node->properties["line"] = format_dec_narrow (it->focus_entry);
 	}
 	// Insert a node "\n" at the end
-	if (dynamic_cast <XMLNodeText *> (ptr) == 0) {
-		ptr = ptr->next = new XMLNodeText ("\n");
+	if (ptr->type != XMLNodeType::kText) {
+		ptr = ptr->next = new XMLNode(XMLNode::TextTag(), "\n");
 	}
 
 	std::string xml = xml_make (root);
@@ -599,7 +593,7 @@ bool save_file (const char *filename,
 		const std::string &password)
 {
 	// First create the XML tree
-	XMLNodeTree *root = make_xml_tree_from_options (options, PerFileOptionGroup ());
+	XMLNode *root = make_xml_tree_from_options(options, PerFileOptionGroup());
 
 	// Find the last child of root node <tiary>
 	XMLNode *ptr = root->children;
@@ -613,54 +607,53 @@ bool save_file (const char *filename,
 		// Insert a text node "\n\t" before each <entry>
 		// At the first loop, ptr should point to a text node "\n"
 		// Change that!
-		if (XMLNodeText *text_node = dynamic_cast <XMLNodeText *>(ptr)) {
-			text_node->text = "\n\t";
-		}
-		else {
-			ptr = ptr->next = new XMLNodeText ("\n\t");
+		if (ptr->type == XMLNodeType::kText) {
+			ptr->text() = "\n\t";
+		} else {
+			ptr = ptr->next = new XMLNode(XMLNode::TextTag(), "\n\t");
 		}
 
 		DiaryEntry *entry = *it; // Never null
-		XMLNodeTree *entry_node = new XMLNodeTree ("entry");
+		XMLNode *entry_node = new XMLNode(XMLNode::TreeTag(), "entry");
 		ptr = ptr->next = entry_node;
 
 		XMLNode *sub_ptr; // Point to <entry>'s children
 
 		// <time local="..." utc="..." />
-		sub_ptr = entry_node->children = new XMLNodeText ("\n\t\t");
-		XMLNodeTree *time_node = new XMLNodeTree ("time");
+		sub_ptr = entry_node->children = new XMLNode(XMLNode::TextTag(), "\n\t\t");
+		XMLNode *time_node = new XMLNode(XMLNode::TreeTag(), "time");
 		sub_ptr = sub_ptr->next = time_node;
 		time_node->properties["local"] = format_time (entry->local_time);
 //		time_node->properties["utc"] = format_time (entry->utc_time);
 
 		// Labels
 		for (DiaryEntry::LabelList::const_iterator it = entry->labels.begin (); it != entry->labels.end (); ++it) {
-			sub_ptr = sub_ptr->next = new XMLNodeText ("\n\t\t");
-			XMLNodeTree *label_node = new XMLNodeTree ("label");
+			sub_ptr = sub_ptr->next = new XMLNode(XMLNode::TextTag(), "\n\t\t");
+			XMLNode *label_node = new XMLNode(XMLNode::TreeTag(), "label");
 			sub_ptr = sub_ptr->next = label_node;
 			// Convert from UCS-4 to UTF-8
 			label_node->properties["name"] = wstring_to_utf8 (*it);
 		}
 
 		// Text
-		sub_ptr = sub_ptr->next = new XMLNodeText ("\n\t\t");
-		XMLNodeTree *title_tag_node = new XMLNodeTree ("title");
+		sub_ptr = sub_ptr->next = new XMLNode(XMLNode::TextTag(), "\n\t\t");
+		XMLNode *title_tag_node = new XMLNode(XMLNode::TreeTag(), "title");
 		sub_ptr = sub_ptr->next = title_tag_node;
-		XMLNodeText *diary_title_node = new XMLNodeText (wstring_to_utf8 (entry->title));
+		XMLNode *diary_title_node = new XMLNode(XMLNode::TextTag(), wstring_to_utf8 (entry->title));
 		title_tag_node->children = diary_title_node;
 
 		// Text
-		sub_ptr = sub_ptr->next = new XMLNodeText ("\n\t\t");
-		XMLNodeTree *text_tag_node = new XMLNodeTree ("text");
+		sub_ptr = sub_ptr->next = new XMLNode(XMLNode::TextTag(), "\n\t\t");
+		XMLNode *text_tag_node = new XMLNode(XMLNode::TreeTag(), "text");
 		sub_ptr = sub_ptr->next = text_tag_node;
-		XMLNodeText *diary_text_node = new XMLNodeText (wstring_to_utf8 (entry->text));
+		XMLNode *diary_text_node = new XMLNode(XMLNode::TextTag(), wstring_to_utf8 (entry->text));
 		text_tag_node->children = diary_text_node;
 
 		// Insert a text node "\n\t" before closing tag </entry>
-		sub_ptr = sub_ptr->next = new XMLNodeText ("\n\t");
+		sub_ptr = sub_ptr->next = new XMLNode(XMLNode::TextTag(), "\n\t");
 	}
 	// Insert a text node "\n" before closing tag </tiary>
-	ptr = ptr->next = new XMLNodeText ("\n");
+	ptr = ptr->next = new XMLNode(XMLNode::TextTag(), "\n");
 
 
 

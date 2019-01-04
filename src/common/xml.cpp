@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -20,33 +20,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-tiary::XMLNodeTree::XMLNodeTree (const char *name_)
-	: children (0)
-	, name (name_)
-	, properties ()
-{
-}
+namespace tiary {
 
-tiary::XMLNodeTree::~XMLNodeTree ()
-{
-}
-
-tiary::XMLNodeText::XMLNodeText (const char *text_)
-	: text(text_)
-{
-}
-
-tiary::XMLNodeText::XMLNodeText (const std::string &text_)
-	: text(text_)
-{
-}
-
-tiary::XMLNodeText::~XMLNodeText ()
-{
-}
-
-void tiary::xml_free (XMLNode *root)
-{
+void xml_free(XMLNode *root) {
 	if (root == 0) {
 		return;
 	}
@@ -59,8 +35,8 @@ void tiary::xml_free (XMLNode *root)
 	for (;;) {
 		XMLNode *right_sibling = p->next;
 		XMLNode *first_child = 0;
-		if (XMLNodeTree *q = dynamic_cast<XMLNodeTree *>(p)) {
-			first_child = q->children;
+		if (p->type == XMLNodeType::kTree) {
+			first_child = p->children;
 		}
 		delete p;
 		if (first_child) {
@@ -91,24 +67,22 @@ void tiary::xml_free (XMLNode *root)
 
 namespace {
 
-using namespace tiary;
-
 // Copy the attribute name and attributes, without children
 XMLNode *shallow_copy (xmlNodePtr iptr)
 {
 	if (iptr->type == XML_TEXT_NODE || iptr->type == XML_CDATA_SECTION_NODE) { // Text node
-		XMLNodeText *optr = 0;
+		XMLNode *optr = nullptr;
 		if (const char *text = (const char *)iptr->content) {
 			// If a text node is empty or completely consists of space (tab, newline) etc.
 			// Eliminate it!
 			if (strspn (text, " \t\r\n\v")[text] != '\0') {
-				optr = new XMLNodeText (text);
+				optr = new XMLNode(XMLNode::TextTag(), text);
 			}
 		}
 		return optr;
 	}
 	else if (iptr->type == XML_ELEMENT_NODE) { // Element node
-		XMLNodeTree *optr = new XMLNodeTree ((const char *)iptr->name);
+		XMLNode *optr = new XMLNode(XMLNode::TreeTag(), (const char *)iptr->name);
 		// Attributes. Not ordered.
 		for (xmlAttrPtr aptr=iptr->properties; aptr; aptr=aptr->next) {
 			if (aptr->name && aptr->children) {
@@ -125,13 +99,12 @@ XMLNode *shallow_copy (xmlNodePtr iptr)
 // The other way
 xmlNodePtr shallow_copy (const XMLNode *iptr)
 {
-	if (const XMLNodeText *p = dynamic_cast<const XMLNodeText *>(iptr)) {
-		return xmlNewText (BAD_CAST (p->text.c_str ()));
-	}
-	else if (const XMLNodeTree *p = dynamic_cast<const XMLNodeTree *>(iptr)) {
-		xmlNodePtr optr = xmlNewNode (0, BAD_CAST (p->name.c_str()));
+	if (iptr->type == XMLNodeType::kText) {
+		return xmlNewText(BAD_CAST(iptr->text().c_str()));
+	} else if (iptr->type == XMLNodeType::kTree) {
+		xmlNodePtr optr = xmlNewNode(0, BAD_CAST(iptr->name().c_str()));
 		// Copy attributes. Not ordered.
-		for (XMLNodeTree::PropertyList::const_iterator it=p->properties.begin(); it!=p->properties.end(); ++it) {
+		for (auto it = iptr->properties.begin(); it != iptr->properties.end(); ++it) {
 			xmlNewProp (optr, BAD_CAST(it->first.c_str()), BAD_CAST(it->second.c_str()));
 		}
 		return optr;
@@ -156,8 +129,7 @@ void libxml2_init ()
 
 } // anonymous namespace
 
-tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
-{
+XMLNode *xml_parse(const char *str, size_t len) {
 	xmlDocPtr doc;
 	xmlNodePtr iptr;
 
@@ -174,17 +146,17 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 	// Successfully parsed. Now we need to construct our own XML tree
 
 	// "(a,b) in stk" means "b's children should be copied as a's children"
-	std::stack<std::pair<XMLNodeTree *, xmlNodePtr>, std::vector<std::pair<XMLNodeTree *, xmlNodePtr> > > stk;
+	std::stack<std::pair<XMLNode *, xmlNodePtr>, std::vector<std::pair<XMLNode *, xmlNodePtr> > > stk;
 
 	XMLNode *root = shallow_copy (iptr);
-	XMLNodeTree *optr = dynamic_cast<XMLNodeTree *>(root);
 				// Current working output node
 				// Current working input node is iptr
-	if (!optr) {
+	if (root->type != XMLNodeType::kTree) {
 		// Root is a text node. Error.
 		delete root;
 		return 0;
 	}
+	XMLNode *optr = root;
 	XMLNode virtual_node;
 	for (;;) {
 		// Shallow copy all children of current node
@@ -194,7 +166,7 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 			if (XMLNode *newnode = shallow_copy (child_ptr)) {
 				last = last->next = newnode;
 				if (child_ptr->xmlChildrenNode) {
-					stk.push (std::make_pair (static_cast<XMLNodeTree *>(newnode), child_ptr));
+					stk.push(std::make_pair(newnode, child_ptr));
 				}
 			}
 		}
@@ -210,8 +182,7 @@ tiary::XMLNode *tiary::xml_parse (const char *str, size_t len)
 	return root;
 }
 
-std::string tiary::xml_make (const XMLNode *root)
-{
+std::string xml_make(const XMLNode *root) {
 	/**
 	 * I have considered directly generating the XML text, which should
 	 * not be difficult to implement and obviously more efficient than
@@ -224,26 +195,26 @@ std::string tiary::xml_make (const XMLNode *root)
 	 */
 	std::string ret;
 
-	if (const XMLNodeTree *iroot = dynamic_cast <const XMLNodeTree *> (root)) {
+	if (root->type == XMLNodeType::kTree) {
 
 		libxml2_init ();
 
 		xmlDocPtr doc = xmlNewDoc (BAD_CAST "1.0"); // "1.0" - XML version
-		xmlNodePtr oroot = xmlNewNode(0, BAD_CAST (iroot->name.c_str()));
+		xmlNodePtr oroot = xmlNewNode(0, BAD_CAST(root->name().c_str()));
 		xmlDocSetRootElement(doc, oroot);
 
 		// "(a,b) in stk" means "a's children should be copied as b's children"
-		std::stack<std::pair<const XMLNodeTree *, xmlNodePtr>, std::vector<std::pair<const XMLNodeTree *, xmlNodePtr> > > stk;
+		std::stack<std::pair<const XMLNode *, xmlNodePtr>, std::vector<std::pair<const XMLNode *, xmlNodePtr>>> stk;
 		xmlNodePtr optr = oroot;         // Current working output node
-		const XMLNodeTree *iptr = iroot; // Current working input node
+		const XMLNode *iptr = root; // Current working input node
 
 		for (;;) {
 			// Shallow copy all children of current node
 			for (XMLNode *child_ptr = iptr->children; child_ptr; child_ptr = child_ptr->next) {
 				if (xmlNodePtr nptr = shallow_copy (child_ptr)) {
 					xmlAddChild (optr, nptr);
-					if (const XMLNodeTree *ip = dynamic_cast <const XMLNodeTree *> (child_ptr)) {
-						stk.push (std::make_pair (ip, nptr));
+					if (child_ptr->type == XMLNodeType::kTree && child_ptr->children) {
+						stk.push(std::make_pair(child_ptr, nptr));
 					}
 				}
 			}
@@ -265,3 +236,5 @@ std::string tiary::xml_make (const XMLNode *root)
 	}
 	return ret;
 }
+
+} // namespace tiary
