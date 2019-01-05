@@ -20,61 +20,60 @@ namespace tiary {
 
 
 StringMatch::StringMatch ()
-	: pattern ()
+	: pattern_()
 #ifdef TIARY_USE_RE2
-	, regex ()
+	, regex_()
 #endif
 {
+}
+
+StringMatch::StringMatch(const std::wstring &pattern, bool use_regex)
+	: pattern_(pattern)
+#ifdef TIARY_USE_RE2
+	, regex_(use_regex ? new Re(pattern) : nullptr)
+#endif
+{
+	if (pattern_.empty()) {
+#ifdef TIARY_USE_RE2
+		regex_.reset();
+#endif
+		return;
+	}
+#ifdef TIARY_USE_RE2
+	if (regex_ && !*regex_) {
+		pattern_.clear();
+		regex_.reset();
+	}
+#endif
 }
 
 StringMatch::~StringMatch ()
 {
 }
 
-
-bool StringMatch::assign (const std::wstring &pattern_, bool use_regex)
-{
-	if (pattern_.empty ()) {
-		return false;
-	}
-#ifdef TIARY_USE_RE2
-	Re *new_pcre = 0;
-	if (use_regex) {
-		new_pcre = new Re (pattern_);
-		if (!*new_pcre) {
-			delete new_pcre;
-			return false;
-		}
-	}
-	regex.reset (new_pcre);
-#endif
-	pattern = pattern_;
-	return true;
-}
-
 std::vector <std::pair <size_t, size_t> > StringMatch::match (const std::wstring &haystack) const
 {
 #ifdef TIARY_USE_RE2
-	if (Re *rex = regex.get ()) {
-		return rex->match (haystack);
+	if (regex_) {
+		return regex_->match (haystack);
 	}
 	else
 #endif
 	{
-		return find_all (strlower (haystack), strlower (pattern));
+		return find_all(strlower(haystack), strlower(pattern_));
 	}
 }
 
 bool StringMatch::basic_match (const std::wstring &haystack) const
 {
 #ifdef TIARY_USE_RE2
-	if (Re *rex = regex.get ()) {
-		return rex->basic_match (haystack);
+	if (regex_) {
+		return regex_->basic_match(haystack);
 	}
 	else
 #endif
 	{
-		return (strlower (haystack).find (strlower (pattern)) != std::wstring::npos);
+		return (strlower(haystack).find(strlower(pattern_)) != std::wstring::npos);
 	}
 }
 

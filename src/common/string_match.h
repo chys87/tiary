@@ -26,13 +26,10 @@ class StringMatch
 {
 public:
 	StringMatch ();
+	StringMatch(StringMatch &&) = default;
+	explicit StringMatch(const std::wstring &, bool use_regex = false);
+	StringMatch &operator = (StringMatch &&) = default;
 	~StringMatch ();
-
-	/**
-	 * @result	Returns true only if the pattern is empty,
-	 * or the regular expression is invalid
-	 */
-	bool assign (const std::wstring &, bool use_regex = false);
 
 	/**
 	 * @brief	Match against a string, returning detailed results
@@ -52,22 +49,22 @@ public:
 	/**
 	 * @brief	Whether this class contains valid search info
 	 */
-	explicit operator bool() const { return !pattern.empty(); }
+	explicit operator bool() const { return !pattern_.empty(); }
 
-	const std::wstring &get_pattern () const { return pattern; }
+	const std::wstring &get_pattern() const { return pattern_; }
 	bool get_use_regex () const
 	{
 #ifdef TIARY_USE_RE2
-		return regex.get ();
+		return static_cast<bool>(regex_);
 #else
 		return false;
 #endif
 	}
 
 private:
-	std::wstring pattern;
+	std::wstring pattern_;
 #ifdef TIARY_USE_RE2
-	std::unique_ptr<Re> regex; ///< Re object related to search_text, if it is a regular expression
+	std::unique_ptr<Re> regex_; ///< Re object related to search_text, if it is a regular expression
 #endif
 
 };

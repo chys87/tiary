@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -16,7 +16,6 @@
 #define TIARY_DIARY_FILTER_H
 
 #include "common/string_match.h"
-#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -25,7 +24,8 @@ namespace tiary {
 
 struct DiaryEntry;
 
-struct Filter {
+class Filter {
+public:
 	/**
 	 * @brief	Whether the given entry should be displayed
 	 * @result	Returns @c true if the entry should be displayed
@@ -44,12 +44,16 @@ struct Filter {
  *
  * Displays only entries with one specific label
  */
-struct FilterByLabel : public Filter
-{
-	std::wstring label;
-
-	bool operator () (const DiaryEntry &) const;
+struct FilterByLabel final : public Filter {
+public:
+	explicit FilterByLabel(const std::wstring &label) : label_(label) {}
+	explicit FilterByLabel(std::wstring &&label) : label_(std::move(label)) {}
+	const std::wstring &label() const { return label_; }
+	bool operator()(const DiaryEntry &) const override;
 	~FilterByLabel ();
+
+private:
+	std::wstring label_;
 };
 
 
@@ -58,10 +62,19 @@ struct FilterByLabel : public Filter
  *
  * Displays only entries contain some specific text
  */
-struct FilterByText : public Filter, public StringMatch
-{
+class FilterByText final : public Filter {
+public:
 	bool operator () (const DiaryEntry &) const;
+
+	FilterByText(const std::wstring &pattern, bool use_regex = false) : matcher_(pattern, use_regex) {}
 	~FilterByText ();
+
+	const std::wstring &get_pattern() const { return matcher_.get_pattern(); }
+	bool get_use_regex() const { return matcher_.get_use_regex(); }
+	explicit operator bool() const { return static_cast<bool>(matcher_); }
+
+private:
+	StringMatch matcher_;
 };
 
 /**
@@ -69,37 +82,47 @@ struct FilterByText : public Filter, public StringMatch
  *
  * Same as tiary::FilterByText, except that only the title is matched against
  */
-struct FilterByTitle : public Filter, public StringMatch
-{
+class FilterByTitle final : public Filter {
+public:
 	bool operator () (const DiaryEntry &) const;
+
+	FilterByTitle(const std::wstring &pattern, bool use_regex = false) : matcher_(pattern, use_regex) {}
 	~FilterByTitle ();
+
+	const std::wstring &get_pattern() const { return matcher_.get_pattern(); }
+	bool get_use_regex() const { return matcher_.get_use_regex(); }
+	explicit operator bool() const { return static_cast<bool>(matcher_); }
+
+private:
+	StringMatch matcher_;
 };
 
 
-
-typedef std::vector<std::unique_ptr<Filter>> FilterList;
 
 /**
  * @brief	Complex filter
  *
  * Use AND or OR to combine a number of other filters
  */
-struct FilterGroup : public Filter, private FilterList
-{
+struct FilterGroup final : public Filter {
 public:
 
-	using FilterList::const_iterator;
-	using FilterList::begin;
-	using FilterList::end;
-	using FilterList::emplace_back;
-	using FilterList::push_back;
-	using FilterList::empty;
-	using FilterList::clear;
-
 	enum Relation { AND, OR };
-	Relation relation = AND;
 
 	bool operator () (const DiaryEntry &) const;
+
+	Relation relation() const { return relation_; }
+	void relation(Relation relation) { relation_ = relation; }
+
+	auto begin() const { return filters_.begin(); }
+	auto end() const { return filters_.end(); }
+	void add(Filter *filter) { filters_.emplace_back(filter); }
+	bool empty() const { return filters_.empty(); }
+	void clear() { filters_.clear(); }
+
+private:
+	std::vector<std::unique_ptr<Filter>> filters_;
+	Relation relation_ = AND;
 };
 
 

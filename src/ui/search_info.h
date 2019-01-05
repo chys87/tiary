@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -25,8 +25,7 @@ namespace ui {
  * This class mains information of a search request,
  * including the text, direction and 
  */
-class SearchInfo : public StringMatch
-{
+class SearchInfo {
 public:
 	SearchInfo ();
 	~SearchInfo ();
@@ -39,7 +38,13 @@ public:
 
 	bool get_backward () const { return backward; }
 
+	explicit operator bool() const { return static_cast<bool>(matcher_); }
+	bool basic_match(const std::wstring &s) const { return matcher_.basic_match(s); }
+	std::vector<std::pair<size_t, size_t>> match(const std::wstring &s) const { return matcher_.match(s); }
+	const StringMatch &get_matcher() const { return matcher_; }
+
 private:
+	StringMatch matcher_;
 	bool backward;             ///< Search backward?
 };
 

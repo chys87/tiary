@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -21,21 +21,18 @@ namespace tiary {
 
 DiaryEntryList Filter::filter (const DiaryEntryList &lst) const
 {
-	DiaryEntryList new_lst (lst);
-	DiaryEntryList::iterator iw = new_lst.begin ();
-	for (DiaryEntryList::const_iterator it = new_lst.begin ();
-			it != new_lst.end (); ++it) {
-		if ((*this)(**it)) {
-			*iw++ = *it;
+	DiaryEntryList new_lst;
+	for (DiaryEntry *entry: lst) {
+		if ((*this)(*entry)) {
+			new_lst.push_back(entry);
 		}
 	}
-	new_lst.erase (iw, new_lst.end ());
 	return new_lst;
 }
 
 bool FilterByLabel::operator () (const DiaryEntry &entry) const
 {
-	return (entry.labels.find (label) != entry.labels.end ());
+	return (entry.labels.find(label_) != entry.labels.end());
 }
 
 FilterByLabel::~FilterByLabel ()
@@ -46,7 +43,7 @@ FilterByLabel::~FilterByLabel ()
 
 bool FilterByText::operator () (const DiaryEntry &entry) const
 {
-	return basic_match (entry.title) || basic_match (entry.text);
+	return matcher_.basic_match(entry.title) || matcher_.basic_match(entry.text);
 }
 
 FilterByText::~FilterByText ()
@@ -57,7 +54,7 @@ FilterByText::~FilterByText ()
 
 bool FilterByTitle::operator () (const DiaryEntry &entry) const
 {
-	return basic_match (entry.title);
+	return matcher_.basic_match(entry.title);
 }
 
 FilterByTitle::~FilterByTitle ()
@@ -69,17 +66,17 @@ FilterByTitle::~FilterByTitle ()
 
 bool FilterGroup::operator () (const DiaryEntry &entry) const
 {
-	if (relation == AND) {
-		for (const_iterator it = FilterList::begin (); it != FilterList::end (); ++it) {
-			if (!(**it)(entry)) {
+	if (relation_ == AND) {
+		for (const auto &filter_ptr : filters_) {
+			if (!(*filter_ptr)(entry)) {
 				return false;
 			}
 		}
 		return true;
 	}
 	else {
-		for (const_iterator it = FilterList::begin (); it != FilterList::end (); ++it) {
-			if ((**it)(entry)) {
+		for (const auto &filter_ptr : filters_) {
+			if ((*filter_ptr)(entry)) {
 				return true;
 			}
 		}

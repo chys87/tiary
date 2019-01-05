@@ -85,7 +85,7 @@ void MainCtrl::redraw ()
 		return;
 	}
 
-	if (w().filtered_entries.get () && w().filtered_entries->empty ()) {
+	if (w().filtered_entries_ && w().filtered_entries_->empty ()) {
 		put(ui::Size{}, L"This is in filtered mode.");
 		put(ui::Size{0, 1}, L"But no entry satisfies your requirement.");
 		put(ui::Size{0, 2}, L"Press Ctrl-G to modify your filter; or LEFT to see all entries.");

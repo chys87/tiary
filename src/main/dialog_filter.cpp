@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -113,17 +113,18 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 	, layout_main (VERTICAL)
 {
 	// Assign control values
-	for (FilterGroup::const_iterator it = result_.begin (); it != result_.end (); ++it) {
-		if (FilterByLabel *filter_lbl = dynamic_cast<FilterByLabel *>(it->get())) {
-			txt_label.set_text (filter_lbl->label, false, filter_lbl->label.length ());
+	for (auto &filter_ptr : result_) {
+		Filter *filter = filter_ptr.get();
+		if (FilterByLabel *filter_lbl = dynamic_cast<FilterByLabel *>(filter)) {
+			txt_label.set_text(filter_lbl->label(), false, filter_lbl->label().length());
 		}
-		else if (FilterByTitle *filter_title = dynamic_cast<FilterByTitle *>(it->get())) {
+		else if (FilterByTitle *filter_title = dynamic_cast<FilterByTitle *>(filter)) {
 			txt_title.set_text (filter_title->get_pattern (), false, filter_title->get_pattern ().length ());
 #ifdef TIARY_USE_RE2
 			chk_title_regex.checkbox.set_status (filter_title->get_use_regex ());
 #endif
 		}
-		else if (FilterByText *filter_text = dynamic_cast<FilterByText *>(it->get())) {
+		else if (FilterByText *filter_text = dynamic_cast<FilterByText *>(filter)) {
 			txt_text.set_text (filter_text->get_pattern (), false, filter_text->get_pattern ().length ());
 #ifdef TIARY_USE_RE2
 			chk_text_regex.checkbox.set_status (filter_text->get_use_regex ());
@@ -230,44 +231,43 @@ void DialogFilter::slot_ok ()
 	FilterGroup new_filter;
 
 	if (!txt_label.get_text ().empty ()) {
-		FilterByLabel *filter = new FilterByLabel;
-		filter->label = txt_label.get_text ();
-		new_filter.emplace_back(filter);
+		FilterByLabel *filter = new FilterByLabel(txt_label.get_text());
+		new_filter.add(filter);
 	}
 	if (!txt_title.get_text ().empty ()) {
-		FilterByTitle *filter = new FilterByTitle;
-		bool assign_ret = filter->assign (txt_title.get_text ()
+		FilterByTitle *filter = new FilterByTitle(txt_title.get_text()
 #ifdef TIARY_USE_RE2
 				, chk_title_regex.get_status ()
 #endif
 				);
 #ifdef TIARY_USE_RE2
-		if (!assign_ret) {
+		if (!*filter) {
+			delete filter;
 			dialog_message (format (L"Invalid regular expression: \"%a\"") << txt_title.get_text ());
 			set_focus_ptr (&txt_title);
 			return;
 		}
 #endif
-		new_filter.emplace_back(filter);
+		new_filter.add(filter);
 	}
 	if (!txt_text.get_text ().empty ()) {
-		FilterByText *filter = new FilterByText;
-		bool assign_ret = filter->assign (txt_text.get_text ()
+		FilterByText *filter = new FilterByText(txt_text.get_text()
 #ifdef TIARY_USE_RE2
 				, chk_text_regex.get_status ()
 #endif
 				);
 #ifdef TIARY_USE_RE2
-		if (!assign_ret) {
+		if (!*filter) {
+			delete filter;
 			dialog_message (format (L"Invalid regular expression: \"%a\"") << txt_text.get_text ());
 			set_focus_ptr (&txt_text);
 			return;
 		}
 #endif
-		new_filter.emplace_back(filter);
+		new_filter.add(filter);
 	}
 
-	new_filter.relation = FilterGroup::AND;
+	new_filter.relation(FilterGroup::AND);
 
 	result = std::move(new_filter);
 

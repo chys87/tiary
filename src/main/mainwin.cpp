@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2011, 2016, 2018 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2011, 2016, 2018, 2019 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -54,7 +54,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	, menu_bar (*this)
 	, context_menu ()
 	, saved (true)
-	, filter ()
+	, filter_()
 	, main_ctrl (*this)
 	, hotkey_hint (*this)
 	, last_search ()
@@ -291,7 +291,7 @@ void MainWin::on_ready ()
 	if (!saved) {
 		status = L"+ ";
 	}
-	if (filter.get ()) {
+	if (filter_) {
 		status += L"[Filter] ";
 	}
 	if (current_filename.empty ()) {
@@ -306,12 +306,11 @@ void MainWin::on_ready ()
 
 void MainWin::updated_filter ()
 {
-	if (filter.get ()) {
-		filtered_entries.reset (new DiaryEntryList (filter->filter (entries)));
-		main_ctrl.modify_number(filtered_entries->size ());
-	}
-	else {
-		filtered_entries.reset ();
+	if (filter_) {
+		filtered_entries_.reset(new DiaryEntryList(filter_->filter(entries)));
+		main_ctrl.modify_number(filtered_entries_->size ());
+	} else {
+		filtered_entries_.reset ();
 		main_ctrl.modify_number(entries.size ());
 	}
 	redraw ();
@@ -319,7 +318,7 @@ void MainWin::updated_filter ()
 
 bool MainWin::unavailable_filtered ()
 {
-	if (filter.get ()) {
+	if (filter_) {
 		ui::dialog_message (
 				L"This operation cannot be done in filtered mode.\n"
 				L"Pressed LEFT to return to normal mode.");
@@ -465,8 +464,8 @@ void MainWin::append ()
 
 DiaryEntryList &MainWin::get_current_list ()
 {
-	if (filtered_entries.get ()) {
-		return *filtered_entries;
+	if (filtered_entries_) {
+		return *filtered_entries_;
 	}
 	else {
 		return entries;
@@ -475,8 +474,8 @@ DiaryEntryList &MainWin::get_current_list ()
 
 const DiaryEntryList &MainWin::get_current_list () const
 {
-	if (filtered_entries.get ()) {
-		return *filtered_entries;
+	if (filtered_entries_) {
+		return *filtered_entries_;
 	}
 	else {
 		return entries;
@@ -727,20 +726,20 @@ void MainWin::edit_filter ()
 	if (entries.empty ()) {
 		return;
 	}
-	if (!filter.get ()) {
-		filter.reset (new FilterGroup);
+	if (!filter_) {
+		filter_.reset(new FilterGroup);
 	}
-	dialog_filter (entries, *filter);
-	if (filter->empty ()) {
-		filter.reset ();
+	dialog_filter(entries, *filter_);
+	if (filter_->empty ()) {
+		filter_.reset ();
 	}
 	updated_filter ();
 }
 
 void MainWin::clear_filter ()
 {
-	if (filter.get ()) {
-		filter.reset ();
+	if (filter_) {
+		filter_.reset();
 		updated_filter ();
 	}
 }
@@ -871,7 +870,7 @@ void MainWin::edit_perfile_options ()
 void MainWin::display_statistics ()
 {
 	if (!entries.empty ()) {
-		tiary::display_statistics (entries, filtered_entries.get (), get_current ());
+		tiary::display_statistics(entries, filtered_entries_.get(), get_current());
 	}
 }
 
@@ -884,12 +883,12 @@ void MainWin::quit ()
 
 bool MainWin::query_normal_mode () const
 {
-	return !filter.get ();
+	return !filter_;
 }
 
 bool MainWin::query_filter_mode () const
 {
-	return filter.get ();
+	return static_cast<bool>(filter_);
 }
 
 bool MainWin::query_nonempty_filtered () const
@@ -914,7 +913,7 @@ bool MainWin::query_allow_down () const
 
 bool MainWin::query_search_continuable () const
 {
-	return (query_nonempty_filtered () && !last_search.get_pattern ().empty ());
+	return (query_nonempty_filtered() && !last_search.get_matcher().get_pattern().empty());
 }
 
 } // namespace tiary
