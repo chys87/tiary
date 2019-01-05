@@ -23,7 +23,7 @@ namespace ui {
 
 SearchInfo::SearchInfo ()
 	: matcher_()
-	, backward (false)
+	, backward_(false)
 {
 }
 
@@ -31,21 +31,18 @@ SearchInfo::~SearchInfo ()
 {
 }
 
-bool SearchInfo::dialog (bool default_backward)
-{
-	std::wstring new_pattern;
-	bool new_backward;
-	bool new_regex;
+bool SearchInfo::dialog(bool default_backward) {
+	SearchDesc new_search;
 
-	ui::dialog_search (new_pattern, new_backward, new_regex,
-			matcher_.get_pattern(), default_backward, matcher_.get_use_regex());
-	if (new_pattern.empty ()) {
+	ui::dialog_search(&new_search,
+			{matcher_.get_pattern(), default_backward, matcher_.get_use_regex()});
+	if (new_search.text.empty ()) {
 		return false;
 	}
 
-	if (StringMatch matcher = StringMatch(new_pattern, new_regex)) {
+	if (StringMatch matcher = StringMatch(new_search.text, new_search.regex)) {
 		matcher_ = std::move(matcher);
-		backward = new_backward;
+		backward_ = new_search.backward;
 		return true;
 	}
 	else {

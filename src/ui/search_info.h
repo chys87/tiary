@@ -36,7 +36,7 @@ public:
 	 */
 	bool dialog (bool default_backward);
 
-	bool get_backward () const { return backward; }
+	bool get_backward () const { return backward_; }
 
 	explicit operator bool() const { return static_cast<bool>(matcher_); }
 	bool basic_match(const std::wstring &s) const { return matcher_.basic_match(s); }
@@ -45,7 +45,7 @@ public:
 
 private:
 	StringMatch matcher_;
-	bool backward;             ///< Search backward?
+	bool backward_; ///< Search backward?
 };
 
 } // namespace ui

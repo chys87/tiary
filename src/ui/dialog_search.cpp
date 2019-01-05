@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -35,7 +35,7 @@ namespace {
 
 class WindowSearch : public FixedWindow, private ButtonDefault
 {
-
+public:
 	ui::TextBox box_input;
 	ui::CheckBoxLabel chk_backward;
 #ifdef TIARY_USE_RE2
@@ -43,14 +43,11 @@ class WindowSearch : public FixedWindow, private ButtonDefault
 #endif
 	ui::Button btn_ok;
 
-	std::wstring &o_text;
-	bool &o_bkwd;
-	bool &o_regex;
+	SearchDesc *output_;
 
 public:
 
-	WindowSearch (std::wstring &o_text, bool &o_bkwd, bool &o_regex, 
-		const std::wstring &text, bool bkwd, bool regex);
+	WindowSearch(SearchDesc *output, const SearchDesc &default_search);
 	~WindowSearch ();
 
 	//void redraw (); // The default one is okay
@@ -60,24 +57,21 @@ private:
 	bool is_text_nonempty () const;
 };
 
-WindowSearch::WindowSearch (std::wstring &o_text_, bool &o_bkwd_, bool &o_regex_, 
-		const std::wstring &text, bool bkwd, bool regex)
+WindowSearch::WindowSearch(SearchDesc *output, const SearchDesc &default_search)
 	: Window (0, L"Search")
 	, FixedWindow ()
 	, box_input (*this, 0)
-	, chk_backward (*this, L"&Backward", bkwd)
+	, chk_backward(*this, L"&Backward", default_search.backward)
 #ifdef TIARY_USE_RE2
-	, chk_regex (*this, L"&Regular expression", regex)
+	, chk_regex(*this, L"&Regular expression", default_search.regex)
 #endif
 	, btn_ok (*this, L"&Go!")
-	, o_text (o_text_)
-	, o_bkwd (o_bkwd_)
-	, o_regex (o_regex_)
+	, output_(output)
 {
-	box_input.set_text (text, false, text.size ());
-	chk_backward.checkbox.set_status (bkwd, false);
+	box_input.set_text(default_search.text, false, default_search.text.size());
+	chk_backward.checkbox.set_status(default_search.backward, false);
 #ifdef TIARY_USE_RE2
-	chk_regex.checkbox.set_status (regex, false);
+	chk_regex.checkbox.set_status(default_search.regex, false);
 #endif
 
 	FixedWindow::resize({40, 7});
@@ -117,12 +111,12 @@ WindowSearch::~WindowSearch ()
 
 void WindowSearch::slot_ok ()
 {
-	o_text = box_input.get_text ();
-	o_bkwd = chk_backward.get_status ();
+	output_->text = box_input.get_text();
+	output_->backward = chk_backward.get_status();
 #ifdef TIARY_USE_RE2
-	o_regex = chk_regex.get_status ();
+	output_->regex = chk_regex.get_status();
 #else
-	o_regex = false;
+	output_->regex = false;
 #endif
 	request_close ();
 }
@@ -136,10 +130,8 @@ bool WindowSearch::is_text_nonempty () const
 
 
 
-void dialog_search (std::wstring &o_text, bool &o_bkwd, bool &o_regex, 
-		const std::wstring &text, bool bkwd, bool regex)
-{
-	WindowSearch (o_text, o_bkwd, o_regex, text, bkwd, regex).event_loop ();
+void dialog_search(SearchDesc *output, const SearchDesc &default_search) {
+	WindowSearch(output, default_search).event_loop ();
 }
 
 } // namespace tiary::ui

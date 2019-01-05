@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -20,15 +20,14 @@
 namespace tiary {
 namespace ui {
 
+struct SearchDesc {
+	std::wstring text;
+	bool backward = false; ///< Direction. true = backward
+	bool regex = false; ///< Use regular expression or not
+};
 
-void dialog_search (
-		std::wstring &o_text, ///< Output search text
-		bool &o_bkwd, ///< Output direction. false = backward
-		bool &o_regex, ///< Output regex status
-		const std::wstring &text, ///< Default search text
-		bool bkwd, ///< Default direction
-		bool regex ///< Default regex status
-		);
+
+void dialog_search(SearchDesc *output, const SearchDesc &default_search);
 
 
 
