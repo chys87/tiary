@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -105,12 +105,11 @@ Date DateSelect::get_date () const
 		return Date (INVALID_DATE);
 	}
 
-	ReadableDate rd;
-	rd.d = d + 1;
-	rd.y = year.get_select () + first_year;
 	unsigned m = month.get_select ();
-	rd.m = m/2 + (m%2)*6 + 1;
-	return Date (rd);
+	return Date(
+		year.get_select () + first_year,
+		m / 2 + (m % 2) * 6 + 1,
+		d + 1);
 }
 
 void DateSelect::move_resize (Size new_pos, Size new_size)

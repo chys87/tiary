@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -23,11 +23,11 @@ namespace ui {
 
 GridSelect::GridSelect (Window &win)
 	: Control (win)
-	, grid_width (0)
-	, cols (0)
-	, rows (0)
-	, items ()
-	, select (size_t (-1))
+	, grid_width_(0)
+	, cols_(0)
+	, rows_(0)
+	, items_()
+	, select_(size_t (-1))
 {
 }
 
@@ -39,23 +39,39 @@ void GridSelect::set_grid (unsigned grid_width, unsigned grid_cols,
 			unsigned grid_rows, const std::vector <Item> &grid_items,
 			size_t new_select)
 {
-	this->grid_width = grid_width;
-	cols = grid_cols;
-	rows = grid_rows;
-	items = grid_items;
-	items.resize (grid_cols * grid_rows);
-	select = size_t (-1);
-	if (new_select<items.size() && items[new_select].selectable) {
-		select = new_select;
+	grid_width_ = grid_width;
+	cols_ = grid_cols;
+	rows_ = grid_rows;
+	items_ = grid_items;
+	items_.resize (grid_cols * grid_rows);
+	select_ = size_t (-1);
+	if (new_select < items_.size() && items_[new_select].selectable) {
+		select_ = new_select;
 	}
-	GridSelect::redraw ();
+	redraw();
+}
+
+void GridSelect::set_grid(unsigned grid_width, unsigned grid_cols,
+			unsigned grid_rows, std::vector<Item> &&grid_items,
+			size_t new_select)
+{
+	grid_width_ = grid_width;
+	cols_ = grid_cols;
+	rows_ = grid_rows;
+	items_ = std::move(grid_items);
+	items_.resize(grid_cols * grid_rows);
+	select_ = size_t(-1);
+	if (new_select < items_.size() && items_[new_select].selectable) {
+		select_ = new_select;
+	}
+	redraw();
 }
 
 void GridSelect::set_select (size_t new_select, bool emit_signal)
 {
-	if (new_select<items.size() && items[new_select].selectable) {
-		if (new_select != select) {
-			select = new_select;
+	if (new_select < items_.size() && items_[new_select].selectable) {
+		if (new_select != select_) {
+			select_ = new_select;
 			if (emit_signal) {
 				sig_select_changed.emit ();
 			}
@@ -63,8 +79,8 @@ void GridSelect::set_select (size_t new_select, bool emit_signal)
 		}
 	}
 	else {
-		if (select < items.size ()) {
-			select = size_t (-1);
+		if (select_ < items_.size ()) {
+			select_ = size_t (-1);
 			if (emit_signal) {
 				sig_select_changed.emit ();
 			}
@@ -79,16 +95,16 @@ void GridSelect::redraw ()
 	clear ();
 	move_cursor(Size{});
 
-	for (unsigned y = 0; y < rows; ++y) {
-		for (unsigned x = 0; x < cols; ++x) {
-			Size pos{x * grid_width, y};
-			unsigned i = y * cols + x;
-			const Item &item = items[i];
+	for (unsigned y = 0; y < rows_; ++y) {
+		for (unsigned x = 0; x < cols_; ++x) {
+			Size pos{x * grid_width_, y};
+			unsigned i = y * cols_ + x;
+			const Item &item = items_[i];
 			PaletteID id = PALETTE_ID_GRID;
 			if (!item.selectable) {
 				id = PALETTE_ID_GRID_INVALID;
 			}
-			else if (i == select) {
+			else if (i == select_) {
 				move_cursor (pos);
 				id = PALETTE_ID_GRID_SELECT;
 			}
@@ -103,7 +119,7 @@ namespace {
 size_t get_next_by_direction (unsigned id, unsigned cols,
 		unsigned rows, wchar_t direction)
 {
-	unsigned N = rows*cols;
+	unsigned N = rows * cols;
 	switch (direction) {
 		case LEFT:
 			if (int (--id) < 0) {
@@ -148,10 +164,10 @@ size_t select_direction (unsigned current_id, unsigned cols, unsigned rows,
 		}
 	}
 	else {
-		id = get_next_by_direction (id, cols, rows, direction);
+		id = get_next_by_direction(id, cols, rows, direction);
 	}
 	while ((id != current_id) && !items[id].selectable) {
-		id = get_next_by_direction (id, cols, rows, direction);
+		id = get_next_by_direction(id, cols, rows, direction);
 	}
 	return id;
 }
@@ -160,7 +176,7 @@ size_t select_direction (unsigned current_id, unsigned cols, unsigned rows,
 
 bool GridSelect::on_key (wchar_t key)
 {
-	if (items.empty ()) {
+	if (items_.empty ()) {
 		return false;
 	}
 	unsigned new_select;
@@ -169,22 +185,22 @@ bool GridSelect::on_key (wchar_t key)
 		case RIGHT:
 		case UP:
 		case DOWN:
-			new_select = select_direction (select, cols, rows, items, key);
-			if (new_select != select) {
+			new_select = select_direction(select_, cols_, rows_, items_, key);
+			if (new_select != select_) {
 				set_select (new_select);
 				return true;
 			}
 			return false;
 		case HOME:
-			new_select = select_direction (-1u, cols, rows, items, RIGHT);
-			if (new_select != select) {
+			new_select = select_direction(-1u, cols_, rows_, items_, RIGHT);
+			if (new_select != select_) {
 				set_select (new_select);
 				return true;
 			}
 			return false;
 		case END:
-			new_select = select_direction (-1u, cols, rows, items, LEFT);
-			if (new_select != select) {
+			new_select = select_direction(-1u, cols_, rows_, items_, LEFT);
+			if (new_select != select_) {
 				set_select (new_select);
 				return true;
 			}
@@ -200,15 +216,15 @@ bool GridSelect::on_mouse (MouseEvent mouse_event)
 		return false;
 	}
 	unsigned click_row = mouse_event.p.y;
-	unsigned click_col = mouse_event.p.x / grid_width;
-	if (click_row>=rows || click_col>=cols) {
+	unsigned click_col = mouse_event.p.x / grid_width_;
+	if (click_row >= rows_ || click_col >= cols_) {
 		return false;
 	}
-	unsigned id = click_row * cols + click_col;
-	if (!items[id].selectable) {
+	unsigned id = click_row * cols_ + click_col;
+	if (!items_[id].selectable) {
 		return false;
 	}
-	if (id != select) {
+	if (id != select_) {
 		set_select (id, true);
 	}
 	if (mouse_event.m & LEFT_CLICK) {
