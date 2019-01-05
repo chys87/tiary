@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -215,10 +215,8 @@ const wchar_t BORDER_2  = 0x60000003; // Top, right
 const wchar_t BORDER_3  = 0x60000004; // Bottom, left
 const wchar_t BORDER_4  = 0x60000005; // Bottom, right
 
-inline bool special_printable (wchar_t c)
-{
-	unsigned ch = c;
-	return ((ch - 0x60000000u) < 256);
+inline constexpr bool special_printable(wchar_t c) {
+	return (c >= 0x60000000 && c < 0x60000000 + 256);
 }
 
 // No global I/O methods available. Use tiary::ui::Window or tiary::ui::Control!

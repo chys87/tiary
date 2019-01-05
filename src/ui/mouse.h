@@ -29,6 +29,11 @@ typedef unsigned MouseMask;
 struct MouseEvent {
 	Size p; ///< @brief Position of the mouse event
 	MouseMask m; ///< @brief Bitwise OR'd of LEFT_PRESS, MOUSE_ALT, etc.
+
+	/// Create a new mouse event with relative position
+	constexpr MouseEvent rebase(Size base_pos) const {
+		return {p - base_pos, m};
+	}
 };
 
 const MouseMask LEFT_PRESS       = 0x0001;

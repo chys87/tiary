@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -78,7 +78,7 @@ public:
 	bool set_focus_prev (bool keep_trying = false);
 	// Argument = one of Control::ctrl_{up,down,left,right}
 	bool set_focus_direction (Control *Control::*);
-	Control *get_focus () const { return focus_ctrl; }
+	Control *get_focus() const { return focus_ctrl_; }
 
 
 	// Interfaces:
@@ -152,15 +152,14 @@ public:
 	// Restore all windows and the UI system
 	static bool resume ();
 
-	const CharColorAttr * const* get_char_table () const { return char_table; }
-	const CharColorAttr * get_char_table (unsigned line) const { return char_table[line]; }
+	const CharColorAttr *get_char_table(unsigned line) const { return char_table_.data() + line * get_size().x; }
 
 	void request_close (); ///< Request the window be closed
 
-	Control *get_dummy_ctrl () { return &dummy_ctrl; }
-	const Control *get_dummy_ctrl () const { return &dummy_ctrl; }
-	Window *get_top_window () const { return top_window; }
-	Window *get_bottom_window () const { return bottom_window; }
+	Control *get_dummy_ctrl() { return &dummy_ctrl_; }
+	const Control *get_dummy_ctrl() const { return &dummy_ctrl_; }
+	Window *get_top_window () const { return top_window_; }
+	Window *get_bottom_window () const { return bottom_window_; }
 	static Window *get_topmost_window () { return topmost_window; }
 	static Window *get_bottommost_window () { return bottommost_window; }
 
@@ -168,44 +167,43 @@ public:
 	void register_hotkey(wchar_t c, Args&&... args) { hotkeys_.register_hotkey(c, std::forward<Args>(args)...); }
 
 private:
+	CharColorAttr *get_char_table(unsigned line) { return char_table_.data() + line * get_size().x; }
+
+private:
 	Hotkeys hotkeys_;
 
 	/// A "request" is a signal sent by a derivative class or a control
 	/// to a Window (the base class).
 	/// Currently there is only one type of "request": close window
-	unsigned requests;
+	uint8_t requests_;
 
 	ColorAttr cur_attr; ///< Current attribute
 
 	// Remember the character and attribute at every point
 	// The area is contiguous. i.e.
-	// char_table = new CharColorAttr*[height];
-	// char_table[0] = new CharColorAttr[height*width];
-	// char_table[i+1] = char_table[i] + width
-	CharColorAttr **char_table;
+	// character at (x, y) = char_table_[y * get_size().y + x]
+	std::vector<CharColorAttr> char_table_;
 
 	void reallocate_char_table ();
-	void deallocate_char_table ();
 
 
-	enum Status
-	{
-		STATUS_NORMAL
-		, STATUS_MOVING
+	enum Status : uint8_t {
+		STATUS_NORMAL,
+		STATUS_MOVING,
 	};
-	Status status;
-	const unsigned options;
-	const std::wstring title;
-	const unsigned title_scr_width;
+	Status status_;
+	const unsigned options_;
+	const std::wstring title_;
+	const unsigned title_scr_width_;
 
 	// The list of controls in the window is saved in a cyclic linked list
 	// One of them is dummy_ctrl
-	DummyControl dummy_ctrl; /// The first one in the linked list, a dummy
-	Control *focus_ctrl; /// 0 = none
+	DummyControl dummy_ctrl_; /// The first one in the linked list, a dummy
+	Control *focus_ctrl_ = nullptr; /// 0 = none
 
 	// Points to the immediate next two windows on both sides of this window
-	Window *top_window;
-	Window *bottom_window;
+	Window *top_window_ = nullptr;
+	Window *bottom_window_ = nullptr;
 
 	// All instances of windows, ordered by order on screen
 	static Window *topmost_window;
