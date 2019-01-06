@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -17,7 +17,8 @@
 
 #include "common/signal.h"
 #include "common/condition.h"
-#include <utility> // std::move
+#include <utility>
+#include <tuple>
 
 namespace tiary {
 
@@ -43,6 +44,12 @@ public:
 	Action(const Signal &sig, Condition &&cond) : signal_(sig), condition_(std::move(cond)) {}
 	Action(Signal &&sig, Condition &&cond) : signal_(std::move(sig)), condition_(std::move(cond)) {}
 	Action(Action &&) = default;
+
+	template <typename... SignalArgs, typename... ConditionArgs>
+	Action(std::piecewise_construct_t, std::tuple<SignalArgs...> signal_args, std::tuple<ConditionArgs...> condition_args) :
+		signal_(std::make_from_tuple<Signal>(std::move(signal_args))),
+		condition_(std::make_from_tuple<Condition>(std::move(condition_args))) {}
+
 	Signal &operator = (Signal &&sig) { return signal_ = std::move(sig); }
 	Condition &operator = (Condition &&cond) { return condition_ = std::move(cond); }
 	Action &operator = (Action &&act) = default;

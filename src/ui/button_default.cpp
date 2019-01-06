@@ -33,8 +33,9 @@ namespace ui {
 ButtonDefault::ButtonDefault ()
 	: Window ()
 {
-	Action sig_tmp (Signal (this, &ButtonDefault::slot_default_button),
-			Condition (this, &ButtonDefault::cond_default_button));
+	Action sig_tmp(std::piecewise_construct,
+			std::make_tuple(this, &ButtonDefault::slot_default_button),
+			std::make_tuple(this, &ButtonDefault::cond_default_button));
 	Window::register_hotkey (RETURN, sig_tmp);
 	Window::register_hotkey (NEWLINE, std::move (sig_tmp));
 }
