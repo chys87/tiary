@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -96,11 +96,11 @@ public:
 
 	template<typename R, typename C, typename D, typename...T, typename = decltype((std::declval<C*>()->*std::declval<R D::*>())(std::declval<T>()...))>
 	Signal(C &o, R D::*f, T... args) :
-		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), C*, T...>(std::mem_fn(f), &o, std::move(args)...)) {}
+		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), &o, std::move(args)...)) {}
 
 	template<typename R, typename C, typename D, typename...T, typename = decltype((std::declval<C*>()->*std::declval<R D::*>())(std::declval<T>()...))>
 	Signal(C *o, R D::*f, T... args) :
-		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), C*, T...>(std::mem_fn(f), o, std::move(args)...)) {}
+		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), o, std::move(args)...)) {}
 
 	Signal(const Signal &sig) : f_(sig.f_ ? sig.f_->copy() : nullptr) {}
 	// Note the second parameter.

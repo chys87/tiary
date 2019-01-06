@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,13 +26,11 @@
  * (menu items, buttons, etc.)
  */
 
+#include <functional>
 #include <memory>
-#include <list>
-#include <utility> // std::forward
+#include <utility>
 
 namespace tiary {
-
-class Condition;
 
 namespace detail {
 
@@ -43,28 +41,16 @@ public:
 	virtual ~CondBase () {}
 };
 
-template <typename C>
-class CondMV final : public CondBase {
+template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::result_of<C()>::type, bool>::value, void>::type>
+class CondC final : public CondBase {
 public:
-	CondMV(C *obj, bool (C::*foo)()) : obj_(obj), foo_(foo) {}
-	bool call(bool) const override { return (obj_->*foo_)(); }
-	CondMV *copy() const override { return new CondMV(obj_, foo_); }
+	CondC(const C &callable) : callable_(callable) {}
+	CondC(C &&callable) : callable_(callable) {}
+	bool call(bool) const override { return bool(callable_()); }
+	CondC *copy() const override { return new CondC(callable_); }
 
 private:
-	C *obj_;
-	bool (C::*foo_)();
-};
-
-template <typename C>
-class CondCMV final : public CondBase {
-public:
-	CondCMV(const C *obj, bool (C::*foo)() const) : obj_(obj), foo_(foo) {}
-	bool call(bool) const override { return (obj_->*foo_)(); }
-	CondCMV *copy() const override { return new CondCMV(obj_, foo_); }
-
-private:
-	const C *obj_;
-	bool (C::*foo_)() const;
+	C callable_;
 };
 
 } // namespace detail
@@ -73,34 +59,44 @@ class Condition
 {
 public:
 	Condition() = default;
-	Condition(const Condition &other) : info (other.info ? other.info->copy() : nullptr) {}
+	Condition(const Condition &other) : info_(other.info_ ? other.info_->copy() : nullptr) {}
 	Condition &operator = (const Condition &other);
 	Condition(Condition &&other) = default;
 	Condition &operator = (Condition &&other) = default;
 
-	template <typename D> Condition (D &obj, bool (D::*foo)()) : info (new detail::CondMV <D> (&obj, foo)) {}
-	template <typename D> Condition (D *obj, bool (D::*foo)()) : info (new detail::CondMV <D> (obj, foo)) {}
-	template <typename D> Condition (const D &obj, bool (D::*foo)() const) : info (new detail::CondCMV <D> (&obj, foo)) {}
-	template <typename D> Condition (const D *obj, bool (D::*foo)() const) : info (new detail::CondCMV <D> (obj, foo)) {}
+	// Condition itself doesn't meet the requirement that it's callable, so we don't need to explicitly exclude it
+	template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::result_of<C()>::type, bool>::value>::type>
+	Condition(C &&callable) : info_(new detail::CondC(std::forward<C>(callable))) {}
 
-	bool call (bool default_return) const { return (info ? info->call (default_return) : default_return); }
+	template <typename C, typename D, typename = typename std::enable_if<std::is_base_of<D, C>::value, void>::type>
+		Condition (C &obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), static_cast<D *>(&obj)))) {}
+	template <typename C, typename D, typename = typename std::enable_if<std::is_base_of<D, C>::value, void>::type>
+		Condition (C *obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), static_cast<D *>(obj)))) {}
+	template <typename C, typename D, typename = typename std::enable_if<std::is_base_of<D, C>::value, void>::type>
+		Condition (const C &obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), static_cast<const D *>(&obj)))) {}
+	template <typename C, typename D, typename = typename std::enable_if<std::is_base_of<D, C>::value, void>::type>
+		Condition (const C *obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), static_cast<const D *>(obj)))) {}
+
+	bool call (bool default_return) const { return (info_ ? info_->call (default_return) : default_return); }
+
+	struct And {};
+	struct Or {};
+	struct Not {};
+	static constexpr And AND{};
+	static constexpr Or OR{};
+	static constexpr Not NOT{};
+
+	Condition(const Condition &a, And, const Condition &b);
+	Condition(const Condition &a, And, Condition &&b);
+	Condition(Condition &&a, And, const Condition &b);
+	Condition(const Condition &a, Or, const Condition &b);
+	Condition(const Condition &a, Or, Condition &&b);
+	Condition(Condition &&a, Or, const Condition &b);
+	Condition(Not, const Condition &);
+	Condition(Not, Condition &&);
 
 private:
-	explicit Condition (detail::CondBase *ptr) : info (ptr) {}
-
-	friend Condition operator ! (const Condition &);
-	friend Condition operator && (const Condition &, const Condition &);
-	friend Condition operator || (const Condition &, const Condition &);
-	friend Condition operator ! (Condition &&);
-	friend Condition operator && (const Condition &, Condition &&);
-	friend Condition operator && (Condition &&, const Condition &);
-	friend Condition operator && (Condition &&, Condition &&);
-	friend Condition operator || (const Condition &, Condition &&);
-	friend Condition operator || (Condition &&, const Condition &);
-	friend Condition operator || (Condition &&, Condition &&);
-
-private:
-	std::unique_ptr<detail::CondBase> info;
+	std::unique_ptr<detail::CondBase> info_;
 };
 
 namespace detail {
@@ -117,76 +113,55 @@ private:
 	Condition obj_;
 };
 
-#define TIARY_COND_BIN_CLASS(cname) \
-	struct cname : public CondBase {\
-		Condition obja_;\
-		Condition objb_;\
-		cname (const Condition &oa, const Condition &ob)\
-			: obja_(oa), objb_(ob) {}\
-		cname(const Condition &oa, Condition &&ob) : obja_(oa), objb_(std::move(ob)) {}\
-		cname(Condition &&oa, const Condition &ob) : obja_(std::move(oa)), objb_(ob) {}\
-		cname(Condition &&oa, Condition &&ob) : obja_(std::move(oa)), objb_(std::move(ob)) {}\
-		~cname ();\
-		bool call(bool) const override;\
-		cname *copy () const override;\
-	};
+class CondAnd : public CondBase {
+public:
+	CondAnd(const Condition &oa, const Condition &ob) : a_(oa), b_(ob) {}
+	CondAnd(const Condition &oa, Condition &&ob) : a_(oa), b_(std::move(ob)) {}
+	CondAnd(Condition &&oa, const Condition &ob) : a_(std::move(oa)), b_(ob) {}
+	CondAnd(Condition &&oa, Condition &&ob) : a_(std::move(oa)), b_(std::move(ob)) {}
+	~CondAnd();
+	bool call(bool) const override;
+	CondAnd *copy () const override;
 
-TIARY_COND_BIN_CLASS(CondAnd)
-TIARY_COND_BIN_CLASS(CondOr)
+private:
+	Condition a_;
+	Condition b_;
+};
 
-#undef TIARY_COND_BIN_CLASS
+class CondOr : public CondBase {
+public:
+	CondOr(const Condition &oa, const Condition &ob) : a_(oa), b_(ob) {}
+	CondOr(const Condition &oa, Condition &&ob) : a_(oa), b_(std::move(ob)) {}
+	CondOr(Condition &&oa, const Condition &ob) : a_(std::move(oa)), b_(ob) {}
+	CondOr(Condition &&oa, Condition &&ob) : a_(std::move(oa)), b_(std::move(ob)) {}
+	~CondOr();
+	bool call(bool) const override;
+	CondOr *copy () const override;
+
+private:
+	Condition a_;
+	Condition b_;
+};
 
 } // namespace detail
 
-inline Condition operator ! (const Condition &obj)
-{
-	return Condition (new detail::CondNot (obj));
-}
+inline Condition::Condition(const Condition &a, And, const Condition &b) : info_(new detail::CondAnd(a, b)) {}
+inline Condition::Condition(const Condition &a, And, Condition &&b) : info_(new detail::CondAnd(a, std::move(b))) {}
+inline Condition::Condition(Condition &&a, And, const Condition &b) : info_(new detail::CondAnd(std::move(a), b)) {}
+inline Condition::Condition(const Condition &a, Or, const Condition &b) : info_(new detail::CondOr(a, b)) {}
+inline Condition::Condition(const Condition &a, Or, Condition &&b) : info_(new detail::CondOr(a, std::move(b))) {}
+inline Condition::Condition(Condition &&a, Or, const Condition &b) : info_(new detail::CondOr(std::move(a), b)) {}
+inline Condition::Condition(Not, const Condition &a) : info_(new detail::CondNot(a)) {}
+inline Condition::Condition(Not, Condition &&a) : info_(new detail::CondNot(std::move(a))) {}
 
-inline Condition operator && (const Condition &obja, const Condition &objb)
-{
-	return Condition (new detail::CondAnd (obja, objb));
-}
-
-inline Condition operator || (const Condition &obja, const Condition &objb)
-{
-	return Condition (new detail::CondOr (obja, objb));
-}
-
-inline Condition operator ! (Condition &&obj)
-{
-	return Condition (new detail::CondNot (std::move (obj)));
-}
-
-inline Condition operator && (const Condition &obja, Condition &&objb)
-{
-	return Condition (new detail::CondAnd (obja, std::move (objb)));
-}
-
-inline Condition operator && (Condition &&obja, const Condition &objb)
-{
-	return Condition (new detail::CondAnd (std::move (obja), objb));
-}
-
-inline Condition operator && (Condition &&obja, Condition &&objb)
-{
-	return Condition (new detail::CondAnd (std::move (obja), std::move (objb)));
-}
-
-inline Condition operator || (const Condition &obja, Condition &&objb)
-{
-	return Condition (new detail::CondOr (obja, std::move (objb)));
-}
-
-inline Condition operator || (Condition &&obja, const Condition &objb)
-{
-	return Condition (new detail::CondOr (std::move (obja), objb));
-}
-
-inline Condition operator || (Condition &&obja, Condition &&objb)
-{
-	return Condition (new detail::CondOr (std::move (obja), std::move (objb)));
-}
+inline Condition operator ! (const Condition &obj) { return Condition(Condition::NOT, obj); }
+inline Condition operator ! (Condition &&obj) { return Condition(Condition::NOT, std::move(obj)); }
+inline Condition operator && (const Condition &obja, const Condition &objb) { return Condition(obja, Condition::AND, objb); }
+inline Condition operator && (const Condition &obja, Condition &&objb) { return Condition(obja, Condition::AND, std::move(objb)); }
+inline Condition operator && (Condition &&obja, const Condition &objb) { return Condition(std::move(obja), Condition::AND, objb); }
+inline Condition operator || (const Condition &obja, const Condition &objb) { return Condition(obja, Condition::OR, objb); }
+inline Condition operator || (const Condition &obja, Condition &&objb) { return Condition(obja, Condition::OR, std::move(objb)); }
+inline Condition operator || (Condition &&obja, const Condition &objb) { return Condition(std::move(obja), Condition::OR, objb); }
 
 } // namespace tiary
 

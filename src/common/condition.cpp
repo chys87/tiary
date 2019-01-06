@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -20,7 +20,7 @@ namespace tiary {
 Condition &Condition::operator = (const Condition &other)
 {
 	if (this != &other) {
-		info.reset(other.info ? other.info->copy() : nullptr);
+		info_.reset(other.info_ ? other.info_->copy() : nullptr);
 	}
 	return *this;
 }
@@ -45,15 +45,15 @@ CondAnd::~CondAnd ()
 }
 
 bool CondAnd::call(bool default_return) const {
-	if (!obja_.call (default_return)) {
+	if (!a_.call(default_return)) {
 		return false;
 	}
-	return objb_.call (default_return);
+	return b_.call(default_return);
 }
 
 CondAnd *CondAnd::copy () const
 {
-	return new CondAnd(obja_, objb_);
+	return new CondAnd(a_, b_);
 }
 
 CondOr::~CondOr ()
@@ -61,15 +61,15 @@ CondOr::~CondOr ()
 }
 
 bool CondOr::call(bool default_return) const {
-	if (obja_.call (default_return)) {
+	if (a_.call(default_return)) {
 		return true;
 	}
-	return objb_.call (default_return);
+	return b_.call(default_return);
 }
 
 CondOr *CondOr::copy () const
 {
-	return new CondOr(obja_, objb_);
+	return new CondOr(a_, b_);
 }
 
 } // namespace tiary::detail
