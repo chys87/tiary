@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -35,7 +35,7 @@ namespace ui {
  * If you use '&' and then modify the text, the hotkey is _not_ re-registered
  * (Behavior may change in the future.)
  */
-class Label final : public UnfocusableControl {
+class Label final : public Control {
 public:
 	Label (Window &, const std::wstring &, unsigned = 0 /**< UIString options */);
 	Label(Window &, std::wstring &&, unsigned = 0 /**< UIString options */);

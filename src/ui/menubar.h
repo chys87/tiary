@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -32,8 +32,7 @@ namespace ui {
  *
  * We also allows displaying some texts on the right side of the menubar.
  */
-class MenuBar final : public UnfocusableControl
-{
+class MenuBar final : public Control {
 public:
 
 	explicit MenuBar (Window &);

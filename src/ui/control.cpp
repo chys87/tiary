@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -21,12 +21,13 @@ namespace tiary {
 namespace ui {
 
 
-Control::Control(Window &win)
+Control::Control(Window &win, uint8_t properties)
 	: MovableObject ()
 	, win_(win)
 	, hotkeys_()
 	, curpos{}
 	, cursor_visible (true)
+	, properties_(properties)
 	, ctrl_left (0)
 	, ctrl_right (0)
 	, ctrl_up (0)
@@ -60,10 +61,19 @@ bool Control::on_key (wchar_t)
 
 void Control::on_defocus ()
 {
+	if (properties_ & kRedrawOnFocusChange) {
+		redraw();
+	}
 }
 
 bool Control::on_focus ()
 {
+	if (properties_ & kUnfocusable) {
+		return false;
+	}
+	if (properties_ & kRedrawOnFocusChange) {
+		redraw();
+	}
 	return true;
 }
 
@@ -168,23 +178,6 @@ void Control::fill (Size fill_pos, Size fill_size, wchar_t ch)
 		fill_size &= get_size() - fill_pos;
 		win_.fill(fill_pos + get_pos(), fill_size, ch);
 	}
-}
-
-
-bool UnfocusableControl::on_focus ()
-{
-	return false;
-}
-
-bool FocusColorControl::on_focus ()
-{
-	redraw ();
-	return true;
-}
-
-void FocusColorControl::on_defocus ()
-{
-	redraw ();
 }
 
 } // namespace tiary::ui

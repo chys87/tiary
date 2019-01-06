@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -39,7 +39,10 @@ struct MouseEvent;
 class Control : public MovableObject
 {
 public:
-	explicit Control (Window &);
+	static constexpr uint8_t kUnfocusable = 1;
+	static constexpr uint8_t kRedrawOnFocusChange = 2;
+
+	explicit Control(Window &, uint8_t properties = 0);
 
 	// move_resize does not imply redraw
 	void move_resize (Size pos, Size size);
@@ -103,6 +106,7 @@ private:
 	Hotkeys hotkeys_;
 	Size curpos; ///< Cursor position
 	bool cursor_visible; ///< Whether the cursor should be visible
+	uint8_t properties_;
 
 public:
 	// The following four pointer describe the relative position of
@@ -119,33 +123,6 @@ public:
 	Action sig_clicked;
 
 	friend class Window;
-};
-
-
-/**
- * @brief	An "unfocusable" control.
- *
- * Makes on_focus return false
- */
-class UnfocusableControl : public virtual Control
-{
-public:
-	using Control::Control;
-	bool on_focus() override;
-};
-
-/**
- * @brief	Controls that look different when focused or not.
- *
- * This is done by forwarding on_focus and on_defocus to redraw.
- * The user should detect whether it's focused or not in redraw.
- */
-class FocusColorControl : public virtual Control
-{
-public:
-	using Control::Control;
-	bool on_focus() override;
-	void on_defocus() override;
 };
 
 } // namespace tiary::ui

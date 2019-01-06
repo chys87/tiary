@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,8 +22,7 @@ namespace ui {
 
 
 Label::Label (Window &win, const std::wstring &str, unsigned options)
-	: Control (win)
-	, UnfocusableControl (win)
+	: Control(win, kUnfocusable)
 	, text (str, options)
 {
 	// Register hotkey
@@ -35,8 +34,7 @@ Label::Label (Window &win, const std::wstring &str, unsigned options)
 }
 
 Label::Label(Window &win, std::wstring &&str, unsigned options)
-	: Control(win)
-	, UnfocusableControl(win)
+	: Control(win, kUnfocusable)
 	, text(std::move(str), options) {
 	// Register hotkey
 	if (wchar_t c = text.get_hotkey ()) {

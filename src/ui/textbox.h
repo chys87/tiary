@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,7 +26,7 @@ namespace ui {
 /*
  * Single-line text editor.
  */
-class TextBox final : public virtual Control, public FocusColorControl, private Scroll {
+class TextBox final : public Control, private Scroll {
 public:
 
 	explicit TextBox (Window &, unsigned attr = 0);
