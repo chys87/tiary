@@ -451,10 +451,37 @@ bool ucs_isalnum (wchar_t c)
 	return find (alnum_table, array_end (alnum_table), c);
 }
 
-bool ucs_iscjk (wchar_t c)
-{
-	unsigned ch = c;
-	return (ch>=0x4E00u) && (ch<0xA000u);
+bool ucs_iscjk(wchar_t c) {
+	uint32_t ch = c;
+	// Quickly return false for ASCII
+	if (ch < 0x3400)
+		return false;
+	// CJK Unified Ideographs
+	if (ch >= 0x4E00 && ch <= 0x9fff)
+		return true;
+	// CJK Unified Ideographs Extension A (Unicode 3.0, 1999)
+	if (ch >= 0x3400 && ch <= 0x4dbf)
+		return true;
+	// CJK Unified Ideographs Extension B (Unicode 3.1, 2001): 20000–2A6DF
+	if (ch >= 0x20000 && ch <= 0x2A6DF)
+		return true;
+	// CJK Unified Ideographs Extension C (Unicode 5.2, 2009): 2A700–2B73F
+	if (ch >= 0x2A700 && ch <= 0x2B73F)
+		return true;
+	// CJK Unified Ideographs Extension D (Unicode 6.0, 2010): 2B740–2B81F
+	if (ch >= 0x2B740 && ch <= 0x2B81F)
+		return true;
+	// CJK Unified Ideographs Extension E (Unicode 8.0, 2015): 2B820–2CEAF
+	if (ch >= 0x2B820 && ch <= 0x2CEAF)
+		return true;
+	// CJK Unified Ideographs Extension F (Unicode 10.0, 2017): 2CEB0–2EBEF
+	if (ch >= 0x2CEB0 && ch <= 0x2EBEF)
+		return true;
+	// CJK Compatibility Ideographs: F900–FAFF
+	if (ch >= 0xF900 && ch <= 0xFAFF)
+		return true;
+
+	return false;
 }
 
 bool allow_line_beginning (wchar_t c)
