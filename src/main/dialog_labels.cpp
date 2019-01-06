@@ -35,8 +35,7 @@ using namespace ui;
 /**
  * @brief	Class for the Label editing dialog
  */
-class WindowLabels : public virtual Window, private ButtonDefaultExtended
-{
+class WindowLabels : public virtual Window, private ButtonDefault {
 
 	WStringLocaleOrderedSet &labels;
 
@@ -65,7 +64,7 @@ public:
 
 WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_)
 	: ui::Window (0, L"Labels")
-	, ButtonDefaultExtended ()
+	, ButtonDefault()
 	, labels (labels_)
 	, lbl_selected (*this, L"&Labels for this entry:")
 	, txt_selected (*this)
@@ -101,8 +100,7 @@ WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocal
 			{layout_buttons, 3, 3},
 		});
 
-	set_default_button (btn_ok);
-	set_special_default_button (lst_all, btn_add);
+	set_default_button(&btn_ok, {{&lst_all, &btn_add}});
 
 	btn_ok.sig_clicked.connect (this, &WindowLabels::slot_ok);
 

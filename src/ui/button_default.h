@@ -40,47 +40,27 @@ public:
 	void on_focus_changed() override;
 
 	/**
-	 * @brief	Set the default "default button"
+	 * @brief	Set default button rules
 	 */
-	void set_default_button (Button * = 0);
-	void set_default_button (Button &btn) { set_default_button (&btn); }
+	void set_default_button(Button *default_button) { default_default_ = default_button; }
+	void set_default_button(Button &default_button) { set_default_button(&default_button); }
+
+	void set_default_button(Button *default_button, std::map<Control *, Button *> &&focus_defaults) {
+		default_default_ = default_button;
+		focus_default_map_ = std::move(focus_defaults);
+	}
 
 	Button *get_current_default_button () const { return current_default_; }
 
 private:
-	Button *default_default_;
+	Button *current_default_ = nullptr; // Updated by on_focus_changed
 
-	Button *current_default_; // Updated by on_focus_changed
+	Button *default_default_ = nullptr;
+	std::map<Control *, Button *> focus_default_map_;
 
 	void slot_default_button ();
 	bool cond_default_button () const; // Whether the default button is usable
 	void redraw_all_buttons ();
-
-	friend class ButtonDefaultExtended;
-};
-
-
-/**
- * @brief	An "extended" version of tiary::ui::ButtonDefault
- *
- * This class allows the default button to change depending on the current focus control
- */
-class ButtonDefaultExtended : public ButtonDefault
-{
-public:
-	/**
-	 * @brief	Set a pair of focus-default controls
-	 */
-	void set_special_default_button (Control *, Button *);
-	void set_special_default_button (Control *ctrl, Button &btn) { set_special_default_button (ctrl, &btn); }
-	void set_special_default_button (Control &ctrl, Button *btn) { set_special_default_button (&ctrl, btn); }
-	void set_special_default_button (Control &ctrl, Button &btn) { set_special_default_button (&ctrl, &btn); }
-
-	void on_focus_changed() override;
-
-private:
-
-	std::map <Control *, Button *> special_map_;
 };
 
 

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -14,7 +14,7 @@
 /**
  * @file	ui/button_default.cpp
  * @author	chys <admin@chys.info>
- * @brief	Implements class tiary::ui::ButtonDefault and tiary::ui::ButtonDefaultExtended
+ * @brief	Implements class tiary::ui::ButtonDefault
  */
 
 
@@ -32,8 +32,6 @@ namespace ui {
 
 ButtonDefault::ButtonDefault ()
 	: Window ()
-	, default_default_(nullptr)
-	, current_default_(0)
 {
 	Action sig_tmp (Signal (this, &ButtonDefault::slot_default_button),
 			Condition (this, &ButtonDefault::cond_default_button));
@@ -43,9 +41,17 @@ ButtonDefault::ButtonDefault ()
 
 void ButtonDefault::on_focus_changed ()
 {
-	Button *default_button = dynamic_cast<Button *>(get_focus());
+	Control *focus = get_focus();
+	// If the focus is a button, it's the default
+	Button *default_button = dynamic_cast<Button *>(focus);
+	// Otherwise, follow the preset rules
 	if (default_button == 0) {
-		default_button = default_default_;
+		auto it = focus_default_map_.find(focus);
+		if (it == focus_default_map_.end()) {
+			default_button = default_default_;
+		} else {
+			default_button = it->second;
+		}
 	}
 
 	if (default_button != current_default_) {
@@ -64,11 +70,6 @@ void ButtonDefault::redraw_all_buttons ()
 	}
 }
 
-void ButtonDefault::set_default_button (Button *btn)
-{
-	default_default_ = btn;
-}
-
 void ButtonDefault::slot_default_button ()
 {
 	if (Button *btn = get_current_default_button ()) {
@@ -84,32 +85,6 @@ bool ButtonDefault::cond_default_button () const
 		}
 	}
 	return false;
-}
-
-
-
-void ButtonDefaultExtended::set_special_default_button (Control *focus, Button *btn)
-{
-	special_map_.emplace(focus, btn);
-}
-
-void ButtonDefaultExtended::on_focus_changed ()
-{
-	Button *default_button = dynamic_cast<Button *>(get_focus());
-	if (default_button == 0) {
-		auto it = special_map_.find(get_focus());
-		if (it == special_map_.end ()) {
-			default_button = default_default_;
-		}
-		else {
-			default_button = it->second;
-		}
-	}
-
-	if (default_button != current_default_) {
-		current_default_ = default_button;
-		redraw_all_buttons ();
-	}
 }
 
 } // namespace tiary::ui
