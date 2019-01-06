@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -39,48 +39,40 @@ struct Stat
 };
 
 // The result is _added_ to ret
-void stat_string (Stat &ret, const std::wstring &text)
-{
-	ret.characters += text.length ();
+void stat_string(Stat *ret, const std::wstring &text) {
+	ret->characters += text.length();
 
 	bool last_alpha = false;
 	wchar_t lastc = L'\n';
-	for (const wchar_t *p = text.c_str (); *p; ++p) {
-		wchar_t c = *p;
+	for (wchar_t c : text) {
 
-		if (c!=L'\n' && lastc==L'\n') {
-			++ret.paragraphs;
+		if (c != L'\n' && lastc == L'\n') {
+			++ret->paragraphs;
 		}
 		lastc = c;
 
-		bool this_alpha;
+		bool this_alpha = false;
 		if (iswgraph (c)) {
-			++ret.char_graph;
+			++ret->char_graph;
 			if (ucs_iscjk (c)) {
-				++ret.cjks;
-				this_alpha = false;
-			}
-			else {
+				++ret->cjks;
+			} else {
 				this_alpha = ucs_isalpha (c);
 			}
 		}
-		else {
-			this_alpha = false;
-		}
 		if (!last_alpha && this_alpha) {
-			++ret.words;
+			++ret->words;
 		}
 		last_alpha = this_alpha;
-		ret.bytes += utf8_len_by_wchar (c);
+		ret->bytes += utf8_len_by_wchar (c);
 	}
 }
 
 // The result is _added_ to ret
-void stat_entry (Stat &ret, const DiaryEntry &entry)
-{
-	unsigned old_paragraphs = ret.paragraphs;
+void stat_entry(Stat *ret, const DiaryEntry &entry) {
+	unsigned old_paragraphs = ret->paragraphs;
 	stat_string (ret, entry.title);
-	ret.paragraphs = old_paragraphs;
+	ret->paragraphs = old_paragraphs;
 	stat_string (ret, entry.text);
 }
 
@@ -95,9 +87,8 @@ TimeSpan get_span (const DiaryEntryList &lst)
 {
 	uint64_t min = uint64_t(0) - 1;
 	uint64_t max = 0;
-	for (DiaryEntryList::const_iterator it=lst.begin(), e=lst.end();
-			it != e; ++it) {
-		uint64_t v = (*it)->local_time.get_value();
+	for (const DiaryEntry *entry : lst) {
+		uint64_t v = entry->local_time.get_value();
 		if (v < min) {
 			min = v;
 		}
@@ -105,8 +96,7 @@ TimeSpan get_span (const DiaryEntryList &lst)
 			max = v;
 		}
 	}
-	TimeSpan ret = { min, max };
-	return ret;
+	return {min, max};
 }
 
 void append_stat (std::wstring &text, ui::RichTextLineList &lst, const Stat &info)
@@ -155,17 +145,17 @@ void display_statistics (const DiaryEntryList &all_entries,
 
 	Stat info = {};
 	if (current_entry) {
-		stat_entry (info, *current_entry);
+		stat_entry(&info, *current_entry);
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Current entry");
 		append_stat (rich_text, rich_lines, info);
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
 	}
 
+	// Show filtered entries
 	if (filtered_entries) {
-		for (DiaryEntryList::const_iterator it=filtered_entries->begin(), e=filtered_entries->end();
-				it != e; ++it) {
-			if (*it != current_entry) {
-				stat_entry (info, **it);
+		for (const DiaryEntry *entry : *filtered_entries) {
+			if (entry != current_entry) {
+				stat_entry(&info, *entry);
 			}
 		}
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD,
@@ -174,18 +164,16 @@ void display_statistics (const DiaryEntryList &all_entries,
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
 	}
 
+	// Add the remaining entries
 	{
-		std::set<const DiaryEntry*> filtered_set;
+		std::set<const DiaryEntry*> visited_set;
 		if (filtered_entries) {
-			filtered_set.insert (filtered_entries->begin (), filtered_entries->end ());
+			visited_set.insert(filtered_entries->begin(), filtered_entries->end());
 		}
-		else {
-			filtered_set.insert (current_entry);
-		}
-		for (DiaryEntryList::const_iterator it=all_entries.begin(), e=all_entries.end();
-				it != e; ++it) {
-			if (filtered_set.find (*it) == filtered_set.end ()) {
-				stat_entry (info, **it);
+		visited_set.insert(current_entry);
+		for (const DiaryEntry *entry : all_entries) {
+			if (visited_set.find(entry) == visited_set.end()) {
+				stat_entry(&info, *entry);
 			}
 		}
 	}
@@ -210,12 +198,10 @@ void display_statistics (const DiaryEntryList &all_entries,
 	unsigned n_distinct_labels;
 	// Count the number of distinct labels
 	{
-		// This set stores only the hash64 values of labels
 		std::unordered_set<std::wstring_view> all_labels;
-		for (DiaryEntryList::const_iterator it=all_entries.begin(), e=all_entries.end();
-				it != e; ++it) {
-			n_labels += (*it)->labels.size ();
-			for (const auto &s: (*it)->labels)
+		for (const DiaryEntry *entry : all_entries) {
+			n_labels += entry->labels.size ();
+			for (const auto &s: entry->labels)
 				all_labels.insert(s);
 		}
 		n_distinct_labels = all_labels.size ();
