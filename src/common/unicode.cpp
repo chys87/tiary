@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -18,7 +18,6 @@
  * @brief	Implements common/unicode.h
  */
 #include "common/unicode.h"
-#include "common/algorithm.h"
 #include <memory>
 #include <wchar.h>
 #include <wctype.h>
@@ -27,49 +26,6 @@
 #include <string.h>
 
 namespace tiary {
-
-namespace {
-
-/**
- * @brief	Defines an interval of Unicode characters
- *
- * The defined interval is from @c first, inclusive, to @c lastnext, exclusive,
- * i.e. <code>[first,lastnext)</code>
- */
-struct WcharInterval
-{
-	unsigned first;
-	unsigned lastnext;
-};
-
-/**
- * @brief	Determines whether a character is in any of a given set of intervals
- * @param	ch	Input character
- * @param	lo,hi	Defines the set of intervals of Unicode characters
- * @result	@c true if @c ch is in any of the intervals in @c [lo,hi). \n
- *			@c false otherwise.
- *
- * We use binary search, so the input intervals must have been sorted
- * in ascending order.
- */
-bool find (const WcharInterval *lo, const WcharInterval *hi, unsigned ch)
-{
-	while (lo < hi) {
-		const WcharInterval *mid = lo + size_t(hi-lo)/2;
-		if (ch < mid->first) {
-			hi = mid;
-		}
-		else if (ch >= mid->lastnext) {
-			lo = mid + 1;
-		}
-		else {
-			return true;
-		}
-	}
-	return false;
-}
-
-} // Anonymous namespace
 
 int utf8_len_by_wchar (wchar_t w)
 {
@@ -418,93 +374,8 @@ wchar_t ucs_reverse_case (wchar_t c)
 	}
 }
 
-namespace {
-const WcharInterval alnum_table[] = {
-	{ L'0', L'9'+1 }, // Numerals
-	{ L'A', L'Z'+1 }, { L'a', L'z'+1 }, // Basic latin
-	{ 0x00c0, 0x00d7 }, { 0x00d8, 0x00f7 }, { 0x00f8, /*0x0100 }, // Latin-1 supplement
-	{ 0x0100,*/ /* 0x0180 }, // Latin Extended-A
-	{ 0x0180,*/ /* 0x0250 }, // Latin Extended-B
-	{ 0x0250,*/ 0x02AF }, // IPA
-	{ 0x02B0, 0x02ff }, // Spacing modifier letters
-	{ 0x0385, /*0x0400 }, // Greek
-	{ 0x0400,*/ /* 0x0500 }, // Cyrillic
-	{ 0x0500,*/ 0x0514 }, // Cyrillic supplement
-	{ 0x0531, 0x0559 }, { 0x0561, 0x0589 }, // Armenian
-	{ 0x05d0, 0x05f0 }, // Hebrew
-	{ 0x0621, 0x0656 }, { 0x066e, 0x06d4 }, { 0x06fa, 0x06fd}, { 0x06ff, 0x0700 }, // Arabic/Urdu/Farsi
-	{ 0x0710, 0x07e0 }, { 0x074d, /*0x0750 }, // Syriac
-	{ 0x0750,*/ 0x076e }, // Arabic supplement
-	{ 0x0780, 0x07a6 }, // Thaana
-	{ 0x07ca, 0x07f4 }, // N'Ko
-	{ 0x2c60, 0x2c78 } // Latin Extended-C
-};
-} // Anonymous namespace
-
-bool ucs_isalpha (wchar_t c)
-{
-	return find (alnum_table+1, array_end (alnum_table), c);
-}
-
-bool ucs_isalnum (wchar_t c)
-{
-	return find (alnum_table, array_end (alnum_table), c);
-}
-
-bool ucs_iscjk(wchar_t c) {
-	uint32_t ch = c;
-	// Quickly return false for ASCII
-	if (ch < 0x3400)
-		return false;
-	// CJK Unified Ideographs
-	if (ch >= 0x4E00 && ch <= 0x9fff)
-		return true;
-	// CJK Unified Ideographs Extension A (Unicode 3.0, 1999)
-	if (ch >= 0x3400 && ch <= 0x4dbf)
-		return true;
-	// CJK Unified Ideographs Extension B (Unicode 3.1, 2001): 20000–2A6DF
-	if (ch >= 0x20000 && ch <= 0x2A6DF)
-		return true;
-	// CJK Unified Ideographs Extension C (Unicode 5.2, 2009): 2A700–2B73F
-	if (ch >= 0x2A700 && ch <= 0x2B73F)
-		return true;
-	// CJK Unified Ideographs Extension D (Unicode 6.0, 2010): 2B740–2B81F
-	if (ch >= 0x2B740 && ch <= 0x2B81F)
-		return true;
-	// CJK Unified Ideographs Extension E (Unicode 8.0, 2015): 2B820–2CEAF
-	if (ch >= 0x2B820 && ch <= 0x2CEAF)
-		return true;
-	// CJK Unified Ideographs Extension F (Unicode 10.0, 2017): 2CEB0–2EBEF
-	if (ch >= 0x2CEB0 && ch <= 0x2EBEF)
-		return true;
-	// CJK Compatibility Ideographs: F900–FAFF
-	if (ch >= 0xF900 && ch <= 0xFAFF)
-		return true;
-
-	return false;
-}
-
-bool allow_line_beginning (wchar_t c)
-{
-	static const unsigned chars[] = {
-		0x0021, 0x0029, 0x002c, 0x002e, 0x003a, 0x003b, 0x003f, 0x005d,
-		0x007d, 0x00a8, 0x00b7, 0x02c7, 0x02c9, 0x2015, 0x2016, 0x2019,
-		0x201d, 0x2026, 0x2236, 0x3001, 0x3002, 0x3003, 0x3005, 0x3009,
-		0x300b, 0x300d, 0x300f, 0x3011, 0x3015, 0x3017, 0xff01, 0xff02,
-		0xff07, 0xff09, 0xff0c, 0xff0e, 0xff1a, 0xff1b, 0xff1f, 0xff3d,
-		0xff40, 0xff5c, 0xff5d, 0xff5e, 0xffe0
-	};
-	return !binary_search_null (chars, array_end(chars), unsigned(c));
-}
-
-bool allow_line_end (wchar_t c)
-{
-	static const unsigned chars[] = {
-		0x0028, 0x005b, 0x007b, 0x00b7, 0x2018, 0x201c, 0x3008, 0x300a,
-		0x300c, 0x300e, 0x3010, 0x3014, 0x3016, 0xff08, 0xff0e, 0xff3b,
-		0xff5b, 0xffe1, 0xffe5
-	};
-	return !binary_search_null (chars, array_end(chars), unsigned(c));
+bool ucs_isalnum(char32_t c) {
+	return (c >= L'0' && c <= L'9') || ucs_isalpha(c);
 }
 
 } // namespace tiary

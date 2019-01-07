@@ -154,10 +154,25 @@ AC_COMPILE_IFELSE(
 		AC_MSG_RESULT([yes]);
 		AC_DEFINE([HAVE___BUILTIN_BSWAP64], [1], [Define to 1 if the compiler supports __builtin_bswap64])
 ], [AC_MSG_RESULT([no])])
+AC_MSG_CHECKING([for case ranges (a GCC extension)])
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(, [[
+		int a = 5;
+		switch (a) {
+			case 0 ... 3: return 1;
+			case 4 ... 6: return 0;
+			default: return 2;
+		}
+		return 3;
+	]])],
+	[
+		AC_MSG_RESULT([yes]);
+		AC_DEFINE([HAVE_CASE_RANGES], [1], [Define to 1 if the compiler supports case ranges (a GCC extension)])
+], [AC_MSG_RESULT([no])])
 
 
 dnl Add several useful flags if supported by compiler
-AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fno-exceptions])
+AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fno-exceptions -finput-charset=utf-8])
 AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
 
 dnl Check whether the compiler has some support for C++17

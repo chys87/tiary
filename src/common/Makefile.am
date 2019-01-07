@@ -53,5 +53,15 @@ libcommon_a_SOURCES = \
 	string_match.cpp \
 	unicode.h \
 	unicode.cpp \
+	unicode.gen.cpp \
 	xml.h \
 	xml.cpp
+
+noinst_PROGRAMS = unicode_range.gen
+
+unicode_range_gen_SOURCES = unicode_range_gen.cpp
+
+CLEANFILES = unicode.gen.cpp
+
+unicode.gen.cpp: unicode_range.gen$(EXEEXT)
+	./unicode_range.gen$(EXEEXT) > $@ || (rm -f $@; exit 1)

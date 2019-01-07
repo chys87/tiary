@@ -24,3 +24,5 @@ config.status
 *.test
 /compile
 .*.sw?
+*.gen
+*.gen.cpp

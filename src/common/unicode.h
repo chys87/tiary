@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -198,11 +198,11 @@ wchar_t ucs_reverse_case (wchar_t c);
  * and in that CJK characters are excluded, and that
  * it is not influenced by the current locale.
  */
-bool ucs_isalpha (wchar_t);
+bool ucs_isalpha(char32_t);
 /**
  * @brief	Determine whether a character is a CJK character
  */
-bool ucs_iscjk (wchar_t);
+bool ucs_iscjk(char32_t);
 /**
  * @brief	Determines whether a character is an alphabetic or numeric character
  *
@@ -210,7 +210,7 @@ bool ucs_iscjk (wchar_t);
  * and in that CJK characters are excluded, and that
  * it is not influenced by the current locale.
  */
-bool ucs_isalnum (wchar_t);
+bool ucs_isalnum(char32_t);
 /**
  * @brief	Determines whether it is appropriate to display a given character
  *			in the beginning of a line.
@@ -223,14 +223,14 @@ bool ucs_isalnum (wchar_t);
  * whether it is appropriate to display a given character in the beginning or
  * at the end of a line.
  */
-bool allow_line_beginning (wchar_t);
+bool allow_line_beginning(char32_t);
 /**
  * @brief	Determines whether it is appropriate to display a given character
  *			in the beginning of a line.
  *
  * See also @c tiary::allow_line_beginning
  */
-bool allow_line_end (wchar_t);
+bool allow_line_end(char32_t);
 
 
 
