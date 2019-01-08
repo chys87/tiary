@@ -1,7 +1,8 @@
 dnl /***********************************************************************
 dnl  *
 dnl  * Tiary, a terminal-based diary keeping system for Unix-like systems
-dnl  * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2016, 2018 chys <admin@CHYS.INFO>
+dnl  * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2016, 2018, 2019,
+dnl  * chys <admin@CHYS.INFO>
 dnl  *
 dnl  * This software is licensed under the 3-clause BSD license.
 dnl  * See LICENSE in the source package and/or online info for details.
@@ -183,8 +184,9 @@ AX_CHECK_COMPILE_FLAG([-std=gnu++17],[
 ])
 
 dnl Let's always include config.h
-CFLAGS="$CFLAGS -include config.h"
-CXXFLAGS="$CXXFLAGS -include config.h"
+dnl "../src/" ensures source files in src/diary doesn't find src/diary/config.h instead
+CFLAGS="$CFLAGS -include ../src/config.h"
+CXXFLAGS="$CXXFLAGS -include ../src/config.h"
 
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([
