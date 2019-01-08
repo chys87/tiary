@@ -26,11 +26,11 @@ constexpr unsigned SECONDS_PER_DAY = 24 * 60 * 60;
 /**
  * @brief	Returns whether a year is leap under the Gregorian calendar
  */
-bool is_leap_year (unsigned) noexcept;
+bool is_leap_year(unsigned) noexcept ATTRIBUTE_CONST;
 /**
  * @brief	Returns the number of days in a given month under the Gregorian calendar
  */
-unsigned day_of_month (unsigned y, unsigned m) noexcept;
+unsigned day_of_month(unsigned y, unsigned m) noexcept ATTRIBUTE_CONST;
 
 /*
  * Date is represented in a 32-bit unsigned integer number
@@ -66,11 +66,11 @@ struct ReadableDateTime : ReadableDate, ReadableTime
  *
  * This function allows "loose representations" like 1989-5-35
  */
-uint32_t make_date (const ReadableDate &) noexcept;
+uint32_t make_date(const ReadableDate &) noexcept ATTRIBUTE_PURE;
 /**
  * This function disallows "loose representations" like 1989-5-35
  */
-uint32_t make_date_strict (const ReadableDate &) noexcept;
+uint32_t make_date_strict(const ReadableDate &) noexcept ATTRIBUTE_PURE;
 
 /**
  * @brief	Make a 32-bit unsigned integer representing the specified time
@@ -78,28 +78,28 @@ uint32_t make_date_strict (const ReadableDate &) noexcept;
  * There is no make_time_strict counterpart. Always allow substandard times
  * like 25:00:00
  */
-uint32_t make_time (const ReadableTime &) noexcept;
+uint32_t make_time(const ReadableTime &) noexcept ATTRIBUTE_PURE;
 
 /**
  * @brief	Make a 64-bit unsigned integer representing the specified date and time.
  * @result	INVALID_DATETIME = Error
  */
-uint64_t make_datetime_strict (const ReadableDate &, const ReadableTime &) noexcept;
-uint64_t make_datetime_strict (const ReadableDateTime &) noexcept;
+uint64_t make_datetime_strict(const ReadableDate &, const ReadableTime &) noexcept ATTRIBUTE_PURE;
+uint64_t make_datetime_strict(const ReadableDateTime &) noexcept ATTRIBUTE_PURE;
 /**
  * This function allows representations like 1989-5-35
  */
-uint64_t make_datetime (const ReadableDate &, const ReadableTime &) noexcept;
-uint64_t make_datetime (const ReadableDateTime &) noexcept;
+uint64_t make_datetime(const ReadableDate &, const ReadableTime &) noexcept ATTRIBUTE_PURE;
+uint64_t make_datetime(const ReadableDateTime &) noexcept ATTRIBUTE_PURE;
 inline constexpr uint64_t make_datetime(uint32_t date, uint32_t time) noexcept {
 	return (date * uint64_t (SECONDS_PER_DAY) + time);
 }
-uint64_t make_datetime_utc (time_t = ::time (0)) noexcept;
+uint64_t make_datetime_utc(time_t = ::time (0)) noexcept ATTRIBUTE_CONST;
 uint64_t make_datetime_local (time_t = ::time (0)) noexcept;
 
 
-ReadableDate extract_date (uint32_t) noexcept;
-ReadableTime extract_time (uint32_t) noexcept;
+ReadableDate extract_date(uint32_t) noexcept ATTRIBUTE_CONST;
+ReadableTime extract_time(uint32_t) noexcept ATTRIBUTE_CONST;
 
 inline constexpr uint32_t extract_date_from_datetime(uint64_t v) noexcept {
 	return uint32_t(v / SECONDS_PER_DAY);
@@ -108,7 +108,7 @@ inline constexpr uint32_t extract_time_from_datetime(uint64_t v) noexcept {
 	return uint32_t(v % SECONDS_PER_DAY);
 }
 
-ReadableDateTime extract_datetime (uint64_t) noexcept;
+ReadableDateTime extract_datetime (uint64_t) noexcept ATTRIBUTE_CONST;
 
 /*
  * %Y	4-digit year (1989)
