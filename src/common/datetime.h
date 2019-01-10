@@ -64,11 +64,11 @@ struct ReadableDateTime : ReadableDate, ReadableTime
  * @brief	Make a 32-bit unsigned integer representing the specified date
  * @result	INVALID_DATE = Error
  *
- * This function allows "loose representations" like 1989-5-35
+ * This function allows "loose representations" like 2018-12-32
  */
 uint32_t make_date(const ReadableDate &) noexcept ATTRIBUTE_PURE;
 /**
- * This function disallows "loose representations" like 1989-5-35
+ * This function disallows "loose representations" like 2018-12-32
  */
 uint32_t make_date_strict(const ReadableDate &) noexcept ATTRIBUTE_PURE;
 
@@ -87,7 +87,7 @@ uint32_t make_time(const ReadableTime &) noexcept ATTRIBUTE_PURE;
 uint64_t make_datetime_strict(const ReadableDate &, const ReadableTime &) noexcept ATTRIBUTE_PURE;
 uint64_t make_datetime_strict(const ReadableDateTime &) noexcept ATTRIBUTE_PURE;
 /**
- * This function allows representations like 1989-5-35
+ * This function allows "loose representations" like 2018-12-32
  */
 uint64_t make_datetime(const ReadableDate &, const ReadableTime &) noexcept ATTRIBUTE_PURE;
 uint64_t make_datetime(const ReadableDateTime &) noexcept ATTRIBUTE_PURE;
@@ -111,14 +111,14 @@ inline constexpr uint32_t extract_time_from_datetime(uint64_t v) noexcept {
 ReadableDateTime extract_datetime (uint64_t) noexcept ATTRIBUTE_CONST;
 
 /*
- * %Y	4-digit year (1989)
- * %y	2-digit year (89)
- * %m	2-digit month (06)
- * %d	2-digit day (04)
- * %b	3-character month (Jun)
- * %w	3-character weekday (Sun)
- * %B	Full month (June)
- * %W	Full weekday (July)
+ * %Y	4-digit year (2019)
+ * %y	2-digit year (19)
+ * %m	2-digit month (01)
+ * %d	2-digit day (10)
+ * %b	3-character month (Mon)
+ * %w	3-character weekday (Thu)
+ * %B	Full month (January)
+ * %W	Full weekday (Thursday)
  * %H	2-digit hour (0-24) (03)
  * %h	2-digit hour (1-12) (03)
  * %M	2-digit minute (20)

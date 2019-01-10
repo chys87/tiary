@@ -302,10 +302,10 @@ Editor: The editor used to edit diary entries.\n\
 \n\
 Time format: This specifies how to display date/time in the main window.\n\
 Long time format: This specifies how to display date/time when viewing entries.\n\
-    %Y: 4-digit year (1989)        %y: 2-digit year (1989)\n\
-    %m: 2-digit month (06)         %d: 2-digit day of month (04)\n\
-    %b: 3-character month (Jun)    %w: 3-character day of week (Sun)\n\
-    %B: Month in full (June)       %W: Day of week in full (Sunday)\n\
+    %Y: 4-digit year (2019)        %y: 2-digit year (19)\n\
+    %m: 2-digit month (01)         %d: 2-digit day of month (10)\n\
+    %b: 3-character month (Jan)    %w: 3-character day of week (Thu)\n\
+    %B: Month in full (January)    %W: Day of week in full (Thursday)\n\
     %H: 2-digit hour (00-23)       %h: 2-digit hour (01-12)\n\
     %M: 2-digit minute (00-59)     %S: 2-digit second (00-59)\n\
     %P: Upper-case AM/PM           %p: Lower-case am/pm\n\
