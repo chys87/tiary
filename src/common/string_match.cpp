@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -27,16 +27,13 @@ StringMatch::StringMatch ()
 {
 }
 
-StringMatch::StringMatch(const std::wstring &pattern, bool use_regex)
+StringMatch::StringMatch(std::wstring_view pattern, bool use_regex)
 	: pattern_(pattern)
 #ifdef TIARY_USE_RE2
-	, regex_(use_regex ? new Re(pattern) : nullptr)
+	, regex_(use_regex && !pattern.empty() ? new Re(pattern) : nullptr)
 #endif
 {
-	if (pattern_.empty()) {
-#ifdef TIARY_USE_RE2
-		regex_.reset();
-#endif
+	if (pattern.empty()) {
 		return;
 	}
 #ifdef TIARY_USE_RE2
@@ -51,8 +48,7 @@ StringMatch::~StringMatch ()
 {
 }
 
-std::vector <std::pair <size_t, size_t> > StringMatch::match (const std::wstring &haystack) const
-{
+std::vector<std::pair<size_t, size_t>> StringMatch::match(std::wstring_view haystack) const {
 #ifdef TIARY_USE_RE2
 	if (regex_) {
 		return regex_->match (haystack);
@@ -64,8 +60,7 @@ std::vector <std::pair <size_t, size_t> > StringMatch::match (const std::wstring
 	}
 }
 
-bool StringMatch::basic_match (const std::wstring &haystack) const
-{
+bool StringMatch::basic_match(std::wstring_view haystack) const {
 #ifdef TIARY_USE_RE2
 	if (regex_) {
 		return regex_->basic_match(haystack);

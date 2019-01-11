@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -31,10 +31,10 @@ const RE2::Options &make_options() {
 
 } // namespace
 
-Re::Re(const std::wstring &regex) : utf8_re_string_('(' + wstring_to_utf8(regex) + ')'), re_(utf8_re_string_, make_options()) {
+Re::Re(std::wstring_view regex) : utf8_re_string_('(' + wstring_to_utf8(regex) + ')'), re_(utf8_re_string_, make_options()) {
 }
 
-std::vector<std::pair<size_t, size_t>> Re::match(const std::wstring &str) const {
+std::vector<std::pair<size_t, size_t>> Re::match(std::wstring_view str) const {
 	std::string utf8 = wstring_to_utf8 (str);
 
 	std::vector <std::pair <size_t, size_t> > ret;
@@ -52,7 +52,7 @@ std::vector<std::pair<size_t, size_t>> Re::match(const std::wstring &str) const 
 	return ret;
 }
 
-bool Re::basic_match(const std::wstring &str) const {
+bool Re::basic_match(std::wstring_view str) const {
 	return RE2::PartialMatch(wstring_to_utf8(str), re_);
 }
 

@@ -37,8 +37,9 @@ namespace ui {
  */
 class Label final : public Control {
 public:
-	Label (Window &, const std::wstring &, unsigned = 0 /**< UIString options */);
+	Label(Window &, std::wstring_view, unsigned = 0 /**< UIString options */);
 	Label(Window &, std::wstring &&, unsigned = 0 /**< UIString options */);
+	Label(Window &win, const wchar_t *s, unsigned options = 0) : Label(win, std::wstring_view(s), options) {}
 	~Label ();
 
 	void redraw ();

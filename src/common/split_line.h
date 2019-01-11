@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -16,7 +16,7 @@
 
 #include <wchar.h>
 #include <vector>
-#include <string>
+#include <string_view>
 
 namespace tiary {
 
@@ -37,16 +37,14 @@ const unsigned SPLIT_CUT_WORD = 2;
 
 // Only one line. Returns the offset of the starting point of the next line
 size_t split_line (SplitStringLine &, unsigned wid, const wchar_t *s, size_t slen = size_t(-1), size_t offset = 0, unsigned options = 0);
-size_t split_line (SplitStringLine &, unsigned wid, const std::wstring &s, size_t offset = 0, unsigned options = 0);
+size_t split_line(SplitStringLine &, unsigned wid, std::wstring_view s, size_t offset = 0, unsigned options = 0);
 
 // Limited number of lines. Returns the actual number of lines
 unsigned split_line (SplitStringLine [], unsigned max_lines, unsigned wid, const wchar_t *s, size_t slen);
-unsigned split_line (SplitStringLine [], unsigned max_lines, unsigned wid, const wchar_t *s);
-unsigned split_line (SplitStringLine [], unsigned max_lines, unsigned wid, const std::wstring &);
+unsigned split_line(SplitStringLine [], unsigned max_lines, unsigned wid, std::wstring_view);
 // Unlimited number of lines. Returns a vector
 SplitStringLineList split_line (unsigned wid, const wchar_t *, size_t);
-SplitStringLineList split_line (unsigned wid, const wchar_t *);
-SplitStringLineList split_line (unsigned wid, const std::wstring &);
+SplitStringLineList split_line (unsigned wid, std::wstring_view);
 
 } // namespace tiary
 

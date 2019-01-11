@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -76,8 +76,7 @@ size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size
 	return (offset + cur + extra_skip);
 }
 
-size_t split_line (SplitStringLine &result, unsigned wid, const std::wstring &str, size_t offset, unsigned options)
-{
+size_t split_line(SplitStringLine &result, unsigned wid, std::wstring_view str, size_t offset, unsigned options) {
 	return split_line (result, wid, str.data (), str.length (), offset, options);
 }
 
@@ -91,13 +90,7 @@ unsigned split_line (SplitStringLine *result, unsigned max_lines, unsigned wid, 
 	return lines;
 }
 
-unsigned split_line (SplitStringLine *result, unsigned max_lines, unsigned wid, const wchar_t *s)
-{
-	return split_line (result, max_lines, wid, s, wcslen (s));
-}
-
-unsigned split_line (SplitStringLine *result, unsigned max_lines, unsigned wid, const std::wstring &s)
-{
+unsigned split_line(SplitStringLine *result, unsigned max_lines, unsigned wid, std::wstring_view s) {
 	return split_line (result, max_lines, wid, s.data (), s.length ());
 }
 
@@ -122,13 +115,7 @@ SplitStringLineList split_line (unsigned wid, const wchar_t *s, size_t slen)
 	return ret;
 }
 
-SplitStringLineList split_line (unsigned wid, const wchar_t *s)
-{
-	return split_line (wid, s, wcslen (s));
-}
-
-SplitStringLineList split_line (unsigned wid, const std::wstring &s)
-{
+SplitStringLineList split_line(unsigned wid, std::wstring_view s) {
 	return split_line (wid, s.data (), s.length ());
 }
 

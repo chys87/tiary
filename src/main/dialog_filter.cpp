@@ -243,7 +243,7 @@ void DialogFilter::slot_ok ()
 #ifdef TIARY_USE_RE2
 		if (!*filter) {
 			delete filter;
-			dialog_message (format (L"Invalid regular expression: \"%a\"") << txt_title.get_text ());
+			dialog_message(std::wstring(format (L"Invalid regular expression: \"%a\"") << txt_title.get_text()));
 			set_focus_ptr (&txt_title);
 			return;
 		}
@@ -259,7 +259,7 @@ void DialogFilter::slot_ok ()
 #ifdef TIARY_USE_RE2
 		if (!*filter) {
 			delete filter;
-			dialog_message (format (L"Invalid regular expression: \"%a\"") << txt_text.get_text ());
+			dialog_message(std::wstring(format (L"Invalid regular expression: \"%a\"") << txt_text.get_text()));
 			set_focus_ptr (&txt_text);
 			return;
 		}

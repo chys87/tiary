@@ -51,27 +51,24 @@ void OptionGroupBase::reset (const OptionDescription *descriptions)
 
 void OptionGroupBase::set (const char *name, const char *value)
 {
-	set (std::string (name), value);
+	data[name] = value;
 }
 
-void OptionGroupBase::set (const char *name, const std::string &value)
-{
-	set (std::string (name), value);
+void OptionGroupBase::set(const char *name, std::string_view value) {
+	data[name] = value;
 }
 
-void OptionGroupBase::set (const char *name, const std::wstring &value)
-{
-	set (name, wstring_to_utf8 (value));
+void OptionGroupBase::set(const char *name, std::wstring_view value) {
+	data[name] = wstring_to_utf8(value);
 }
 
-void OptionGroupBase::set (const char *name, unsigned value)
-{
-	set (std::string (name), value);
+void OptionGroupBase::set(const char *name, unsigned value) {
+	data[name] = format_dec_narrow(value);
 }
 
 void OptionGroupBase::set (const char *name, bool value)
 {
-	set (std::string (name), value);
+	data[name].assign(1, value ? '1' : '0');
 }
 
 void OptionGroupBase::set (const std::string &name, const char *value)
@@ -79,19 +76,17 @@ void OptionGroupBase::set (const std::string &name, const char *value)
 	data[name] = value;
 }
 
-void OptionGroupBase::set (const std::string &name, const std::string &value)
-{
+void OptionGroupBase::set(const std::string &name, std::string_view value) {
 	data[name] = value;
 }
 
-void OptionGroupBase::set (const std::string &name, const std::wstring &value)
-{
-	set (name, wstring_to_utf8 (value));
+void OptionGroupBase::set(const std::string &name, std::wstring_view value) {
+	data[name] = wstring_to_utf8(value);
 }
 
 void OptionGroupBase::set (const std::string &name, unsigned value)
 {
-	set (name, format_dec_narrow (value));
+	data[name] = format_dec_narrow(value);
 }
 
 void OptionGroupBase::set (const std::string &name, bool value)
@@ -99,32 +94,34 @@ void OptionGroupBase::set (const std::string &name, bool value)
 	data[name].assign (1, value ? '1' : '0');
 }
 
-const std::string &OptionGroupBase::get (const char *name) const
-{
-	return get (std::string (name));
+const std::string &OptionGroupBase::get(const char *name) const {
+	DataType::const_iterator it = data.find(name);
+	if (it == data.end ()) { // Not found. But we must return a reference
+		return error_return_;
+	}
+	return it->second;
 }
 
 unsigned OptionGroupBase::get_num (const char *name) const
 {
-	return get_num (std::string (name));
+	return strtoul(get(name).c_str(), 0, 10);
 }
 
 bool OptionGroupBase::get_bool (const char *name) const
 {
-	return get_bool (std::string (name));
+	return (get(name)[0] == '1');
 }
 
 std::wstring OptionGroupBase::get_wstring (const char *name) const
 {
-	return get_wstring (std::string (name));
+	return utf8_to_wstring(get(name));
 }
 
 const std::string &OptionGroupBase::get (const std::string &name) const
 {
 	DataType::const_iterator it = data.find (name);
 	if (it == data.end ()) { // Not found. But we must return a reference
-		static const std::string error_return;
-		return error_return;
+		return error_return_;
 	}
 	return it->second;
 }
@@ -143,5 +140,7 @@ std::wstring OptionGroupBase::get_wstring (const std::string &name) const
 {
 	return utf8_to_wstring (get (name));
 }
+
+const std::string OptionGroupBase::error_return_;
 
 } // namespace tiary

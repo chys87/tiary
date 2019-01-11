@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -63,13 +63,13 @@ template <typename ChT> std::basic_string<ChT> get_current_dir ();
  *
  * This function does not resolve symbolic links
  */
-std::wstring get_full_pathname (const std::wstring &);
+std::wstring get_full_pathname(std::wstring_view);
 
 /**
  * @brief	Replaces home dir name with "~"
  */
-std::string home_fold_pathname (const std::string &);
-std::wstring home_fold_pathname (const std::wstring &);
+std::string home_fold_pathname(std::string_view);
+std::wstring home_fold_pathname(std::wstring_view);
 
 /**
  * @brief	Expands "~" and "~user" with actual dir names
@@ -83,7 +83,7 @@ std::wstring home_expand_pathname(std::wstring_view);
  * It may be absolute or starting with "~" or relative,
  * whichever is "nicer" (shorter and/or easier to read)
  */
-std::wstring get_nice_pathname (const std::wstring &);
+std::wstring get_nice_pathname(std::wstring_view);
 
 
 
@@ -104,7 +104,7 @@ inline unsigned get_file_attr (const std::wstring &s) { return get_file_attr (s.
 /**
  * @brief	Split a full pathname to directory name and basename
  */
-std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &, bool canonicalize = false);
+std::pair<std::wstring,std::wstring> split_pathname(std::wstring_view, bool canonicalize = false);
 
 /**
  * @brief	Combine a directory name and basename to a full name

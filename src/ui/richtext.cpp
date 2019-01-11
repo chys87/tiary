@@ -29,7 +29,7 @@
 namespace tiary {
 namespace ui {
 
-RichText::RichText (Window &win, const std::wstring &txt, const LineList &lst)
+RichText::RichText(Window &win, std::wstring_view txt, const LineList &lst)
 	: Control (win)
 	, text (txt)
 	, line_list (lst)
@@ -40,7 +40,7 @@ RichText::RichText (Window &win, const std::wstring &txt, const LineList &lst)
 	set_cursor_visibility (false);
 }
 
-RichText::RichText (Window &win, const std::wstring &txt, LineList &&lst)
+RichText::RichText(Window &win, std::wstring_view txt, LineList &&lst)
 	: Control (win)
 	, text (txt)
 	, line_list (std::forward <LineList> (lst))

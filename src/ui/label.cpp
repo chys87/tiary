@@ -21,7 +21,7 @@ namespace tiary {
 namespace ui {
 
 
-Label::Label (Window &win, const std::wstring &str, unsigned options)
+Label::Label (Window &win, std::wstring_view str, unsigned options)
 	: Control(win, kUnfocusable)
 	, text (str, options)
 {

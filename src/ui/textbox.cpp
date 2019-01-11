@@ -132,13 +132,11 @@ unsigned TextBox::get_item_screen_size (unsigned j) const
 	}
 }
 
-void TextBox::set_text (const std::wstring &s, bool emit_sig_changed)
-{
+void TextBox::set_text(std::wstring_view s, bool emit_sig_changed) {
 	set_text (s, emit_sig_changed, Scroll::get_focus ());
 }
 
-void TextBox::set_text (const std::wstring &s, bool emit_sig_changed, unsigned new_cursor_pos)
-{
+void TextBox::set_text(std::wstring_view s, bool emit_sig_changed, unsigned new_cursor_pos) {
 	if (text == s) {
 		return;
 	}

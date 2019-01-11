@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -176,11 +176,13 @@ template <> std::basic_string<wchar_t> get_current_dir <wchar_t> ()
 	return mbs_to_wstring (get_current_dir<char>());
 }
 
-std::wstring get_full_pathname (const std::wstring &name)
-{
-	std::vector<std::wstring> split = split_string (
-			(name[0] != L'/' ? get_current_dir <wchar_t> () + L'/' + name : name),
-			L'/');
+std::wstring get_full_pathname(std::wstring_view name) {
+	std::wstring split_buffer;
+
+	std::vector<std::wstring_view> split =
+			(name.empty() || name[0] != L'/') ?
+			split_string_view((split_buffer = get_current_dir<wchar_t>() + L'/' + std::wstring(name)), L'/') :
+			split_string_view(name, L'/');
 	// Empty tokens are eliminated by split_string, effectively
 	// getting "//" replaced by "/"
 
@@ -203,7 +205,7 @@ std::wstring get_full_pathname (const std::wstring &name)
 	}
 
 	if (split.empty ()) {
-		split.push_back (std::wstring ());
+		split.push_back({});
 	}
 
 	std::wstring ret;
@@ -217,9 +219,8 @@ std::wstring get_full_pathname (const std::wstring &name)
 namespace {
 
 template <typename ChT> inline
-std::basic_string<ChT> home_fold_pathname_impl (const std::basic_string<ChT> &name)
-{
-	std::basic_string <ChT> fullname = name;
+std::basic_string<ChT> home_fold_pathname_impl(std::basic_string_view<ChT> name) {
+	std::basic_string<ChT> fullname(name);
 	const std::basic_string <ChT> &homedir = get_home_dir <ChT> ();
 	size_t homelen = homedir.length ();
 	if (fullname.length () >= homelen) {
@@ -234,13 +235,11 @@ std::basic_string<ChT> home_fold_pathname_impl (const std::basic_string<ChT> &na
 
 } // anonymous namespace
 
-std::string home_fold_pathname (const std::string &name)
-{
+std::string home_fold_pathname(std::string_view name) {
 	return home_fold_pathname_impl (name);
 }
 
-std::wstring home_fold_pathname (const std::wstring &name)
-{
+std::wstring home_fold_pathname(std::wstring_view name) {
 	return home_fold_pathname_impl (name);
 }
 
@@ -269,8 +268,7 @@ std::wstring home_expand_pathname(std::wstring_view name) {
 	return home_expand_pathname_impl (name);
 }
 
-std::wstring get_nice_pathname (const std::wstring &name)
-{
+std::wstring get_nice_pathname(std::wstring_view name) {
 	std::wstring fullname = get_full_pathname (name);
 	std::wstring homefold = home_fold_pathname (fullname);
 	std::wstring curdir = get_current_dir<wchar_t>();
@@ -353,34 +351,35 @@ unsigned get_file_attr (const wchar_t *name)
 	return get_file_attr (wstring_to_mbs (name).c_str ());
 }
 
-std::pair<std::wstring,std::wstring> split_pathname (const std::wstring &name, bool canonicalize)
-{
+std::pair<std::wstring,std::wstring> split_pathname(std::wstring_view name, bool canonicalize) {
 	std::wstring::size_type last_split = name.rfind (L'/');
 
 	// If a backslash exists in name, this is true;
 	// If not, last_split = npos = -1, this is also true;
-	std::wstring basename (name, last_split + 1);
+	std::wstring_view basename = name.substr(last_split + 1);
 
 	std::wstring dirname;
 	if (last_split == std::wstring::npos) { // No backslash exist in name
 		if (canonicalize) {
 			dirname = get_current_dir <wchar_t> ();
-		}
-		else {
-			dirname.assign (1, L'.');
+		} else {
+			dirname = L'.';
 		}
 	}
 	else {
 		if (last_split == 0) { // Dirname is root
 			++last_split;
 		}
-		dirname.assign (name, 0, last_split);
 		if (canonicalize) {
-			dirname = get_full_pathname (dirname);
+			dirname = get_full_pathname(name.substr(0, last_split));
+		} else {
+			dirname = name.substr(0, last_split);
 		}
 	}
 
-	return {std::move(dirname), std::move(basename)};
+	return {std::piecewise_construct,
+		std::forward_as_tuple(std::move(dirname)),
+		std::make_tuple(basename)};
 }
 
 std::wstring combine_pathname(std::wstring_view path, std::wstring_view basename) {

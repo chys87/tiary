@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -36,11 +36,8 @@ const WindowMessageButton MESSAGE_DEFAULT_YES    = 0x20;
 const WindowMessageButton MESSAGE_DEFAULT_NO     = 0x40;
 const WindowMessageButton MESSAGE_DEFAULT_CANCEL = 0x80;
 
-WindowMessageButton dialog_message (const std::wstring &text, WindowMessageButton buttons = MESSAGE_OK);
-WindowMessageButton dialog_message (const wchar_t *text, WindowMessageButton buttons = MESSAGE_OK);
-WindowMessageButton dialog_message (const std::wstring &text, const std::wstring &title,
-		WindowMessageButton buttons = MESSAGE_OK);
-WindowMessageButton dialog_message (const wchar_t *text, const wchar_t *title,
+WindowMessageButton dialog_message(std::wstring_view text, WindowMessageButton buttons = MESSAGE_OK);
+WindowMessageButton dialog_message(std::wstring_view text, std::wstring_view title,
 		WindowMessageButton buttons = MESSAGE_OK);
 
 } // namespace tiary::ui

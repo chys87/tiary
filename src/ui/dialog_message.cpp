@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -35,7 +35,7 @@ class WindowMessage : public Window
 	Button *p_buttons[4];
 
 public:
-	WindowMessage (const std::wstring &text, const std::wstring &title,
+	WindowMessage(std::wstring_view text, std::wstring_view title,
 			WindowMessageButton buttons);
 	~WindowMessage ();
 
@@ -46,7 +46,7 @@ public:
 	void redraw ();
 };
 
-WindowMessage::WindowMessage (const std::wstring &text, const std::wstring &title,
+WindowMessage::WindowMessage(std::wstring_view text, std::wstring_view title,
 		WindowMessageButton mask)
 	: Window (0, title)
 	, lbl_text (*this, text)
@@ -167,28 +167,16 @@ void WindowMessage::redraw ()
 
 } // anonymous namespace
 
-WindowMessageButton dialog_message (const std::wstring &text, WindowMessageButton buttons)
-{
-	return dialog_message (text, std::wstring (), buttons);
+WindowMessageButton dialog_message(std::wstring_view text, WindowMessageButton buttons) {
+	return dialog_message(text, {}, buttons);
 }
 
-WindowMessageButton dialog_message (const wchar_t *text, WindowMessageButton buttons)
-{
-	return dialog_message (std::wstring (text), buttons);
-}
-
-WindowMessageButton dialog_message (const std::wstring &text, const std::wstring &title,
+WindowMessageButton dialog_message(std::wstring_view text, std::wstring_view title,
 		WindowMessageButton buttons)
 {
 	WindowMessage win (text, title, buttons);
 	win.event_loop ();
 	return win.get_result ();
-}
-
-WindowMessageButton dialog_message (const wchar_t *text, const wchar_t *title,
-		WindowMessageButton buttons)
-{
-	return dialog_message (std::wstring (text), std::wstring (title), buttons);
 }
 
 } // namespace tiary::ui

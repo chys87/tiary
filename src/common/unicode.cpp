@@ -169,9 +169,7 @@ size_t utf8_count_chars(std::string_view str) {
 	return ret;
 }
 
-char *wchar_to_utf8 (char *dst, wchar_t w)
-{
-	uint32_t u = w;
+char *wchar_to_utf8 (char *dst, char32_t u) {
 	if (u < 0x800) {
 		if (u < 0x80) {
 			*dst++ = u;
@@ -212,13 +210,12 @@ char *wchar_to_utf8 (char *d, const wchar_t *s, size_t n)
 	return d;
 }
 
-std::string wstring_to_utf8 (const std::wstring &src)
-{
+std::string wstring_to_utf8(std::wstring_view src) {
 	std::string dst;
 	dst.reserve (src.length () * 2);
-	for (const wchar_t *s = src.c_str(); *s; ++s) {
+	for (wchar_t c : src) {
 		char buf[4];
-		char *end = wchar_to_utf8 (buf, *s);
+		char *end = wchar_to_utf8(buf, c);
 		dst.append (buf, end);
 	}
 	return dst;
@@ -275,13 +272,7 @@ std::string wstring_to_mbs (const wchar_t *src, size_t srclen, char substitute)
 	return ret;
 }
 
-std::string wstring_to_mbs (const wchar_t *src, char substitute)
-{
-	return wstring_to_mbs (src, wcslen (src), substitute);
-}
-
-std::string wstring_to_mbs (const std::wstring &src, char substitute)
-{
+std::string wstring_to_mbs(std::wstring_view src, char substitute) {
 	return wstring_to_mbs (src.data (), src.length (), substitute);
 }
 

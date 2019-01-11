@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -41,9 +41,9 @@ class Window;
 class UIString : public UIStringBase
 {
 public:
-	explicit UIString(const std::wstring &, unsigned options = 0);
+	explicit UIString(std::wstring_view, unsigned options = 0);
 	explicit UIString(std::wstring && = std::wstring(), unsigned options = 0);
-	void set_text (const std::wstring &, unsigned options = 0);
+	void set_text(std::wstring_view, unsigned options = 0);
 	void set_text(std::wstring &&, unsigned options = 0);
 
 	const SplitStringLineList &split_line (unsigned wid) const;

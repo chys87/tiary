@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -39,10 +39,11 @@ std::string make_external_command_line (const char *prog, const char *extra_para
 	 * Instead, we generate a command and use system.
 	 */
 
-	std::string command = "false";
+	std::string exe;
 
 	// Split prog into tokens deliminated by pipe strings
-	for (std::string &exe: split_string(prog, '|')) {
+	for (std::string_view exe_view : split_string_view(prog, '|')) {
+		exe = exe_view;
 		environment_expand(exe);
 		strip(exe);
 		if (exe.empty ()) {
@@ -51,11 +52,14 @@ std::string make_external_command_line (const char *prog, const char *extra_para
 		const char *p = exe.c_str ();
 		size_t tokenlen = strchrnul (p, ' ') - p;
 		if (!find_executable({p, tokenlen}).empty()) {
-			command = std::move(exe) + ' ' + extra_param;
-			break;
+			exe += ' ';
+			exe += extra_param;
+			return exe;
 		}
 	}
-	return command;
+
+	exe = "false";
+	return exe;
 }
 
 } // anonymous namespace

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -30,21 +30,21 @@ const WindowInputAttribute INPUT_PASSWORD = 1;
 /// @brief	Displays a dialog to receive keyboard inputs from the user
 /// @result	The entered text, or @c return_on_error if the user presses Esc
 std::wstring dialog_input (
-		const std::wstring &hint, ///< The hint text.
-		const std::wstring &default_text = std::wstring (), ///< Default text in the box
+		std::wstring_view hint, ///< The hint text.
+		std::wstring_view default_text = {}, ///< Default text in the box
 		unsigned text_box_width = 16, ///< Screen width of the textbox
 		WindowInputAttribute attributes = 0, ///< Currently only 0 or tiary::ui::INPUT_PASSWORD
-		const std::wstring &return_on_error = std::wstring () ///< What to return if the user presses Esc
+		std::wstring_view return_on_error = {} ///< What to return if the user presses Esc
 		);
 
 /// @brief	Displays a dialog to receive keyboard inputs from the user
 std::wstring dialog_input2 (
-		const std::wstring &title,
-		const std::wstring &hint, ///< The hint text.
-		const std::wstring &default_text = std::wstring (), ///< Default text in the box
+		std::wstring_view title,
+		std::wstring_view hint, ///< The hint text.
+		std::wstring_view default_text = {}, ///< Default text in the box
 		unsigned text_box_width = 16, ///< Screen width of the textbox
 		WindowInputAttribute attributes = 0, ///< Currently only 0 or tiary::ui::INPUT_PASSWORD
-		const std::wstring &return_on_error = std::wstring () ///< What to return if the user presses Esc
+		std::wstring_view return_on_error = {} ///< What to return if the user presses Esc
 		);
 
 } // namespace tiary::ui

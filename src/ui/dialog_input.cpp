@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -41,8 +41,8 @@ class WindowInput : public FixedWindow, private ButtonDefault
 	std::wstring &result;
 
 public:
-	WindowInput (const std::wstring &title,
-			const std::wstring &hint, const std::wstring &default_text,
+	WindowInput(std::wstring_view title,
+			std::wstring_view hint, std::wstring_view default_text,
 			unsigned text_box_width,
 			WindowInputAttribute attr,
 			std::wstring &result_);
@@ -53,15 +53,15 @@ public:
 	void slot_ok ();     // Pressed Enter or clicked OK Button
 };
 
-WindowInput::WindowInput (const std::wstring &title,
-		const std::wstring &hint, const std::wstring &default_text,
+WindowInput::WindowInput(std::wstring_view title,
+		std::wstring_view hint, std::wstring_view default_text,
 		unsigned text_box_width,
 		WindowInputAttribute attr,
 		std::wstring &result_)
 	: Window (0, title)
 	, FixedWindow ()
 	, ButtonDefault ()
-	, lbl_hint (*this, hint)
+	, lbl_hint(*this, hint)
 	, box_input (*this, (attr & INPUT_PASSWORD) ? TextBox::PASSWORD_BOX : 0)
 	, btn_ok (*this, L"&OK")
 	, result (result_)
@@ -93,19 +93,18 @@ void WindowInput::slot_ok ()
 
 } // anonymous namespace
 
-std::wstring dialog_input (const std::wstring &hint, const std::wstring &default_text,
+std::wstring dialog_input(std::wstring_view hint, std::wstring_view default_text,
 		unsigned text_box_width, WindowInputAttribute attributes,
-		const std::wstring &return_on_error)
-{
-	return dialog_input2 (std::wstring (), hint, default_text, text_box_width,
+		std::wstring_view return_on_error) {
+	return dialog_input2({}, hint, default_text, text_box_width,
 			attributes, return_on_error);
 }
 
-std::wstring dialog_input2 (const std::wstring &title, const std::wstring &hint,
-		const std::wstring &default_text, unsigned text_box_width,
-		WindowInputAttribute attributes, const std::wstring &return_on_error)
+std::wstring dialog_input2(std::wstring_view title, std::wstring_view hint,
+		std::wstring_view default_text, unsigned text_box_width,
+		WindowInputAttribute attributes, std::wstring_view return_on_error)
 {
-	std::wstring ret = return_on_error;
+	std::wstring ret(return_on_error);
 	WindowInput (title, hint, default_text, text_box_width, attributes, ret).event_loop ();
 	return ret;
 }

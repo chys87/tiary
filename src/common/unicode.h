@@ -93,7 +93,7 @@ size_t utf8_count_chars(std::string_view str);
  *			to store the converted UTF-8 sequence.
  * @result	Points to the byte following the last one in the converted sequence.
  */
-char *wchar_to_utf8 (char *dst, wchar_t c);
+char *wchar_to_utf8(char *dst, char32_t c);
 /**
  * @brief	Converts a null-terminated wide (Unicode) string to UTF-8
  * @param	dst	Points to a block of memory, which must be sufficient
@@ -115,7 +115,7 @@ char *wchar_to_utf8 (char *dst, const wchar_t *src, size_t srclen);
  * @param	src	The wide (Unicode) string to be converted.
  * @result	The converted UTF-8 string.
  */
-std::string wstring_to_utf8 (const std::wstring &src);
+std::string wstring_to_utf8(std::wstring_view src);
 
 
 /**
@@ -139,8 +139,7 @@ std::wstring mbs_to_wstring (const std::string &);
  * @result	The converted multi-byte string encoded in the current LC_CTYPE locale
  */
 std::string wstring_to_mbs (const wchar_t *src, size_t srclen, char substitute = '?');
-std::string wstring_to_mbs (const wchar_t *src, char substitute = '?');
-std::string wstring_to_mbs (const std::wstring &src, char substitute = '?');
+std::string wstring_to_mbs(std::wstring_view src, char substitute = '?');
 
 
 /**

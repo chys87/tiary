@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -25,8 +25,8 @@ const unsigned SELECT_FILE_WRITE          = 1;
 const unsigned SELECT_FILE_WARN_OVERWRITE = 2; // Ignored if SELECT_FILE_WRITE not set
 
 std::wstring dialog_select_file (
-		const std::wstring &hint, ///< Info displayed in the top of the dialog
-		const std::wstring &default_file, ///< Default file name
+		std::wstring_view hint, ///< Info displayed in the top of the dialog
+		std::wstring_view default_file, ///< Default file name
 		unsigned options
 		);
 

@@ -57,20 +57,16 @@ protected:
 
 	const DataType &get_data () const { return data; }
 
-private:
-
-	DataType data;
-
 public:
 	void set (const char *, const char *);
-	void set (const char *, const std::string &);
-	void set (const char *, const std::wstring &);
+	void set(const char *, std::string_view);
+	void set(const char *, std::wstring_view);
 	void set (const char *, unsigned);
 	void set (const char *, bool);
 
 	void set (const std::string &, const char *);
-	void set (const std::string &, const std::string &);
-	void set (const std::string &, const std::wstring &);
+	void set(const std::string &, std::string_view);
+	void set(const std::string &, std::wstring_view);
 	void set (const std::string &, unsigned);
 	void set (const std::string &, bool);
 
@@ -89,6 +85,11 @@ public:
 	typedef const_iterator iterator;
 	iterator begin () const { return data.begin (); }
 	iterator end () const { return data.end (); }
+
+private:
+
+	DataType data;
+	static const std::string error_return_;
 };
 
 

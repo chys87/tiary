@@ -1,3 +1,16 @@
+// -*- mode:c++; tab-width:4; -*-
+// vim:ft=cpp ts=4
+
+/***************************************************************************
+ *
+ * Tiary, a terminal-based diary keeping system for Unix-like systems
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
+ *
+ * This software is licensed under the 3-clause BSD license.
+ * See LICENSE in the source package and/or online info for details.
+ *
+ **************************************************************************/
+
 #include "ui/richtextlist.h"
 #include "common/unicode.h"
 #include "common/split_line.h"
@@ -10,34 +23,22 @@ namespace tiary {
 namespace ui {
 
 void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, const std::wstring &line_text)
-{
+		PaletteID id, std::wstring_view line_text) {
 	RichTextLine tmp_line = { text.length (), line_text.length (), id, ucs_width (line_text) };
 	lst.push_back (tmp_line);
 	text += line_text;
 }
 
 void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, const wchar_t *line_text)
-{
-	size_t len = wcslen (line_text);
-	RichTextLine tmp_line = { text.length (), len, id, ucs_width (line_text, len) };
-	lst.push_back (tmp_line);
-	text.append (line_text, len);
-}
-
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, const wchar_t *text_a, const std::wstring &text_b)
-{
-	size_t len_a = wcslen (text_a);
+		PaletteID id, std::wstring_view text_a, std::wstring_view text_b) {
 	RichTextLine tmp_line = {
 		text.length (),
-		len_a + text_b.length (),
+		text_a.length() + text_b.length(),
 		id,
-		ucs_width (text_a, len_a) + ucs_width (text_b)
+		ucs_width(text_a) + ucs_width(text_b)
 	};
 	lst.push_back (tmp_line);
-	text.append (text_a, len_a);
+	text.append(text_a);
 	text.append (text_b);
 }
 
@@ -92,8 +93,7 @@ struct SplitStringLine2RichTextLine {
 
 } // anonymous namespace
 
-RichTextLineList split_richtext_lines (const std::wstring &str, PaletteID id, unsigned wid)
-{
+RichTextLineList split_richtext_lines(std::wstring_view str, PaletteID id, unsigned wid) {
 	SplitStringLineList split = split_line (wid, str);
 	RichTextLineList ret (split.size ());
 	std::transform (split.begin (), split.end (), ret.begin (), SplitStringLine2RichTextLine (id));

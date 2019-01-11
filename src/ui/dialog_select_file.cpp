@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -43,12 +43,13 @@ namespace {
 class WindowSelectFile : public virtual Window, private ButtonDefault
 {
 public:
-	WindowSelectFile (const std::wstring &hint_, const std::wstring &default_file, unsigned options_);
+	WindowSelectFile(std::wstring_view hint, std::wstring_view default_file, unsigned options_);
 	~WindowSelectFile ();
 
 	void redraw ();
 
 	const std::wstring &get_result () const { return result; }
+	std::wstring &&move_result() { return std::move(result); }
 
 private:
 	TextBox text_input;
@@ -67,14 +68,14 @@ private:
 	void slot_ok ();
 	void slot_refresh ();
 
-	void set_text (const std::wstring &, bool rewrite_input_box = true);
+	void set_text(std::wstring_view, bool rewrite_input_box = true);
 };
 
 const wchar_t string_show_hidden_files[] = L"Show &hidden files";
 // Minus 2: Null terminator and the "&" character
 const size_t len_show_hidden_files = sizeof string_show_hidden_files / sizeof (wchar_t) - 2;
 
-WindowSelectFile::WindowSelectFile (const std::wstring &hint, const std::wstring &default_file, unsigned options_)
+WindowSelectFile::WindowSelectFile(std::wstring_view hint, std::wstring_view default_file, unsigned options_)
 	: Window (0, hint)
 	, ButtonDefault ()
 	, text_input (*this)
@@ -180,7 +181,7 @@ void WindowSelectFile::slot_ok ()
 		// Possibly need to warn against overwriting
 		if (!(attr & FILE_ATTR_NONEXIST) && (options & SELECT_FILE_WARN_OVERWRITE)) {
 			// Warn
-			if (dialog_message (format (L"File \"%a\" already exists. Overwrite it?") << text_input.get_text(),
+			if (dialog_message(std::wstring(format(L"File \"%a\" already exists. Overwrite it?") << text_input.get_text()),
 						MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO) != MESSAGE_YES) {
 				return;
 			}
@@ -226,8 +227,7 @@ bool FilterDots::operator () (const DirEnt &ent) const
 	return false;
 }
 
-void WindowSelectFile::set_text (const std::wstring &newname, bool rewrite_input_box)
-{
+void WindowSelectFile::set_text(std::wstring_view newname, bool rewrite_input_box) {
 	std::wstring newname_expanded = home_expand_pathname (newname);
 	std::pair<std::wstring, std::wstring> split_fullname = split_pathname (newname_expanded, true);
 	if (rewrite_input_box) {
@@ -275,14 +275,12 @@ void WindowSelectFile::set_text (const std::wstring &newname, bool rewrite_input
 } // anonymous namespace
 
 std::wstring dialog_select_file (
-		const std::wstring &hint,
-		const std::wstring &default_file,
-		unsigned options
-		)
-{
+		std::wstring_view hint,
+		std::wstring_view default_file,
+		unsigned options) {
 	WindowSelectFile win (hint, default_file, options);
 	win.event_loop ();
-	return win.get_result ();
+	return std::move(win.move_result());
 }
 
 } // namespace tiary::ui

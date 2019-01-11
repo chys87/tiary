@@ -39,8 +39,8 @@ public:
 	bool get_backward () const { return backward_; }
 
 	explicit operator bool() const { return static_cast<bool>(matcher_); }
-	bool basic_match(const std::wstring &s) const { return matcher_.basic_match(s); }
-	std::vector<std::pair<size_t, size_t>> match(const std::wstring &s) const { return matcher_.match(s); }
+	bool basic_match(std::wstring_view s) const { return matcher_.basic_match(s); }
+	std::vector<std::pair<size_t, size_t>> match(std::wstring_view s) const { return matcher_.match(s); }
 	const StringMatch &get_matcher() const { return matcher_; }
 
 private:

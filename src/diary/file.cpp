@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2016, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2016, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -590,8 +590,7 @@ bool save_global_options (const GlobalOptionGroup &options, const RecentFileList
 bool save_file (const char *filename,
 		const DiaryEntryList &entries,
 		const PerFileOptionGroup &options,
-		const std::string &password)
-{
+		std::string_view password) {
 	// First create the XML tree
 	XMLNode *root = make_xml_tree_from_options(options, PerFileOptionGroup());
 

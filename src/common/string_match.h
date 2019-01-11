@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -17,7 +17,7 @@
 
 #include "common/re.h"
 #include <memory>
-#include <string>
+#include <string_view>
 #include <vector>
 
 namespace tiary {
@@ -27,7 +27,7 @@ class StringMatch
 public:
 	StringMatch ();
 	StringMatch(StringMatch &&) = default;
-	explicit StringMatch(const std::wstring &, bool use_regex = false);
+	explicit StringMatch(std::wstring_view, bool use_regex = false);
 	StringMatch &operator = (StringMatch &&) = default;
 	~StringMatch ();
 
@@ -38,12 +38,12 @@ public:
 	 * of which is the offset and the second the length of the matched
 	 * substring.
 	 */
-	std::vector <std::pair <size_t, size_t> > match (const std::wstring &) const;
+	std::vector<std::pair<size_t, size_t>> match(std::wstring_view) const;
 
 	/**
 	 * @brief	Match against a string, returning only true/false
 	 */
-	bool basic_match (const std::wstring &) const;
+	bool basic_match(std::wstring_view) const;
 
 
 	/**

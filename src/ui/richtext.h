@@ -25,6 +25,8 @@
 #include "ui/control.h"
 #include "ui/richtextlist.h"
 #include "ui/search_info.h"
+#include <string>
+#include <string_view>
 #include <vector>
 
 namespace tiary {
@@ -46,8 +48,8 @@ public:
 	typedef RichTextLine Line;
 	typedef RichTextLineList LineList;
 
-	RichText (Window &, const std::wstring &, const LineList &);
-	RichText (Window &, const std::wstring &, LineList &&);
+	RichText(Window &, std::wstring_view, const LineList &);
+	RichText(Window &, std::wstring_view, LineList &&);
 	~RichText ();
 
 	void redraw ();

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -27,7 +27,7 @@ size_t remove_amp (std::wstring &text, unsigned options);
 
 } // anonymous namespace
 
-UIStringBase::UIStringBase (const std::wstring &s, unsigned options)
+UIStringBase::UIStringBase(std::wstring_view s, unsigned options)
 	: text (s)
 	, hotkey_pos (remove_amp (text, options))
 {
@@ -38,8 +38,7 @@ UIStringBase::UIStringBase(std::wstring &&s, unsigned options)
 	, hotkey_pos (remove_amp (text, options)) {
 }
 
-void UIStringBase::set_text (const std::wstring &s, unsigned options)
-{
+void UIStringBase::set_text(std::wstring_view s, unsigned options) {
 	text = s;
 	hotkey_pos = remove_amp (text, options);
 }

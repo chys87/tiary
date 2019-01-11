@@ -251,8 +251,8 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		case LOAD_FILE_NOT_FOUND: // No file. Just use the defaults
 			break;
 		default: // Warning, and use the defaults
-			ui::dialog_message (format (L"WARNING: Config file ~/%a reading error. Using defaults.")
-					<< TIARY_WIDIFY (GLOBAL_OPTION_FILE));
+			ui::dialog_message(std::wstring(format(L"WARNING: Config file ~/%a reading error. Using defaults.")
+					<< TIARY_WIDIFY(GLOBAL_OPTION_FILE)));
 			break;
 	}
 
@@ -339,7 +339,7 @@ void MainWin::load (const std::wstring &filename)
 	auto enter_password = [&nice_filename]() -> std::string {
 		return wstring_to_utf8(ui::dialog_input2(
 				L"Enter password",
-				format(L"File \"%a\" is password protected. Please enter the password:") << nice_filename,
+				std::wstring(format(L"File \"%a\" is password protected. Please enter the password:") << nice_filename),
 				std::wstring(),
 				35,
 				ui::INPUT_PASSWORD));
@@ -415,7 +415,7 @@ void MainWin::save (const std::wstring &filename)
 	else {
 		fmt = L"Cannot save file \"%a\".";
 	}
-	ui::dialog_message (format (fmt) << filename);
+	ui::dialog_message(std::wstring(format(fmt) << filename));
 }
 
 void MainWin::default_save ()
@@ -631,10 +631,10 @@ bool MainWin::check_save ()
 	if (saved) {
 		return true;
 	}
-	switch (ui::dialog_message (
-				format (L"Save changes to \"%a\"?") << (
+	switch (ui::dialog_message(
+				std::wstring(format(L"Save changes to \"%a\"?") << (
 					current_filename.empty () ? L"<Untitled>" : current_filename.c_str ()
-				),
+				)),
 				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_CANCEL)) {
 		case ui::MESSAGE_YES:
 			default_save ();
@@ -694,7 +694,7 @@ void MainWin::open_file ()
 	if (check_save ()) {
 		std::wstring new_filename = ui::dialog_select_file (
 				L"Open",
-				std::wstring (),
+				std::wstring_view(),
 				ui::SELECT_FILE_READ);
 		if (!new_filename.empty ()) {
 			load (new_filename);
@@ -804,7 +804,7 @@ void MainWin::edit_password ()
 {
 	if (!password_.empty ()) {
 		std::wstring old_password = ui::dialog_input (L"Please enter your old password:",
-				std::wstring (), 35, ui::INPUT_PASSWORD, std::wstring ());
+				std::wstring_view(), 35, ui::INPUT_PASSWORD, std::wstring_view());
 		if (old_password.empty ()) {
 			return;
 		}
@@ -815,7 +815,7 @@ void MainWin::edit_password ()
 	}
 
 	std::wstring new_password1 = ui::dialog_input (L"Please enter your new password:",
-			std::wstring (), 35, ui::INPUT_PASSWORD, L"\n\r");
+			std::wstring_view(), 35, ui::INPUT_PASSWORD, L"\n\r");
 	if (new_password1 == L"\n\r") { // Canceled
 		return;
 	}
@@ -831,7 +831,7 @@ void MainWin::edit_password ()
 	}
 	else {
 		std::wstring new_password2 = ui::dialog_input (L"Please enter again:",
-				std::wstring (), 35, ui::INPUT_PASSWORD, std::wstring ());
+				std::wstring_view(), 35, ui::INPUT_PASSWORD, std::wstring_view());
 		if (new_password1 == new_password2) {
 			password_ = wstring_to_utf8(new_password1);
 			main_ctrl.touch ();

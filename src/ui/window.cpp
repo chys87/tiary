@@ -325,7 +325,7 @@ void Window::DummyControl::redraw ()
 Window *Window::topmost_window = 0;
 Window *Window::bottommost_window = 0;
 
-Window::Window (unsigned options, const std::wstring &title)
+Window::Window(unsigned options, std::wstring_view title)
 	: MovableObject ()
 	, hotkeys_()
 	, requests_(0)

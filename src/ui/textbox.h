@@ -41,8 +41,8 @@ public:
 	const std::wstring & get_text () const { return text; }
 
 	// Does not change cursor_position
-	void set_text (const std::wstring &, bool emit_sig_changed = true);
-	void set_text (const std::wstring &, bool emit_sig_changed, unsigned new_cursor_pos);
+	void set_text(std::wstring_view, bool emit_sig_changed = true);
+	void set_text(std::wstring_view, bool emit_sig_changed, unsigned new_cursor_pos);
 
 	Signal sig_changed;
 

@@ -147,16 +147,6 @@ Size Control::put (Size xy, const wchar_t *s)
 	return win_.put(get_pos(), get_size(), xy, s);
 }
 
-Size Control::put (Size xy, const wchar_t *s, size_t n)
-{
-	return win_.put(get_pos(), get_size(), xy, s, n);
-}
-
-Size Control::put (Size xy, const std::wstring &s)
-{
-	return win_.put(get_pos(), get_size(), xy, s);
-}
-
 
 Size Control::put(Size xy, std::wstring_view s) {
 	return win_.put(get_pos(), get_size(), xy, s);
