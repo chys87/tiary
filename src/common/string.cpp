@@ -25,29 +25,6 @@ void *mempcpy (void *dst, const void *src, size_t len)
 }
 #endif
 
-#ifndef HAVE_STPCPY
-namespace {
-
-template <typename T> inline
-T *stpcpy_impl (T *dst, const T *src)
-{
-	size_t len = strlen(src) + 1;
-	return -1 + (T*) mempcpy (dst, src, len * sizeof (T));
-}
-
-} // Anonymous namespace
-
-char *stpcpy (char *dst, const char *src)
-{
-	return stpcpy_impl (dst, src);
-}
-
-wchar_t *stpcpy (wchar_t *dst, const wchar_t *src)
-{
-	return stpcpy_impl (dst, src);
-}
-#endif
-
 #ifndef HAVE_STRCHRNUL
 const char *strchrnul (const char *str, int ch)
 {

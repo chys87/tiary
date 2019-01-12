@@ -42,13 +42,6 @@ using ::mempcpy;
 #else
 void *mempcpy (void *, const void *, size_t);
 #endif
-#ifdef HAVE_STPCPY
-inline char *stpcpy (char *dst, const char *src) { return ::stpcpy (dst, src); }
-inline wchar_t *stpcpy (wchar_t *dst, const wchar_t *src) { return ::wcpcpy (dst, src); }
-#else
-char *stpcpy (char *dst, const char *src);
-wchar_t *stpcpy (wchar_t *dst, const wchar_t *src);
-#endif
 #ifdef HAVE_STRCHRNUL
 inline const char *strchrnul (const char *str, int ch) { return ::strchrnul (str, ch); }
 inline char *strchrnul (char *str, int ch) { return ::strchrnul (str, ch); }
