@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -134,7 +134,7 @@ unsigned environment_expand (std::string &s)
 		dollar = strchrnul (src, '$');
 	} while (*dollar);
 	r.append (src, dollar);
-	r.swap (s);
+	s = std::move(r);
 	return expansions;
 }
 

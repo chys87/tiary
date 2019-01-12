@@ -194,7 +194,7 @@ void WindowSelectFile::slot_ok ()
 			return;
 		}
 	}
-	result.swap (expanded_name);
+	result = std::move(expanded_name);
 	request_close ();
 }
 

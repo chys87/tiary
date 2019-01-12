@@ -274,7 +274,7 @@ std::wstring get_nice_pathname(std::wstring_view name) {
 	std::wstring curdir = get_current_dir<wchar_t>();
 	// Special case: curdir == '/'
 	if (curdir.length () < 2) {
-		fullname.swap (homefold);
+		fullname = std::move(homefold);
 		return fullname;
 	}
 	// Special case: curdir == filename
@@ -319,7 +319,7 @@ std::wstring get_nice_pathname(std::wstring_view name) {
 	}
 	fullname.resize (fullname.length () - 1);
 	if (homefold.length () < fullname.length ()) {
-		fullname.swap (homefold);
+		fullname = std::move(homefold);
 	}
 	return fullname;
 }
