@@ -76,12 +76,12 @@ std::string make_function_footer(const FunctionMeta &meta) {
 
 std::string make_function_body_if_else(const FunctionMeta &meta, const std::vector<Range> &ranges) {
 	std::ostringstream oss;
-	oss << std::hex;
+	oss << std::showbase << std::hex;
 	for (const Range &range : ranges) {
 		if (range.lo == range.hi) {
-			oss << "\tif (c == 0x" << range.lo << ")\n";
+			oss << "\tif (c == " << range.lo << ")\n";
 		} else {
-			oss << "\tif (c >= 0x" << range.lo << " && c <= 0x" << range.hi << ")\n";
+			oss << "\tif (c >= " << range.lo << " && c <= " << range.hi << ")\n";
 		}
 		oss << "\t\treturn " << range.value << ";\n";
 	}
@@ -91,7 +91,7 @@ std::string make_function_body_if_else(const FunctionMeta &meta, const std::vect
 
 std::string make_function_body_case_ranges(const FunctionMeta &meta, const std::vector<Range> &ranges) {
 	std::ostringstream oss;
-	oss << std::hex;
+	oss << std::showbase << std::hex;
 
 	oss << "\tswitch (c) {\n";
 
@@ -99,9 +99,9 @@ std::string make_function_body_case_ranges(const FunctionMeta &meta, const std::
 		auto jt = it;
 		for (; jt != ranges.end() && jt->value == it->value; ++jt) {
 			if (jt->lo == jt->hi) {
-				oss << "\tcase 0x" << jt->lo << ":\n";
+				oss << "\tcase " << jt->lo << ":\n";
 			} else {
-				oss << "\tcase 0x" << jt->lo << " ... 0x" << jt->hi << ":\n";
+				oss << "\tcase " << jt->lo << " ... " << jt->hi << ":\n";
 			}
 		}
 		oss << "\t\treturn " << it->value << ";\n";
