@@ -14,6 +14,7 @@
 
 #include "common/misc.h"
 #include "common/containers.h"
+#include "common/string.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -100,42 +101,33 @@ bool safe_write_file(const char *filename, std::string_view data, std::string_vi
 }
 
 
-unsigned environment_expand (std::string &s)
-{
-	const char *src = s.c_str ();
-	const char *dollar = strchr (src, '$');
-	if (dollar == 0) {
-		return 0;
-	}
-	unsigned expansions = 0;
+std::string environment_expand(std::string_view s) {
 	std::string r;
-	do {
-		r.append (src, dollar);
+	size_t start_pos = 0;
+	size_t dollar_pos;
+	while ((dollar_pos = s.find('$', start_pos)) != s.npos) {
+		r += s.substr(start_pos, dollar_pos - start_pos);
 		std::string varname;
-		if (dollar[1] == '{') {
-			const char *dollarend = strchrnul (dollar+2, '}');
-			if (*dollarend == '\0') {
-				src = dollar;
-				dollar = dollarend;
+		if (dollar_pos + 1 < s.length() && s[dollar_pos + 1] == '{') {
+			size_t dollar_end = s.find('}', dollar_pos + 2);
+			if (dollar_end == s.npos) {
 				break;
 			}
-			varname.assign (dollar+2, dollarend);
-			src = dollarend+1;
-		}
-		else {
-			size_t varnamelen = strspn (dollar+1, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
-			varname.assign (dollar+1, varnamelen);
-			src = dollar+1+varnamelen;
+			varname = s.substr(dollar_pos + 2, dollar_end - (dollar_pos + 2));
+			start_pos = dollar_end + 1;
+		} else {
+			size_t dollar_end = s.find_first_not_of("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"sv, dollar_pos + 1);
+			varname = s.substr(dollar_pos + 1, dollar_end - (dollar_pos + 1));
+			start_pos = dollar_end;
 		}
 		if (const char *varval = getenv (varname.c_str ())) {
 			r += varval;
 		}
-		++expansions;
-		dollar = strchrnul (src, '$');
-	} while (*dollar);
-	r.append (src, dollar);
-	s = std::move(r);
-	return expansions;
+	}
+	if (start_pos < s.length()) {
+		r += s.substr(start_pos);
+	}
+	return r;
 }
 
 } // namespace tiary

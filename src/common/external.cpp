@@ -43,8 +43,7 @@ std::string make_external_command_line (const char *prog, const char *extra_para
 
 	// Split prog into tokens deliminated by pipe strings
 	for (std::string_view exe_view : split_string_view(prog, '|')) {
-		exe = exe_view;
-		environment_expand(exe);
+		exe = environment_expand(exe_view);
 		strip_in_place(exe);
 		if (exe.empty ()) {
 			continue;
