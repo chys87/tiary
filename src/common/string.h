@@ -30,6 +30,9 @@
 
 namespace tiary {
 
+using namespace std::literals::string_literals;
+using namespace std::literals::string_view_literals;
+
 // Allow some "char" functions for wchar_t as well
 inline const wchar_t *strchr (const wchar_t *str, wchar_t ch) { return wcschr (str, ch); }
 inline wchar_t *strchr (wchar_t *str, wchar_t ch) { return wcschr (str, ch); }
@@ -67,8 +70,10 @@ std::vector <std::pair <size_t, size_t> >
 
 // Remove spaces at the beginning and the end
 // Returns if the string was changed
-bool strip (std::string &);
-bool strip (std::wstring &);
+bool strip_in_place(std::string &);
+bool strip_in_place(std::wstring &);
+std::string strip(std::string_view);
+std::wstring strip(std::wstring_view);
 
 
 // Split a string into tokens

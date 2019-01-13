@@ -78,18 +78,17 @@ find_all(std::wstring_view haystack, std::wstring_view needle)
 namespace {
 
 template <typename T> inline
-bool strip_impl (std::basic_string<T> &str, const T *trim)
-{
+bool strip_in_place_impl(std::basic_string<T> &str, std::basic_string_view<T> trim) {
 	if (str.empty ()) {
 		return false;
 	}
-	size_t startpos = str.find_first_not_of (trim);
+	size_t startpos = str.find_first_not_of(trim.data(), 0, trim.length());
 	if (startpos == std::basic_string<T>::npos) {
 		str.clear ();
 		return true;
 	}
 	else {
-		size_t endpos = str.find_last_not_of (trim) + 1;
+		size_t endpos = str.find_last_not_of(trim.data(), str.npos, trim.length()) + 1;
 		if (startpos == 0) {
 			if (endpos >= str.size ()) {
 				return false;
@@ -108,16 +107,33 @@ bool strip_impl (std::basic_string<T> &str, const T *trim)
 	}
 }
 
+template <typename T>
+inline std::basic_string<T> strip_impl(std::basic_string_view<T> str, std::basic_string_view<T> trim) {
+	size_t start = str.find_first_not_of(trim);
+	if (start == str.npos) {
+		return {};
+	} else {
+		size_t end = str.find_last_not_of(trim);
+		return std::basic_string<T>(str.substr(start, end - start + 1));
+	}
 }
 
-bool strip (std::wstring &str)
-{
-	return strip_impl (str, L" \t\v\r\n");
+} // namespace
+
+bool strip_in_place(std::string &str) {
+	return strip_in_place_impl(str, " \t\v\r\n"sv);
 }
 
-bool strip (std::string &str)
-{
-	return strip_impl (str, " \t\v\r\n");
+bool strip_in_place(std::wstring &str) {
+	return strip_in_place_impl(str, L" \t\v\r\n"sv);
+}
+
+std::string strip(std::string_view str) {
+	return strip_impl(str, " \t\v\r\n"sv);
+}
+
+std::wstring strip(std::wstring_view str) {
+	return strip_impl(str, L" \t\v\r\n"sv);
 }
 
 

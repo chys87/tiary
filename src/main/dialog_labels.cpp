@@ -129,11 +129,12 @@ void WindowLabels::redraw ()
 
 WStringLocaleOrderedSet set_from_text (const std::wstring &text)
 {
-	std::vector<std::wstring> lst = split_string(text, L',');
-	for (std::wstring &s : lst) {
-		strip(s);
+	WStringLocaleOrderedSet set;
+
+	for (std::wstring_view label : split_string(text, L',')) {
+		set.insert(strip(label));
 	}
-	WStringLocaleOrderedSet set (lst.begin (), lst.end ());
+
 	set.erase (std::wstring ());
 	return set;
 }

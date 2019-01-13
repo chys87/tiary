@@ -45,7 +45,7 @@ std::string make_external_command_line (const char *prog, const char *extra_para
 	for (std::string_view exe_view : split_string_view(prog, '|')) {
 		exe = exe_view;
 		environment_expand(exe);
-		strip(exe);
+		strip_in_place(exe);
 		if (exe.empty ()) {
 			continue;
 		}
