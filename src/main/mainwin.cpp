@@ -49,7 +49,7 @@ namespace tiary {
 
 
 
-MainWin::MainWin (const std::wstring &initial_filename)
+MainWin::MainWin(std::wstring_view initial_filename)
 	: ui::Window (ui::Window::WINDOW_NO_BORDER)
 	, menu_bar (*this)
 	, context_menu ()
@@ -256,12 +256,13 @@ MainWin::MainWin (const std::wstring &initial_filename)
 			break;
 	}
 
-	std::wstring filename = initial_filename;
-	if (filename.empty ()) {
-		filename = utf8_to_wstring (global_options.get (GLOBAL_OPTION_DEFAULT_FILE));
-	}
-	if (!filename.empty ()) {
-		load (filename);
+	if (!initial_filename.empty()) {
+		load(initial_filename);
+	} else {
+		std::wstring filename = utf8_to_wstring(global_options.get(GLOBAL_OPTION_DEFAULT_FILE));
+		if (!filename.empty()) {
+			load(filename);
+		}
 	}
 }
 
@@ -294,11 +295,10 @@ void MainWin::on_ready ()
 	if (filter_) {
 		status += L"[Filter] "sv;
 	}
-	if (current_filename.empty ()) {
+	if (current_filename_.empty ()) {
 		status += L"<New file>"sv;
-	}
-	else {
-		status += get_nice_pathname (current_filename);
+	} else {
+		status += get_nice_pathname(current_filename_);
 	}
 	menu_bar.set_text (std::move (status));
 	hotkey_hint.redraw ();
@@ -327,8 +327,7 @@ bool MainWin::unavailable_filtered ()
 	return true;
 }
 
-void MainWin::load (const std::wstring &filename)
-{
+void MainWin::load(std::wstring_view filename) {
 	// Clear everything that's been loaded.
 	reset_file ();
 
@@ -353,12 +352,11 @@ void MainWin::load (const std::wstring &filename)
 	switch (load_ret) {
 		case LOAD_FILE_DEPRECATED:
 		case LOAD_FILE_SUCCESS:
-			current_filename = full_filename;
+			current_filename_ = full_filename;
 			main_ctrl.touch ();
 			saved = true;
 			{
-				RecentFileList::const_iterator it = std::find (recent_files.begin (),
-						recent_files.end (), current_filename);
+				auto it = std::find(recent_files.begin(), recent_files.end(), current_filename_);
 				if (it != recent_files.end ()) {
 					main_ctrl.set_focus (it->focus_entry);
 				}
@@ -404,11 +402,10 @@ void MainWin::load (const std::wstring &filename)
 	}
 }
 
-void MainWin::save (const std::wstring &filename)
-{
+void MainWin::save(std::wstring_view filename) {
 	const wchar_t *fmt;
 	if (save_file(wstring_to_mbs(filename).c_str(), entries, per_file_options, password_)) {
-		current_filename = filename;
+		current_filename_ = filename;
 		saved = true;
 		fmt = L"Successfully saved \"%a\".";
 	}
@@ -420,11 +417,10 @@ void MainWin::save (const std::wstring &filename)
 
 void MainWin::default_save ()
 {
-	if (current_filename.empty ()) {
+	if (current_filename_.empty()) {
 		save_as ();
-	}
-	else {
-		save (current_filename);
+	} else {
+		save(current_filename_);
 	}
 }
 
@@ -432,7 +428,7 @@ void MainWin::save_as ()
 {
 	std::wstring filename = ui::dialog_select_file (
 			L"Save as"sv,
-			current_filename,
+			current_filename_,
 			ui::SELECT_FILE_WRITE | ui::SELECT_FILE_WARN_OVERWRITE);
 	if (!filename.empty ()) {
 		filename = get_full_pathname (filename);
@@ -633,7 +629,7 @@ bool MainWin::check_save ()
 	}
 	switch (ui::dialog_message(
 				std::wstring(format(L"Save changes to \"%a\"?") << (
-					current_filename.empty () ? L"<Untitled>" : current_filename.c_str ()
+					current_filename_.empty () ? L"<Untitled>" : current_filename_.c_str ()
 				)),
 				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_CANCEL)) {
 		case ui::MESSAGE_YES:
@@ -649,14 +645,13 @@ bool MainWin::check_save ()
 
 void MainWin::update_recent_files ()
 {
-	if (current_filename.empty ())
+	if (current_filename_.empty ())
 		return;
 	bool changed = true; // Whether any change was made to recent_files
 	unsigned current_focus = main_ctrl.get_current_focus ();
-	RecentFileList::iterator it = std::find (recent_files.begin (), recent_files.end (),
-			current_filename);
+	auto it = std::find(recent_files.begin(), recent_files.end(), current_filename_);
 	if (it == recent_files.end ()) {
-		recent_files.insert(recent_files.begin(), {current_filename, current_focus});
+		recent_files.insert(recent_files.begin(), {current_filename_, current_focus});
 		changed = true;
 	} else {
 		if (it != recent_files.begin ()) {
@@ -792,7 +787,7 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 void MainWin::reset_file ()
 {
 	per_file_options.reset ();
-	current_filename.clear ();
+	current_filename_.clear ();
 	password_.clear();
 	for (DiaryEntry *entry: entries) {
 		delete entry;
@@ -854,7 +849,7 @@ void MainWin::edit_all_labels ()
 
 void MainWin::edit_global_options ()
 {
-	tiary::edit_global_options (global_options, current_filename);
+	tiary::edit_global_options(global_options, current_filename_);
 	save_global_options (global_options, recent_files);
 	main_ctrl.redraw();
 }

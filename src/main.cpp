@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -51,11 +51,11 @@ int main (int argc, char **argv)
 	tiary::ui::init ();
 	tiary::ui::set_mouse_status (true);
 
-	std::wstring filename;
 	if (argc >= 2) {
-		filename = mbs_to_wstring (argv[1]);
+		return main_body(mbs_to_wstring(argv[1]));
+	} else {
+		return main_body({});
 	}
-	return main_body (filename);
 }
 
 namespace {

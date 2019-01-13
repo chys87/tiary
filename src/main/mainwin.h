@@ -30,6 +30,7 @@
 #include "main/mainctrl.h"
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace tiary {
@@ -40,7 +41,7 @@ struct FilterGroup;
 class MainWin final : public ui::Window {
 public:
 	// Constructor & destructor
-	explicit MainWin (const std::wstring &initial_filename);
+	explicit MainWin(std::wstring_view initial_filename);
 	~MainWin ();
 
 	// Overload virtual functions
@@ -58,7 +59,7 @@ private:
 
 	PerFileOptionGroup per_file_options; ///< Per-file options
 
-	std::wstring current_filename; ///< Currently working filename. Empty = none
+	std::wstring current_filename_; ///< Currently working filename. Empty = none
 	std::string password_; ///< Password. Empty = none
 	std::vector<DiaryEntry *> entries; ///< Diary entries
 	RecentFileList recent_files; ///< Recent files
@@ -76,11 +77,11 @@ private:
 
 	ui::SearchInfo last_search; ///< Remember what we last searched for
 
-	// If successful, set current_filename
+	// If successful, set current_filename_
 	// If failed, reset everything
-	void load (const std::wstring &filename);
-	// If successful, set current_filename
-	void save (const std::wstring &filename);
+	void load(std::wstring_view filename);
+	// If successful, set current_filename_
+	void save(std::wstring_view filename);
 	void default_save ();
 	void save_as ();
 
