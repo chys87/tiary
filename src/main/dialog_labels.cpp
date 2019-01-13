@@ -63,16 +63,16 @@ public:
 };
 
 WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocaleOrderedSet &all_labels_)
-	: ui::Window (0, L"Labels")
+	: ui::Window(0, L"Labels"sv)
 	, ButtonDefault()
 	, labels (labels_)
-	, lbl_selected (*this, L"&Labels for this entry:")
+	, lbl_selected(*this, L"&Labels for this entry:"sv)
 	, txt_selected (*this)
-	, lbl_all (*this, L"All la&bels")
+	, lbl_all(*this, L"All la&bels"sv)
 	, lst_all (*this)
-	, btn_add (*this, L"&Add")
-	, btn_ok (*this, L"&OK")
-	, btn_cancel (*this, L"&Cancel")
+	, btn_add(*this, L"&Add"sv)
+	, btn_ok(*this, L"&OK"sv)
+	, btn_cancel(*this, L"&Cancel"sv)
 	, layout_main (VERTICAL)
 	, layout_buttons (HORIZONTAL)
 {

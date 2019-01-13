@@ -16,10 +16,11 @@
 #include "diary/diary.h"
 #include "ui/dialog_richtext.h"
 #include "ui/paletteid.h"
+#include "common/algorithm.h"
 #include "common/containers.h"
 #include "common/format.h"
+#include "common/string.h"
 #include "common/unicode.h"
-#include "common/algorithm.h"
 #include <wctype.h>
 #include <math.h>
 #include <unordered_set>
@@ -102,34 +103,34 @@ TimeSpan get_span (const DiaryEntryList &lst)
 void append_stat (std::wstring &text, ui::RichTextLineList &lst, const Stat &info)
 {
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Characters          ", format_dec (info.characters, 8));
+			L"Characters          "sv, format_dec(info.characters, 8));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Printable characters", format_dec (info.char_graph, 8));
+			L"Printable characters"sv, format_dec(info.char_graph, 8));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Non-CJK words       ", format_dec (info.words, 8));
+			L"Non-CJK words       "sv, format_dec(info.words, 8));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"CJK characters      ", format_dec (info.cjks, 8));
+			L"CJK characters      "sv, format_dec(info.cjks, 8));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Paragraphs          ", format_dec (info.paragraphs, 8));
+			L"Paragraphs          "sv, format_dec(info.paragraphs, 8));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"UTF-8 bytes         ", format_dec (info.bytes, 8));
+			L"UTF-8 bytes         "sv, format_dec(info.bytes, 8));
 }
 
 void append_average_stat (std::wstring &text, ui::RichTextLineList &lst, const Stat &info, unsigned n)
 {
 	double x = 1. / n;
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Characters          ", format_double (info.characters * x, 8, 4));
+			L"Characters          "sv, format_double(info.characters * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Printable characters", format_double (info.char_graph * x, 8, 4));
+			L"Printable characters"sv, format_double(info.char_graph * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Non-CJK words       ", format_double (info.words * x, 8, 4));
+			L"Non-CJK words       "sv, format_double(info.words * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"CJK characters      ", format_double (info.cjks * x, 8, 4));
+			L"CJK characters      "sv, format_double(info.cjks * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Paragraphs          ", format_double (info.paragraphs * x, 8, 4));
+			L"Paragraphs          "sv, format_double(info.paragraphs * x, 8, 4));
 	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
-			L"UTF-8 bytes         ", format_double (info.bytes * x, 8, 4));
+			L"UTF-8 bytes         "sv, format_double(info.bytes * x, 8, 4));
 }
 
 } // anonymous namespace
@@ -146,7 +147,7 @@ void display_statistics (const DiaryEntryList &all_entries,
 	Stat info = {};
 	if (current_entry) {
 		stat_entry(&info, *current_entry);
-		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Current entry");
+		ui::append_richtext_line(rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Current entry"sv);
 		append_stat (rich_text, rich_lines, info);
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
 	}
@@ -159,7 +160,7 @@ void display_statistics (const DiaryEntryList &all_entries,
 			}
 		}
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD,
-			L"Displayed entries   ", format_dec (filtered_entries->size (), 8));
+			L"Displayed entries   "sv, format_dec(filtered_entries->size(), 8));
 		append_stat (rich_text, rich_lines, info);
 		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
 	}
@@ -179,7 +180,7 @@ void display_statistics (const DiaryEntryList &all_entries,
 	}
 
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD,
-		L"All entries         ", format_dec (all_entries.size (), 8));
+		L"All entries         "sv, format_dec(all_entries.size(), 8));
 	append_stat (rich_text, rich_lines, info);
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
 
@@ -192,7 +193,7 @@ void display_statistics (const DiaryEntryList &all_entries,
 			<< format_datetime(span.max, L"%m/%d/%Y"))
 		);
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
-		L"Entries per day     ", format_double (double (all_entries.size ()) / days, 8, 4));
+		L"Entries per day     "sv, format_double(double(all_entries.size()) / days, 8, 4));
 
 	unsigned n_labels = 0;
 	unsigned n_distinct_labels;
@@ -207,17 +208,17 @@ void display_statistics (const DiaryEntryList &all_entries,
 		n_distinct_labels = all_labels.size ();
 	}
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Labels              ", format_dec (n_distinct_labels, 8));
+			L"Labels              "sv, format_dec(n_distinct_labels, 8));
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
-			L"Labels per entry    ", format_double (double (n_labels) / all_entries.size (), 8, 4));
+			L"Labels per entry    "sv, format_double(double(n_labels) / all_entries.size(), 8, 4));
 
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
 
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Average entry");
+	ui::append_richtext_line(rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Average entry"sv);
 	append_average_stat (rich_text, rich_lines, info, all_entries.size ());
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
 
-	ui::dialog_richtext (L"Statistics", rich_text, rich_lines);
+	ui::dialog_richtext(L"Statistics"sv, rich_text, rich_lines);
 }
 
 } // namespace tiary

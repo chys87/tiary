@@ -13,8 +13,9 @@
 
 
 #include "ui/date_select.h"
-#include "common/format.h"
 #include "common/algorithm.h"
+#include "common/format.h"
+#include "common/string.h"
 #include <utility> // std::forward
 
 namespace tiary {
@@ -55,7 +56,7 @@ const wchar_t day_names [][3] = {
 DateSelect::DateSelect (Window &win)
 	: year (win, make_year_names (), 0)
 	, month (win)
-	, lbl_weekday (win, L" S  M  T  W  T  F  S")
+	, lbl_weekday(win, L" S  M  T  W  T  F  S"sv)
 	, day (win)
 	, sig_date_changed ()
 	, offset (0)

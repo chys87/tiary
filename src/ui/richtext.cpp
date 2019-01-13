@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,8 +22,9 @@
 #include "ui/dialog_message.h"
 #include "ui/mouse.h"
 #include "ui/scrollbar.h"
-#include "common/format.h"
 #include "common/algorithm.h"
+#include "common/format.h"
+#include "common/string.h"
 #include <utility> // std::forward
 
 namespace tiary {
@@ -235,7 +236,7 @@ void RichText::do_search (bool previous, bool include_current)
 			return;
 		}
 	}
-	dialog_message (L"Not found", L"Error");
+	dialog_message(L"Not found"sv, L"Error"sv);
 }
 
 } // namespace tiary::ui

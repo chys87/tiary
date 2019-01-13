@@ -17,7 +17,7 @@
 
 #include "ui/size.h"
 #include "ui/richtextlist.h"
-#include <string>
+#include <string_view>
 #include <vector>
 
 namespace tiary {
@@ -28,8 +28,8 @@ namespace ui {
  *
  */
 void dialog_richtext (
-		const std::wstring &title, ///< Title for the dialog
-		const std::wstring &text,  ///< Text
+		std::wstring_view title, ///< Title for the dialog
+		std::wstring_view text,  ///< Text
 		const RichTextLineList &list, ///< Line info
 		Size size_hint = {} ///< A text area size hint (may be silently ignored)
 		);

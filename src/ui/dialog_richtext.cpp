@@ -33,14 +33,14 @@ class WindowRichText : public Window
 	unsigned max_text_width;
 
 public:
-	WindowRichText (const std::wstring &title, const std::wstring &text,
+	WindowRichText(std::wstring_view title, std::wstring_view text,
 			const RichTextLineList &list, Size size_hint);
 	~WindowRichText ();
 
 	void redraw ();
 };
 
-WindowRichText::WindowRichText (const std::wstring &title, const std::wstring &text,
+WindowRichText::WindowRichText(std::wstring_view title, std::wstring_view text,
 		const RichTextLineList &lst, Size size_hint_)
 	: Window (0, title)
 	, text (*this, text, lst)
@@ -87,8 +87,8 @@ void WindowRichText::redraw ()
 
 } // anonymous namespace
 
-void dialog_richtext (const std::wstring &title,
-		const std::wstring &text,
+void dialog_richtext(std::wstring_view title,
+		std::wstring_view text,
 		const RichTextLineList &list,
 		Size size_hint)
 {

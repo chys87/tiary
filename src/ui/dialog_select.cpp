@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,8 +26,9 @@
 #include "ui/button_default.h"
 #include "ui/layout.h"
 #include "ui/chain.h"
-#include "common/unicode.h"
 #include "common/algorithm.h"
+#include "common/string.h"
+#include "common/unicode.h"
 
 namespace tiary {
 namespace ui {
@@ -46,7 +47,7 @@ class DialogSelect final : public FixedWindow, private ButtonDefault {
 	size_t result;
 
 public:
-	DialogSelect (const std::wstring &, const std::vector <std::wstring> &, size_t);
+	DialogSelect(std::wstring_view, const std::vector<std::wstring> &, size_t);
 	~DialogSelect ();
 
 	void redraw ();
@@ -55,14 +56,14 @@ public:
 	size_t get_result () const { return result; }
 };
 
-DialogSelect::DialogSelect (const std::wstring &title, const std::vector <std::wstring> &items,
+DialogSelect::DialogSelect(std::wstring_view title, const std::vector <std::wstring> &items,
 		size_t pre_select)
 	: Window (0, title)
 	, FixedWindow ()
 	, ButtonDefault ()
 	, lst_items (*this)
-	, btn_ok (*this, L"&OK")
-	, btn_cancel (*this, L"&Cancel")
+	, btn_ok(*this, L"&OK"sv)
+	, btn_cancel(*this, L"&Cancel"sv)
 	, layout_main (VERTICAL)
 	, layout_buttons (HORIZONTAL)
 	, max_text_width (0)
@@ -126,7 +127,7 @@ void DialogSelect::slot_ok ()
 } // anonymous namespace
 
 
-size_t dialog_select (const std::wstring &title,
+size_t dialog_select(std::wstring_view title,
 		const std::vector <std::wstring> &selections,
 		size_t pre_select)
 {

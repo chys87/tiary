@@ -46,7 +46,7 @@ bool SearchInfo::dialog(bool default_backward) {
 		return true;
 	}
 	else {
-		dialog_message (L"Invalid regular expression", L"Error");
+		dialog_message(L"Invalid regular expression"sv, L"Error"sv);
 		return false;
 	}
 }

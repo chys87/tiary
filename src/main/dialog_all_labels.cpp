@@ -25,6 +25,7 @@
 #include "diary/diary.h"
 #include "common/format.h"
 #include "common/containers.h"
+#include "common/string.h"
 
 /**
  * @file	main/dialog_all_labels.cpp
@@ -73,13 +74,13 @@ private:
 };
 
 WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
-	: Window (0, L"All labels")
+	: Window(0, L"All labels"sv)
 	, FixedWindow ()
 	, ButtonDefault ()
 	, lst_labels (*this)
-	, btn_rename (*this, L"&Rename")
-	, btn_delete (*this, L"&Delete")
-	, btn_ok (*this, L"&OK")
+	, btn_rename(*this, L"&Rename"sv)
+	, btn_delete(*this, L"&Delete"sv)
+	, btn_ok(*this, L"&OK"sv)
 	, layout_main (HORIZONTAL)
 	, layout_right (VERTICAL)
 	, entries (entries_)
@@ -139,7 +140,7 @@ void WindowAllLabels::slot_rename ()
 	if (k < lst_labels.get_items ().size ()) {
 		const std::wstring &old_name = lst_labels.get_items () [k];
 		std::wstring new_name = dialog_input2 (
-				L"Rename label",
+				L"Rename label"sv,
 				std::wstring(format(L"Enter the new name for \"%a\":") << old_name),
 				old_name,
 				32);
@@ -161,7 +162,7 @@ void WindowAllLabels::slot_rename ()
 		}
 
 		if (dialog_message(std::wstring(format(warning_template) << old_name << new_name),
-					L"Rename label", msg_buttons) == MESSAGE_YES) {
+					L"Rename label"sv, msg_buttons) == MESSAGE_YES) {
 
 			all_labels.erase (old_name);
 			all_labels.insert (new_name);
@@ -187,7 +188,7 @@ void WindowAllLabels::slot_delete ()
 	if (k < lst_labels.get_items ().size ()) {
 		const std::wstring &old_name = lst_labels.get_items () [k];
 		if (dialog_message(std::wstring(format (L"Are you sure you want to delete label \"%a\"?\nThis operation cannot be undone!")
-					<< old_name), L"Delete label", MESSAGE_YES|MESSAGE_NO) == MESSAGE_YES) {
+					<< old_name), L"Delete label"sv, MESSAGE_YES|MESSAGE_NO) == MESSAGE_YES) {
 			all_labels.erase (old_name);
 			for (DiaryEntryList::iterator it = entries.begin (); it != entries.end (); ++it) {
 				(*it)->labels.erase (old_name);

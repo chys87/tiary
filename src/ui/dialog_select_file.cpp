@@ -21,11 +21,12 @@
 #include "ui/button_default.h"
 #include "ui/chain.h"
 #include "ui/layout.h"
-#include "common/dir.h"
 #include "ui/dialog_message.h"
-#include "common/format.h"
-#include "common/algorithm.h"
 #include "ui/checkbox_label.h"
+#include "common/algorithm.h"
+#include "common/dir.h"
+#include "common/format.h"
+#include "common/string.h"
 #include <list>
 
 namespace tiary {
@@ -80,9 +81,9 @@ WindowSelectFile::WindowSelectFile(std::wstring_view hint, std::wstring_view def
 	, ButtonDefault ()
 	, text_input (*this)
 	, list_files (*this)
-	, check_hidden_files (*this, string_show_hidden_files, true)
-	, btn_ok (*this, L"&OK")
-	, btn_cancel (*this, L"&Cancel")
+	, check_hidden_files(*this, std::wstring_view(string_show_hidden_files, sizeof(string_show_hidden_files) - 1), true)
+	, btn_ok(*this, L"&OK"sv)
+	, btn_cancel(*this, L"&Cancel"sv)
 	, layout_main (VERTICAL)
 	, layout_buttons (HORIZONTAL)
 	, result (default_file)
@@ -190,7 +191,7 @@ void WindowSelectFile::slot_ok ()
 	else {
 		// File selected for reading. Must exist
 		if (attr & FILE_ATTR_NONEXIST) {
-			dialog_message (L"You must select an existing file.");
+			dialog_message(L"You must select an existing file."sv);
 			return;
 		}
 	}
@@ -237,7 +238,7 @@ void WindowSelectFile::set_text(std::wstring_view newname, bool rewrite_input_bo
 	if (list_dir != split_fullname.first) {
 		list_dir = split_fullname.first;
 		// Refresh items in list_files
-		DirEntList files = tiary::list_dir (list_dir, FilterDots(list_dir == L"/", check_hidden_files.get_status ()));
+		DirEntList files = tiary::list_dir (list_dir, FilterDots(list_dir == L"/"sv, check_hidden_files.get_status ()));
 		ListBox::ItemList display_list;
 		display_list.reserve (files.size ());
 		for (DirEntList::iterator it = files.begin();

@@ -13,11 +13,12 @@
 
 
 #include "ui/dialog_message.h"
-#include "ui/window.h"
-#include "ui/label.h"
 #include "ui/button.h"
-#include "common/algorithm.h"
 #include "ui/chain.h"
+#include "ui/label.h"
+#include "ui/window.h"
+#include "common/algorithm.h"
+#include "common/string.h"
 
 namespace tiary {
 namespace ui {
@@ -63,22 +64,22 @@ WindowMessage::WindowMessage(std::wstring_view text, std::wstring_view title,
 	Button *btn_cancel = 0;
 	Button **p = p_buttons;
 	if (mask & MESSAGE_OK) {
-		btn_ok = new Button (*this, L"&OK");
+		btn_ok = new Button(*this, L"&OK"sv);
 		btn_ok->sig_clicked.connect (this, &WindowMessage::slot_click, MESSAGE_OK);
 		*p++ = btn_ok;
 	}
 	if (mask & MESSAGE_YES) {
-		btn_yes = new Button (*this, L"&Yes");
+		btn_yes = new Button(*this, L"&Yes"sv);
 		btn_yes->sig_clicked.connect (this, &WindowMessage::slot_click, MESSAGE_YES);
 		*p++ = btn_yes;
 	}
 	if (mask & MESSAGE_NO) {
-		btn_no = new Button (*this, L"&No");
+		btn_no = new Button(*this, L"&No"sv);
 		btn_no->sig_clicked.connect (this, &WindowMessage::slot_click, MESSAGE_NO);
 		*p++ = btn_no;
 	}
 	if (mask & MESSAGE_CANCEL) {
-		btn_cancel = new Button (*this, L"&Cancel");
+		btn_cancel = new Button(*this, L"&Cancel"sv);
 		btn_cancel->sig_clicked.connect (this, &WindowMessage::slot_click, MESSAGE_CANCEL);
 		*p++ = btn_cancel;
 	}

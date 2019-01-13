@@ -32,6 +32,7 @@
 #include "common/algorithm.h"
 #include "common/unicode.h"
 #include "common/dir.h"
+#include "common/string.h"
 
 
 
@@ -99,34 +100,34 @@ public:
 
 const wchar_t expand_lines_array[][2] = { L"1", L"2", L"3", L"4", L"5", L"6", L"7", L"8" };
 WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std::wstring &current_filename_)
-	: Window (0, L"Preferences")
+	: Window(0, L"Preferences"sv)
 	, FixedWindow ()
 	, ButtonDefault ()
 	, options (options_)
 	, current_filename (current_filename_)
-	, lbl_default_file (*this, L"Default &file:")
+	, lbl_default_file(*this, L"Default &file:"sv)
 	, lbl_default_file_name (*this, std::wstring ())
 	, layout_default_file (HORIZONTAL)
-	, btn_default_file (*this, L"Choose...")
-	, btn_default_file_current (*this, L"Use current file")
+	, btn_default_file(*this, L"Choose..."sv)
+	, btn_default_file_current(*this, L"Use current file"sv)
 	, layout_default_file_buttons (HORIZONTAL)
-	, lbl_expand_lines (*this, L"Expand &lines:")
+	, lbl_expand_lines(*this, L"Expand &lines:"sv)
 	, drp_expand_lines (*this, std::vector<std::wstring>(expand_lines_array, array_end (expand_lines_array)),
 			options_.get_num(GLOBAL_OPTION_EXPAND_LINES)-1)
 	, layout_expand_lines (HORIZONTAL)
-	, lbl_editor (*this, L"&Editor:")
+	, lbl_editor(*this, L"&Editor:"sv)
 	, txt_editor (*this)
 	, layout_editor (HORIZONTAL)
-	, lbl_datetime_format (*this, L"&Time format:")
+	, lbl_datetime_format(*this, L"&Time format:"sv)
 	, txt_datetime_format (*this)
 	, layout_datetime_format (HORIZONTAL)
-	, lbl_longtime_format (*this, L"Lo&ng time format:")
+	, lbl_longtime_format(*this, L"Lo&ng time format:"sv)
 	, txt_longtime_format (*this)
 	, layout_longtime_format (HORIZONTAL)
-	, btn_ok (*this, L"&OK")
-	, btn_cancel (*this, L"&Cancel")
-	, btn_reset (*this, L"&Reset")
-	, btn_help (*this, L"&Help")
+	, btn_ok(*this, L"&OK"sv)
+	, btn_cancel(*this, L"&Cancel"sv)
+	, btn_reset(*this, L"&Reset"sv)
+	, btn_help(*this, L"&Help"sv)
 	, layout_buttons (HORIZONTAL)
 	, layout_main (VERTICAL)
 {
@@ -256,7 +257,7 @@ void WindowGlobalOptions::slot_default_file ()
 {
 	lbl_default_file_name.set_text(
 			get_full_pathname (
-				dialog_select_file (L"Default file",
+				dialog_select_file(L"Default file"sv,
 					lbl_default_file_name.get_text (),
 					SELECT_FILE_READ)),
 			UIString::NO_HOTKEY);
@@ -282,7 +283,7 @@ void WindowGlobalOptions::slot_ok ()
 
 void WindowGlobalOptions::slot_reset ()
 {
-	if (ui::dialog_message (L"Do you really want to reset all settings to default?",
+	if (ui::dialog_message(L"Do you really want to reset all settings to default?"sv,
 				MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO) == MESSAGE_YES) {
 		// Use a new GlobalOptionGroup object
 		// Do not clobber options in this function
@@ -290,7 +291,7 @@ void WindowGlobalOptions::slot_reset ()
 	}
 }
 
-const wchar_t help_info[] = L"\
+const std::wstring_view help_info = L"\
 Default file: This file is automatically loaded, unless you explicitly open another one.\n\
 \n\
 Expand lines: The number of lines the selected diary entry should use on screen.\n\
@@ -310,7 +311,7 @@ Long time format: This specifies how to display date/time when viewing entries.\
     %M: 2-digit minute (00-59)     %S: 2-digit second (00-59)\n\
     %P: Upper-case AM/PM           %p: Lower-case am/pm\n\
     Example: %b %d, %Y\n\
-";
+"sv;
 
 void WindowGlobalOptions::slot_help ()
 {

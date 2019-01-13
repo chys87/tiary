@@ -26,6 +26,7 @@
 #include "ui/chain.h"
 #include "ui/checkbox_label.h"
 #include "ui/label.h"
+#include "common/string.h"
 
 
 namespace tiary {
@@ -58,14 +59,14 @@ private:
 };
 
 WindowSearch::WindowSearch(SearchDesc *output, const SearchDesc &default_search)
-	: Window (0, L"Search")
+	: Window(0, L"Search"sv)
 	, FixedWindow ()
 	, box_input (*this, 0)
-	, chk_backward(*this, L"&Backward", default_search.backward)
+	, chk_backward(*this, L"&Backward"sv, default_search.backward)
 #ifdef TIARY_USE_RE2
-	, chk_regex(*this, L"&Regular expression", default_search.regex)
+	, chk_regex(*this, L"&Regular expression"sv, default_search.regex)
 #endif
-	, btn_ok (*this, L"&Go!")
+	, btn_ok(*this, L"&Go!"sv)
 	, output_(output)
 {
 	box_input.set_text(default_search.text, false, default_search.text.size());

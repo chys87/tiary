@@ -21,7 +21,7 @@
 namespace tiary {
 namespace ui {
 
-Button::Button (Window &win, const std::wstring &str)
+Button::Button(Window &win, std::wstring_view str)
 	: Control(win, kRedrawOnFocusChange)
 	, text (str)
 {

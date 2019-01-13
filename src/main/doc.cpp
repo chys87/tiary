@@ -24,6 +24,7 @@
 #include "ui/richtextlist.h"
 #include "ui/paletteid.h"
 #include "common/format.h"
+#include "common/string.h"
 
 namespace tiary {
 
@@ -78,13 +79,13 @@ const ui::RichTextLineC info[] = {
 void show_doc ()
 {
 	std::wstring text;
-	ui::dialog_richtext (L"Help",
+	ui::dialog_richtext(L"Help"sv,
 			text,
 			ui::combine_lines (text, info, sizeof info / sizeof *info)
 			);
 }
 
-const wchar_t license [] = L"\
+constexpr std::wstring_view license = L"\
 Copyright (c) " TIARY_COPYRIGHT_YEAR_WIDE L", chys <admin@CHYS.INFO>\n\
 All rights reserved.\n\
 \n\
@@ -109,18 +110,17 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n\
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n\
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n\
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\
-";
+"sv;
 
 void show_license ()
 {
-	std::wstring text = license;
-	ui::dialog_richtext (L"License (Three-clause BSD license)",
-			text,
-			ui::split_richtext_lines (text, ui::PALETTE_ID_SHOW_NORMAL, 80)
+	ui::dialog_richtext(L"License (Three-clause BSD license)"sv,
+			license,
+			ui::split_richtext_lines(license, ui::PALETTE_ID_SHOW_NORMAL, 80)
 			);
 }
 
-const wchar_t about [] = L"\
+constexpr const wchar_t *about = L"\
 Tiary %a.%b.%c\n\
 \n\
 \n\
@@ -139,7 +139,7 @@ void show_about ()
 	ui::dialog_message(std::wstring(format(about) << unsigned(TIARY_MAJOR_VERSION)
 			<< unsigned (TIARY_MINOR_VERSION)
 			<< unsigned (TIARY_PATCH_VERSION)
-			<< TIARY_COPYRIGHT_YEAR_WIDE), L"About");
+			<< TIARY_COPYRIGHT_YEAR_WIDE), L"About"sv);
 }
 
 } // namespace tiary

@@ -20,7 +20,7 @@ namespace tiary {
 namespace ui {
 
 
-CheckBoxLabel::CheckBoxLabel (Window &win, const std::wstring &text, bool initial_status)
+CheckBoxLabel::CheckBoxLabel(Window &win, std::wstring_view text, bool initial_status)
 	: checkbox (win, initial_status)
 	, label (win, text)
 {

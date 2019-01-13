@@ -189,8 +189,8 @@ std::wstring get_full_pathname(std::wstring_view name) {
 	// Eliminate single dots and double dots
 	auto iw = split.begin();
 	for (auto it = iw; it != split.end(); ++it) {
-		if (*it == L".") {
-		} else if (*it == L"..") {
+		if (*it == L"."sv) {
+		} else if (*it == L".."sv) {
 			if (iw != split.begin()) {
 				--iw;
 			}

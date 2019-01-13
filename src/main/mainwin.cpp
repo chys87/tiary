@@ -108,7 +108,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	Action action_pageup (Signal (main_ctrl, &MainCtrl::set_focus_pageup), q_allow_up);
 	Action action_pagedown (Signal (main_ctrl, &MainCtrl::set_focus_pagedown), q_allow_down);
 
-	menu_bar.add (L"&File")
+	menu_bar.add(L"&File"sv)
 		(L"&New              Ctrl+N", action_new_file)
 		(L"&Open...          Ctrl+O", action_open_file)
 		(L"Open &recent file..."    , action_open_recent_file)
@@ -122,7 +122,7 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		()
 		(L"&Quit           q Ctrl+Q", action_quit)
 		;
-	context_menu = &menu_bar.add (L"&Entry");
+	context_menu = &menu_bar.add(L"&Entry"sv);
 	(*context_menu)
 		(L"&New entry      a INSERT", action_append)
 		(L"&Delete         d DELETE", action_delete)
@@ -138,22 +138,22 @@ MainWin::MainWin (const std::wstring &initial_filename)
 		(L"Move dow&n      M",        action_move_down)
 		(L"&Sort all       S",        action_sort_all)
 		;
-	menu_bar.add (L"&View")
+	menu_bar.add(L"&View"sv)
 		(L"&Filter...        CtrL+G", action_filter)
 		(L"&Clear filter     LEFT",   action_clear_filter)
 		;
-	menu_bar.add (L"&Search")
+	menu_bar.add(L"&Search"sv)
 		(L"&Find...        / Ctrl+F", action_search)
 		(L"Find &next      n F3",     action_search_next)
 		(L"Find &previous  N",        action_search_previous)
 		;
-	menu_bar.add (L"Se&ttings")
+	menu_bar.add(L"Se&ttings"sv)
 		(L"&Labels...      L",        action_all_labels)
 		()
 		(L"&Preferences... R",        action_global_options)
 		(L"&File perferences...",     action_perfile_options)
 		;
-	menu_bar.add (L"&Help")
+	menu_bar.add(L"&Help"sv)
 		(L"&Help             F1",     action_show_doc)
 		()
 		(L"&License",                 action_show_license)
@@ -223,24 +223,24 @@ MainWin::MainWin (const std::wstring &initial_filename)
 	main_ctrl.register_hotkey (ui::LEFT,     action_clear_filter);
 
 	hotkey_hint
-		(8000, L"Esc",     L"Menu",             std::move (action_menu))
-		(7000, L"LEFT",    L"Clear filter",     std::move (action_clear_filter))
-		(1000, L"a",       L"New entry",        std::move (action_append))
-		(1000, L"e",       L"Edit",             std::move (action_edit))
-		(1000, L"d",       L"Delete",           std::move (action_delete))
-		(500,  L"^G",      L"Filter",           std::move (action_filter))
-		(1000, L"/",       L"Search",           std::move (action_search))
-		(2000, L"n",       L"Next",             std::move (action_search_next))
-		(1000, L"t",       L"Time",             std::move (action_time))
-		(1000, L"l",       L"Labels",           std::move (action_item_labels))
-		(500,  L"L",       L"Manage labels",    std::move (action_all_labels))
-		(1000, L"m",       L"Move up",          std::move (action_move_up))
-		(1000, L"M",       L"Move down",        std::move (action_move_down))
-		(0,    L"s",       L"Statistics",       std::move (action_statistics))
-		(500,  L"S",       L"Sort",             std::move (action_sort_all))
-		(500,  L"p",       L"Password",         std::move (action_password))
-		(0,    L"F1",      L"Help",             std::move (action_show_doc))
-		(8000, L"q",       L"Quit",             std::move (action_quit))
+		(8000, L"Esc"sv,     L"Menu"sv,             std::move(action_menu))
+		(7000, L"LEFT"sv,    L"Clear filter"sv,     std::move(action_clear_filter))
+		(1000, L"a"sv,       L"New entry"sv,        std::move(action_append))
+		(1000, L"e"sv,       L"Edit"sv,             std::move(action_edit))
+		(1000, L"d"sv,       L"Delete"sv,           std::move(action_delete))
+		(500,  L"^G"sv,      L"Filter"sv,           std::move(action_filter))
+		(1000, L"/"sv,       L"Search"sv,           std::move(action_search))
+		(2000, L"n"sv,       L"Next"sv,             std::move(action_search_next))
+		(1000, L"t"sv,       L"Time"sv,             std::move(action_time))
+		(1000, L"l"sv,       L"Labels"sv,           std::move(action_item_labels))
+		(500,  L"L"sv,       L"Manage labels"sv,    std::move(action_all_labels))
+		(1000, L"m"sv,       L"Move up"sv,          std::move(action_move_up))
+		(1000, L"M"sv,       L"Move down"sv,        std::move(action_move_down))
+		(0,    L"s"sv,       L"Statistics"sv,       std::move(action_statistics))
+		(500,  L"S"sv,       L"Sort"sv,             std::move(action_sort_all))
+		(500,  L"p"sv,       L"Password"sv,         std::move(action_password))
+		(0,    L"F1"sv,      L"Help"sv,             std::move(action_show_doc))
+		(8000, L"q"sv,       L"Quit"sv,             std::move(action_quit))
 		;
 
 	MainWin::redraw ();
@@ -289,13 +289,13 @@ void MainWin::on_ready ()
 	// [+] [Filtering] [Filename]
 	std::wstring status;
 	if (!saved) {
-		status = L"+ ";
+		status = L"+ "sv;
 	}
 	if (filter_) {
-		status += L"[Filter] ";
+		status += L"[Filter] "sv;
 	}
 	if (current_filename.empty ()) {
-		status += L"<New file>";
+		status += L"<New file>"sv;
 	}
 	else {
 		status += get_nice_pathname (current_filename);
@@ -321,7 +321,7 @@ bool MainWin::unavailable_filtered ()
 	if (filter_) {
 		ui::dialog_message (
 				L"This operation cannot be done in filtered mode.\n"
-				L"Pressed LEFT to return to normal mode.");
+				L"Pressed LEFT to return to normal mode."sv);
 		return false;
 	}
 	return true;
@@ -338,7 +338,7 @@ void MainWin::load (const std::wstring &filename)
 
 	auto enter_password = [&nice_filename]() -> std::string {
 		return wstring_to_utf8(ui::dialog_input2(
-				L"Enter password",
+				L"Enter password"sv,
 				std::wstring(format(L"File \"%a\" is password protected. Please enter the password:") << nice_filename),
 				std::wstring(),
 				35,
@@ -367,7 +367,7 @@ void MainWin::load (const std::wstring &filename)
 				// Do it here so that the content has been drawn on screen
 				ui::dialog_message(L"This file is stored in a cryptographically non-secure format, dating back from 2009.\n"
 					L"Please re-save as soon as possible, but please note that the re-saved file cannot be read "
-					L"by old versions of tiary.");
+					L"by old versions of tiary."sv);
 			}
 			return;
 
@@ -375,7 +375,7 @@ void MainWin::load (const std::wstring &filename)
 			error_info = format (L"File not found: %a") << nice_filename;
 			break;
 		case LOAD_FILE_PASSWORD: // Password incorrect.
-			error_info = L"Incorrect password.";
+			error_info = L"Incorrect password."sv;
 			sleep (1);
 			break;
 		case LOAD_FILE_READ_ERROR:
@@ -431,7 +431,7 @@ void MainWin::default_save ()
 void MainWin::save_as ()
 {
 	std::wstring filename = ui::dialog_select_file (
-			L"Save as",
+			L"Save as"sv,
 			current_filename,
 			ui::SELECT_FILE_WRITE | ui::SELECT_FILE_WARN_OVERWRITE);
 	if (!filename.empty ()) {
@@ -449,8 +449,8 @@ void MainWin::append ()
 	time_t cur_time = time (0);
 //	ent->utc_time.assign_utc (cur_time);
 	ent->local_time = DateTime (DateTime::LOCAL, cur_time);
-	ent->title = L"Your title goes here.";
-	ent->text = L"Your contents go here.";
+	ent->title = L"Your title goes here."sv;
+	ent->text = L"Your contents go here."sv;
 	if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str())
 			&& (!ent->title.empty () || !ent->text.empty ())) {
 		entries.push_back (ent);
@@ -537,7 +537,7 @@ void MainWin::remove_current ()
 	}
 	size_t k = main_ctrl.get_current_focus ();
 	if (ui::dialog_message (
-				L"Are you sure to remove the currently selected entry?",
+				L"Are you sure to remove the currently selected entry?"sv,
 				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_DEFAULT_NO) == ui::MESSAGE_YES) {
 		delete entries[k];
 		entries.erase (entries.begin () + k);
@@ -595,7 +595,7 @@ void MainWin::sort_all ()
 	if (!unavailable_filtered ()) {
 		return;
 	}
-	if (ui::dialog_message (L"Are you sure you want to sort all entries by time? This operation cannot be undone.",
+	if (ui::dialog_message(L"Are you sure you want to sort all entries by time? This operation cannot be undone."sv,
 				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_DEFAULT_NO) == ui::MESSAGE_YES) {
 		std::stable_sort (entries.begin (), entries.end (), CompareEntry ());
 		main_ctrl.touch ();
@@ -693,7 +693,7 @@ void MainWin::open_file ()
 {
 	if (check_save ()) {
 		std::wstring new_filename = ui::dialog_select_file (
-				L"Open",
+				L"Open"sv,
 				std::wstring_view(),
 				ui::SELECT_FILE_READ);
 		if (!new_filename.empty ()) {
@@ -707,7 +707,7 @@ void MainWin::open_recent_file ()
 	if (check_save ()) {
 		unsigned n_recent_files = recent_files.size ();
 		if (n_recent_files == 0) {
-			ui::dialog_message (L"No recent file");
+			ui::dialog_message(L"No recent file"sv);
 			return;
 		}
 		bool modified = false;
@@ -786,7 +786,7 @@ void MainWin::do_search (bool bkwd, bool include_current_entry)
 		}
 	}
 	// Not found.
-	ui::dialog_message (L"Not found.");
+	ui::dialog_message(L"Not found."sv);
 }
 
 void MainWin::reset_file ()
@@ -803,45 +803,44 @@ void MainWin::reset_file ()
 void MainWin::edit_password ()
 {
 	if (!password_.empty ()) {
-		std::wstring old_password = ui::dialog_input (L"Please enter your old password:",
+		std::wstring old_password = ui::dialog_input(L"Please enter your old password:"sv,
 				std::wstring_view(), 35, ui::INPUT_PASSWORD, std::wstring_view());
 		if (old_password.empty ()) {
 			return;
 		}
 		if (wstring_to_utf8(old_password) != password_) {
-			ui::dialog_message (L"Incorrect password.");
+			ui::dialog_message(L"Incorrect password."sv);
 			return;
 		}
 	}
 
-	std::wstring new_password1 = ui::dialog_input (L"Please enter your new password:",
-			std::wstring_view(), 35, ui::INPUT_PASSWORD, L"\n\r");
-	if (new_password1 == L"\n\r") { // Canceled
+	std::wstring new_password1 = ui::dialog_input(L"Please enter your new password:"sv,
+			std::wstring_view(), 35, ui::INPUT_PASSWORD, L"\n\r"sv);
+	if (new_password1 == L"\n\r"sv) { // Canceled
 		return;
 	}
 
-	const wchar_t *info = 0;
+	std::wstring_view info;
 	if (new_password1.empty ()) {
-		if (ui::dialog_message (L"Are you sure you want to remove the password?",
+		if (ui::dialog_message(L"Are you sure you want to remove the password?"sv,
 					ui::MESSAGE_YES|ui::MESSAGE_NO) == ui::MESSAGE_YES) {
 			password_.clear ();
 			main_ctrl.touch ();
-			info = L"Password removed.";
+			info = L"Password removed."sv;
 		}
 	}
 	else {
-		std::wstring new_password2 = ui::dialog_input (L"Please enter again:",
+		std::wstring new_password2 = ui::dialog_input(L"Please enter again:"sv,
 				std::wstring_view(), 35, ui::INPUT_PASSWORD, std::wstring_view());
 		if (new_password1 == new_password2) {
 			password_ = wstring_to_utf8(new_password1);
 			main_ctrl.touch ();
-			info = L"Password changed.";
-		}
-		else {
-			info = L"Password NOT changed.";
+			info = L"Password changed."sv;
+		} else {
+			info = L"Password NOT changed."sv;
 		}
 	}
-	if (info) {
+	if (!info.empty()) {
 		ui::dialog_message (info);
 	}
 }

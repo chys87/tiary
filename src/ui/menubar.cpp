@@ -40,8 +40,7 @@ MenuBar::~MenuBar ()
 {
 }
 
-Menu &MenuBar::add (const std::wstring &text)
-{
+Menu &MenuBar::add(std::wstring_view text) {
 	item_list.emplace_back();
 	Item &item = item_list.back();
 	item.text.set_text (text);
@@ -60,11 +59,6 @@ Menu &MenuBar::add (const std::wstring &text)
 	}
 
 	return *item.menu;
-}
-
-Menu &MenuBar::add (const wchar_t *text)
-{
-	return add (std::wstring (text));
 }
 
 bool MenuBar::on_mouse (MouseEvent mouse_event)

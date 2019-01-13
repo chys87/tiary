@@ -25,6 +25,7 @@
 #include "ui/fixed_window.h"
 #include "ui/chain.h"
 #include "common/algorithm.h"
+#include "common/string.h"
 
 namespace tiary {
 namespace ui {
@@ -63,7 +64,7 @@ WindowInput::WindowInput(std::wstring_view title,
 	, ButtonDefault ()
 	, lbl_hint(*this, hint)
 	, box_input (*this, (attr & INPUT_PASSWORD) ? TextBox::PASSWORD_BOX : 0)
-	, btn_ok (*this, L"&OK")
+	, btn_ok(*this, L"&OK"sv)
 	, result (result_)
 {
 	unsigned hint_height = lbl_hint.split_line (text_box_width).size ();

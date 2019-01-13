@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -54,7 +54,7 @@ void write_for_view (std::wstring &text, RichTextLineList &lst,
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format));
 	if (!ent.labels.empty ()) {
 		append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL,
-				L"Labels: " + join (ent.labels.begin (), ent.labels.end (), L", "));
+				L"Labels: " + join(ent.labels.begin(), ent.labels.end(), L", "sv));
 	}
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL);
 
@@ -158,8 +158,7 @@ void reformat_content (std::wstring &title, std::wstring &text, const char *s)
 	text.erase (iw, text.end ());
 }
 
-bool error_false (const wchar_t *info)
-{
+bool error_false(std::wstring_view info) {
 	ui::dialog_message (info);
 	return false;
 }
@@ -181,7 +180,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	 */
 	int fd = my_mkstemp(&temp_file, "/tmp/tiary.temp.|.txt");
 	if (fd < 0) {
-		return error_false (L"Failed to create a temporary file in /tmp.");
+		return error_false(L"Failed to create a temporary file in /tmp."sv);
 	}
 
 	// There is no universal method to notify the editor of the encoding;
@@ -189,7 +188,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	if (!write_for_edit (fd, ent.title, ent.text)) {
 		close (fd);
 		unlink (temp_file.c_str ());
-		return error_false (L"Failed to write to temporary file :( Why?");
+		return error_false(L"Failed to write to temporary file :( Why?"sv);
 	}
 
 	time_t oldmtime;
@@ -197,7 +196,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	if (fstat (fd, &stbuf) != 0) {
 		close (fd);
 		unlink (temp_file.c_str ());
-		return error_false (L"stat on temporary file failed :( Why?");
+		return error_false(L"stat on temporary file failed :( Why?"sv);
 	}
 	oldmtime = stbuf.st_mtime;
 
@@ -210,7 +209,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 
 	if (editor_status != 0) { // Editor failed.
 		close (fd);
-		return error_false (L"Editor not found or failed for some reason :(");
+		return error_false(L"Editor not found or failed for some reason :("sv);
 	}
 
 	// No change?
@@ -223,7 +222,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	size_t fsize = lseek (fd, 0, SEEK_END);
 	if (ssize_t (fsize) < 0 || write (fd, "", 1) != 1) {
 		close (fd);
-		return error_false (L"Strange IO error with temporary file :( Why?");
+		return error_false(L"Strange IO error with temporary file :( Why?"sv);
 	}
 	++fsize;
 	char *raw = (char *) mmap (NULL, fsize, PROT_READ, MAP_PRIVATE
@@ -233,7 +232,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 			, fd, 0);
 	close (fd);
 	if (raw == MAP_FAILED) {
-		return error_false (L"Strange IO error with temporary file :( Why?");
+		return error_false(L"Strange IO error with temporary file :( Why?"sv);
 	}
 #ifdef MADV_SEQUENTIAL
 	madvise (raw, fsize, MADV_SEQUENTIAL);
@@ -276,7 +275,7 @@ void view_all_entries (const DiaryEntryList &entries, const std::wstring &longti
 		text_list.insert (text_list.end (), 4, tmp_line);
 	}
 	ui::dialog_richtext (
-			L"View all entries",
+			L"View all entries"sv,
 			text,
 			text_list,
 			Size{view_line_width + 3, 0});

@@ -27,8 +27,9 @@ class Button final : public Control {
 public:
 	// The text must be a single line
 	// Otherwise, the behavior is undefined
-	Button(Window &, const std::wstring &);
+	Button(Window &, std::wstring_view);
 	Button(Window &, std::wstring &&);
+	Button(Window &win, const wchar_t *text) : Button(win, std::wstring_view(text)) {}
 	~Button ();
 
 	bool on_key (wchar_t);

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -19,9 +19,10 @@
 #include "ui/button.h"
 #include "ui/layout.h"
 #include "ui/chain.h"
-#include "common/unicode.h"
 #include "common/algorithm.h"
 #include "common/dir.h"
+#include "common/string.h"
+#include "common/unicode.h"
 
 namespace tiary {
 
@@ -61,14 +62,14 @@ private:
 };
 
 WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
-	: Window (0, L"Open recent files")
+	: Window(0, L"Open recent files"sv)
 	, FixedWindow ()
 	, ButtonDefault ()
 	, lst_files (*this)
-	, btn_ok (*this, L"&OK")
-	, btn_cancel (*this, L"&Cancel")
-	, btn_remove (*this, L"&Remove")
-	, btn_remove_all (*this, L"C&lear all")
+	, btn_ok (*this, L"&OK"sv)
+	, btn_cancel(*this, L"&Cancel"sv)
+	, btn_remove(*this, L"&Remove"sv)
+	, btn_remove_all(*this, L"C&lear all"sv)
 	, layout_main (VERTICAL)
 	, layout_buttons (HORIZONTAL)
 	, max_width (0)

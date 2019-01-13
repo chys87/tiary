@@ -27,8 +27,9 @@
 #include "ui/checkbox_label.h"
 #include "ui/dialog_message.h"
 #include "common/algorithm.h"
-#include "common/unicode.h"
 #include "common/dir.h"
+#include "common/string.h"
+#include "common/unicode.h"
 
 
 
@@ -62,15 +63,15 @@ public:
 };
 
 WindowPerFileOptions::WindowPerFileOptions (PerFileOptionGroup &options_)
-	: Window (0, L"File Preferences")
+	: Window(0, L"File Preferences"sv)
 	, FixedWindow ()
 	, ButtonDefault ()
 	, options (options_)
-	, chk_modtime (*this, L"Use &modification time", options_.get_bool (PERFILE_OPTION_MODTIME))
-	, btn_ok (*this, L"&OK")
-	, btn_cancel (*this, L"&Cancel")
-	, btn_reset (*this, L"&Reset")
-	, btn_help (*this, L"&Help")
+	, chk_modtime(*this, L"Use &modification time"sv, options_.get_bool (PERFILE_OPTION_MODTIME))
+	, btn_ok(*this, L"&OK"sv)
+	, btn_cancel(*this, L"&Cancel"sv)
+	, btn_reset(*this, L"&Reset"sv)
+	, btn_help(*this, L"&Help"sv)
 	, layout_buttons (HORIZONTAL)
 	, layout_main (VERTICAL)
 {
@@ -125,7 +126,7 @@ void WindowPerFileOptions::slot_ok ()
 
 void WindowPerFileOptions::slot_reset ()
 {
-	if (ui::dialog_message (L"Do you really want to reset all settings to default?",
+	if (ui::dialog_message(L"Do you really want to reset all settings to default?"sv,
 				MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO) == MESSAGE_YES) {
 		// Use a new GlobalOptionGroup object
 		// Do not clobber options in this function
@@ -134,12 +135,12 @@ void WindowPerFileOptions::slot_reset ()
 	}
 }
 
-const wchar_t help_info[] = L"\
+constexpr std::wstring_view help_info = L"\
 Use modification time:\n\
     If enabled, tiary assumes the date/time of each entry to be the\n\
     recent modification time, and is reset each time the entry is modified.\n\
     By default (disabled), the date/time is assumed to be the creation time.\n\
-";
+"sv;
 
 void WindowPerFileOptions::slot_help ()
 {

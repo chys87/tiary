@@ -38,8 +38,7 @@ public:
 	explicit MenuBar (Window &);
 	~MenuBar ();
 
-	Menu &add (const std::wstring &); ///< Add an item to menu
-	Menu &add (const wchar_t *); ///< Add an item to menu
+	Menu &add(std::wstring_view); ///< Add an item to menu
 
 	bool on_mouse (MouseEvent);
 	void redraw ();

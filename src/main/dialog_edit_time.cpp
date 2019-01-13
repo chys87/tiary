@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -29,6 +29,7 @@
 #include "ui/layout.h"
 #include "ui/date_select.h"
 #include "common/datetime.h"
+#include "common/string.h"
 
 namespace tiary {
 
@@ -82,12 +83,12 @@ WindowTime::WindowTime (ReadableDateTime date_time)
 	, FixedWindow ()
 	, date_select (*this)
 	, drp_hour (*this, std::vector<std::wstring>(num_names, num_names+24), date_time.H)
-	, lbl_colon1 (*this, L":")
+	, lbl_colon1(*this, L":"sv)
 	, drp_minute (*this, std::vector<std::wstring>(num_names, num_names+60), date_time.M)
-	, lbl_colon2 (*this, L":")
+	, lbl_colon2(*this, L":"sv)
 	, drp_second (*this, drp_minute.get_items (), date_time.S)
-	, btn_now (*this, L"&Now")
-	, btn_ok (*this, L"&OK")
+	, btn_now(*this, L"&Now"sv)
+	, btn_ok(*this, L"&OK"sv)
 	, layout_main (VERTICAL)
 	, layout_time (HORIZONTAL)
 	, layout_buttons (HORIZONTAL)

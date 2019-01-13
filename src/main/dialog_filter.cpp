@@ -35,6 +35,7 @@
 #include "ui/layout.h"
 #include "ui/chain.h"
 #include "common/format.h"
+#include "common/string.h"
 
 namespace tiary {
 
@@ -84,31 +85,31 @@ public:
 };
 
 DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGroup &result_)
-	: Window (0, L"Filtering")
+	: Window(0, L"Filtering"sv)
 	, FixedWindow ()
 	, ButtonDefault ()
 	, all_labels (all_labels_)
 	, result (result_)
-	, lbl_label (*this, L"L&abel:")
+	, lbl_label(*this, L"L&abel:"sv)
 	, txt_label (*this)
-	, btn_label (*this, L"C&hoose")
+	, btn_label(*this, L"C&hoose"sv)
 	, layout_label (HORIZONTAL)
-	, lbl_title (*this, L"&Title")
+	, lbl_title(*this, L"&Title"sv)
 	, txt_title (*this)
 	, layout_title (HORIZONTAL)
 #ifdef TIARY_USE_RE2
-	, chk_title_regex (*this, L"&Regular expression", false)
+	, chk_title_regex(*this, L"&Regular expression"sv, false)
 	, layout_title_regex (HORIZONTAL)
 #endif
-	, lbl_text (*this, L"&Content:")
+	, lbl_text(*this, L"&Content:"sv)
 	, txt_text (*this)
 	, layout_text (HORIZONTAL)
 #ifdef TIARY_USE_RE2
-	, chk_text_regex (*this, L"Regular e&xpression", false)
+	, chk_text_regex(*this, L"Regular e&xpression"sv, false)
 	, layout_text_regex (HORIZONTAL)
 #endif
-	, btn_ok (*this, L"&OK")
-	, btn_cancel (*this, L"Cancel")
+	, btn_ok(*this, L"&OK"sv)
+	, btn_cancel(*this, L"Cancel"sv)
 	, layout_buttons (HORIZONTAL)
 	, layout_main (VERTICAL)
 {
@@ -277,7 +278,7 @@ void DialogFilter::slot_ok ()
 void DialogFilter::slot_choose_label ()
 {
 	std::vector <std::wstring> label_list (all_labels.begin (), all_labels.end ());
-	size_t choice = dialog_select (L"Select a label", label_list);
+	size_t choice = dialog_select(L"Select a label"sv, label_list);
 	if (choice < label_list.size ()) {
 		const std::wstring &label = label_list[choice];
 		txt_label.set_text (label, false, label.size ());

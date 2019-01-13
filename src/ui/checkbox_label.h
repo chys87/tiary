@@ -28,8 +28,9 @@ public:
 	CheckBox checkbox;
 	Label label;
 
-	CheckBoxLabel (Window &, const std::wstring &, bool initial_status = false);
+	CheckBoxLabel(Window &, std::wstring_view, bool initial_status = false);
 	CheckBoxLabel(Window &, std::wstring &&, bool initial_status = false);
+	CheckBoxLabel(Window &win, const wchar_t *text,bool initial_status = false) : CheckBoxLabel(win, std::wstring_view(text), initial_status) {}
 	~CheckBoxLabel ();
 
 	void move_resize (Size, Size);
