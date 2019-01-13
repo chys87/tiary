@@ -39,10 +39,14 @@ const char *strchrnul (const char *str, int ch)
 
 const wchar_t *strchrnul (const wchar_t *str, wchar_t ch)
 {
+#ifdef HAVE_WCSCHRNUL
+	return wcschrnul(str, ch);
+#else
 	while (*str && *str!=ch) {
 		++str;
 	}
 	return str;
+#endif
 }
 
 std::wstring strlower(std::wstring_view str) {

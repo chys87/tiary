@@ -102,7 +102,7 @@ AC_CHECK_FUNCS([openat fstatat])
 
 dnl Check for a bunch of optional libc functions
 AC_CHECK_FUNCS([faccessat euidaccess eaccess mempcpy])
-AC_CHECK_FUNCS([strchrnul get_current_dir_name])
+AC_CHECK_FUNCS([strchrnul wcschrnul get_current_dir_name])
 
 dnl Check for optional unlocked FILE operations
 m4_foreach_w([f],[
