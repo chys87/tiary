@@ -141,14 +141,15 @@ std::string find_executable(std::string_view exe);
 
 /**
  * @brief	Create and open a temporary file, similar with mkstemp
- * @param	name	[IN/OUT] The name for the temporary file, e.g.
+ * @param	name	[OUT] The name of the temporary file
+ * @param	template	Template of the the filename, e.g.
  *					"/tmp/tiary.|.txt", where "|" will be replaced by some
  *					random characters
  * @result	The FD for the file, open in O_RDWR|O_CREAT|O_EXCL|O_CLOEXEC
  *
  * @c name is modified in an undefined way on failure.
  */
-int my_mkstemp (std::string &name);
+int my_mkstemp(std::string *name, std::string_view name_template);
 
 } // namespace tiary
 

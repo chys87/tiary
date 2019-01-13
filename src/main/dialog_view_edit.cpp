@@ -170,7 +170,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 {
 	// Write the contents to a temp file
 	// Then invoke an editor
-	std::string temp_file = "/tmp/tiary.temp.|.txt";
+	std::string temp_file;
 	/*
 	 * The reason why I implement my own my_mkstemp is that
 	 * I want to add a suffix (.txt) to the filename, in order
@@ -179,7 +179,7 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	 * between filenames "/tmp/tiary.temp.ABcdEF" and 
 	 * "/tmp/tiary.temp.ABcdEF.txt"
 	 */
-	int fd = my_mkstemp (temp_file);
+	int fd = my_mkstemp(&temp_file, "/tmp/tiary.temp.|.txt");
 	if (fd < 0) {
 		return error_false (L"Failed to create a temporary file in /tmp.");
 	}

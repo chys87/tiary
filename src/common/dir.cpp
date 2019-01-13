@@ -501,10 +501,9 @@ std::string find_executable(std::string_view exe) {
 	return result;
 }
 
-int my_mkstemp (std::string &name)
-{
-	size_t pipe_sign = name.find ('|');
-	if (pipe_sign == std::string::npos) {
+int my_mkstemp(std::string *name, std::string_view name_template) {
+	size_t pipe_sign = name_template.find ('|');
+	if (pipe_sign == std::string_view::npos) {
 		// No pipe sign exist in name.
 		return -1;
 	}
@@ -513,13 +512,16 @@ int my_mkstemp (std::string &name)
 	gettimeofday (&tv, 0);
 	seed += uint64_t (getpid ()) ^ (uint64_t (tv.tv_usec) << 16) ^ tv.tv_sec;
 
-	name.insert (pipe_sign, 5, '|');
+	*name = name_template.substr(0, pipe_sign);
+	*name += "||||||"sv;
+	*name += name_template.substr(pipe_sign + 1);
 	// '|' is now replaced by 6 pipesigns
 
 	for (unsigned left_attempts = 20; left_attempts; seed += 7777, --left_attempts) {
 		static const char letters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_+";
+		static_assert(sizeof(letters) >= 64, "Not enough letters");
 		uint64_t v = seed;
-		std::string::iterator iw = name.begin () + pipe_sign;
+		std::string::iterator iw = name->begin() + pipe_sign;
 		*iw++ = letters[v % 64];
 		v /= 64;
 		*iw++ = letters[v % 64];
@@ -531,7 +533,7 @@ int my_mkstemp (std::string &name)
 		*iw++ = letters[v % 64];
 		v /= 64;
 		*iw++ = letters[v % 64];
-		int fd = open (name.c_str (), O_RDWR|O_CREAT|O_EXCL
+		int fd = open (name->c_str(), O_RDWR|O_CREAT|O_EXCL
 #ifdef O_CLOEXEC
 				|O_CLOEXEC
 #endif
