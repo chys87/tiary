@@ -118,8 +118,6 @@ WindowAllLabels::WindowAllLabels (DiaryEntryList &entries_)
 
 	register_hotkey (ESCAPE, btn_ok.sig_clicked);
 	set_default_button (btn_ok);
-
-	WindowAllLabels::redraw ();
 }
 
 WindowAllLabels::~WindowAllLabels ()

@@ -211,8 +211,6 @@ DialogFilter::DialogFilter (const DiaryEntry::LabelList &all_labels_, FilterGrou
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 	set_default_button (btn_ok);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
-
-	DialogFilter::redraw ();
 }
 
 DialogFilter::~DialogFilter ()

@@ -236,8 +236,6 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 
 	// Copy existing option values to controls
 	copy_options_to_controls (options);
-
-	WindowGlobalOptions::redraw ();
 }
 
 WindowGlobalOptions::~WindowGlobalOptions ()

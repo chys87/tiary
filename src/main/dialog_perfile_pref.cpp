@@ -110,8 +110,6 @@ WindowPerFileOptions::WindowPerFileOptions (PerFileOptionGroup &options_)
 	set_default_button (btn_ok);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
 	register_hotkey (F1, btn_help.sig_clicked);
-
-	WindowPerFileOptions::redraw ();
 }
 
 WindowPerFileOptions::~WindowPerFileOptions ()

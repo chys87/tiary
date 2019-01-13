@@ -96,8 +96,6 @@ DialogSelect::DialogSelect(std::wstring_view title, const std::vector <std::wstr
 
 	set_default_button (btn_ok);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
-
-	redraw();
 }
 
 DialogSelect::~DialogSelect ()

@@ -114,8 +114,6 @@ WindowMessage::WindowMessage(std::wstring_view text, std::wstring_view title,
 	else if ((mask & (MESSAGE_CANCEL|MESSAGE_DEFAULT_CANCEL)) == (MESSAGE_CANCEL|MESSAGE_DEFAULT_CANCEL)) {
 		set_focus_ptr (btn_cancel);
 	}
-
-	WindowMessage::redraw ();
 }
 
 WindowMessage::~WindowMessage ()

@@ -79,7 +79,6 @@ WindowInput::WindowInput(std::wstring_view title,
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
 	set_default_button (btn_ok);
 	btn_ok.sig_clicked.connect (this, &WindowInput::slot_ok);
-	WindowInput::redraw ();
 }
 
 WindowInput::~WindowInput ()

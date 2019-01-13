@@ -419,6 +419,8 @@ void Window::event_loop ()
 		set_focus_ptr(dummy_ctrl_.next, 1);
 	}
 
+	redraw();
+
 	while (!(requests_ & REQUEST_CLOSE)) {
 
 		on_ready ();

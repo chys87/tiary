@@ -120,8 +120,6 @@ WindowRecentFiles::WindowRecentFiles (RecentFileList &lst)
 	set_default_button (btn_ok);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
 	lst_files.register_hotkey (DELETE, btn_remove.sig_clicked);
-
-	WindowRecentFiles::redraw ();
 }
 
 WindowRecentFiles::~WindowRecentFiles ()

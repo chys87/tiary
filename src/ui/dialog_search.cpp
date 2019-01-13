@@ -102,8 +102,6 @@ WindowSearch::WindowSearch(SearchDesc *output, const SearchDesc &default_search)
 	btn_ok.sig_clicked = Condition (this, &WindowSearch::is_text_nonempty);
 	btn_ok.sig_clicked.connect (this, &WindowSearch::slot_ok);
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
-
-	WindowSearch::redraw ();
 }
 
 WindowSearch::~WindowSearch ()

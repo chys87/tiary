@@ -131,8 +131,6 @@ WindowTime::WindowTime (ReadableDateTime date_time)
 	btn_now.sig_clicked.connect (this, &WindowTime::slot_now);
 	btn_ok.sig_clicked.connect (this, &WindowTime::slot_ok);
 	register_hotkey (ESCAPE, Signal (this, &Window::request_close));
-
-	WindowTime::redraw ();
 }
 
 WindowTime::~WindowTime ()

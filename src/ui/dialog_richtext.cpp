@@ -59,8 +59,6 @@ WindowRichText::WindowRichText(std::wstring_view title, std::wstring_view text,
 	register_hotkey (NEWLINE, sig_close);
 	register_hotkey (ESCAPE, sig_close);
 	register_hotkey (L'q', std::move (sig_close));
-
-	WindowRichText::redraw ();
 }
 
 WindowRichText::~WindowRichText ()

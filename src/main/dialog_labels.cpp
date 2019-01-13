@@ -110,8 +110,6 @@ WindowLabels::WindowLabels (WStringLocaleOrderedSet &labels_, const WStringLocal
 
 	btn_cancel.sig_clicked.connect (this, &Window::request_close);
 	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
-
-	WindowLabels::redraw ();
 }
 
 WindowLabels::~WindowLabels ()
