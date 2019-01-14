@@ -91,8 +91,7 @@ namespace {
 class ItemControl;
 class MenuWindow;
 
-class ItemControl : public Control
-{
+class ItemControl final : public Control {
 public:
 	ItemControl (MenuWindow &, const MenuItem &, bool);
 	~ItemControl ();
@@ -113,8 +112,7 @@ private:
 	friend class MenuWindow;
 };
 
-class MenuWindow : public Window
-{
+class MenuWindow final : public Window {
 public:
 	MenuWindow (const Menu &, Size left, Size right, bool unget_left_);
 	~MenuWindow ();
@@ -122,14 +120,14 @@ public:
 	void on_winch ();
 	bool on_key (wchar_t);
 	bool on_mouse_outside (MouseEvent);
-	void redraw (); // Window::redraw is ok
+	// void redraw (); // Window::redraw is ok
 
-	MenuItem *get_result () const { return result; }
+	MenuItem *get_result() const { return result_; }
 
 private:
 
-	MenuItem *result;
-	bool unget_left;
+	MenuItem *result_ = nullptr;
+	bool unget_left_;
 
 	friend class ItemControl;
 };
@@ -159,14 +157,13 @@ bool ItemControl::on_focus ()
 		return false;
 	}
 	else {
-		ItemControl::redraw ();
+		redraw();
 		return true;
 	}
 }
 
-void ItemControl::on_defocus ()
-{
-	ItemControl::redraw ();
+void ItemControl::on_defocus() {
+	redraw();
 }
 
 bool ItemControl::on_key (wchar_t c)
@@ -239,7 +236,7 @@ void ItemControl::slot_trigger ()
 	focus ();
 	if (item.submenu == 0) {
 		// No submenu
-		static_cast<MenuWindow &>(window()).result = const_cast<MenuItem *>(&item);
+		static_cast<MenuWindow &>(window()).result_ = const_cast<MenuItem *>(&item);
 		window().request_close ();
 	}
 	else {
@@ -249,17 +246,15 @@ void ItemControl::slot_trigger ()
 		MenuWindow subwin (*item.submenu, left, right, false);
 		subwin.event_loop ();
 		if (MenuItem *subret = subwin.get_result ()) {
-			static_cast<MenuWindow&>(window()).result = subret;
+			static_cast<MenuWindow&>(window()).result_ = subret;
 			window().request_close();
 		}
 	}
 }
 
-MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_left_)
+MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_left)
 	: Window (Window::WINDOW_NO_CLOSE_BUTTON|Window::WINDOW_NONMOVABLE)
-	, result (0)
-	, unget_left (unget_left_)
-{
+	, unget_left_(unget_left) {
 	ItemControl **ctrls = new ItemControl * [menu_.size ()];
 	ItemControl **valid_ctrls = new ItemControl * [menu_.size ()]; // Excluding separators
 	ItemControl **pi = ctrls;
@@ -300,7 +295,6 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 		ctrls[i]->move_resize({1, unsigned(i) + 1}, {size.x - 1, 1});
 	}
 	delete [] ctrls;
-	MenuWindow::redraw ();
 }
 
 MenuWindow::~MenuWindow ()
@@ -320,7 +314,7 @@ bool MenuWindow::on_key (wchar_t c)
 		return true;
 	}
 
-	if ((unget_left || c!=LEFT) && c!=ESCAPE) {
+	if ((unget_left_ || c != LEFT) && c != ESCAPE) {
 		unget (c);
 	}
 	request_close ();
@@ -330,11 +324,6 @@ bool MenuWindow::on_key (wchar_t c)
 void MenuWindow::on_winch ()
 {
 	request_close ();
-}
-
-void MenuWindow::redraw ()
-{
-	Window::redraw ();
 }
 
 bool MenuWindow::on_mouse_outside (MouseEvent me)
