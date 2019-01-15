@@ -33,23 +33,11 @@ struct Size;
 struct MenuItem;
 struct Menu;
 
-struct MenuItem
-{
+struct MenuItem {
 	std::wstring text; ///< Empty string indicates a separator
 	Action action; ///< An action associated with this item
 	bool hidden = false; ///< Don't display this item. Can be useful in some contexts, i.e. a Recent File list
 	std::unique_ptr<Menu> submenu; ///< Submenu
-
-	MenuItem() = default; ///< Initialize to a separator
-
-	// valid_foo is not frequently used, so we do not initialize it in the constructor
-	MenuItem(std::wstring_view, const Signal &);
-	MenuItem(std::wstring_view, const Action &);
-	MenuItem(std::wstring_view, Signal &&);
-	MenuItem(std::wstring_view, Action &&);
-
-	MenuItem (MenuItem &&) = default;
-	MenuItem &operator = (MenuItem &&other) = default;
 
 	Menu &get_submenu (); ///< Returns a reference to the submenu (create if necessary)
 };
@@ -72,10 +60,10 @@ struct Menu
 	size_t size () const { return item_list.size (); }
 
 	MenuItem &add (); ///< Add a separator
-	MenuItem &add (const wchar_t *text, const Signal &sig);
-	MenuItem &add (const wchar_t *text, Action &&act);
-	MenuItem &add (const wchar_t *text, Signal &&sig = Signal ());
-	MenuItem &add (const wchar_t *text, const Action &act);
+	MenuItem &add(std::wstring_view text, const Signal &sig);
+	MenuItem &add(std::wstring_view text, Action &&act);
+	MenuItem &add(std::wstring_view text, Signal &&sig = Signal());
+	MenuItem &add(std::wstring_view text, const Action &act);
 
 	// operator () is identical to add (), except that it returns *this
 	Menu &operator () ()
@@ -83,30 +71,26 @@ struct Menu
 		add ();
 		return *this;
 	}
-	Menu &operator () (const wchar_t *text, Signal &&sig = Signal ())
-	{
+	Menu &operator () (std::wstring_view text, Signal &&sig = Signal()) {
 		add (text, std::move (sig));
 		return *this;
 	}
-	Menu &operator () (const wchar_t *text, Action &&act)
-	{
+	Menu &operator () (std::wstring_view text, Action &&act) {
 		add (text, std::move (act));
 		return *this;
 	}
 
-	Menu &operator () (const wchar_t *text, const Signal &sig)
-	{
+	Menu &operator () (std::wstring_view text, const Signal &sig) {
 		add (text, sig);
 		return *this;
 	}
 	
-	Menu &operator () (const wchar_t *text, const Action &act)
-	{
+	Menu &operator () (std::wstring_view text, const Action &act) {
 		add (text, act);
 		return *this;
 	}
 
-	Menu &add_submenu (const wchar_t *text);
+	Menu &add_submenu(std::wstring_view text);
 
 	/**
 	 * @param	left	The first-choice place to display the menu.

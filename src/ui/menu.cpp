@@ -25,26 +25,6 @@
 namespace tiary {
 namespace ui {
 
-MenuItem::MenuItem(std::wstring_view text_, const Signal &sig_)
-	: text (text_)
-	, action(sig_) {
-}
-
-MenuItem::MenuItem(std::wstring_view text_, const Action &act_)
-	: text (text_)
-	, action(act_) {
-}
-
-MenuItem::MenuItem(std::wstring_view text_, Signal &&sig_)
-	: text (text_)
-	, action(std::move(sig_)) {
-}
-
-MenuItem::MenuItem(std::wstring_view text_, Action &&act_)
-	: text (text_)
-	, action(std::move(act_)) {
-}
-
 Menu &MenuItem::get_submenu ()
 {
 	if (submenu == nullptr) {
@@ -57,33 +37,28 @@ Menu &MenuItem::get_submenu ()
 
 
 MenuItem &Menu::add() {
-	item_list.emplace_back(new MenuItem);
-	return *item_list.back();
+	return *item_list.emplace_back(new MenuItem);
 }
 
-MenuItem &Menu::add(const wchar_t *text, const Signal &sig) {
-	item_list.emplace_back(new MenuItem(text, sig));
-	return *item_list.back();
+MenuItem &Menu::add(std::wstring_view text, const Signal &sig) {
+	return *item_list.emplace_back(new MenuItem{std::wstring(text), sig});
 }
 
-MenuItem &Menu::add(const wchar_t *text, const Action &act) {
-	item_list.emplace_back(new MenuItem(text, act));
-	return *item_list.back();
+MenuItem &Menu::add(std::wstring_view text, const Action &act) {
+	return *item_list.emplace_back(new MenuItem{std::wstring(text), act});
 }
 
-MenuItem &Menu::add(const wchar_t *text, Signal &&sig) {
-	item_list.emplace_back(new MenuItem(text, std::move(sig)));
-	return *item_list.back();
+MenuItem &Menu::add(std::wstring_view text, Signal &&sig) {
+	return *item_list.emplace_back(new MenuItem{std::wstring(text), std::move(sig)});
 }
 
-MenuItem &Menu::add(const wchar_t *text, Action &&act) {
-	item_list.emplace_back(new MenuItem(text, std::move(act)));
-	return *item_list.back();
+MenuItem &Menu::add(std::wstring_view text, Action &&act) {
+	return *item_list.emplace_back(new MenuItem{std::wstring(text), std::move(act)});
 }
 
-Menu &Menu::add_submenu (const wchar_t *text)
-{
-	return add (text).get_submenu ();
+Menu &Menu::add_submenu(std::wstring_view text) {
+	auto &ptr = item_list.emplace_back(new MenuItem{std::wstring(text)});
+	return ptr->get_submenu ();
 }
 
 namespace {
