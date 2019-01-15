@@ -25,22 +25,22 @@
 namespace tiary {
 namespace ui {
 
-MenuItem::MenuItem (const std::wstring &text_, const Signal &sig_)
+MenuItem::MenuItem(std::wstring_view text_, const Signal &sig_)
 	: text (text_)
 	, action(sig_) {
 }
 
-MenuItem::MenuItem (const std::wstring &text_, const Action &act_)
+MenuItem::MenuItem(std::wstring_view text_, const Action &act_)
 	: text (text_)
 	, action(act_) {
 }
 
-MenuItem::MenuItem (const std::wstring &text_, Signal &&sig_)
+MenuItem::MenuItem(std::wstring_view text_, Signal &&sig_)
 	: text (text_)
 	, action(std::move(sig_)) {
 }
 
-MenuItem::MenuItem (const std::wstring &text_, Action &&act_)
+MenuItem::MenuItem(std::wstring_view text_, Action &&act_)
 	: text (text_)
 	, action(std::move(act_)) {
 }

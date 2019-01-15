@@ -43,10 +43,10 @@ struct MenuItem
 	MenuItem() = default; ///< Initialize to a separator
 
 	// valid_foo is not frequently used, so we do not initialize it in the constructor
-	MenuItem (const std::wstring &, const Signal &);
-	MenuItem (const std::wstring &, const Action &);
-	MenuItem (const std::wstring &, Signal &&);
-	MenuItem (const std::wstring &, Action &&);
+	MenuItem(std::wstring_view, const Signal &);
+	MenuItem(std::wstring_view, const Action &);
+	MenuItem(std::wstring_view, Signal &&);
+	MenuItem(std::wstring_view, Action &&);
 
 	MenuItem (MenuItem &&) = default;
 	MenuItem &operator = (MenuItem &&other) = default;
