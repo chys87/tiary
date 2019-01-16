@@ -120,7 +120,7 @@ MainWin::MainWin(std::wstring_view initial_filename)
 		()
 		(L"S&tatistics     s"sv,        action_statistics)
 		()
-		(L"&Quit           q Ctrl+Qsv", action_quit)
+		(L"&Quit           q Ctrl+Q"sv, action_quit)
 		;
 	context_menu = &menu_bar.add(L"&Entry"sv);
 	(*context_menu)
