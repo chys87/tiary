@@ -1,10 +1,16 @@
 # /***********************************************************************
 #  *
 #  * Tiary, a terminal-based diary keeping system for Unix-like systems
-#  * Copyright (C) 2009, 2010, 2011, 2012, 2019, chys <admin@CHYS.INFO>
+#  * Copyright (C) 2019, chys <admin@CHYS.INFO>
 #  *
 #  * This software is licensed under the 3-clause BSD license.
 #  * See LICENSE in the source package and/or online info for details.
 #  *
 #  **********************************************************************/
-SUBDIRS = src ut
+
+
+AM_CPPFLAGS = -I$(top_builddir)/src -I$(top_srcdir)/src
+LDADD = ../src/common/libcommon.a -lgtest_main -lgtest
+check_PROGRAMS = datetime.out
+TESTS = $(check_PROGRAMS)
+datetime_out_SOURCES = datetime.cpp

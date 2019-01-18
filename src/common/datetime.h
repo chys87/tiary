@@ -85,6 +85,10 @@ uint32_t make_date(const ReadableDate &) noexcept ATTRIBUTE_PURE;
  */
 uint32_t make_date_strict(const ReadableDate &) noexcept ATTRIBUTE_PURE;
 
+constexpr uint32_t kDateAtUnixEpoch = 719163;
+constexpr ReadableDate kUnixEpoch = {1970, 1, 1, 4};
+constexpr uint64_t kDateTimeAtUnixEpoch = uint64_t(kDateAtUnixEpoch) * SECONDS_PER_DAY;
+
 /**
  * @brief	Make a 32-bit unsigned integer representing the specified time
  *
@@ -107,7 +111,9 @@ uint64_t make_datetime(const ReadableDateTime &) noexcept ATTRIBUTE_PURE;
 inline constexpr uint64_t make_datetime(uint32_t date, uint32_t time) noexcept {
 	return (date * uint64_t (SECONDS_PER_DAY) + time);
 }
-uint64_t make_datetime_utc(time_t = ::time (0)) noexcept ATTRIBUTE_CONST;
+inline constexpr uint64_t make_datetime_utc(time_t t = ::time (0)) noexcept {
+	return kDateTimeAtUnixEpoch + t;
+}
 uint64_t make_datetime_local (time_t = ::time (0)) noexcept;
 
 

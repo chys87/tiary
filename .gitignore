@@ -26,3 +26,4 @@ config.status
 .*.sw?
 *.gen
 *.gen.cpp
+*.out

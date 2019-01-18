@@ -207,5 +207,6 @@ AC_CONFIG_FILES([
 	src/diary/Makefile
 	src/main/Makefile
 	src/ui/Makefile
+	ut/Makefile
 ])
 AC_OUTPUT

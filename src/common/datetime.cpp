@@ -175,19 +175,6 @@ uint64_t make_datetime_local (time_t t) noexcept
 	return make_datetime (rd, rt);
 }
 
-uint64_t make_datetime_utc (time_t t) noexcept
-{
-#if 0 //def TIARY_HAVE_LOCALTIME_R_AND_GMTIME_R
-	struct tm tmbuf;
-	struct tm *T = gmtime_r (&t, &tmbuf);
-#else
-	struct tm *T = gmtime (&t);
-#endif
-	struct ReadableDate rd = { (unsigned)T->tm_year+1900, (unsigned)T->tm_mon+1, (unsigned)T->tm_mday };
-	struct ReadableTime rt = { (unsigned)T->tm_hour, (unsigned)T->tm_min, (unsigned)T->tm_sec };
-	return make_datetime (rd, rt);
-}
-
 
 ReadableDate extract_date (uint32_t v) noexcept
 {
