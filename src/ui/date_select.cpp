@@ -143,7 +143,7 @@ void DateSelect::update_day_list (bool emit_signal)
 	m = m/2 + (m%2)*6 + 1;
 	Date first_day_of_month (y, m, 1);
 	offset = first_day_of_month.extract ().w;
-	dom = day_of_month (y, m);
+	dom = days_of_month(y, m);
 
 	std::vector <GridSelect::Item> grid_items (6*7);
 	std::copy (day_names, day_names + dom, grid_items.begin () + offset);

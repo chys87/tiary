@@ -25,12 +25,25 @@ constexpr unsigned SECONDS_PER_DAY = 24 * 60 * 60;
 
 /**
  * @brief	Returns whether a year is leap under the Gregorian calendar
+ *
+ * A leap year in the Gregorian calendar is also a leap year in the pseudo calendar
+ * in the implementation.
  */
-bool is_leap_year(unsigned) noexcept ATTRIBUTE_CONST;
+inline constexpr bool is_leap_year(unsigned y) noexcept {
+	return (y % 4 == 0) && (y % 100 != 0 || (y / 100 % 4 == 0));
+}
+
+static_assert( is_leap_year(1996));
+static_assert(!is_leap_year(1997));
+static_assert(!is_leap_year(1998));
+static_assert(!is_leap_year(1999));
+static_assert( is_leap_year(2000));
+static_assert(!is_leap_year(2100));
+
 /**
  * @brief	Returns the number of days in a given month under the Gregorian calendar
  */
-unsigned day_of_month(unsigned y, unsigned m) noexcept ATTRIBUTE_CONST;
+unsigned days_of_month(unsigned y, unsigned m) noexcept ATTRIBUTE_CONST;
 
 /*
  * Date is represented in a 32-bit unsigned integer number

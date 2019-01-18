@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -57,6 +57,8 @@ const signed char revdays[366] = {
 	REPEAT_29(2)   // Feb
 };
 
+const unsigned char mdays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
 // Cumulative leap days from Year 1 to Year y-1 (either true/pseudo cal)
 inline unsigned cumul_leap_days (unsigned y) noexcept
 {
@@ -65,25 +67,11 @@ inline unsigned cumul_leap_days (unsigned y) noexcept
 
 } // anonymous namespace
 
-// Checks whether a year is leap; either true/pseudo cal
-bool is_leap_year (unsigned y) noexcept
-{
-	if (y % 4) {
-		return false;
-	}
-	if (!(y%100) && (y/100%4)) {
-		return false;
-	}
-	return true;
-}
-
-unsigned day_of_month (unsigned y, unsigned m) noexcept
-{
+unsigned days_of_month(unsigned y, unsigned m) noexcept {
 	--m;
 	if (m >= 12) {
 		return 0;
 	}
-	static const unsigned char mdays [12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	if (m != 1) {
 		return mdays[m];
 	}
@@ -203,29 +191,26 @@ uint64_t make_datetime_utc (time_t t) noexcept
 
 ReadableDate extract_date (uint32_t v) noexcept
 {
-	unsigned y, m, d, w;
 	unsigned tmp;
 
-	w = v % 7;
+	unsigned w = v % 7;
 
 	v += 306; // To Pseudodate; 306 = days from Mar to Dec
 	--v; // Starting 0
-	y = v/(365*400+97)*400;
+	unsigned y = v/(365*400+97)*400;
 	v %= 365*400+97; // Now the date is within 400 years
-	if ((tmp = v/(365*100+24)) > 3) { // Which century ?
-		tmp = 3;
-	}
+	tmp = v / (365 * 100 + 24); // Which century ?
+	tmp -= tmp >> 2; // if (tmp > 3) tmp = 3
 	v -= tmp*(365*100+24); // Days elapsed since beginning of the century
 	y += tmp*100 + v/(365*4+1)*4;
 	v %= 365*4+1; // Days elapsed since beginning of the 4-year period
-	if ((tmp = v / 365) > 3) {
-		tmp = 3;
-	}
+	tmp = v / 365;
+	tmp -= tmp >> 2; // if (tmp > 3) tmp = 3
 	v -= tmp * 365;
 	++v; // Now v = number of day in year; starting 1
 	y += tmp + 1; // +1: Convert to human-readable year number
-	m = (int)revdays[v-1];
-	d = v - days[m + 9];
+	unsigned m = (int)revdays[v-1];
+	unsigned d = v - days[m + 9];
 	if ((int)m <= 0) {
 		m += 12;
 		--y;
