@@ -90,27 +90,15 @@ std::string format_hex_narrow (unsigned x)
 	return std::string (p, buffer + BUFFER_SIZE);
 }
 
-std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
-{
-	// Calculate 10 to the power of frac_digits
-	unsigned pow = 1;
-	unsigned base = 10;
-	for (unsigned n = frac_digits; n; n>>=1) {
-		if (n & 1) {
-			pow *= base;
-		}
-		base *= base;
+std::wstring format_double(double x, unsigned int_digits, unsigned frac_digits) {
+	constexpr int kBufSize = 128;
+	wchar_t buf[kBufSize];
+	int n = swprintf(buf, kBufSize, L"%*.*f", int_digits + frac_digits + 1, frac_digits, x);
+	if (n >= 0 && n < kBufSize) {
+		return std::wstring(buf, n);
+	} else {
+		return {};
 	}
-
-	// FIXME: lrint should be used. We need to modify CMakeLists.txt for this
-	unsigned val = unsigned (x * pow + .5);
-	unsigned quo = val/pow, rem = val%pow;
-	std::wstring ret = format_dec (quo, int_digits, L' ');
-	if (frac_digits) {
-		ret += L'.';
-		format_dec(&ret, rem, frac_digits, L'0');
-	}
-	return ret;
 }
 
 Format::~Format ()
