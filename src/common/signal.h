@@ -26,6 +26,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "common/type_identity.h"
 
 namespace tiary {
 
@@ -94,12 +95,12 @@ public:
 	explicit Signal(R f, T... args) :
 		f_(new detail::SignalCallable<R, T...>(std::move(f), std::move(args)...)) {}
 
-	template<typename R, typename C, typename D, typename...T, typename = decltype((std::declval<C*>()->*std::declval<R D::*>())(std::declval<T>()...))>
-	Signal(C &o, R D::*f, T... args) :
+	template<typename R, typename D, typename...T, typename = decltype((std::declval<D*>()->*std::declval<R D::*>())(std::declval<T>()...))>
+	Signal(type_identity_t<D> &o, R D::*f, T... args) :
 		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), &o, std::move(args)...)) {}
 
-	template<typename R, typename C, typename D, typename...T, typename = decltype((std::declval<C*>()->*std::declval<R D::*>())(std::declval<T>()...))>
-	Signal(C *o, R D::*f, T... args) :
+	template<typename R, typename D, typename...T, typename = decltype((std::declval<D*>()->*std::declval<R D::*>())(std::declval<T>()...))>
+	Signal(type_identity_t<D> *o, R D::*f, T... args) :
 		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), o, std::move(args)...)) {}
 
 	Signal(const Signal &sig) : f_(sig.f_ ? sig.f_->copy() : nullptr) {}
@@ -111,13 +112,13 @@ public:
 	std::void_t<typename std::result_of<R(T...)>::type> connect(R f, T... args) {
 		f_.reset(new detail::SignalCallable<R, T...>(std::move(f), std::move(args)...));
 	}
-	template<typename R, typename C, typename D, typename... T>
-	auto connect(C &o, R D::*f, T... args) -> std::void_t<decltype((o.*f)(args...))> {
-		f_.reset(new detail::SignalCallable<decltype(std::mem_fn(f)), C*, T...>(std::mem_fn(f), &o, std::move(args)...));
+	template<typename R, typename D, typename... T>
+	auto connect(type_identity_t<D> &o, R D::*f, T... args) -> std::void_t<decltype((o.*f)(args...))> {
+		f_.reset(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), &o, std::move(args)...));
 	}
-	template<typename R, typename C, typename D, typename... T>
-	auto connect(C *o, R D::*f, T... args) -> std::void_t<decltype((o->*f)(args...))> {
-		f_.reset(new detail::SignalCallable<decltype(std::mem_fn(f)), C*, T...>(std::mem_fn(f), o, std::move(args)...));
+	template<typename R, typename D, typename... T>
+	auto connect(type_identity_t<D> *o, R D::*f, T... args) -> std::void_t<decltype((o->*f)(args...))> {
+		f_.reset(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), o, std::move(args)...));
 	}
 
 	// Connect to another Signal

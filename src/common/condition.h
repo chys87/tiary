@@ -29,6 +29,7 @@
 #include <functional>
 #include <memory>
 #include <utility>
+#include "common/type_identity.h"
 
 namespace tiary {
 
@@ -68,14 +69,14 @@ public:
 	template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::result_of<C()>::type, bool>::value>::type>
 	Condition(C &&callable) : info_(new detail::CondC(std::forward<C>(callable))) {}
 
-	template <typename C, typename D, typename = typename std::enable_if<std::is_base_of<D, C>::value, void>::type>
-		Condition (C &obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), static_cast<D *>(&obj)))) {}
-	template <typename C, typename D, typename = typename std::enable_if<std::is_base_of<D, C>::value, void>::type>
-		Condition (C *obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), static_cast<D *>(obj)))) {}
-	template <typename C, typename D, typename = typename std::enable_if<std::is_base_of<D, C>::value, void>::type>
-		Condition (const C &obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), static_cast<const D *>(&obj)))) {}
-	template <typename C, typename D, typename = typename std::enable_if<std::is_base_of<D, C>::value, void>::type>
-		Condition (const C *obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), static_cast<const D *>(obj)))) {}
+	template <typename D>
+		Condition(type_identity_t<D> &obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), &obj))) {}
+	template <typename D>
+		Condition(type_identity_t<D> *obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), obj))) {}
+	template <typename D>
+		Condition (const type_identity_t<D> &obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), &obj))) {}
+	template <typename D>
+		Condition (const type_identity_t<D> *obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), obj))) {}
 
 	bool call (bool default_return) const { return (info_ ? info_->call (default_return) : default_return); }
 
