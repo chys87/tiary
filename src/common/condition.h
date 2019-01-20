@@ -42,7 +42,7 @@ public:
 	virtual ~CondBase () {}
 };
 
-template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::result_of<C()>::type, bool>::value, void>::type>
+template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::invoke_result<C>::type, bool>::value, void>::type>
 class CondC final : public CondBase {
 public:
 	CondC(const C &callable) : callable_(callable) {}
@@ -66,7 +66,7 @@ public:
 	Condition &operator = (Condition &&other) = default;
 
 	// Condition itself doesn't meet the requirement that it's callable, so we don't need to explicitly exclude it
-	template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::result_of<C()>::type, bool>::value>::type>
+	template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::invoke_result<C>::type, bool>::value>::type>
 	Condition(C &&callable) : info_(new detail::CondC(std::forward<C>(callable))) {}
 
 	template <typename D>

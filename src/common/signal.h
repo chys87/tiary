@@ -91,7 +91,7 @@ public:
 	Signal(Signal &&) = default;
 	Signal &operator = (Signal &&sig) = default;
 
-	template <typename R, typename...T, typename = typename std::result_of<R(T...)>::type>
+	template <typename R, typename...T, typename = typename std::invoke_result<R, T...>::type>
 	explicit Signal(R f, T... args) :
 		f_(new detail::SignalCallable<R, T...>(std::move(f), std::move(args)...)) {}
 
@@ -109,7 +109,7 @@ public:
 	Signal(Signal *sig, int) : f_(new detail::SignalRecursive(*sig)) {}
 
 	template <typename R, typename... T>
-	std::void_t<typename std::result_of<R(T...)>::type> connect(R f, T... args) {
+	std::void_t<typename std::invoke_result<R, T...>::type> connect(R f, T... args) {
 		f_.reset(new detail::SignalCallable<R, T...>(std::move(f), std::move(args)...));
 	}
 	template<typename R, typename D, typename... T>
