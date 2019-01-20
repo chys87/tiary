@@ -120,7 +120,7 @@ void show_license ()
 			);
 }
 
-constexpr const wchar_t *about = L"\
+constexpr std::wstring_view about = L"\
 Tiary %a.%b.%c\n\
 \n\
 \n\
@@ -132,14 +132,15 @@ See License for details.\n\
 \n\
 This product includes cryptographic software written by\n\
 Eric Young (eay@cryptsoft.com)\n\
-";
+"sv;
 
 void show_about ()
 {
-	ui::dialog_message(std::wstring(format(about) << unsigned(TIARY_MAJOR_VERSION)
-			<< unsigned (TIARY_MINOR_VERSION)
-			<< unsigned (TIARY_PATCH_VERSION)
-			<< TIARY_COPYRIGHT_YEAR_WIDE), L"About"sv);
+	ui::dialog_message(format(about,
+				unsigned(TIARY_MAJOR_VERSION),
+				unsigned (TIARY_MINOR_VERSION),
+				unsigned (TIARY_PATCH_VERSION),
+				TIARY_COPYRIGHT_YEAR_WIDE), L"About"sv);
 }
 
 } // namespace tiary

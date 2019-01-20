@@ -103,9 +103,8 @@ void RichText::redraw ()
 	choose_palette (PALETTE_ID_BACKGROUND);
 	clear({0, hgt}, {wid, 1});
 	put({0, hgt},
-			format (L"Lines %a-%b/%c") << top_line+1 << top_line+show_lines
-				<< unsigned (line_list.size ())
-			);
+			format(L"Lines %a-%b/%c"sv, top_line + 1, top_line + show_lines,
+				unsigned(line_list.size())));
 	// Scroll bar
 	clear({wid, 0}, {1, hgt + 1});
 	attribute_toggle (REVERSE);

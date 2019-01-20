@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -21,7 +21,7 @@
  *
  * Example:
  *
- * std::wstring s = format (L"I am %a. I am %b years old now.") << L"chys" << 22;
+ * std::wstring s = format(L"I am %a. I am %b years old.", L"chys", 31u);
  *
  * The maximal number of arguments is 26, from %a to %z (case sensitive)
  *
@@ -43,6 +43,7 @@
  */
 
 #include <string>
+#include <string_view>
 
 namespace tiary {
 
@@ -74,32 +75,39 @@ std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
 class Format {
 public:
 	static const unsigned MAX_ARGS = 26;
+	struct Result {};
 
-	explicit Format (const wchar_t *fmt) : format (fmt), args(), nargs (0) { offset[0] = 0; }
+	explicit Format(std::wstring_view fmt) : format_(fmt), args_(), nargs_(0) { offset_[0] = 0; }
 	~Format ();
 
-	Format &operator << (wchar_t);
-	Format &operator << (const wchar_t *);
-	Format &operator << (std::wstring_view);
+	void add(wchar_t);
+	void add(std::wstring_view);
+	void add(unsigned);
+	void add(HexTag);
 
+	Format &operator << (wchar_t c) { add(c); return *this; }
+	Format &operator << (std::wstring_view s) { add(s); return *this; }
 	// Decimal
-	Format &operator << (unsigned);
+	Format &operator << (unsigned v) { add(v); return *this; }
 	// Hexidecimal
-	Format &operator << (HexTag);
+	Format &operator << (HexTag v) { add(v); return *this; }
 
-	operator std::wstring () const;
+	std::wstring result() const;
+
+	operator std::wstring() const { return result(); }
+	std::wstring operator << (Result) const { return result(); }
 
 private:
-	const wchar_t *format;      ///< Format string
-	std::wstring args;          ///< The concatenation of all args
-	unsigned nargs;             ///< Current number of args
-	unsigned offset[MAX_ARGS+1];///< Offset in args
+	std::wstring_view format_;      ///< Format string
+	std::wstring args_;             ///< The concatenation of all args
+	unsigned nargs_;                ///< Current number of args
+	unsigned offset_[MAX_ARGS + 1]; ///< Offset in args
 
 };
 
-inline Format format (const wchar_t *fmt)
-{
-	return Format (fmt);
+template <typename... Args>
+inline std::wstring format(std::wstring_view fmt, Args&&... args) {
+	return (Format(fmt) << ... << std::forward<Args>(args));
 }
 
 } // namespace tiary

@@ -11,6 +11,7 @@
 
 AM_CPPFLAGS = -I$(top_builddir)/src -I$(top_srcdir)/src
 LDADD = ../src/common/libcommon.a -lgtest_main -lgtest
-check_PROGRAMS = datetime.out
+check_PROGRAMS = datetime.out format.out
 TESTS = $(check_PROGRAMS)
 datetime_out_SOURCES = datetime.cpp
+format_out_SOURCES = format.cpp

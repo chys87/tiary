@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -101,103 +101,84 @@ std::wstring format_double(double x, unsigned int_digits, unsigned frac_digits) 
 	}
 }
 
-Format::~Format ()
-{
-}
+Format::~Format() = default;
 
-Format &Format::operator << (wchar_t c)
-{
-	if (nargs < MAX_ARGS) {
-		args += c;
-		offset[++nargs] = args.size ();
+void Format::add(wchar_t c) {
+	if (nargs_ < MAX_ARGS) {
+		args_ += c;
+		offset_[++nargs_] = args_.size();
 	}
-	return *this;
 }
 
-Format &Format::operator << (const wchar_t *s)
-{
-	if (nargs < MAX_ARGS) {
-		args += s;
-		offset[++nargs] = args.size ();
+void Format::add(std::wstring_view s) {
+	if (nargs_ < MAX_ARGS) {
+		args_ += s;
+		offset_[++nargs_] = args_.size();
 	}
-	return *this;
 }
 
-Format &Format::operator << (std::wstring_view s) {
-	if (nargs < MAX_ARGS) {
-		args += s;
-		offset[++nargs] = args.size ();
+void Format::add(unsigned x) {
+	if (nargs_ < MAX_ARGS) {
+		format_dec(&args_, x);
+		offset_[++nargs_] = args_.size();
 	}
-	return *this;
 }
 
-Format &Format::operator << (unsigned x)
-{
-	if (nargs < MAX_ARGS) {
-		format_dec(&args, x);
-		offset[++nargs] = args.size ();
+void Format::add(HexTag a) {
+	if (nargs_ < MAX_ARGS) {
+		format_hex(&args_, static_cast<unsigned>(a));
+		offset_[++nargs_] = args_.size();
 	}
-	return *this;
 }
 
-Format &Format::operator << (HexTag a)
-{
-	if (nargs < MAX_ARGS) {
-		format_hex(&args, static_cast<unsigned>(a));
-		offset[++nargs] = args.size ();
-	}
-	return *this;
-}
-
-Format::operator std::wstring () const
-{
+std::wstring Format::result() const {
 	std::wstring ret;
-	const wchar_t *p_scan = format;
-	while (const wchar_t *percentage = wcschr (p_scan, L'%')) {
-		wchar_t next = percentage[1];
-		if (next == L'\0') {
-			break;
+	ret.reserve(format_.size() + args_.size());
+	size_t start = 0;
+	size_t percent;
+	while ((percent = format_.find(L'%', start)) != format_.npos && percent + 1 < format_.size()) {
+		wchar_t next = format_[percent + 1];
+		if (next == L'%') {
+			ret.append(&format_[start], &format_[percent + 1]);
+			start = percent + 2;
+			continue;
 		}
-		else if (next == L'%') {
-			ret.append (p_scan, percentage+1);
-			p_scan = percentage + 2;
-		}
-		else {
-			ret.append (p_scan, percentage);
-			p_scan = percentage+1;
 
-			const unsigned OPTS_FILL_ZERO = 1;
-			const unsigned OPTS_LEFT_ALIGN = 2;
-			unsigned opts = 0;
-			if (next == L'-') {
-				opts |= OPTS_LEFT_ALIGN;
-				++p_scan;
-			}
-			else if (next == L'0') {
-				opts |= OPTS_FILL_ZERO;
-				++p_scan;
-			}
-			unsigned wid = 0;
-			while (unsigned (*p_scan - L'0') < 10) {
-				wid = wid * 10 + unsigned (*p_scan++ - L'0');
-			}
-			unsigned id = *p_scan++ - L'a';
-			if (id < nargs) {
-				unsigned scrwid = 0;
-				if (wid) {
-					scrwid = ucs_width (args.data () + offset[id], offset[id+1] - offset[id]);
+		ret.append(&format_[start], &format_[percent]);
+		start = percent + 1;
+
+		bool left_align = false;
+		wchar_t fill_char = L' ';
+		if (next == L'-') {
+			left_align = true;
+			++start;
+		} else if (next == L'0') {
+			fill_char = L'0';
+			++start;
+		}
+		unsigned wid = 0;
+		while (start < format_.size() - 1 && (format_[start] >= L'0' && format_[start] <= L'9')) {
+			wid = wid * 10 + unsigned(format_[start++] - L'0');
+		}
+		unsigned id = format_[start++] - L'a';
+		if (id < nargs_) {
+			std::wstring_view data{args_.data() + offset_[id], offset_[id + 1] - offset_[id]};
+			unsigned scrwid;
+			if (wid && wid > (scrwid = ucs_width(data))) {
+				unsigned fix_width = wid - scrwid;
+				if (left_align) {
+					ret += data;
+					ret.append(fix_width, fill_char);
+				} else {
+					ret.append(fix_width, fill_char);
+					ret += data;
 				}
-				if (!(opts&OPTS_LEFT_ALIGN) && wid>scrwid) {
-					ret.append (wid - scrwid, (opts&OPTS_FILL_ZERO) ? L'0' : L' ');
-				}
-				ret.append (args.data() + offset[id], offset[id+1] - offset[id]);
-				if ((opts&OPTS_LEFT_ALIGN) && wid>scrwid) {
-					ret.append (wid - scrwid, (opts&OPTS_FILL_ZERO) ? L'0' : L' ');
-				}
+			} else {
+				ret += data;
 			}
 		}
 	}
-	ret += p_scan;
+	ret.append(&format_[start], format_.size() - start);
 	return ret;
 }
 

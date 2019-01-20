@@ -251,8 +251,8 @@ MainWin::MainWin(std::wstring_view initial_filename)
 		case LOAD_FILE_NOT_FOUND: // No file. Just use the defaults
 			break;
 		default: // Warning, and use the defaults
-			ui::dialog_message(std::wstring(format(L"WARNING: Config file ~/%a reading error. Using defaults.")
-					<< TIARY_WIDIFY(GLOBAL_OPTION_FILE)));
+			ui::dialog_message(format(L"WARNING: Config file ~/%a reading error. Using defaults."sv,
+					TIARY_WIDIFY(GLOBAL_OPTION_FILE)));
 			break;
 	}
 
@@ -338,7 +338,7 @@ void MainWin::load(std::wstring_view filename) {
 	auto enter_password = [&nice_filename]() -> std::string {
 		return wstring_to_utf8(ui::dialog_input2(
 				L"Enter password"sv,
-				std::wstring(format(L"File \"%a\" is password protected. Please enter the password:") << nice_filename),
+				format(L"File \"%a\" is password protected. Please enter the password:"sv, nice_filename),
 				std::wstring(),
 				35,
 				ui::INPUT_PASSWORD));
@@ -370,27 +370,27 @@ void MainWin::load(std::wstring_view filename) {
 			return;
 
 		case LOAD_FILE_NOT_FOUND: // Not found. Warning
-			error_info = format (L"File not found: %a") << nice_filename;
+			error_info = format(L"File not found: %a"sv, nice_filename);
 			break;
 		case LOAD_FILE_PASSWORD: // Password incorrect.
 			error_info = L"Incorrect password."sv;
 			sleep (1);
 			break;
 		case LOAD_FILE_READ_ERROR:
-			error_info = format (L"Cannot read file: %a") << nice_filename;
+			error_info = format(L"Cannot read file: %a"sv, nice_filename);
 			break;
 		case LOAD_FILE_BUNZIP2:
 		case LOAD_FILE_XML:
-			error_info = format (L"File format error: %a") << nice_filename;
+			error_info = format(L"File format error: %a"sv, nice_filename);
 			break;
 		case LOAD_FILE_DECRYPTION:
-			error_info = format (L"File decryption error: %a") << nice_filename;
+			error_info = format(L"File decryption error: %a"sv, nice_filename);
 			break;
 		case LOAD_FILE_CONTENT:
-			error_info = format (L"File content error: %a\n"
+			error_info = format(L"File content error: %a\n"
 					L"This may be due to a bug. If possible, please send a copy of this file"
 					L" to chys <admin@chys.info> so that we can fix the problem and help "
-					L"recover the contents.") << nice_filename;
+					L"recover the contents."sv, nice_filename);
 			break;
 	}
 	reset_file ();
@@ -403,16 +403,15 @@ void MainWin::load(std::wstring_view filename) {
 }
 
 void MainWin::save(std::wstring_view filename) {
-	const wchar_t *fmt;
+	std::wstring_view fmt;
 	if (save_file(wstring_to_mbs(filename).c_str(), entries, per_file_options, password_)) {
 		current_filename_ = filename;
 		saved = true;
-		fmt = L"Successfully saved \"%a\".";
+		fmt = L"Successfully saved \"%a\"."sv;
+	} else {
+		fmt = L"Cannot save file \"%a\"."sv;
 	}
-	else {
-		fmt = L"Cannot save file \"%a\".";
-	}
-	ui::dialog_message(std::wstring(format(fmt) << filename));
+	ui::dialog_message(format(fmt, filename));
 }
 
 void MainWin::default_save ()
@@ -628,8 +627,8 @@ bool MainWin::check_save ()
 		return true;
 	}
 	switch (ui::dialog_message(
-				std::wstring(format(L"Save changes to \"%a\"?") << (
-					current_filename_.empty () ? L"<Untitled>" : current_filename_.c_str ()
+				format(L"Save changes to \"%a\"?"sv, (
+					current_filename_.empty() ? L"<Untitled>"sv : std::wstring_view(current_filename_)
 				)),
 				ui::MESSAGE_YES|ui::MESSAGE_NO|ui::MESSAGE_CANCEL)) {
 		case ui::MESSAGE_YES:

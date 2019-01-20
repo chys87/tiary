@@ -139,27 +139,27 @@ void WindowAllLabels::slot_rename ()
 		const std::wstring &old_name = lst_labels.get_items () [k];
 		std::wstring new_name = dialog_input2 (
 				L"Rename label"sv,
-				std::wstring(format(L"Enter the new name for \"%a\":") << old_name),
+				format(L"Enter the new name for \"%a\":"sv, old_name),
 				old_name,
 				32);
 		if (new_name.empty () || new_name == old_name) {
 			return;
 		}
 
-		const wchar_t *warning_template;
+		std::wstring_view warning_template;
 		WindowMessageButton msg_buttons;
 
 		if (all_labels.find (new_name) != all_labels.end ()) { // This label already exists
 			warning_template = L"Label \"%b\" already exists. Are you sure you want to merge \"%a\" into \"%b\"?\n"
-						L"This operation cannot be undone!";
+						L"This operation cannot be undone!"sv;
 			msg_buttons = MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO;
 		}
 		else {
-			warning_template = L"Are you sure you want to rename \"%a\" to \"%b\"?";
+			warning_template = L"Are you sure you want to rename \"%a\" to \"%b\"?"sv;
 			msg_buttons = MESSAGE_YES|MESSAGE_NO;
 		}
 
-		if (dialog_message(std::wstring(format(warning_template) << old_name << new_name),
+		if (dialog_message(format(warning_template, old_name, new_name),
 					L"Rename label"sv, msg_buttons) == MESSAGE_YES) {
 
 			all_labels.erase (old_name);
@@ -185,8 +185,8 @@ void WindowAllLabels::slot_delete ()
 	size_t k = lst_labels.get_select ();
 	if (k < lst_labels.get_items ().size ()) {
 		const std::wstring &old_name = lst_labels.get_items () [k];
-		if (dialog_message(std::wstring(format (L"Are you sure you want to delete label \"%a\"?\nThis operation cannot be undone!")
-					<< old_name), L"Delete label"sv, MESSAGE_YES|MESSAGE_NO) == MESSAGE_YES) {
+		if (dialog_message(format(L"Are you sure you want to delete label \"%a\"?\nThis operation cannot be undone!"sv,
+					old_name), L"Delete label"sv, MESSAGE_YES|MESSAGE_NO) == MESSAGE_YES) {
 			all_labels.erase (old_name);
 			for (DiaryEntryList::iterator it = entries.begin (); it != entries.end (); ++it) {
 				(*it)->labels.erase (old_name);

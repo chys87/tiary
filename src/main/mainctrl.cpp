@@ -21,9 +21,10 @@
 #include "main/mainwin.h"
 #include "ui/paletteid.h"
 #include "ui/mouse.h"
+#include "common/algorithm.h"
 #include "common/format.h"
 #include "common/split_line.h"
-#include "common/algorithm.h"
+#include "common/string.h"
 #include "common/unicode.h"
 #include <algorithm>
 #include <limits>
@@ -122,7 +123,7 @@ void MainCtrl::redraw ()
 		const DiaryEntry &entry = *ent_lst[i+info.first];
 
 		// Entry ID
-		pos = put (pos, format (L"%04a  ") << id_map[&entry]);
+		pos = put(pos, format(L"%04a  "sv, id_map[&entry]));
 
 		// Date
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_DATE_SELECT : ui::PALETTE_ID_ENTRY_DATE);
