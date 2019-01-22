@@ -63,7 +63,7 @@ public:
 	}
 
 	void emit() { signal_.emit (); }
-	bool call_condition(bool default_return) const { return condition_.call (default_return); }
+	bool call_condition() const { return condition_.call(); }
 
 	Signal &signal() { return signal_; }
 	Condition &condition() { return condition_; }

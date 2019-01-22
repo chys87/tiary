@@ -37,7 +37,7 @@ namespace detail {
 
 class CondBase {
 public:
-	virtual bool call(bool default_return) const = 0;
+	virtual bool call() const = 0;
 	virtual CondBase *copy () const = 0;
 	virtual ~CondBase () {}
 };
@@ -47,7 +47,7 @@ class CondC final : public CondBase {
 public:
 	CondC(const C &callable) : callable_(callable) {}
 	CondC(C &&callable) : callable_(callable) {}
-	bool call(bool) const override { return bool(callable_()); }
+	bool call() const override { return bool(callable_()); }
 	CondC *copy() const override { return new CondC(callable_); }
 
 private:
@@ -78,7 +78,8 @@ public:
 	template <typename D>
 		Condition (const type_identity_t<D> *obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), obj))) {}
 
-	bool call (bool default_return) const { return (info_ ? info_->call (default_return) : default_return); }
+	bool call() const { return (info_ ? info_->call() : true); }
+	explicit operator bool() const { return static_cast<bool>(info_); }
 
 	struct And {};
 	struct Or {};
@@ -107,7 +108,7 @@ public:
 	explicit CondNot(const Condition &o) : obj_(o) {}
 	explicit CondNot(Condition &&o) : obj_(std::move (o)) {}
 	~CondNot ();
-	bool call(bool) const override;
+	bool call() const override;
 	CondNot *copy() const override;
 
 private:
@@ -121,7 +122,7 @@ public:
 	CondAnd(Condition &&oa, const Condition &ob) : a_(std::move(oa)), b_(ob) {}
 	CondAnd(Condition &&oa, Condition &&ob) : a_(std::move(oa)), b_(std::move(ob)) {}
 	~CondAnd();
-	bool call(bool) const override;
+	bool call() const override;
 	CondAnd *copy () const override;
 
 private:
@@ -136,7 +137,7 @@ public:
 	CondOr(Condition &&oa, const Condition &ob) : a_(std::move(oa)), b_(ob) {}
 	CondOr(Condition &&oa, Condition &&ob) : a_(std::move(oa)), b_(std::move(ob)) {}
 	~CondOr();
-	bool call(bool) const override;
+	bool call() const override;
 	CondOr *copy () const override;
 
 private:

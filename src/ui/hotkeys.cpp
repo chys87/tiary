@@ -75,7 +75,7 @@ bool Hotkeys::emit(wchar_t c) {
 	HotkeyList::iterator it = hotkey_list.find (c);
 	if (it != hotkey_list.end ()) {
 		Action &act = it->second;
-		if (act.is_really_connected () && act.call_condition (true)) {
+		if (act.is_really_connected() && act.call_condition()) {
 			act.emit ();
 			return true;
 		}

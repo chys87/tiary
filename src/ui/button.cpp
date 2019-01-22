@@ -50,7 +50,7 @@ Button::~Button ()
 bool Button::on_key (wchar_t c)
 {
 	if (c==RETURN || c==NEWLINE || c==L' ') {
-		if (sig_clicked.is_really_connected () && sig_clicked.call_condition (true)) {
+		if (sig_clicked.is_really_connected() && sig_clicked.call_condition()) {
 			sig_clicked.emit ();
 			return true;
 		}
@@ -60,7 +60,7 @@ bool Button::on_key (wchar_t c)
 
 void Button::slot_clicked ()
 {
-	if (sig_clicked.call_condition (true)) {
+	if (sig_clicked.call_condition()) {
 		sig_clicked.emit ();
 	}
 }
@@ -72,7 +72,7 @@ void Button::redraw ()
 	unsigned x = (get_size().x - w) / 2;
 
 	PaletteID id;
-	if (!sig_clicked.call_condition (true)) {
+	if (!sig_clicked.call_condition()) {
 		if (is_focus ()) {
 			id = PALETTE_ID_BUTTON_FOCUS_INVALID;
 		}

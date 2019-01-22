@@ -31,8 +31,8 @@ CondNot::~CondNot ()
 {
 }
 
-bool CondNot::call(bool default_return) const {
-	return !obj_.call(!default_return);
+bool CondNot::call() const {
+	return !obj_.call();
 }
 
 CondNot *CondNot::copy () const
@@ -44,11 +44,8 @@ CondAnd::~CondAnd ()
 {
 }
 
-bool CondAnd::call(bool default_return) const {
-	if (!a_.call(default_return)) {
-		return false;
-	}
-	return b_.call(default_return);
+bool CondAnd::call() const {
+	return (a_.call() && b_.call());
 }
 
 CondAnd *CondAnd::copy () const
@@ -60,11 +57,8 @@ CondOr::~CondOr ()
 {
 }
 
-bool CondOr::call(bool default_return) const {
-	if (a_.call(default_return)) {
-		return true;
-	}
-	return b_.call(default_return);
+bool CondOr::call() const {
+	return (a_.call() || b_.call());
 }
 
 CondOr *CondOr::copy () const

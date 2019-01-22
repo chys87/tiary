@@ -237,7 +237,7 @@ MenuWindow::MenuWindow (const Menu &menu_, Size left, Size right, bool unget_lef
 	unsigned maxwid = 0;
 	for (const std::unique_ptr<MenuItem> &pmi: menu_) {
 		if (!pmi->hidden) {
-			bool validity = pmi->action.call_condition (true);
+			bool validity = pmi->action.call_condition();
 			ItemControl *p = *pi++ = new ItemControl (*this, *pmi, validity);
 			if (validity && !p->text.get_text ().empty ()) {
 				*pv++ = p;

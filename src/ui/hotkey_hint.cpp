@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -60,7 +60,7 @@ void HotkeyHint::redraw ()
 	// at position -1
 	for (HotkeyItem *item: sorted_list_) {
 		unsigned required_width = item->wid + 1;
-		if ((left_width >= required_width) && item->action.call_condition (true)) {
+		if ((left_width >= required_width) && item->action.call_condition()) {
 			left_width -= required_width;
 			if (left_width) {
 				--left_width;

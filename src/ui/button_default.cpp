@@ -81,7 +81,7 @@ void ButtonDefault::slot_default_button ()
 bool ButtonDefault::cond_default_button () const
 {
 	if (Button *btn = get_current_default_button ()) {
-		if (btn->sig_clicked.call_condition (true)) {
+		if (btn->sig_clicked.call_condition()) {
 			return true;
 		}
 	}
