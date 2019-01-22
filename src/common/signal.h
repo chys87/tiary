@@ -103,7 +103,7 @@ public:
 	Signal(type_identity_t<D> *o, R D::*f, T... args) :
 		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), o, std::move(args)...)) {}
 
-	Signal(const Signal &sig) : f_(sig.f_ ? sig.f_->copy() : nullptr) {}
+	Signal(const Signal &sig);
 	// Note the second parameter.
 	Signal(Signal &sig, int) : f_(new detail::SignalRecursive(sig)) {}
 	Signal(Signal *sig, int) : f_(new detail::SignalRecursive(*sig)) {}
@@ -128,7 +128,8 @@ public:
 		}
 	}
 
-	Signal &operator = (const Signal &sig) { f_.reset(sig.f_ ? sig.f_->copy() : nullptr); return *this; }
+	void assign(const Signal &);
+	Signal &operator = (const Signal &sig) { assign(sig); return *this; }
 
 	// disconnect
 	void disconnect () { f_.reset(); }

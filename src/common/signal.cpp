@@ -38,6 +38,16 @@ bool SignalRecursive::is_really_connected() const {
 
 } // namespace detail
 
+Signal::Signal(const Signal &sig)
+	: f_(sig.f_ ? sig.f_->copy() : nullptr) {
+}
+
+void Signal::assign(const Signal &sig) {
+	if (this != &sig) {
+		f_.reset(sig.f_ ? sig.f_->copy() : nullptr);
+	}
+}
+
 bool Signal::is_really_connected () const
 {
 	const detail::SignalBase *p = f_.get();

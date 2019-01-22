@@ -60,8 +60,8 @@ class Condition
 {
 public:
 	Condition() = default;
-	Condition(const Condition &other) : info_(other.info_ ? other.info_->copy() : nullptr) {}
-	Condition &operator = (const Condition &other);
+	Condition(const Condition &other);
+	Condition &operator = (const Condition &other) { assign(other); return *this; }
 	Condition(Condition &&other) = default;
 	Condition &operator = (Condition &&other) = default;
 
@@ -80,6 +80,7 @@ public:
 
 	bool call() const { return (info_ ? info_->call() : true); }
 	explicit operator bool() const { return static_cast<bool>(info_); }
+	void assign(const Condition &);
 
 	struct And {};
 	struct Or {};

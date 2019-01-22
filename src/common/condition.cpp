@@ -17,12 +17,14 @@
 
 namespace tiary {
 
-Condition &Condition::operator = (const Condition &other)
-{
+Condition::Condition(const Condition &other)
+	: info_(other.info_ ? other.info_->copy() : nullptr) {
+}
+
+void Condition::assign(const Condition &other) {
 	if (this != &other) {
 		info_.reset(other.info_ ? other.info_->copy() : nullptr);
 	}
-	return *this;
 }
 
 namespace detail {
