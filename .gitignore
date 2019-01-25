@@ -9,6 +9,7 @@ aclocal.m4
 depcomp
 install-sh
 missing
+test-driver
 stamp-h1
 config.h*
 config.log
