@@ -389,7 +389,7 @@ void decrypt_2009(void *data, size_t datalen, std::string_view pass) {
 	}
 }
 
-std::array<unsigned char, 64> format_2018_password_digest(std::string_view password) {
+std::array<unsigned char, SHA512::DIGEST_LENGTH> format_2018_password_digest(std::string_view password) {
 	SHA512 h;
 	h(password_salt2018a, sizeof(password_salt2018a));
 	h(password);
@@ -470,20 +470,20 @@ LoadFileRet load_file (
 		everything = bunzip2 (&everything[32], everything.size () - 32);
 
 		success_ret = LOAD_FILE_DEPRECATED;
-	} else if (everything.size() >= 16 + 64 && !memcmp(&everything[0], new_format_signature_2018, 16)) {
+	} else if (everything.size() >= 16 + SHA512::DIGEST_LENGTH && !memcmp(&everything[0], new_format_signature_2018, 16)) {
 		// Second 64 bytes: SHA(salt_2018a + password + salt_2018b)
 		password = enter_password();
 		if (password.empty ()) { // User cancelation
 			return LOAD_FILE_PASSWORD;
 		}
 
-		if (memcmp(format_2018_password_digest(password).data(), &everything[16], 64) != 0) { // Password incorrect
+		if (memcmp(format_2018_password_digest(password).data(), &everything[16], SHA512::DIGEST_LENGTH) != 0) { // Password incorrect
 			password.clear ();
 			return LOAD_FILE_PASSWORD;
 		}
 
 		// Password correct. Decrypt now
-		everything = evp_aes_decrypt({&everything[16 + 64], everything.size() - 16 - 64}, password);
+		everything = evp_aes_decrypt({&everything[16 + SHA512::DIGEST_LENGTH], everything.size() - 16 - SHA512::DIGEST_LENGTH}, password);
 		if (everything.empty()) {
 			return LOAD_FILE_DECRYPTION;
 		}
@@ -667,9 +667,9 @@ bool save_file (const char *filename,
 		everything = evp_aes_encrypt(everything, password);
 
 		// Encrypted file header
-		char header[16 + 64];
+		char header[16 + SHA512::DIGEST_LENGTH];
 		memcpy(header, new_format_signature_2018, 16);
-		memcpy(header + 16, format_2018_password_digest(password).data(), 64);
+		memcpy(header + 16, format_2018_password_digest(password).data(), SHA512::DIGEST_LENGTH);
 
 		// Write to file
 		return safe_write_file(filename, {header, sizeof(header)}, everything);

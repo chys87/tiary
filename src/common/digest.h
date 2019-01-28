@@ -85,6 +85,8 @@ public:
 		Desc::final(static_cast<unsigned char *>(buffer), &context_);
 	}
 
+	static constexpr unsigned DIGEST_LENGTH = Desc::DIGEST_LENGTH;
+
 private:
 	typename Desc::CTX context_;
 };
