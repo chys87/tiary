@@ -72,27 +72,28 @@ dnl Check for mouse support in libncursesw (Optional)
 AC_CHECK_FUNCS([mousemask], [AC_DEFINE([TIARY_USE_MOUSE], [1], [Define to 1 if mouse support is available])])
 
 dnl Check for libxml2 (Required)
-PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.6.0],[
-					CXXFLAGS="$CXXFLAGS $pkg_cv_libxml2_CFLAGS"
-					LIBS="$LIBS $pkg_cv_libxml2_LIBS"
-					],[AC_MSG_ERROR([*** libxml2 >= 2.7.0 is required.])])
+PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.6.0],[],[AC_MSG_ERROR([*** libxml2 >= 2.7.0 is required.])])
 
 dnl Check for RE2 (Optional)
 PKG_CHECK_MODULES([re2], [re2 >= 0.0.0], [
-					CXXFLAGS="$CXXFLAGS $pkg_cv_re2_CFLAGS"
-					LIBS="$LIBS $pkg_cv_re2_LIBS"
 					AC_DEFINE([TIARY_USE_RE2], [1], [Define to 1 if re2 is available])
 					], [AC_MSG_WARN([*** re2 is unavailable.])])
 
 dnl Check for libcrypto from OpenSSL (Required)
-PKG_CHECK_MODULES([libcrypto], [libcrypto >= 1.0.2], [
-					CXXFLAGS="$CXXFLAGS $pkg_cv_libcrypto_CFLAGS"
-					LIBS="$LIBS $pkg_cv_libcrypto_LIBS"
-					], [AC_MSG_ERROR([*** libcrypto >= 1.0.2 is required.])])
+PKG_CHECK_MODULES([libcrypto], [libcrypto >= 1.0.2], [AC_SUBST(LIBS)], [AC_MSG_ERROR([*** libcrypto >= 1.0.2 is required.])])
+
+CONF_CPPFLAGS="$CONF_CPPFLAGS $pkg_cv_libxml2_CFLAGS $pkg_cv_re2_CFLAGS $pkg_cv_libcrypto_CFLAGS"
+CONF_LIBS="$CONF_LIBS $pkg_cv_libxml2_LIBS $pkg_cv_re2_LIBS $pkg_cv_libcrypto_LIBS"
 
 dnl Check for required functions from libcrypto
+bak_CXXFLAGS="$CXXFLAGS"
+bak_LIBS="$LIBS"
+CXXFLAGS="$CXXFLAGS $pkg_cv_libcrypto_CFLAGS"
+LIBS="$LIBS $pkg_cv_libcrypto_LIBS"
 AC_CHECK_FUNCS([MD5_Update SHA512_Update EVP_aes_256_cbc EVP_CIPHER_CTX_new], [],
 				[AC_MSG_ERROR([*** MD5, SHA512, EVP-AES-256-CBC are required])])
+CXXFLAGS="$bak_CXXFLAGS"
+LIBS="$bak_LIBS"
 
 dnl Check for wcwidth function (Optional)
 AC_CHECK_FUNCS([wcwidth], [], [AC_MSG_ERROR([*** wcwidth not found])])
@@ -194,12 +195,12 @@ AX_CHECK_COMPILE_FLAG([-std=gnu++17],[
 	AC_MSG_ERROR(["-std=gnu++17" is not supported. You need a modern compiler.])
 ])
 
-dnl Let's always include config.h
-dnl "../src/" ensures source files in src/diary doesn't find src/diary/config.h instead
-CFLAGS="$CFLAGS -include ../src/config.h"
-CXXFLAGS="$CXXFLAGS -include ../src/config.h"
+dnl Let's always include tiary-config.h (renamed to avoid conflict with src/diary/config.h)
+CONF_CPPFLAGS="$CONF_CPPFLAGS -I\$(top_builddir)/src -I\$(top_srcdir)/src -include tiary-config.h"
+AC_SUBST([CONF_CPPFLAGS])
+AC_SUBST([CONF_LIBS])
 
-AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_HEADERS([src/tiary-config.h])
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile

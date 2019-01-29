@@ -11,7 +11,8 @@ install-sh
 missing
 test-driver
 stamp-h1
-config.h*
+/src/tiary-config.h
+/src/tiary-config.h.in
 config.log
 config.status
 *.vim
@@ -28,3 +29,5 @@ config.status
 *.gen
 *.gen.cpp
 *.out
+/ut/*.log
+/ut/*.trs

@@ -1,7 +1,8 @@
 # /***********************************************************************
 #  *
 #  * Tiary, a terminal-based diary keeping system for Unix-like systems
-#  * Copyright (C) 2009, 2010, 2011, 2012, 2014, chys <admin@CHYS.INFO>
+#  * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2019,
+#  * chys <admin@CHYS.INFO>
 #  *
 #  * This software is licensed under the 3-clause BSD license.
 #  * See LICENSE in the source package and/or online info for details.
@@ -10,7 +11,7 @@
 
 
 
-AM_CPPFLAGS = -I$(top_builddir)/src -I$(top_srcdir)/src
+AM_CPPFLAGS = @CONF_CPPFLAGS@
 
 noinst_LIBRARIES = libmain.a
 

@@ -9,7 +9,7 @@
 #  **********************************************************************/
 
 
-AM_CPPFLAGS = -I$(top_builddir)/src -I$(top_srcdir)/src
+AM_CPPFLAGS = @CONF_CPPFLAGS@
 LDADD = ../src/common/libcommon.a -lgtest_main -lgtest
 check_PROGRAMS = datetime.out format.out
 TESTS = $(check_PROGRAMS)
