@@ -108,7 +108,7 @@ uint64_t parse_time (const char *s)
  * (%Y-%m-%d %H:%M:%S)
  */
 std::string format_time(const DateTime &date_time) {
-	return wstring_to_utf8(date_time.format(L"%Y-%m-%d %H:%M:%S"sv));
+	return date_time.format("%Y-%m-%d %H:%M:%S"sv);
 }
 
 bool is_legal_label_name (const std::wstring &name)
