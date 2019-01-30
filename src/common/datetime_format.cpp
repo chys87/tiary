@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -62,21 +62,21 @@ const wchar_t full_month_name[][10] = {
 
 } // anonymous namespace
 
-std::wstring format_datetime (uint64_t v, const wchar_t *fmt)
-{
+std::wstring format_datetime(uint64_t v, std::wstring_view fmt) {
 	ReadableDateTime rdt = extract_datetime (v);
 	std::wstring ret;
-	ret.reserve (wcslen (fmt)*2);
-	while (const wchar_t *p = wcschr (fmt, L'%')) {
-		if (p[1] == L'\0') {
+	ret.reserve(fmt.length() * 2);
+	size_t pos = 0;
+	size_t percent_pos;
+	while ((percent_pos = fmt.find(L'%', pos)) != fmt.npos) {
+		if (percent_pos + 1 >= fmt.length()) {
 			break;
 		}
-		ret.append (fmt, p);
-		fmt = p+2;
-		switch (p[1]) {
+		ret += fmt.substr(pos, percent_pos - pos);
+		switch (fmt[percent_pos + 1]) {
 			default:
 			case L'%':
-				ret += p[1];
+				ret += fmt[percent_pos + 1];
 				break;
 			case L'Y':
 				to_string_4 (ret, rdt.y);
@@ -123,8 +123,9 @@ std::wstring format_datetime (uint64_t v, const wchar_t *fmt)
 				ret += L'm';
 				break;
 		}
+		pos = percent_pos + 2;
 	}
-	ret += fmt;
+	ret += fmt.substr(pos);
 	return ret;
 }
 

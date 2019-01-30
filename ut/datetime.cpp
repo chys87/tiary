@@ -42,4 +42,8 @@ TEST(datetime, make_datetime_utc) {
 	EXPECT_EQ(make_datetime(kDateAtUnixEpoch, 0), make_datetime_utc(0));
 }
 
+TEST(datetime, format) {
+	EXPECT_EQ(L"2019-01-30 15:44:12", format_datetime(make_datetime({2019, 1, 30}, {15, 44, 12}), L"%Y-%m-%d %H:%M:%S"));
+}
+
 } // namespace tiary

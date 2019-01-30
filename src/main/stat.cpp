@@ -187,10 +187,10 @@ void display_statistics (const DiaryEntryList &all_entries,
 	TimeSpan span = get_span (all_entries);
 	unsigned days = extract_date_from_datetime (span.max) - extract_date_from_datetime (span.min) + 1;
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
-			std::wstring(Format(L"Date span           %8a days (%b - %c)")
-			<< days
-			<< format_datetime(span.min, L"%m/%d/%Y")
-			<< format_datetime(span.max, L"%m/%d/%Y"))
+			format(L"Date span           %8a days (%b - %c)"sv,
+				days,
+				format_datetime(span.min, L"%m/%d/%Y"sv),
+				format_datetime(span.max, L"%m/%d/%Y"sv))
 		);
 	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
 		L"Entries per day     "sv, format_double(double(all_entries.size()) / days, 8, 4));

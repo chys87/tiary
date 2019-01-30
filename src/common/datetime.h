@@ -145,7 +145,7 @@ ReadableDateTime extract_datetime (uint64_t) noexcept ATTRIBUTE_CONST;
  * %P	2-character AM/PM (AM)
  * %p	2-character am/pm (am)
  */
-std::wstring format_datetime (uint64_t, const wchar_t *format);
+std::wstring format_datetime(uint64_t, std::wstring_view format);
 
 class Date;
 class Time;
@@ -198,8 +198,7 @@ public:
 	constexpr operator Date() const { return Date(extract_date_from_datetime(v_)); }
 	constexpr operator Time() const { return Time(extract_time_from_datetime(v_)); }
 
-	std::wstring format(const wchar_t *format) const { return format_datetime(v_, format); }
-	std::wstring format(const std::wstring &format) const { return format_datetime(v_, format.c_str()); }
+	std::wstring format(std::wstring_view format) const { return format_datetime(v_, format); }
 
 private:
 	uint64_t v_;

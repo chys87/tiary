@@ -127,7 +127,7 @@ void MainCtrl::redraw ()
 
 		// Date
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_DATE_SELECT : ui::PALETTE_ID_ENTRY_DATE);
-		pos = put (pos, entry.local_time.format (date_format.c_str ()));
+		pos = put(pos, entry.local_time.format(date_format));
 		pos.x++;
 
 		// Title
