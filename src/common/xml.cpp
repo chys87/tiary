@@ -107,8 +107,8 @@ xmlNodePtr shallow_copy(const XMLNode *iptr) {
 	case XMLNodeType::kTree: {
 		xmlNodePtr optr = xmlNewNode(0, BAD_CAST(iptr->name().c_str()));
 		// Copy attributes.
-		for (auto it = iptr->properties.begin(); it != iptr->properties.end(); ++it) {
-			xmlNewProp (optr, BAD_CAST(it->first.c_str()), BAD_CAST(it->second.c_str()));
+		for (const auto &prop_pair: iptr->properties) {
+			xmlNewProp(optr, BAD_CAST(prop_pair.first.c_str()), BAD_CAST(prop_pair.second.c_str()));
 		}
 		return optr;
 	}

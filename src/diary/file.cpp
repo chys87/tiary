@@ -277,16 +277,11 @@ bool general_analyze_xml (const XMLNode *root,
 
 		if (main_child->name() == "option"sv) { // An option
 			auto it_option_name = main_child->properties.find("name");
-			if (it_option_name != main_child->properties.end()) {
-				auto it_option_value = main_child->properties.find("value");
-				if (it_option_value != main_child->properties.end()) {
-					opts.set(it_option_name->second, it_option_value->second);
-				} else if (strictest) {
-					// <option> without "name" - Disallowed in strict mode
-					return false;
-				}
+			auto it_option_value = main_child->properties.find("value");
+			if (it_option_name != main_child->properties.end() && it_option_value != main_child->properties.end()) {
+				opts.set(it_option_name->second, it_option_value->second);
 			} else if (strictest) {
-				// <option> without "name" - Disallowed in strict mode
+				// <option> without "name" or "value" - Disallowed in strict mode
 				return false;
 			}
 		} else if (entries && main_child->name() == "entry"sv) {
@@ -513,18 +508,18 @@ XMLNode *make_xml_tree_from_options(const OptionGroupBase &opts, const OptionGro
 	root->children = nullptr;
 	XMLNode **tail = &root->children;
 
-	for (OptionGroupBase::const_iterator it=opts.begin (); it!=opts.end(); ++it) {
+	for (const auto &opt_pair: opts) {
 		// If the option is the same as default, do not save it
 
-		if (default_options.get (it->first) == it->second) {
+		if (default_options.get(opt_pair.first) == opt_pair.second) {
 			continue;
 		}
 
 		XMLNode *newnode = new XMLNode(XMLNode::TreeTag(), "option");
 		*tail = newnode;
 		tail = &newnode->next;
-		newnode->properties["name"] = it->first;
-		newnode->properties["value"] = it->second;
+		newnode->properties.emplace("name", opt_pair.first);
+		newnode->properties.emplace("value", opt_pair.second);
 	}
 
 	return root;
@@ -545,12 +540,12 @@ bool save_global_options (const GlobalOptionGroup &options, const RecentFileList
 	}
 
 	// Loop thru recent files
-	for (RecentFileList::const_iterator it = recent_files.begin (); it != recent_files.end (); ++it) {
+	for (const auto &rf: recent_files) {
 		XMLNode *recent_node = new XMLNode(XMLNode::TreeTag(), "recent");
 		*tail = recent_node;
 		tail = &recent_node->next;
-		recent_node->properties["file"] = wstring_to_utf8 (it->filename);
-		recent_node->properties["line"] = format_dec_narrow (it->focus_entry);
+		recent_node->properties.emplace("file", wstring_to_utf8(rf.filename));
+		recent_node->properties.emplace("line", format_dec_narrow(rf.focus_entry));
 	}
 
 	std::string xml = xml_make (root);
@@ -574,8 +569,7 @@ bool save_file (const char *filename,
 	}
 
 	// Loop thru entries
-	for (DiaryEntryList::const_iterator it = entries.begin (); it != entries.end (); ++it) {
-		DiaryEntry *entry = *it; // Never null
+	for (DiaryEntry *entry: entries) {
 		XMLNode *entry_node = new XMLNode(XMLNode::TreeTag(), "entry");
 		*tail = entry_node;
 		tail = &entry_node->next;
@@ -583,7 +577,7 @@ bool save_file (const char *filename,
 		// <time local="..." />
 		XMLNode *time_node = new XMLNode(XMLNode::TreeTag(), "time");
 		XMLNode *sub_ptr = entry_node->children = time_node;
-		time_node->properties["local"] = format_time (entry->local_time);
+		time_node->properties.emplace("local", format_time(entry->local_time));
 
 		// Labels
 		for (const std::wstring &label: entry->labels) {

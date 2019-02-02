@@ -32,7 +32,6 @@ struct DiaryEntry
 	typedef WStringLocaleOrderedSet LabelList;
 
 	DateTime local_time; // Local date and time
-//	DateTime utc_time; // UTC date and time
 	std::wstring title;
 	std::wstring text;
 	LabelList labels;
@@ -44,11 +43,11 @@ struct RecentFile
 {
 	std::wstring filename;
 	unsigned focus_entry;
-
-	bool operator == (std::wstring_view name) const {
-		return (filename == name);
-	}
 };
+
+inline bool operator == (const RecentFile &rf, std::wstring_view name) {
+	return (rf.filename == name);
+}
 
 // New files are in the front
 typedef std::vector<RecentFile> RecentFileList;
