@@ -44,7 +44,7 @@ public:
 
 	void redraw ();
 
-	void set_text (const std::wstring &, unsigned = 0 /**< UIString options */);
+	void set_text(std::wstring_view, unsigned = 0 /**< UIString options */);
 	void set_text(std::wstring &&, unsigned = 0 /**< UIString options */);
 	const UIString &get_uistring () const { return text; }
 	const std::wstring &get_text () const { return text.get_text (); }

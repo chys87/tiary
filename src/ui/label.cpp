@@ -55,8 +55,7 @@ void Label::redraw ()
 	text.output(*this, Size{}, get_size());
 }
 
-void Label::set_text (const std::wstring &str, unsigned options)
-{
+void Label::set_text(std::wstring_view str, unsigned options) {
 	text.set_text (str, options);
 	Label::redraw ();
 }
