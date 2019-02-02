@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -19,6 +19,7 @@
 #include <libxml/parser.h>
 #include <stdlib.h>
 #include <string.h>
+#include "common/string.h"
 
 namespace tiary {
 
@@ -68,49 +69,51 @@ void xml_free(XMLNode *root) {
 namespace {
 
 // Copy the attribute name and attributes, without children
-XMLNode *shallow_copy (xmlNodePtr iptr)
-{
-	if (iptr->type == XML_TEXT_NODE || iptr->type == XML_CDATA_SECTION_NODE) { // Text node
+XMLNode *shallow_copy(const xmlNode *iptr) {
+	switch (iptr->type) {
+	case XML_TEXT_NODE:
+	case XML_CDATA_SECTION_NODE: { // Text node
 		XMLNode *optr = nullptr;
 		if (const char *text = (const char *)iptr->content) {
 			// If a text node is empty or completely consists of space (tab, newline) etc.
 			// Eliminate it!
-			if (strspn (text, " \t\r\n\v")[text] != '\0') {
-				optr = new XMLNode(XMLNode::TextTag(), text);
+			std::string_view text_sv = text;
+			if (text_sv.find_first_not_of(" \t\r\n\v"sv) != text_sv.npos) {
+				optr = new XMLNode(XMLNode::TextTag(), text_sv);
 			}
 		}
 		return optr;
 	}
-	else if (iptr->type == XML_ELEMENT_NODE) { // Element node
+	case XML_ELEMENT_NODE: { // Element node
 		XMLNode *optr = new XMLNode(XMLNode::TreeTag(), (const char *)iptr->name);
 		// Attributes. Not ordered.
 		for (xmlAttrPtr aptr=iptr->properties; aptr; aptr=aptr->next) {
-			if (aptr->name && aptr->children) {
-				optr->properties[(const char *)aptr->name] = (const char *)aptr->children->content;
+			if (aptr->name && aptr->children && aptr->children->content) {
+				optr->properties.emplace((const char *)aptr->name, (const char *)aptr->children->content);
 			}
 		}
 		return optr;
 	}
-	else { // Other kinds of nodes. Not supported.
-		return 0;
+	default: // Other kinds of nodes. Not supported.
+		return nullptr;
 	}
 }
 
 // The other way
-xmlNodePtr shallow_copy (const XMLNode *iptr)
-{
-	if (iptr->type == XMLNodeType::kText) {
-		return xmlNewText(BAD_CAST(iptr->text().c_str()));
-	} else if (iptr->type == XMLNodeType::kTree) {
+xmlNodePtr shallow_copy(const XMLNode *iptr) {
+	switch (iptr->type) {
+	case XMLNodeType::kText:
+		return xmlNewTextLen(BAD_CAST(iptr->text().c_str()), iptr->text().length());
+	case XMLNodeType::kTree: {
 		xmlNodePtr optr = xmlNewNode(0, BAD_CAST(iptr->name().c_str()));
-		// Copy attributes. Not ordered.
+		// Copy attributes.
 		for (auto it = iptr->properties.begin(); it != iptr->properties.end(); ++it) {
 			xmlNewProp (optr, BAD_CAST(it->first.c_str()), BAD_CAST(it->second.c_str()));
 		}
 		return optr;
 	}
-	else {
-		return 0;
+	default:
+		return nullptr;
 	}
 }
 
@@ -123,6 +126,8 @@ void libxml2_init ()
 	if (!called) {
 		xmlSetGenericErrorFunc (0, generic_error_silent);
 		xmlSetStructuredErrorFunc (0, structured_error_silent);
+		xmlKeepBlanksDefault(0);
+		xmlIndentTreeOutput = 1;
 		called = true;
 	}
 }
@@ -130,15 +135,15 @@ void libxml2_init ()
 } // anonymous namespace
 
 XMLNode *xml_parse(const char *str, size_t len) {
-	xmlDocPtr doc;
-	xmlNodePtr iptr;
-
 	libxml2_init ();
 
-	if (!(doc = xmlReadMemory (str, len, 0, 0, 0))) {
+	xmlDocPtr doc = xmlReadMemory(str, len, 0, 0, 0);
+	if (doc == nullptr) {
 		return 0;
 	}
-	if (!(iptr = xmlDocGetRootElement (doc))) {
+
+	const xmlNode *iptr = xmlDocGetRootElement(doc);
+	if (iptr == nullptr) {
 		xmlFreeDoc (doc);
 		return 0;
 	}
@@ -146,7 +151,7 @@ XMLNode *xml_parse(const char *str, size_t len) {
 	// Successfully parsed. Now we need to construct our own XML tree
 
 	// "(a,b) in stk" means "b's children should be copied as a's children"
-	std::stack<std::pair<XMLNode *, xmlNodePtr>, std::vector<std::pair<XMLNode *, xmlNodePtr> > > stk;
+	std::stack<std::pair<XMLNode *, const xmlNode *>, std::vector<std::pair<XMLNode *, const xmlNode *>>> stk;
 
 	XMLNode *root = shallow_copy (iptr);
 				// Current working output node
@@ -157,20 +162,19 @@ XMLNode *xml_parse(const char *str, size_t len) {
 		return 0;
 	}
 	XMLNode *optr = root;
-	XMLNode virtual_node;
 	for (;;) {
 		// Shallow copy all children of current node
-		virtual_node.next = 0;
-		XMLNode *last = &virtual_node;
-		for (xmlNodePtr child_ptr = iptr->xmlChildrenNode; child_ptr; child_ptr = child_ptr->next) {
+		optr->children = nullptr;
+		XMLNode **tail = &optr->children;
+		for (const xmlNode *child_ptr = iptr->xmlChildrenNode; child_ptr; child_ptr = child_ptr->next) {
 			if (XMLNode *newnode = shallow_copy (child_ptr)) {
-				last = last->next = newnode;
+				*tail = newnode;
+				tail = &newnode->next;
 				if (child_ptr->xmlChildrenNode) {
 					stk.push(std::make_pair(newnode, child_ptr));
 				}
 			}
 		}
-		optr->children = virtual_node.next;
 		if (stk.empty ()) {
 			break;
 		}
@@ -228,7 +232,7 @@ std::string xml_make(const XMLNode *root) {
 
 		xmlChar *str;
 		int len;
-		xmlDocDumpMemoryEnc (doc, &str, &len, "UTF-8");
+		xmlDocDumpFormatMemoryEnc(doc, &str, &len, "UTF-8", 1);
 		xmlFreeDoc (doc);
 
 		ret.assign ((const char*)str, len);

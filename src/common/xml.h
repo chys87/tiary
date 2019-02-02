@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -18,6 +18,7 @@
 #include "common/containers.h"
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include <string>
 #include <string_view>
 
@@ -53,9 +54,12 @@ struct XMLNode
 	std::string &text() { return name_or_text; }
 
 	XMLNode() = default;
-	XMLNode(TreeTag, const char *tag_name) : type(XMLNodeType::kTree), name_or_text(tag_name) {}
-	XMLNode(TextTag, const char *t) : type(XMLNodeType::kText), name_or_text(t) {}
-	XMLNode(TextTag, const std::string &t) : type(XMLNodeType::kText), name_or_text(t) {}
+	XMLNode(TreeTag, const char *tag_name) : type(XMLNodeType::kTree), name_or_text(tag_name, strlen(tag_name)) {}
+	XMLNode(TreeTag, std::string_view tag_name) : type(XMLNodeType::kTree), name_or_text(tag_name) {}
+	XMLNode(TreeTag, std::string &&tag_name) : type(XMLNodeType::kTree), name_or_text(std::move(tag_name)) {}
+	XMLNode(TextTag, const char *text) : type(XMLNodeType::kText), name_or_text(text, strlen(text)) {}
+	XMLNode(TextTag, std::string_view text) : type(XMLNodeType::kText), name_or_text(text) {}
+	XMLNode(TextTag, std::string &&text) : type(XMLNodeType::kText), name_or_text(std::move(text)) {}
 
 	XMLNode(const XMLNode &) = delete;
 	XMLNode &operator = (const XMLNode &) = delete;
