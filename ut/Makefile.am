@@ -11,7 +11,8 @@
 
 AM_CPPFLAGS = @CONF_CPPFLAGS@
 LDADD = ../src/common/libcommon.a -lgtest_main -lgtest
-check_PROGRAMS = datetime.out format.out
+check_PROGRAMS = datetime.out format.out unicode.out
 TESTS = $(check_PROGRAMS)
 datetime_out_SOURCES = datetime.cpp
 format_out_SOURCES = format.cpp
+unicode_out_SOURCES = unicode.cpp

@@ -27,9 +27,7 @@
 
 namespace tiary {
 
-int utf8_len_by_wchar (wchar_t w)
-{
-	unsigned u = w;
+unsigned utf8_len_by_wchar(char32_t u) {
 	if (u < 0x800) {
 		if (u < 0x80) {
 			return 1;
@@ -49,8 +47,7 @@ int utf8_len_by_wchar (wchar_t w)
 	}
 }
 
-int utf8_len_by_first_byte (unsigned char b)
-{
+unsigned utf8_len_by_first_byte(unsigned char b) {
 	/*
 	 * 1: 0xxx xxxx
 	 * 0: 10xx xxxx (Error)
@@ -71,89 +68,54 @@ int utf8_len_by_first_byte (unsigned char b)
 	return ret[b >> 3];
 }
 
-wchar_t utf8_to_wchar (const char *p, const char **end)
-{
-	uint32_t u;
-	unsigned b;
-	int len;
+std::wstring utf8_to_wstring(std::string_view s, wchar_t substitute) {
+	std::wstring r(s.length(), L'\0');
+	auto iw = r.begin();
 
-	u = (uint8_t)*p++;
-	len = utf8_len_by_first_byte (u);
-	u &= 0xffu >> len;
-	switch (len) {
-	default: /* case 4: */
-		if (((b = (uint8_t)*p++) & 0xc0) != 0x80) {
-			break;
+	const char *p = s.data();
+	const char *e = p + s.length();
+	while (p < e) {
+		unsigned n = utf8_len_by_first_byte(*p);
+		if (n == 0) {
+			++p;
+			if (substitute) {
+				*iw++ = substitute;
+			}
+		} else if (n == 1) {
+			*iw++ = *p++;
+		} else if (p + n > e) {
+			if (substitute) {
+				*iw++ = substitute;
+				break;
+			}
+		} else {
+			char32_t u = uint8_t(*p++) & (0xffu >> n);
+			for (unsigned i = n - 1; i; --i) {
+				uint32_t b = uint8_t(*p++);
+				if ((b & 0xc0) == 0x80) {
+					u = (u << 6) | (b & 0x3f);
+				} else {
+					u = L'\0';
+					break;
+				}
+			}
+			if (u) {
+				if (utf8_len_by_wchar(u) != n) {
+					// Over-long encoding
+					if (substitute) {
+						*iw++ = substitute;
+					}
+				} else {
+					*iw++ = u;
+				}
+			} else if (substitute) {
+				*iw++ = substitute;
+			}
 		}
-		u = (u<<6) | (b & 0x3f);
-	case 3:
-		if (((b = (uint8_t)*p++) & 0xc0) != 0x80) {
-			break;
-		}
-		u = (u<<6) | (b & 0x3f);
-	case 2:
-		if (((b = (uint8_t)*p++) & 0xc0) != 0x80) {
-			break;
-		}
-		u = (u<<6) | (b & 0x3f);
-	case 1:
-		if (end) {
-			*end = p;
-		}
-		return u;
-	case 0:
-		if (end) {
-			*end = p;
-		}
-		return L'\0';
 	}
-	if (end) {
-		*end = p - 1;
-	}
-	return L'\0';
-}
 
-wchar_t utf8_to_wchar (char *src, char **end)
-{
-	return utf8_to_wchar (src, (const char **)end);
-}
-
-namespace {
-
-/**
- * This function requries BOTH the string to be null-terminated
- * and the length to be given
- */
-std::wstring utf8_to_wstring_impl (const char *s, size_t l, wchar_t substitute)
-{
-	std::wstring r (l, L'\0');
-	std::wstring::iterator iw = r.begin ();
-	while (*s) {
-		const char *next;
-		wchar_t c = utf8_to_wchar (s, &next);
-		if (c == 0) {
-			c = substitute;
-		}
-		if (c) {
-			*iw++ = c;
-		}
-		s = next;
-	}
 	r.erase (iw, r.end ());
 	return r;
-}
-
-} // anonymous namespace
-
-std::wstring utf8_to_wstring (const char *s, wchar_t substitute)
-{
-	return utf8_to_wstring_impl (s, strlen (s), substitute);
-}
-
-std::wstring utf8_to_wstring (const std::string &s, wchar_t substitute)
-{
-	return utf8_to_wstring_impl (s.c_str() /* Not to be replaced by data () */,
-			s.length (), substitute);
 }
 
 size_t utf8_count_chars(std::string_view str) {
@@ -161,7 +123,7 @@ size_t utf8_count_chars(std::string_view str) {
 	const char *e = s + str.length();
 	size_t ret = 0;
 	while (s < e) {
-		int n = utf8_len_by_first_byte(*s++);
+		unsigned n = utf8_len_by_first_byte(*s++);
 		if (n > 1)
 			s += n - 1;
 		++ret;

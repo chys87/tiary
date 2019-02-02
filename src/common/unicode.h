@@ -38,7 +38,7 @@ namespace tiary {
  *			Possible results are from 1 to 4, inclusive. \n
  *			A return value of 0 indicates an error.
  */
-int utf8_len_by_wchar (wchar_t c);
+unsigned utf8_len_by_wchar(char32_t c);
 /**
  * @brief	Decides the length of the UTF-8 sequence, given the first byte.
  * @param	b	First byte of an UTF-8 sequence that represent one Unicode character
@@ -46,29 +46,11 @@ int utf8_len_by_wchar (wchar_t c);
  *			Possible results are from 1 to 4, inclusive. \n
  *			A return value of 0 indicates an error.
  */
-int utf8_len_by_first_byte (unsigned char b);
-/**
- * @brief	Converts a UTF-8 sequence to one Unicode character
- * @param	src	Points to the first byte of the UTF-8 sequence
- * @param	end	If non-NULL, stores a pointer to the next byte following the last
- *				one in the UTF-8 sequence
- * @result	The converted Unicode character. \n
- *			If the UTF-8 sequence is invalid, 0 is returned.
- */
-wchar_t utf8_to_wchar (const char *src, const char **end = 0);
+unsigned utf8_len_by_first_byte(unsigned char b);
 /**
  * Allows non-const pointers too.
  */
 wchar_t utf8_to_wchar (char *src, char **dst);
-
-/**
- * @brief	Converts a UTF-8 encoded string to a wide (Unicode) string
- * @param	str	Points to the first byte of a null-terminated UTF-8 string
- * @param	substitute	A character to substitute invalid sequences in str. \n
- *			<code>L'\\0'</code> indicates that invalid sequences should simply be ignored.
- * @result	The converted wide (Unicode) string
- */
-std::wstring utf8_to_wstring (const char *str, wchar_t substitute = L'?');
 
 /**
  * @brief	Converts a UTF-8 encoded string to a wide (Unicode) string
@@ -77,7 +59,7 @@ std::wstring utf8_to_wstring (const char *str, wchar_t substitute = L'?');
  *			<code>L'\\0'</code> indicates that invalid sequences should simply be ignored.
  * @result	The converted wide (Unicode) string
  */
-std::wstring utf8_to_wstring (const std::string &str, wchar_t substitute = L'?');
+std::wstring utf8_to_wstring(std::string_view str, wchar_t substitute = L'?');
 
 /**
  * @brief	Count the number of Unicode characters in a UTF-8 string
