@@ -53,27 +53,26 @@ void write_for_view (std::wstring &text, RichTextLineList &lst,
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, view_line_width, L'=');
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format));
 	if (!ent.labels.empty ()) {
-		append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL,
-				L"Labels: " + join(ent.labels.begin(), ent.labels.end(), L", "sv));
+		append_richtext_line(text, lst, PALETTE_ID_SHOW_NORMAL,
+				L"Labels: "sv, join(ent.labels.begin(), ent.labels.end(), L", "sv));
 	}
 	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL);
 
 	// Text
-	SplitStringLineList split_list = split_line (edit_line_width, ent.text);
 	size_t base_offset = text.length ();
 	text += ent.text;
 	PaletteID palette = PALETTE_ID_SHOW_NORMAL;
-	for (SplitStringLineList::const_iterator it = split_list.begin ();
-			it != split_list.end (); ++it) {
-		size_t begin = base_offset + it->begin;
+	for (const auto &item: split_line (edit_line_width, ent.text)) {
+		size_t begin = base_offset + item.begin;
 		// If a line begins with a space, it's considered the first line of a qutoed paragraph
-		if (it->len && (text[begin] == L' '))
+		if (item.len && (text[begin] == L' ')) {
 			palette = PALETTE_ID_SHOW_QUOTE;
+		}
 		// An empty line ends a quoted paragraph
-		if (it->len == 0)
+		if (item.len == 0) {
 			palette = PALETTE_ID_SHOW_NORMAL;
-		RichTextLine tmp_line = { begin, it->len, palette, it->wid };
-		lst.push_back (tmp_line);
+		}
+		lst.push_back({begin, item.len, palette, item.wid});
 	}
 }
 
@@ -81,12 +80,10 @@ void write_for_view (std::wstring &text, RichTextLineList &lst,
 bool write_for_edit (int fd, const std::wstring &title, const std::wstring &text)
 {
 	std::string mbs = wstring_to_mbs (title);
-	mbs.reserve (text.length () * 2);
+	mbs.reserve(mbs.length() + text.length() * 2);
 	mbs.append (2, '\n');
-	SplitStringLineList split_list = split_line (edit_line_width, text);
-	for (SplitStringLineList::const_iterator it = split_list.begin ();
-			it != split_list.end (); ++it) {
-		mbs += wstring_to_mbs (text.data() + it->begin, it->len);
+	for (const auto &item: split_line(edit_line_width, text)) {
+		mbs += wstring_to_mbs(text.data() + item.begin, item.len);
 		mbs += '\n';
 	}
 	return (size_t)write (fd, mbs.data (), mbs.length ()) == mbs.length ();
