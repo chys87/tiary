@@ -26,12 +26,12 @@
 #include "common/string.h"
 #include "common/datetime.h"
 #include "common/dir.h"
+#include "common/misc.h"
 #include "ui/paletteid.h"
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <sys/mman.h>
 #include <string.h>
 #include <functional>
 #include <errno.h>
@@ -92,12 +92,11 @@ bool write_for_edit (int fd, const std::wstring &title, const std::wstring &text
 	return (size_t)write (fd, mbs.data (), mbs.length ()) == mbs.length ();
 }
 
-// The argument points to a memory-mapped area that maps the edited file.
+// The string view argument references the edited file.
 // Read its contents, removing unnecessary newline characters
 // (add spaces when necessary)
 // The first line is converted to the title
-void reformat_content (std::wstring &title, std::wstring &text, const char *s)
-{
+void reformat_content(std::wstring *title, std::wstring *text, std::string_view s) {
 	// Be careful!
 	// Some implementations may use COW in std::basic_string
 	// or not always keeping a null character at the end
@@ -106,23 +105,20 @@ void reformat_content (std::wstring &title, std::wstring &text, const char *s)
 	// Make sure this function works with those implementations too.
 
 	// First line = title
-	const char *firstnewline = strchrnul (s, '\n');
-	title = mbs_to_wstring (std::string (s, firstnewline));
+	size_t first_new_line = s.find('\n');
+	*title = mbs_to_wstring(std::string(s.substr(0, first_new_line)));
 
-	if (*firstnewline != '\n') {
+	if (first_new_line == s.npos) {
 		// Only one line??
-		text.clear ();
+		text->clear();
 		return;
 	}
-	s = firstnewline;
-	if (*s == '\n') {
-		++s;
-	}
+	s.remove_prefix(first_new_line + 1);
 
-	text = mbs_to_wstring (s);
-	std::wstring::iterator iw = text.begin ();
+	*text = mbs_to_wstring(std::string(s));
+	std::wstring::iterator iw = text->begin ();
 	std::wstring::const_iterator ir = iw;
-	std::wstring::const_iterator end = text.end();
+	std::wstring::const_iterator end = text->end();
 	wchar_t last = L'\0', cur;
 	while (ir != end) {
 		cur = *ir++;
@@ -155,7 +151,7 @@ void reformat_content (std::wstring &title, std::wstring &text, const char *s)
 		}
 		last = cur;
 	}
-	text.erase (iw, text.end ());
+	text->erase(iw, text->end());
 }
 
 bool error_false(std::wstring_view info) {
@@ -191,14 +187,13 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 		return error_false(L"Failed to write to temporary file :( Why?"sv);
 	}
 
-	time_t oldmtime;
 	struct stat stbuf;
 	if (fstat (fd, &stbuf) != 0) {
 		close (fd);
 		unlink (temp_file.c_str ());
 		return error_false(L"stat on temporary file failed :( Why?"sv);
 	}
-	oldmtime = stbuf.st_mtime;
+	time_t oldmtime = stbuf.st_mtime;
 
 	// Call and wait for the editor
 	ui::Window::suspend ();
@@ -219,26 +214,19 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 	}
 
 	// Read contents. For convenience, use a memory mapping
-	size_t fsize = lseek (fd, 0, SEEK_END);
-	if (ssize_t (fsize) < 0 || write (fd, "", 1) != 1) {
-		close (fd);
+	if (lseek(fd, 0, SEEK_SET) != 0) {
+		close(fd);
 		return error_false(L"Strange IO error with temporary file :( Why?"sv);
 	}
-	++fsize;
-	char *raw = (char *) mmap (NULL, fsize, PROT_READ, MAP_PRIVATE
-#ifdef MAP_POPULATE
-			|MAP_POPULATE
-#endif
-			, fd, 0);
-	close (fd);
-	if (raw == MAP_FAILED) {
-		return error_false(L"Strange IO error with temporary file :( Why?"sv);
+
+	std::string raw;
+	bool read_ret = read_whole_file(fd, &raw);
+	close(fd);
+	if (!read_ret) {
+		return error_false(L"Failed to read temporary file :( Why?"sv);
 	}
-#ifdef MADV_SEQUENTIAL
-	madvise (raw, fsize, MADV_SEQUENTIAL);
-#endif
-	reformat_content (ent.title, ent.text, raw);
-	munmap (raw, fsize);
+
+	reformat_content(&ent.title, &ent.text, raw);
 	return true;
 }
 

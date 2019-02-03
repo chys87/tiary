@@ -23,7 +23,8 @@
 
 namespace tiary {
 
-bool read_whole_file(FILE *, std::string &, size_t estimated_size = 4096);
+bool read_whole_file(FILE *, std::string *, size_t estimated_size = 4096);
+bool read_whole_file(int, std::string *, size_t estimated_size = 4096);
 
 // Save or overwrite a file as safely as possible
 bool safe_write_file(const char *filename, std::string_view data, std::string_view data2 = {});

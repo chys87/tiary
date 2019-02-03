@@ -17,6 +17,7 @@
 #include "common/string.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,21 +25,49 @@
 
 namespace tiary {
 
-bool read_whole_file(FILE *fp, std::string &ret, size_t estimated_size)
-{
+bool read_whole_file(FILE *fp, std::string *ret, size_t estimated_size) {
 	if (estimated_size < 128) {
 		estimated_size = 128;
 	}
 
-	ret.clear();
+	ret->clear();
 	std::unique_ptr<char[]> buf{new char[estimated_size]};
 
 	size_t l;
 	while ((l = fread_unlocked(buf.get(), 1, estimated_size, fp)) != 0) {
-		ret.append(buf.get(), l);
+		ret->append(buf.get(), l);
 	}
 	if (ferror_unlocked(fp)) {
 		return false;
+	}
+	return true;
+}
+
+bool read_whole_file(int fd, std::string *ret, size_t estimated_size) {
+	if (estimated_size < 128) {
+		estimated_size = 128;
+	}
+
+	ret->clear();
+	std::unique_ptr<char[]> buf{new char[estimated_size]};
+
+	for (;;) {
+		ssize_t l = read(fd, buf.get(), estimated_size);
+		if (l > 0) {
+			ret->append(buf.get(), l);
+		} else if (l == 0) {
+			break;
+#ifdef EAGAIN
+		} else if (errno == EAGAIN) {
+			continue;
+#endif
+#ifdef EWOULDBLOCK
+		} else if (errno == EWOULDBLOCK) {
+			continue;
+#endif
+		} else {
+			return false;
+		}
 	}
 	return true;
 }

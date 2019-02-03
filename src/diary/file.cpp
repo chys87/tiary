@@ -395,7 +395,7 @@ LoadFileRet load_global_options (GlobalOptionGroup &options, RecentFileList &rec
 	XMLNode *root;
 	{
 		std::string data;
-		bool ret = read_whole_file (fp, data, 128*1024);
+		bool ret = read_whole_file(fp, &data, 128 * 1024);
 		fclose (fp);
 		if (!ret) {
 			return LOAD_FILE_READ_ERROR;
@@ -428,7 +428,7 @@ LoadFileRet load_file (
 	std::string everything;
 
 	// Read everything out of file
-	bool bool_ret = read_whole_file (fp, everything);
+	bool bool_ret = read_whole_file(fp, &everything);
 	fclose (fp);
 	if (!bool_ret) {
 		return LOAD_FILE_READ_ERROR;

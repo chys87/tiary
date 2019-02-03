@@ -440,12 +440,12 @@ void MainWin::append ()
 {
 	if (!unavailable_filtered ())
 		return;
-	DiaryEntry *ent = new DiaryEntry;
-	time_t cur_time = time (0);
-//	ent->utc_time.assign_utc (cur_time);
-	ent->local_time = DateTime (DateTime::LOCAL, cur_time);
-	ent->title = L"Your title goes here."sv;
-	ent->text = L"Your contents go here."sv;
+	DiaryEntry *ent = new DiaryEntry{
+		DateTime(DateTime::LOCAL, time(nullptr)),
+		std::wstring(L"Your title goes here."sv),
+		std::wstring(L"Your contents go here."sv),
+		{}
+	};
 	if (edit_entry (*ent, global_options.get (GLOBAL_OPTION_EDITOR).c_str())
 			&& (!ent->title.empty () || !ent->text.empty ())) {
 		entries.push_back (ent);
