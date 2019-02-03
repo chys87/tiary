@@ -142,8 +142,8 @@ bool is_legal_label_name(std::wstring_view name) {
  */
 DiaryEntry *analyze_entry_xml(const XMLNode *entry_node) {
 	uint64_t local_time = 0;
-	const char *title = 0;
-	const char *text = 0;
+	std::string_view title;
+	std::string_view text;
 	DiaryEntry::LabelList labels;
 
 	if (entry_node->type != XMLNodeType::kTree) {
@@ -185,35 +185,33 @@ DiaryEntry *analyze_entry_xml(const XMLNode *entry_node) {
 
 		} else if (ptr->name() == "title"sv) {
 
-			if (title != 0) { // More than one <title> tags
+			if (title.data() != nullptr) { // More than one <title> tags
 				return 0;
 			}
 
 			if (ptr->children == 0) { // Empty
-				title = "";
-			}
-			else if (ptr->children->type == XMLNodeType::kText) {
-				if (ptr->children->next != 0) {
-					return 0;
-				}
-				title = ptr->children->text().c_str ();
-			}
-
-		} else if (ptr->name() == "text"sv) {
-
-			if (text != 0) { // More than one <text> tags
-				return 0;
-			}
-
-			if (ptr->children == 0) { // Empty
-				text = "";
+				title = ""sv;
 			} else if (ptr->children->type == XMLNodeType::kText) {
 				if (ptr->children->next != 0) {
 					return 0;
 				}
-				text = ptr->children->text().c_str ();
+				title = ptr->children->text();
 			}
-			else {
+
+		} else if (ptr->name() == "text"sv) {
+
+			if (text.data() != nullptr) { // More than one <text> tags
+				return 0;
+			}
+
+			if (ptr->children == 0) { // Empty
+				text = ""sv;
+			} else if (ptr->children->type == XMLNodeType::kText) {
+				if (ptr->children->next != 0) {
+					return 0;
+				}
+				text = ptr->children->text();
+			} else {
 				return 0;
 			}
 
@@ -225,17 +223,17 @@ DiaryEntry *analyze_entry_xml(const XMLNode *entry_node) {
 	}
 
 	// Almost finished! But are we missing any required tags?
-	if (local_time==0 || title==0 || text==0) {
+	if (local_time == 0 || title.data() == nullptr || text.data() == nullptr) {
 		return 0;
 	}
 
 	// Finally successful
-	DiaryEntry *entry = new DiaryEntry;
-	entry->local_time = DateTime (local_time);
-	entry->title = utf8_to_wstring (title);
-	entry->text = utf8_to_wstring (text);
-	entry->labels = std::move (labels);
-	return entry;
+	return new DiaryEntry{
+		DateTime(local_time),
+		utf8_to_wstring(title),
+		utf8_to_wstring(text),
+		std::move(labels)
+	};
 }
 
 
