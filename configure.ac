@@ -186,6 +186,7 @@ m4_foreach_w([f],[
 
 dnl Add several useful flags if supported by compiler
 AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fno-exceptions -finput-charset=utf-8])
+AX_APPEND_COMPILE_FLAGS([-Werror=return-type])
 AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
 
 dnl Check whether the compiler has some support for C++17
