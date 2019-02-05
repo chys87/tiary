@@ -12,7 +12,9 @@
  **************************************************************************/
 
 #include <gtest/gtest.h>
+#include <locale.h>
 #include "common/unicode.h"
+#include "common/string.h"
 
 namespace tiary {
 
@@ -27,6 +29,18 @@ TEST(UTF8, OverLong) {
 
 TEST(UTF8, CountChars) {
 	EXPECT_EQ(6, utf8_count_chars((const char *)u8"A\u0080\u0800\u8000\U00010000\U0010ABCD"));
+}
+
+class Mbs : public ::testing::Test {
+public:
+	void SetUp() override {
+		setlocale(LC_ALL, "zh_CN.UTF-8");
+	}
+};
+
+TEST_F(Mbs, MbsToWstring) {
+	auto s = u8"ABC\u0080\u0800\u8000\0\u8000"sv;
+	EXPECT_EQ(L"ABC\u0080\u0800\u8000\0\u8000"sv, mbs_to_wstring({(const char *)s.data(), s.length()}));
 }
 
 } // namespace tiary

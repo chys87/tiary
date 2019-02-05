@@ -102,7 +102,7 @@ void reformat_content(std::wstring *title, std::wstring *text, std::string_view 
 
 	// First line = title
 	size_t first_new_line = s.find('\n');
-	*title = mbs_to_wstring(std::string(s.substr(0, first_new_line)));
+	*title = mbs_to_wstring(s.substr(0, first_new_line));
 
 	if (first_new_line == s.npos) {
 		// Only one line??
@@ -111,7 +111,7 @@ void reformat_content(std::wstring *title, std::wstring *text, std::string_view 
 	}
 	s.remove_prefix(first_new_line + 1);
 
-	*text = mbs_to_wstring(std::string(s));
+	*text = mbs_to_wstring(s);
 	std::wstring::iterator iw = text->begin ();
 	std::wstring::const_iterator ir = iw;
 	std::wstring::const_iterator end = text->end();

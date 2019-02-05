@@ -19,6 +19,7 @@
  */
 #include "common/unicode.h"
 #include <memory>
+#include <type_traits>
 #include <wchar.h>
 #include <wctype.h>
 #include <stdint.h>
@@ -183,33 +184,25 @@ std::string wstring_to_utf8(std::wstring_view src) {
 	return dst;
 }
 
-std::wstring mbs_to_wstring (const char *src)
-{
-	// mbstowcs always starts at initial shift state,
-	// needless to use mbsrtowcs here
-	size_t len = strlen (src);
+std::wstring mbs_to_wstring(std::string_view src) {
+	size_t len = src.size();
 	std::unique_ptr<wchar_t[]> buffer{new wchar_t[len+1]};
-	if (mbstowcs(buffer.get(), src, len+1) == size_t(-1)) {
-		buffer[0] = L'\0';
-	}
-	std::wstring ret = buffer.get();
-	return ret;
-}
+	wchar_t *w = buffer.get();
 
-std::wstring mbs_to_wstring (const char *src, size_t len)
-{
-	return mbs_to_wstring (std::string (src, len));
-}
-
-std::wstring mbs_to_wstring (const std::string &src)
-{
-	size_t len = src.size ();
-	std::unique_ptr<wchar_t[]> buffer{new wchar_t[len+1]};
-	if (mbstowcs(buffer.get(), src.c_str (), len+1) == size_t(-1)) {
-		buffer[0] = L'\0';
+	mbstate_t state = {};
+	for (const char *s = &src[0], *e = &src[len]; s < e; ) {
+		std::make_signed_t<size_t> convret = mbrtowc(w, s, e - s, &state);
+		if (convret < 0) {
+			w = buffer.get();
+			break;
+		} else if (convret == 0) { // L'\0'
+			convret = 1;
+		}
+		++w;
+		s += convret;
 	}
-	std::wstring ret = buffer.get();
-	return ret;
+
+	return std::wstring(buffer.get(), w);
 }
 
 

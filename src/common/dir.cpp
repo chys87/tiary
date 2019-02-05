@@ -434,8 +434,9 @@ DirEntList list_dir (
 			dirname += '/';
 		}
 		while (struct dirent *ent = readdir (dir)) {
-			tmp_ent.name = mbs_to_wstring (ent->d_name);
-			tmp_ent.attr = get_file_attr (dirname + ent->d_name);
+			std::string_view name = ent->d_name;
+			tmp_ent.name = mbs_to_wstring(name);
+			tmp_ent.attr = get_file_attr(std::string(dirname) += name);
 			if (!filter (tmp_ent)) {
 				filelist.push_back (std::move (tmp_ent));
 			}

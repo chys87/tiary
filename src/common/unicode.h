@@ -109,9 +109,7 @@ std::string wstring_to_utf8(std::wstring_view src);
  * (Many encodings are not as robust as UTF-8. Usually one error jungles all
  * remaining data. So we do not attempt recovering at all.)
  */
-std::wstring mbs_to_wstring (const char *src);
-std::wstring mbs_to_wstring (const char *, size_t);
-std::wstring mbs_to_wstring (const std::string &);
+std::wstring mbs_to_wstring(std::string_view);
 
 /**
  * @brief	Converts a wide (Unicode) string to multi-byte
