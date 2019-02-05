@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -29,8 +29,7 @@ namespace ui {
  */
 void dialog_richtext (
 		std::wstring_view title, ///< Title for the dialog
-		std::wstring_view text,  ///< Text
-		const RichTextLineList &list, ///< Line info
+		MultiLineRichText &&mrt, ///< Text info
 		Size size_hint = {} ///< A text area size hint (may be silently ignored)
 		);
 

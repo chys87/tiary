@@ -134,7 +134,7 @@ void MainCtrl::redraw ()
 		SplitStringLine split_info;
 		const std::wstring &title = entry.title;
 		choose_palette (i == info.focus_pos ? ui::PALETTE_ID_ENTRY_TITLE_SELECT : ui::PALETTE_ID_ENTRY_TITLE);
-		split_line (split_info, maxS (0, get_size().x-pos.x), title, 0, SPLIT_NEWLINE_AS_SPACE|SPLIT_CUT_WORD);
+		split_line(&split_info, maxS (0, get_size().x-pos.x), title, 0, SPLIT_NEWLINE_AS_SPACE|SPLIT_CUT_WORD);
 		pos = put (pos, disp_buffer,
 				std::replace_copy_if (
 						&title[split_info.begin], &title[split_info.begin+split_info.len],
@@ -170,18 +170,17 @@ void MainCtrl::redraw ()
 			// [...]
 			for (unsigned j=1; j<expand_lines; ++j) {
 				pos = ui::Size{0, pos.y + 1};
-				offset = split_line (split_info, get_size().x, text, offset,
+				offset = split_line(&split_info, get_size().x, text, offset,
 						SPLIT_NEWLINE_AS_SPACE);
 				wchar_t *bufend = std::replace_copy_if (
 						&text[split_info.begin], &text[split_info.begin+split_info.len],
 						disp_buffer, [](auto x) { return !iswprint(x); }, L' ');
 				pos = put (pos, disp_buffer, bufend-disp_buffer);
 			}
-		}
-		else {
+		} else {
 			// Other entry
 			// [Date] [Title] [Labels] [...]
-			offset = split_line (split_info, maxS (0, get_size().x - pos.x), text, offset,
+			offset = split_line(&split_info, maxS (0, get_size().x - pos.x), text, offset,
 					SPLIT_NEWLINE_AS_SPACE|SPLIT_CUT_WORD);
 			wchar_t *bufend = std::replace_copy_if (
 					&text[split_info.begin], &text[split_info.begin+split_info.len],

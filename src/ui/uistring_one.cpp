@@ -50,7 +50,7 @@ Size UIStringOne::output (Control &ctrl, Size pos, unsigned wid) const
 	size_t end = get_text ().length ();
 	if (wid < width) {
 		SplitStringLine oneline;
-		split_line (oneline, wid, get_text ());
+		split_line(&oneline, wid, get_text ());
 		end = oneline.len;
 	}
 	if (get_hotkey_pos () < end) {
@@ -71,7 +71,7 @@ Size UIStringOne::output (Window &win, Size pos, unsigned wid) const
 	size_t end = get_text ().length ();
 	if (wid < width) {
 		SplitStringLine oneline;
-		split_line (oneline, wid, get_text ());
+		split_line(&oneline, wid, get_text ());
 		end = oneline.len;
 	}
 	if (get_hotkey_pos () < end) {

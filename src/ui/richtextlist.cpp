@@ -22,81 +22,47 @@
 namespace tiary {
 namespace ui {
 
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, std::wstring_view line_text) {
-	RichTextLine tmp_line = { text.length (), line_text.length (), id, ucs_width (line_text) };
-	lst.push_back (tmp_line);
+void MultiLineRichText::append(PaletteID id, std::wstring_view line_text) {
+	lines.push_back({text.length(), line_text.length(), id, ucs_width(line_text)});
 	text += line_text;
 }
 
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, std::wstring_view text_a, std::wstring_view text_b) {
-	RichTextLine tmp_line = {
-		text.length (),
+void MultiLineRichText::append(PaletteID id, std::wstring_view text_a, std::wstring_view text_b) {
+	lines.push_back({
+		text.length(),
 		text_a.length() + text_b.length(),
 		id,
 		ucs_width(text_a) + ucs_width(text_b)
-	};
-	lst.push_back (tmp_line);
+	});
 	text.append(text_a);
-	text.append (text_b);
+	text.append(text_b);
 }
 
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, unsigned repeat, wchar_t ch)
-{
-	RichTextLine tmp_line = { text.length (), repeat, id, repeat * ucs_width (ch) };
-	lst.push_back (tmp_line);
-	text.append (repeat, ch);
+void MultiLineRichText::append(PaletteID id, unsigned repeat, wchar_t ch) {
+	lines.push_back({text.length(), repeat, id, repeat * ucs_width(ch)});
+	text.append(repeat, ch);
 }
 
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id)
-{
-	RichTextLine tmp_line = { text.length (), 0, id, 0 };
-	lst.push_back (tmp_line);
+void MultiLineRichText::append(PaletteID id) {
+	lines.push_back({text.length(), 0, id, 0});
 }
 
-RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *linec, size_t nlines)
-{
-	str.clear ();
-	RichTextLineList line_list (nlines);
-	RichTextLineList::iterator it = line_list.begin ();
-	for (; nlines; --nlines) {
-		it->id = linec->id;
-		size_t len = wcslen (linec->text);
-		it->offset = str.length ();
-		it->len = len;
-		it->screen_wid = ucs_width (linec->text, len);
-		str.append (linec->text, len);
-		++linec;
-		++it;
+MultiLineRichText combine_lines(std::initializer_list<RichTextLineC> linec_list) {
+	MultiLineRichText mrt;
+	mrt.lines.reserve(linec_list.size());
+
+	for (const RichTextLineC &linec: linec_list) {
+		mrt.lines.push_back({mrt.text.length(), linec.text.length(), linec.id, ucs_width(linec.text)});
+		mrt.text += linec.text;
 	}
-	return line_list;
+	return mrt;
 }
-
-namespace {
-
-struct SplitStringLine2RichTextLine {
-	PaletteID id;
-	explicit SplitStringLine2RichTextLine (PaletteID &id_) : id(id_) {}
-	RichTextLine operator () (const SplitStringLine &in) const
-	{
-		RichTextLine ret;
-		ret.offset = in.begin;
-		ret.len = in.len;
-		ret.id = id;
-		ret.screen_wid = in.wid;
-		return ret;
-	}
-};
-
-} // anonymous namespace
 
 RichTextLineList split_richtext_lines(std::wstring_view str, PaletteID id, unsigned wid) {
-	SplitStringLineList split = split_line (wid, str);
-	RichTextLineList ret (split.size ());
-	std::transform (split.begin (), split.end (), ret.begin (), SplitStringLine2RichTextLine (id));
+	RichTextLineList ret;
+	for (const SplitStringLine &line: split_line(wid, str)) {
+		ret.push_back({line.begin, line.len, id, line.wid});
+	}
 	return ret;
 }
 

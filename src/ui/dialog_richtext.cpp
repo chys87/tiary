@@ -27,30 +27,29 @@ namespace {
 
 class WindowRichText : public Window
 {
-
-	RichText text;
-	Size size_hint;
-	unsigned max_text_width;
-
 public:
-	WindowRichText(std::wstring_view title, std::wstring_view text,
-			const RichTextLineList &list, Size size_hint);
+	WindowRichText(std::wstring_view title, MultiLineRichText &&mrt,
+			Size size_hint);
 	~WindowRichText ();
 
 	void redraw ();
+
+private:
+	RichText text;
+	Size size_hint;
+	unsigned max_text_width;
 };
 
-WindowRichText::WindowRichText(std::wstring_view title, std::wstring_view text,
-		const RichTextLineList &lst, Size size_hint_)
+WindowRichText::WindowRichText(std::wstring_view title, MultiLineRichText &&mrt,
+		Size size_hint_)
 	: Window (0, title)
-	, text (*this, text, lst)
+	, text(*this, std::move(mrt))
 	, size_hint (size_hint_)
 {
 	max_text_width = 0;
-	for (RichTextLineList::const_iterator it = lst.begin ();
-			it != lst.end (); ++it) {
-		if (max_text_width < it->screen_wid) {
-			max_text_width = it->screen_wid;
+	for (const RichTextLine &line: text.get_mrt().lines) {
+		if (max_text_width < line.screen_wid) {
+			max_text_width = line.screen_wid;
 		}
 	}
 
@@ -71,8 +70,8 @@ void WindowRichText::redraw ()
 	if (ideal_size.x < max_text_width) {
 		ideal_size.x = max_text_width + 12;
 	}
-	if (ideal_size.y < text.get_list ().size ()) {
-		ideal_size.y = text.get_list ().size () + 3;
+	if (ideal_size.y < text.get_mrt().lines.size()) {
+		ideal_size.y = text.get_mrt().lines.size() + 3;
 	}
 	ideal_size += Size{4, 2}; // Border
 	Size scrsize = get_screen_size ();
@@ -86,11 +85,9 @@ void WindowRichText::redraw ()
 } // anonymous namespace
 
 void dialog_richtext(std::wstring_view title,
-		std::wstring_view text,
-		const RichTextLineList &list,
-		Size size_hint)
-{
-	WindowRichText (title, text, list, size_hint).event_loop ();
+		MultiLineRichText &&mrt,
+		Size size_hint) {
+	WindowRichText(title, std::move(mrt), size_hint).event_loop();
 }
 
 } // namespace tiary::ui

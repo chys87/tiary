@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -48,23 +48,22 @@ public:
 	typedef RichTextLine Line;
 	typedef RichTextLineList LineList;
 
-	RichText(Window &, std::wstring_view, const LineList &);
-	RichText(Window &, std::wstring_view, LineList &&);
+	RichText(Window &, const MultiLineRichText &mrt);
+	RichText(Window &, MultiLineRichText &&mrt);
 	~RichText ();
 
 	void redraw ();
 	bool on_mouse (MouseEvent); // For scroll bar only
 	bool on_key (wchar_t);
 
-	const LineList &get_list () const { return line_list; }
+	const MultiLineRichText &get_mrt() const { return mrt_; }
 
 	void slot_search (bool backward);
 	void slot_search_continue (bool previous);
 
 private:
 
-	const std::wstring text;
-	const LineList line_list;
+	const MultiLineRichText mrt_;
 	unsigned top_line;
 
 	// first = starting offset of highlight spots

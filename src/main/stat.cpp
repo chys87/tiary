@@ -100,36 +100,34 @@ TimeSpan get_span (const DiaryEntryList &lst)
 	return {min, max};
 }
 
-void append_stat (std::wstring &text, ui::RichTextLineList &lst, const Stat &info)
-{
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+void append_stat(ui::MultiLineRichText *mrt, const Stat &info) {
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Characters          "sv, format_dec(info.characters, 8));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Printable characters"sv, format_dec(info.char_graph, 8));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Non-CJK words       "sv, format_dec(info.words, 8));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"CJK characters      "sv, format_dec(info.cjks, 8));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Paragraphs          "sv, format_dec(info.paragraphs, 8));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"UTF-8 bytes         "sv, format_dec(info.bytes, 8));
 }
 
-void append_average_stat (std::wstring &text, ui::RichTextLineList &lst, const Stat &info, unsigned n)
-{
+void append_average_stat(ui::MultiLineRichText *mrt, const Stat &info, unsigned n) {
 	double x = 1. / n;
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Characters          "sv, format_double(info.characters * x, 8, 4));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Printable characters"sv, format_double(info.char_graph * x, 8, 4));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Non-CJK words       "sv, format_double(info.words * x, 8, 4));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"CJK characters      "sv, format_double(info.cjks * x, 8, 4));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Paragraphs          "sv, format_double(info.paragraphs * x, 8, 4));
-	ui::append_richtext_line (text, lst, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt->append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"UTF-8 bytes         "sv, format_double(info.bytes * x, 8, 4));
 }
 
@@ -139,17 +137,16 @@ void display_statistics (const DiaryEntryList &all_entries,
 		const DiaryEntryList *filtered_entries,
 		const DiaryEntry *current_entry)
 {
-	std::wstring rich_text;
-	rich_text.reserve (4096); // Just a rough guess
-	ui::RichTextLineList rich_lines;
-	rich_lines.reserve (128); // Just a rough guess
+	ui::MultiLineRichText mrt;
+	mrt.text.reserve(4096); // Just a rough guess
+	mrt.lines.reserve(128); // Just a rough guess
 
 	Stat info = {};
 	if (current_entry) {
 		stat_entry(&info, *current_entry);
-		ui::append_richtext_line(rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Current entry"sv);
-		append_stat (rich_text, rich_lines, info);
-		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
+		mrt.append(ui::PALETTE_ID_SHOW_BOLD, L"Current entry"sv);
+		append_stat(&mrt, info);
+		mrt.append(ui::PALETTE_ID_SHOW_NORMAL);
 	}
 
 	// Show filtered entries
@@ -159,10 +156,10 @@ void display_statistics (const DiaryEntryList &all_entries,
 				stat_entry(&info, *entry);
 			}
 		}
-		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD,
+		mrt.append(ui::PALETTE_ID_SHOW_BOLD,
 			L"Displayed entries   "sv, format_dec(filtered_entries->size(), 8));
-		append_stat (rich_text, rich_lines, info);
-		ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
+		append_stat(&mrt, info);
+		mrt.append(ui::PALETTE_ID_SHOW_NORMAL);
 	}
 
 	// Add the remaining entries
@@ -179,20 +176,20 @@ void display_statistics (const DiaryEntryList &all_entries,
 		}
 	}
 
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD,
+	mrt.append(ui::PALETTE_ID_SHOW_BOLD,
 		L"All entries         "sv, format_dec(all_entries.size(), 8));
-	append_stat (rich_text, rich_lines, info);
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
+	append_stat(&mrt, info);
+	mrt.append(ui::PALETTE_ID_SHOW_NORMAL);
 
 	TimeSpan span = get_span (all_entries);
 	unsigned days = extract_date_from_datetime (span.max) - extract_date_from_datetime (span.min) + 1;
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt.append(ui::PALETTE_ID_SHOW_NORMAL,
 			format(L"Date span           %8a days (%b - %c)"sv,
 				days,
 				format_datetime(span.min, L"%m/%d/%Y"sv),
 				format_datetime(span.max, L"%m/%d/%Y"sv))
 		);
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt.append(ui::PALETTE_ID_SHOW_NORMAL,
 		L"Entries per day     "sv, format_double(double(all_entries.size()) / days, 8, 4));
 
 	unsigned n_labels = 0;
@@ -207,18 +204,18 @@ void display_statistics (const DiaryEntryList &all_entries,
 		}
 		n_distinct_labels = all_labels.size ();
 	}
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt.append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Labels              "sv, format_dec(n_distinct_labels, 8));
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL,
+	mrt.append(ui::PALETTE_ID_SHOW_NORMAL,
 			L"Labels per entry    "sv, format_double(double(n_labels) / all_entries.size(), 8, 4));
 
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
+	mrt.append(ui::PALETTE_ID_SHOW_NORMAL);
 
-	ui::append_richtext_line(rich_text, rich_lines, ui::PALETTE_ID_SHOW_BOLD, L"Average entry"sv);
-	append_average_stat (rich_text, rich_lines, info, all_entries.size ());
-	ui::append_richtext_line (rich_text, rich_lines, ui::PALETTE_ID_SHOW_NORMAL);
+	mrt.append(ui::PALETTE_ID_SHOW_BOLD, L"Average entry"sv);
+	append_average_stat(&mrt, info, all_entries.size ());
+	mrt.append(ui::PALETTE_ID_SHOW_NORMAL);
 
-	ui::dialog_richtext(L"Statistics"sv, rich_text, rich_lines);
+	ui::dialog_richtext(L"Statistics"sv, std::move(mrt));
 }
 
 } // namespace tiary

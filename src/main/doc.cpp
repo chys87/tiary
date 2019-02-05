@@ -28,61 +28,52 @@
 
 namespace tiary {
 
-const ui::RichTextLineC info[] = {
-	{ ui::PALETTE_ID_SHOW_BOLD  , L"KEYBOARD COMMANDS" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"=================" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    Key                  Description" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    ============         =================================================" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    Esc                  Go to menu" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    k UP                 Backward one line" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    j DOWN               Forward one line" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    ^ g < HOME           Jump to the first entry" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    $ G > END            Jump to the last entry" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    b PAGEUP             Backward one page" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    f PAGEDOWN           Forward one page" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    v ENTER RIGHT        View the selected entry" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    V                    View all entries" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    e E                  Edit the selected entry" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    l                    Edit labels of the selected entry" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    L                    Rename or delete labels, applying to all entries" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    t T                  Change the time of the selected entry" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    a A INSERT           Add a new entry" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    d D DELETE           Remove the selected entry" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    m                    Move the selected entry up" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    M                    Move the selected entry down" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    s                    Display statistics info" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    S                    Sort all entries by date and time" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    / CTRL+F             Search forward" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    ?                    Search backward" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    n F3                 Search next" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    N                    Search previous" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+G               Filtering" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    p P                  Create/modify/remove password" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    r                    Edit per-file preferences" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    R                    Edit global preferences" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+L               Refresh the screen" },
+void show_doc() {
+	ui::dialog_richtext(L"Help"sv, ui::combine_lines({
+		{ui::PALETTE_ID_SHOW_BOLD  , L"KEYBOARD COMMANDS"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"================="sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L""sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    Key                  Description"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    ============         ================================================="sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    Esc                  Go to menu"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    k UP                 Backward one line"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    j DOWN               Forward one line"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    ^ g < HOME           Jump to the first entry"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    $ G > END            Jump to the last entry"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    b PAGEUP             Backward one page"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    f PAGEDOWN           Forward one page"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    v ENTER RIGHT        View the selected entry"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    V                    View all entries"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    e E                  Edit the selected entry"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    l                    Edit labels of the selected entry"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    L                    Rename or delete labels, applying to all entries"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    t T                  Change the time of the selected entry"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    a A INSERT           Add a new entry"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    d D DELETE           Remove the selected entry"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    m                    Move the selected entry up"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    M                    Move the selected entry down"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    s                    Display statistics info"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    S                    Sort all entries by date and time"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    / CTRL+F             Search forward"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    ?                    Search backward"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    n F3                 Search next"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    N                    Search previous"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+G               Filtering"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    p P                  Create/modify/remove password"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    r                    Edit per-file preferences"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    R                    Edit global preferences"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+L               Refresh the screen"sv},
 #ifdef TIARY_USE_MOUSE
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    F12                  Enable/disable mouse" },
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    F12                  Enable/disable mouse"sv},
 #endif
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    h H F1               View this help info" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+N               New file" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+O               Open file" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    w CTRL+S             Save" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    W                    Save as" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"    q Q                  Quit" },
-	{ ui::PALETTE_ID_SHOW_NORMAL, L"" }
-};
-
-
-
-void show_doc ()
-{
-	std::wstring text;
-	ui::dialog_richtext(L"Help"sv,
-			text,
-			ui::combine_lines (text, info, sizeof info / sizeof *info)
-			);
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    h H F1               View this help info"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+N               New file"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    CTRL+O               Open file"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    w CTRL+S             Save"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    W                    Save as"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L"    q Q                  Quit"sv},
+		{ui::PALETTE_ID_SHOW_NORMAL, L""sv}
+	}));
 }
 
 constexpr std::wstring_view license = L"\
@@ -115,9 +106,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\
 void show_license ()
 {
 	ui::dialog_richtext(L"License (Three-clause BSD license)"sv,
-			license,
-			ui::split_richtext_lines(license, ui::PALETTE_ID_SHOW_NORMAL, 80)
-			);
+			{
+				std::wstring(license),
+				ui::split_richtext_lines(license, ui::PALETTE_ID_SHOW_NORMAL, 80)
+			});
 }
 
 constexpr std::wstring_view about = L"\

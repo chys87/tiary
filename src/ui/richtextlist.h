@@ -23,9 +23,10 @@
  */
 
 #include "ui/ui.h" // PaletteID
-#include <vector>
+#include <initializer_list>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace tiary {
 namespace ui {
@@ -33,7 +34,7 @@ namespace ui {
 struct RichTextLineC
 {
 	PaletteID id;
-	const wchar_t *text;
+	std::wstring_view text;
 };
 
 struct RichTextLine
@@ -46,17 +47,18 @@ struct RichTextLine
 
 typedef std::vector<RichTextLine> RichTextLineList;
 
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, std::wstring_view line_text);
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, unsigned repeat, wchar_t ch);
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id); // Empty line
-void append_richtext_line (std::wstring &text, RichTextLineList &lst,
-		PaletteID id, std::wstring_view line_text, std::wstring_view text2);
+struct MultiLineRichText {
+	std::wstring text;
+	RichTextLineList lines;
+
+	void append(PaletteID id, std::wstring_view line_text);
+	void append(PaletteID id, unsigned repeat, wchar_t ch);
+	void append(PaletteID id); // Empty line
+	void append(PaletteID id, std::wstring_view line_text, std::wstring_view text2);
+};
 
 /// @brief Convert a series of lines represented in RichTextLineC to RichTextLineList
-RichTextLineList combine_lines (std::wstring &str, const RichTextLineC *, size_t);
+MultiLineRichText combine_lines(std::initializer_list<RichTextLineC>);
 /// @brief Split a string to lines, each with the same palette id
 RichTextLineList split_richtext_lines(std::wstring_view, PaletteID, unsigned wid);
 

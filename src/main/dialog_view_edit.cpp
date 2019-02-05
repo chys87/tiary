@@ -45,34 +45,33 @@ using namespace ui;
 const unsigned edit_line_width = 78;
 const unsigned view_line_width = 78;
 
-void write_for_view (std::wstring &text, RichTextLineList &lst,
-		const DiaryEntry &ent, const std::wstring &longtime_format)
-{
-	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, view_line_width, L'=');
-	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, ent.title);
-	append_richtext_line (text, lst, PALETTE_ID_SHOW_BOLD, view_line_width, L'=');
-	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format));
+void write_for_view(MultiLineRichText *mrt,
+		const DiaryEntry &ent, const std::wstring &longtime_format) {
+	mrt->append(PALETTE_ID_SHOW_BOLD, view_line_width, L'=');
+	mrt->append(PALETTE_ID_SHOW_BOLD, ent.title);
+	mrt->append(PALETTE_ID_SHOW_BOLD, view_line_width, L'=');
+	mrt->append(PALETTE_ID_SHOW_NORMAL, ent.local_time.format (longtime_format));
 	if (!ent.labels.empty ()) {
-		append_richtext_line(text, lst, PALETTE_ID_SHOW_NORMAL,
+		mrt->append(PALETTE_ID_SHOW_NORMAL,
 				L"Labels: "sv, join(ent.labels.begin(), ent.labels.end(), L", "sv));
 	}
-	append_richtext_line (text, lst, PALETTE_ID_SHOW_NORMAL);
+	mrt->append(PALETTE_ID_SHOW_NORMAL);
 
 	// Text
-	size_t base_offset = text.length ();
-	text += ent.text;
+	size_t base_offset = mrt->text.length ();
+	mrt->text += ent.text;
 	PaletteID palette = PALETTE_ID_SHOW_NORMAL;
 	for (const auto &item: split_line (edit_line_width, ent.text)) {
 		size_t begin = base_offset + item.begin;
 		// If a line begins with a space, it's considered the first line of a qutoed paragraph
-		if (item.len && (text[begin] == L' ')) {
+		if (item.len && (mrt->text[begin] == L' ')) {
 			palette = PALETTE_ID_SHOW_QUOTE;
 		}
 		// An empty line ends a quoted paragraph
 		if (item.len == 0) {
 			palette = PALETTE_ID_SHOW_NORMAL;
 		}
-		lst.push_back({begin, item.len, palette, item.wid});
+		mrt->lines.push_back({begin, item.len, palette, item.wid});
 	}
 }
 
@@ -229,15 +228,13 @@ bool edit_entry (DiaryEntry &ent, const char *editor)
 
 void view_entry (DiaryEntry &ent, const std::wstring &longtime_format)
 {
-	std::wstring text;
-	text.reserve (ent.text.length () + 512);
-	RichTextLineList text_list;
-	text_list.reserve (ent.text.length () / 32);
-	write_for_view (text, text_list, ent, longtime_format);
+	MultiLineRichText mrt;
+	mrt.text.reserve(ent.text.length() + 512);
+	mrt.lines.reserve(ent.text.length() / 32);
+	write_for_view(&mrt, ent, longtime_format);
 	ui::dialog_richtext (
 			ent.title,
-			text,
-			text_list,
+			std::move(mrt),
 			Size{view_line_width + 3, 0});
 }
 
@@ -246,23 +243,21 @@ void view_all_entries (const DiaryEntryList &entries, const std::wstring &longti
 	if (entries.empty ()) {
 		return;
 	}
-	std::wstring text;
-	text.reserve (512 * entries.size ()); // This is arbitrary. Actual size is difficult to guess.
-	ui::RichTextLineList text_list;
-	text_list.reserve (32 * entries.size ()); // This is arbitrary. Actual size is difficult to guess.
+	MultiLineRichText mrt;
+	mrt.text.reserve(512 * entries.size()); // This is arbitrary. Actual size is difficult to guess.
+	mrt.lines.reserve(32 * entries.size()); // This is arbitrary. Actual size is difficult to guess.
 	DiaryEntryList::const_iterator it = entries.begin ();
 	for (;;) {
-		write_for_view (text, text_list, **it, longtime_format);
+		write_for_view(&mrt, **it, longtime_format);
 		if (++it == entries.end ()) {
 			break;
 		}
-		ui::RichTextLine tmp_line = { text.length (), 0, ui::PALETTE_ID_SHOW_NORMAL, 0 };
-		text_list.insert (text_list.end (), 4, tmp_line);
+		ui::RichTextLine tmp_line = {mrt.text.length(), 0, ui::PALETTE_ID_SHOW_NORMAL, 0};
+		mrt.lines.insert(mrt.lines.end(), 4, tmp_line);
 	}
 	ui::dialog_richtext (
 			L"View all entries"sv,
-			text,
-			text_list,
+			std::move(mrt),
 			Size{view_line_width + 3, 0});
 }
 

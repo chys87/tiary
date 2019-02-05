@@ -16,30 +16,25 @@
 
 namespace tiary {
 
-size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size_t slen, size_t offset, unsigned options)
-{
-	s += offset;
-	if (slen == size_t (-1)) {
-		slen = wcslen (s);
-	}
-	else {
-		slen -= offset;
-	}
+size_t split_line(SplitStringLine *result, unsigned wid, std::wstring_view str, size_t offset, unsigned options) {
+	str.remove_prefix(offset);
+	const wchar_t *s = str.data();
+	size_t slen = str.length();
 
 	size_t cur = 0;     // Current position
 	unsigned curwid = 0;// Used screen width
 
 	for (;;) {
 		if (cur >= slen) {
-			result.begin = offset;
-			result.len = slen;
-			result.wid = curwid;
+			result->begin = offset;
+			result->len = slen;
+			result->wid = curwid;
 			return (offset + slen);
 		}
 		if (!(options & SPLIT_NEWLINE_AS_SPACE) && s[cur] == L'\n') {
-			result.begin = offset;
-			result.len = cur;
-			result.wid = curwid;
+			result->begin = offset;
+			result->len = cur;
+			result->wid = curwid;
 			return (offset + cur + 1); // Skip the newline character
 		}
 		unsigned w = ucs_width (s[cur]);
@@ -70,53 +65,35 @@ size_t split_line (SplitStringLine &result, unsigned wid, const wchar_t *s, size
 			++extra_skip;
 		}
 	}
-	result.begin = offset;
-	result.len = cur;
-	result.wid = curwid;
+	result->begin = offset;
+	result->len = cur;
+	result->wid = curwid;
 	return (offset + cur + extra_skip);
 }
 
-size_t split_line(SplitStringLine &result, unsigned wid, std::wstring_view str, size_t offset, unsigned options) {
-	return split_line (result, wid, str.data (), str.length (), offset, options);
-}
-
-unsigned split_line (SplitStringLine *result, unsigned max_lines, unsigned wid, const wchar_t *s, size_t slen)
-{
+unsigned split_line (SplitStringLine *result, unsigned max_lines, unsigned wid, std::wstring_view s) {
 	unsigned offset = 0;
-	unsigned lines;
-	for (lines = 0; lines<max_lines && offset<slen; ++lines) {
-		offset = split_line (*result++, wid, s, slen, offset, 0);
+	unsigned lines = 0;
+	for (; lines < max_lines && offset < s.length(); ++lines) {
+		offset = split_line(result++, wid, s, offset, 0);
 	}
 	return lines;
 }
 
-unsigned split_line(SplitStringLine *result, unsigned max_lines, unsigned wid, std::wstring_view s) {
-	return split_line (result, max_lines, wid, s.data (), s.length ());
-}
-
-SplitStringLineList split_line (unsigned wid, const wchar_t *s, size_t slen)
-{
-	SplitStringLineList ret (slen);
+SplitStringLineList split_line(unsigned wid, std::wstring_view s) {
+	SplitStringLineList ret;
 	if (wid < 2) { // Robustness. Avoid dead loops
-		for (size_t k=0; k<slen; ++k) {
-			ret[k].begin = k;
-			ret[k].len = 1;
-			ret[k].wid = ucs_width (s[k]);
+		for (size_t k = 0; k < s.length(); ++k) {
+			ret.push_back({k, 1, ucs_width(s[k])});
 		}
-	}
-	else {
-		SplitStringLineList::iterator it = ret.begin ();
-		for (unsigned offset = 0; offset < slen; ) {
-			offset = split_line (*it, wid, s, slen, offset, 0);
-			++it;
+	} else {
+		for (unsigned offset = 0; offset < s.length(); ) {
+			SplitStringLine line;
+			offset = split_line(&line, wid, s, offset, 0);
+			ret.push_back(std::move(line));
 		}
-		ret.erase (it, ret.end ());
 	}
 	return ret;
-}
-
-SplitStringLineList split_line(unsigned wid, std::wstring_view s) {
-	return split_line (wid, s.data (), s.length ());
 }
 
 } // namespace tiary
