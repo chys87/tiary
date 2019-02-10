@@ -32,21 +32,13 @@ namespace ui {
 
 RichText::RichText(Window &win, const MultiLineRichText &mrt)
 	: Control (win)
-	, mrt_(mrt)
-	, top_line (0)
-	, highlight_list ()
-	, search_info ()
-{
+	, mrt_(mrt) {
 	set_cursor_visibility (false);
 }
 
 RichText::RichText(Window &win, MultiLineRichText &&mrt)
 	: Control (win)
-	, mrt_(std::move(mrt))
-	, top_line (0)
-	, highlight_list ()
-	, search_info ()
-{
+	, mrt_(std::move(mrt)) {
 	set_cursor_visibility (false);
 }
 
@@ -61,26 +53,26 @@ void RichText::redraw ()
 	if (int (wid) < 0 || int (hgt) < 0) {
 		return;
 	}
-	unsigned show_lines = minU (hgt, mrt_.lines.size() - top_line);
+	unsigned show_lines = minU(hgt, mrt_.lines.size() - top_line_);
 
 	for (unsigned i=0; i<show_lines; ++i) {
 		Size pos{0, i};
-		choose_palette(mrt_.lines[top_line + i].id);
+		choose_palette(mrt_.lines[top_line_ + i].id);
 		clear(pos, {wid, 1});
-		size_t offset = mrt_.lines[top_line + i].offset;
-		size_t end_offset = mrt_.lines[top_line + i].len + offset;
-		HighlightList::const_iterator lower = highlight_list.lower_bound (offset);
-		HighlightList::const_iterator upper = highlight_list.lower_bound (end_offset);
+		size_t offset = mrt_.lines[top_line_ + i].offset;
+		size_t end_offset = mrt_.lines[top_line_ + i].len + offset;
+		auto lower = highlight_list_.lower_bound(offset);
+		auto upper = highlight_list_.lower_bound(end_offset);
 		// We may have a match whose starting point is on the previous line
 		// Check for that!
-		if (lower != highlight_list.begin ()) {
-			HighlightList::const_iterator last = lower;
+		if (lower != highlight_list_.begin ()) {
+			auto last = lower;
 			--last;
 			if (offset < last->first + last->second) {
 				lower = last;
 			}
 		}
-		for (HighlightList::const_iterator it = lower; it != upper; ++it) {
+		for (auto it = lower; it != upper; ++it) {
 			if (offset < it->first) {
 				pos = put(pos, mrt_.text.data() + offset, it->first-offset);
 				offset = it->first;
@@ -101,12 +93,12 @@ void RichText::redraw ()
 	choose_palette (PALETTE_ID_BACKGROUND);
 	clear({0, hgt}, {wid, 1});
 	put({0, hgt},
-			format(L"Lines %a-%b/%c"sv, top_line + 1, top_line + show_lines,
+			format(L"Lines %a-%b/%c"sv, top_line_ + 1, top_line_ + show_lines,
 				unsigned(mrt_.lines.size())));
 	// Scroll bar
 	clear({wid, 0}, {1, hgt + 1});
 	attribute_toggle (REVERSE);
-	ScrollBarInfo scrollbar = scrollbar_info(hgt, mrt_.lines.size(), top_line);
+	ScrollBarInfo scrollbar = scrollbar_info(hgt, mrt_.lines.size(), top_line_);
 	clear({wid, scrollbar.pos}, {1, scrollbar.size});
 }
 
@@ -116,7 +108,7 @@ bool RichText::on_mouse (MouseEvent mouse_event)
 			(mouse_event.p.x+1 < get_size().x)) {
 		return false;
 	}
-	top_line = scrollbar_click(get_size().y - 1, mrt_.lines.size(), mouse_event.p.y);
+	top_line_ = scrollbar_click(get_size().y - 1, mrt_.lines.size(), mouse_event.p.y);
 	RichText::redraw ();
 	return true;
 }
@@ -126,16 +118,16 @@ bool RichText::on_key (wchar_t key)
 	switch (key) {
 		case L'k':
 		case UP:
-			if (top_line) {
-				--top_line;
+			if (top_line_) {
+				--top_line_;
 				RichText::redraw ();
 				return true;
 			}
 			break;
 		case L'j':
 		case DOWN:
-			if (top_line + 1 < mrt_.lines.size()) {
-				++top_line;
+			if (top_line_ + 1 < mrt_.lines.size()) {
+				++top_line_;
 				RichText::redraw ();
 				return true;
 			}
@@ -144,7 +136,7 @@ bool RichText::on_key (wchar_t key)
 		case L'^':
 		case L'g':
 		case L'<':
-			top_line = 0;
+			top_line_ = 0;
 			RichText::redraw ();
 			return true;
 		case END:
@@ -152,15 +144,15 @@ bool RichText::on_key (wchar_t key)
 		case L'>':
 		case L'G':
 			if (mrt_.lines.size()) {
-				top_line = mrt_.lines.size() - 1;
+				top_line_ = mrt_.lines.size() - 1;
 				RichText::redraw ();
 				return true;
 			}
 			break;
 		case PAGEUP:
 		case L'b':
-			if (top_line) {
-				top_line = maxS (0, top_line - get_size ().y + 2);
+			if (top_line_) {
+				top_line_ = maxS(0, top_line_ - get_size().y + 2);
 				RichText::redraw ();
 			}
 			break;
@@ -168,8 +160,8 @@ bool RichText::on_key (wchar_t key)
 		case PAGEDOWN:
 		case L'f':
 		case L' ':
-			if (top_line + 1 < mrt_.lines.size()) {
-				top_line = minU(mrt_.lines.size() - 1, top_line + get_size().y - 2);
+			if (top_line_ + 1 < mrt_.lines.size()) {
+				top_line_ = minU(mrt_.lines.size() - 1, top_line_ + get_size().y - 2);
 				RichText::redraw ();
 				return true;
 			}
@@ -198,17 +190,17 @@ bool RichText::on_key (wchar_t key)
 
 void RichText::slot_search (bool bkwd)
 {
-	if (search_info.dialog (bkwd)) {
-		std::vector<std::pair<size_t, size_t>> result = search_info.match(mrt_.text);
-		highlight_list.clear ();
-		highlight_list.insert(result.begin(), result.end());
+	if (search_info_.dialog(bkwd)) {
+		std::vector<std::pair<size_t, size_t>> result = search_info_.match(mrt_.text);
+		highlight_list_.clear ();
+		highlight_list_.insert(result.begin(), result.end());
 		do_search (false, true);
 	}
 }
 
 void RichText::slot_search_continue (bool previous)
 {
-	if (!search_info) {
+	if (!search_info_) {
 		slot_search (previous);
 	}
 	else {
@@ -218,17 +210,17 @@ void RichText::slot_search_continue (bool previous)
 
 void RichText::do_search (bool previous, bool include_current)
 {
-	unsigned k = top_line;
+	unsigned k = top_line_;
 	unsigned num_ents = mrt_.lines.size();
-	int inc = (!previous == !search_info.get_backward ()) ? 1 : -1;
+	int inc = (!previous == !search_info_.get_backward()) ? 1 : -1;
 	if (!include_current) {
 		k += inc;
 	}
 	for (; k < num_ents; k += inc) {
 		// Is there any match on the k-th line?
-		if (highlight_list.lower_bound(mrt_.lines[k].offset)
-				!= highlight_list.lower_bound(mrt_.lines[k].offset + mrt_.lines[k].len)) {
-			top_line = k;
+		if (highlight_list_.lower_bound(mrt_.lines[k].offset)
+				!= highlight_list_.lower_bound(mrt_.lines[k].offset + mrt_.lines[k].len)) {
+			top_line_ = k;
 			RichText::redraw ();
 			return;
 		}

@@ -62,18 +62,17 @@ public:
 	void slot_search_continue (bool previous);
 
 private:
+	void do_search (bool previous, bool include_current);
 
+private:
 	const MultiLineRichText mrt_;
-	unsigned top_line;
+	unsigned top_line_ = 0;
 
 	// first = starting offset of highlight spots
 	// second = length of highlight spots
-	typedef std::map <size_t, size_t> HighlightList;
-	HighlightList highlight_list;
+	std::map<size_t, size_t> highlight_list_;
 
-	SearchInfo search_info;
-
-	void do_search (bool previous, bool include_current);
+	SearchInfo search_info_;
 };
 
 
