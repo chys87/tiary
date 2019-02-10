@@ -38,7 +38,7 @@ public:
 	void redraw ();
 	unsigned get_item_screen_size (unsigned) const; // Overload an interface in Scroll
 
-	const std::wstring & get_text () const { return text; }
+	const std::wstring & get_text() const { return text_; }
 
 	// Does not change cursor_position
 	void set_text(std::wstring_view, bool emit_sig_changed = true);
@@ -49,8 +49,8 @@ public:
 	static const unsigned PASSWORD_BOX = 1;
 
 private:
-	std::wstring text;
-	unsigned attributes;
+	std::wstring text_;
+	unsigned attributes_;
 };
 
 

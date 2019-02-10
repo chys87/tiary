@@ -27,8 +27,8 @@ namespace ui {
 TextBox::TextBox (Window &win, unsigned attr)
 	: Control(win, kRedrawOnFocusChange)
 	, Scroll (0, true)
-	, text ()
-	, attributes (attr)
+	, text_()
+	, attributes_(attr)
 {
 }
 
@@ -48,7 +48,7 @@ bool TextBox::on_key (wchar_t key)
 			}
 			break;
 		case RIGHT:
-			if (scroll_info.focus < text.length ()) {
+			if (scroll_info.focus < text_.length()) {
 				Scroll::modify_focus (scroll_info.focus + 1);
 				processed = true;
 			}
@@ -57,11 +57,11 @@ bool TextBox::on_key (wchar_t key)
 			Scroll::modify_focus (0);
 			break;
 		case END:
-			Scroll::modify_focus (text.length ());
+			Scroll::modify_focus(text_.length());
 			break;
 		case DELETE:
-			if (scroll_info.focus < text.length ()) {
-				text.erase (scroll_info.focus, 1);
+			if (scroll_info.focus < text_.length()) {
+				text_.erase(scroll_info.focus, 1);
 				Scroll::modify_number_delete ();
 				sig_changed.emit ();
 				processed = true;
@@ -70,15 +70,23 @@ bool TextBox::on_key (wchar_t key)
 		case BACKSPACE1:
 		case BACKSPACE2:
 			if (scroll_info.focus) {
-				text.erase (scroll_info.focus-1, 1);
+				text_.erase(scroll_info.focus-1, 1);
 				Scroll::modify_number_backspace ();
 				sig_changed.emit ();
 				processed = true;
 			}
 			break;
+		case CTRL_K:
+			if (scroll_info.focus < text_.length()) {
+				text_.erase(scroll_info.focus);
+				Scroll::modify_number(scroll_info.focus);
+				sig_changed.emit();
+				processed = true;
+			}
+			break;
 		default:
 			if (iswprint (key)) {
-				text.insert (scroll_info.focus, 1, key);
+				text_.insert(scroll_info.focus, 1, key);
 				Scroll::modify_number_insert ();
 				sig_changed.emit ();
 				processed = true;
@@ -113,22 +121,21 @@ void TextBox::redraw ()
 	choose_palette (is_focus () ? PALETTE_ID_TEXTBOX_FOCUS : PALETTE_ID_TEXTBOX);
 	clear ();
 	Scroll::Info scroll_info = Scroll::get_info ();
-	if (attributes & PASSWORD_BOX) {
+	if (attributes_ & PASSWORD_BOX) {
 		fill(Size{}, Size{scroll_info.len, 1}, L'*');
 	} else {
-		put(Size{}, text.data() + scroll_info.first, scroll_info.len);
+		put(Size{}, text_.data() + scroll_info.first, scroll_info.len);
 	}
 	move_cursor({scroll_info.focus_pos, 0});
 }
 
 unsigned TextBox::get_item_screen_size (unsigned j) const
 {
-	assert (j < text.length ());
-	if (attributes & PASSWORD_BOX) {
+	assert(j < text_.length());
+	if (attributes_ & PASSWORD_BOX) {
 		return 1;
-	}
-	else {
-		return ucs_width (text[j]);
+	} else {
+		return ucs_width(text_[j]);
 	}
 }
 
@@ -137,10 +144,10 @@ void TextBox::set_text(std::wstring_view s, bool emit_sig_changed) {
 }
 
 void TextBox::set_text(std::wstring_view s, bool emit_sig_changed, unsigned new_cursor_pos) {
-	if (text == s) {
+	if (text_ == s) {
 		return;
 	}
-	text = s;
+	text_ = s;
 	Scroll::modify_number (s.length ());
 	new_cursor_pos = minU (new_cursor_pos, s.length ());
 	if (new_cursor_pos != Scroll::get_focus ()) {
