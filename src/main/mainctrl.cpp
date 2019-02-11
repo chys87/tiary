@@ -33,7 +33,7 @@ namespace tiary {
 
 MainCtrl::MainCtrl (MainWin &win)
 	: ui::Control (win)
-	, ui::Scroll (1 /* To be set later */, false)
+	, scroll_(1 /* To be set later */, false)
 {
 	set_cursor_visibility (false);
 }
@@ -47,12 +47,12 @@ bool MainCtrl::on_mouse (ui::MouseEvent mouse_event)
 	if (!(mouse_event.m & (ui::LEFT_CLICK | ui::LEFT_DCLICK | ui::RIGHT_CLICK))) {
 		return false;
 	}
-	ui::Scroll::Info info = ui::Scroll::get_info ();
-	unsigned k = mouse_event.p.y + info.first;
-	if (k >= info.focus) {
+	unsigned k = mouse_event.p.y + scroll_.get_first();
+	unsigned scroll_focus = scroll_.get_focus();
+	if (k >= scroll_focus) {
 		unsigned expand_lines = w().global_options.get_num (GLOBAL_OPTION_EXPAND_LINES);
-		if (k < info.focus + expand_lines) {
-			k = info.focus;
+		if (k < scroll_focus + expand_lines) {
+			k = scroll_focus;
 		}
 		else {
 			k -= expand_lines - 1;
@@ -94,9 +94,9 @@ void MainCtrl::redraw ()
 	}
 
 	unsigned expand_lines = w().global_options.get_num (GLOBAL_OPTION_EXPAND_LINES);
-	ui::Scroll::modify_height (get_size ().y - expand_lines + 1);
+	scroll_.modify_height(get_size().y - expand_lines + 1);
 
-	Scroll::Info info = Scroll::get_info ();
+	ui::Scroll::Info info = scroll_.get_info();
 
 	ui::Size pos{};
 
@@ -204,7 +204,7 @@ void MainCtrl::set_focus (unsigned k)
 	if (k >= num_ent) {
 		k = num_ent - 1;
 	}
-	ui::Scroll::modify_focus (k);
+	scroll_.modify_focus(k);
 	MainCtrl::redraw ();
 }
 
@@ -220,17 +220,17 @@ void MainCtrl::set_focus_down ()
 
 void MainCtrl::set_focus_pageup ()
 {
-	set_focus (get_current_focus () - ui::Scroll::get_height () + 1);
+	set_focus (get_current_focus() - scroll_.get_height() + 1);
 }
 
 void MainCtrl::set_focus_pagedown ()
 {
-	set_focus (get_current_focus () + ui::Scroll::get_height () - 1);
+	set_focus (get_current_focus() + scroll_.get_height() - 1);
 }
 
 void MainCtrl::touch ()
 {
-	ui::Scroll::modify_number (w ().get_current_list ().size ());
+	scroll_.modify_number(w().get_current_list().size());
 	w().saved = false;
 	MainCtrl::redraw ();
 }

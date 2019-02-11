@@ -35,7 +35,7 @@ class MainWin;
  *
  * The menu is not part of this control.
  */
-class MainCtrl final : public ui::Control, private ui::Scroll {
+class MainCtrl final : public ui::Control {
 private:
 	// Everything is private.
 	// Only friend class MainWin can instantiate MainCtrl
@@ -53,7 +53,7 @@ private:
 
 	friend class MainWin;
 
-	inline unsigned get_current_focus () const { return ui::Scroll::get_focus (); }
+	inline unsigned get_current_focus() const { return scroll_.get_focus(); }
 
 	void set_focus (unsigned); ///< Change focus
 	void set_focus_up (); ///< As if UP is pressed
@@ -61,6 +61,10 @@ private:
 	void set_focus_pageup (); ///< As if PAGEUP is pressed
 	void set_focus_pagedown (); ///< As if PAGEDOWN is pressed
 	void touch (); ///< Call this when any entry is modified
+	void modify_number(unsigned number) { scroll_.modify_number(number); }
+
+private:
+	ui::Scroll scroll_;
 };
 
 

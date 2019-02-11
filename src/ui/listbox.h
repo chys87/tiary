@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,7 +22,7 @@
 namespace tiary {
 namespace ui {
 
-class ListBox final : public Control, private Scroll {
+class ListBox final : public Control {
 public:
 
 	typedef std::vector<std::wstring> ItemList;
@@ -51,6 +51,7 @@ public:
 	Signal sig_double_clicked; // If double clicked, first emit sig_select_changed, then sig_double_click
 
 private:
+	Scroll scroll_;
 	ItemList items;
 	bool select_any;
 };

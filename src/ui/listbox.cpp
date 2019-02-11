@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -27,7 +27,7 @@ namespace ui {
 
 ListBox::ListBox (Window &win)
 	: Control (win)
-	, Scroll (0, false)
+	, scroll_(0, false)
 	, items ()
 	, select_any (false)
 {
@@ -40,9 +40,8 @@ ListBox::~ListBox ()
 size_t ListBox::get_select () const
 {
 	if (select_any) {
-		return Scroll::get_info ().focus;
-	}
-	else {
+		return scroll_.get_focus();
+	} else {
 		return size_t (-1);
 	}
 }
@@ -50,14 +49,14 @@ size_t ListBox::get_select () const
 void ListBox::set_items (const ItemList &new_items, size_t new_select, bool emit_signal)
 {
 	items = new_items;
-	Scroll::modify_number (items.size ());
+	scroll_.modify_number(items.size());
 	set_select (new_select, emit_signal);
 }
 
 void ListBox::set_items (ItemList &&new_items, size_t new_select, bool emit_signal)
 {
 	items = std::forward<ItemList> (new_items);
-	Scroll::modify_number (items.size ());
+	scroll_.modify_number(items.size());
 	set_select (new_select, emit_signal);
 }
 
@@ -65,9 +64,9 @@ void ListBox::set_select (size_t new_select, bool emit_signal, bool scroll_to_to
 {
 	if (new_select < items.size ()) {
 		select_any = true;
-		Scroll::modify_focus (new_select);
+		scroll_.modify_focus(new_select);
 		if (scroll_to_top) {
-			Scroll::scroll_focus_to_first ();
+			scroll_.scroll_focus_to_first();
 		}
 	}
 	else {
@@ -81,7 +80,7 @@ void ListBox::set_select (size_t new_select, bool emit_signal, bool scroll_to_to
 
 bool ListBox::on_key (wchar_t key)
 {
-	Scroll::Info scroll_info = Scroll::get_info ();
+	Scroll::Info scroll_info = scroll_.get_info();
 	switch (key) {
 		case UP:
 		case 'k':
@@ -192,12 +191,10 @@ bool ListBox::on_mouse (MouseEvent mouse_event)
 			focus_to_first = true;
 		}
 		else {
-			Scroll::Info info = Scroll::get_info ();
-			if (mouse_event.p.y >= info.len) {
+			if (mouse_event.p.y >= scroll_.get_len()) {
 				new_focus = size_t(-1);
-			}
-			else {
-				new_focus = mouse_event.p.y + info.first;
+			} else {
+				new_focus = mouse_event.p.y + scroll_.get_first();
 			}
 		}
 	}
@@ -227,7 +224,7 @@ void ListBox::move_resize (Size new_pos, Size new_size)
 	unsigned oldheight = get_size ().y;
 	Control::move_resize (new_pos, new_size);
 	if (oldheight != new_size.y) {
-		Scroll::modify_height (new_size.y);
+		scroll_.modify_height(new_size.y);
 	}
 }
 
@@ -240,7 +237,7 @@ void ListBox::redraw ()
 	}
 	choose_palette (PALETTE_ID_LISTBOX);
 	clear ();
-	const Scroll::Info info = Scroll::get_info ();
+	const Scroll::Info info = scroll_.get_info();
 	for (unsigned i=0; i<info.len; ++i) {
 		const std::wstring &str = items[info.first+i];
 		choose_palette ((select_any && i==info.focus_pos) ? PALETTE_ID_LISTBOX_SELECT : PALETTE_ID_LISTBOX);

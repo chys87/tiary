@@ -26,7 +26,7 @@ namespace ui {
 /*
  * Single-line text editor.
  */
-class TextBox final : public Control, private Scroll {
+class TextBox final : public Control {
 public:
 
 	explicit TextBox (Window &, unsigned attr = 0);
@@ -36,7 +36,6 @@ public:
 	bool on_mouse (MouseEvent);
 	void move_resize (Size, Size);
 	void redraw ();
-	unsigned get_item_screen_size (unsigned) const; // Overload an interface in Scroll
 
 	const std::wstring & get_text() const { return text_; }
 
@@ -49,6 +48,10 @@ public:
 	static const unsigned PASSWORD_BOX = 1;
 
 private:
+	unsigned get_item_screen_size(unsigned) const; /// Provides callback for Scroll
+
+private:
+	Scroll scroll_;
 	std::wstring text_;
 	unsigned attributes_;
 };

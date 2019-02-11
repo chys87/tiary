@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -19,38 +19,24 @@
 namespace tiary {
 namespace ui {
 
-
-Scroll::Scroll (unsigned height_, bool allow_focus_end_)
-	: height (maxU (1, height_))
-	, number (0)
-	, first (0)
-	, len (0)
-	, focus (0)
-	, allow_focus_end (allow_focus_end_)
-	, accumulate_height (2, 0)
+Scroll::Scroll(unsigned height, bool allow_focus_end, std::function<unsigned(unsigned)> get_item_screen_size)
+	: get_item_screen_size_(std::move(get_item_screen_size))
+	, accumulate_height_{0, 1}
+	, height_(maxU(1, height))
+	, allow_focus_end_(allow_focus_end)
 {
-	accumulate_height[1] = 1;
 	recalculate_len ();
 }
 
-Scroll::~Scroll ()
-{
-}
+Scroll::~Scroll() = default;
 
-
-Scroll::Info Scroll::get_info () const
-{
-	Info ret;
-	ret.first = first;
-	ret.len = len;
-	ret.focus = focus;
-	ret.focus_pos = accumulate_height[focus] - accumulate_height[first];
-	return ret;
-}
-
-unsigned Scroll::get_item_screen_size (unsigned) const
-{
-	return 1;
+Scroll::Info Scroll::get_info() const {
+	return {
+		first_,
+		len_,
+		focus_,
+		get_focus_pos(),
+	};
 }
 
 void Scroll::modify_focus (unsigned new_focus)
@@ -58,10 +44,10 @@ void Scroll::modify_focus (unsigned new_focus)
 	if (new_focus > max_possible_focus ()) {
 		return;
 	}
-	focus = new_focus;
-	if (new_focus - first >= len) {
-		if (new_focus < first) { // Scroll backward (upward)
-			first = new_focus;
+	focus_ = new_focus;
+	if (new_focus - first_ >= len_) {
+		if (new_focus < first_) { // Scroll backward (upward)
+			first_ = new_focus;
 		}
 		else { // Scroll forward (downward)
 			// Let's put the focus in the last line.
@@ -75,19 +61,19 @@ void Scroll::modify_focus (unsigned new_focus)
 
 void Scroll::modify_focus_pos (unsigned new_focus_pos)
 {
-	if (new_focus_pos >= height) {
+	if (new_focus_pos >= height_) {
 		return;
 	}
 	// Find the maximal possible j, s.t.
-	// first <= k <= max_possible_focus ()
-	// accumulate_height[k] <= accumulate_height[first] + new_focus_pos
-	unsigned k = first;
+	// first_ <= k <= max_possible_focus ()
+	// accumulate_height_[k] <= accumulate_height_[first_] + new_focus_pos
+	unsigned k = first_;
 	unsigned max = max_possible_focus ();
-	unsigned limit = accumulate_height[first] + new_focus_pos;
-	while (k<max && accumulate_height[k+1]<=limit) {
+	unsigned limit = accumulate_height_[first_] + new_focus_pos;
+	while (k < max && accumulate_height_[k + 1] <= limit) {
 		++k;
 	}
-	focus = k;
+	focus_ = k;
 }
 
 void Scroll::modify_height (unsigned new_height)
@@ -95,13 +81,13 @@ void Scroll::modify_height (unsigned new_height)
 	if (new_height == 0) {
 		return;
 	}
-	unsigned old_height = height;
-	height = new_height;
+	unsigned old_height = height_;
+	height_ = new_height;
 	if (new_height < old_height) {
 		// Became narrower.
 		// We may need to scroll forward (downward)
 		// to keep the selected item visible
-		if (accumulate_height[focus+1] > accumulate_height[first] + new_height) {
+		if (accumulate_height_[focus_ + 1] > accumulate_height_[first_] + new_height) {
 			// Let's put the focus in the last line.
 			put_focus_last_line ();
 		}
@@ -110,15 +96,15 @@ void Scroll::modify_height (unsigned new_height)
 		// Became wider.
 		// If this will lead to space in the end, scroll backward (upward)
 		unsigned max = max_possible_focus ();
-		if (accumulate_height[max+1] - accumulate_height[first] < new_height) {
+		if (accumulate_height_[max + 1] - accumulate_height_[first_] < new_height) {
 			// Find the smallest possible first, such that
-			// accumulate_height[max+1] <= accumulate_height[first] + height
+			// accumulate_height_[max + 1] <= accumulate_height_[first] + height_
 			unsigned j = max;
-			unsigned tmp = accumulate_height[max+1];
-			while (j && tmp<=accumulate_height[j-1]+height) {
+			unsigned tmp = accumulate_height_[max + 1];
+			while (j && tmp<=accumulate_height_[j - 1] + height_) {
 				--j;
 			}
-			first = j;
+			first_ = j;
 		}
 	}
 	recalculate_len ();
@@ -126,23 +112,21 @@ void Scroll::modify_height (unsigned new_height)
 
 void Scroll::modify_number (unsigned new_number)
 {
-	number = new_number;
+	number_ = new_number;
 	recalculate_accumulate_height ();
 	unsigned max_focus = max_possible_focus ();
-	if (first >= number) {
-		focus = max_focus;
+	if (first_ >= number_) {
+		focus_ = max_focus;
 		put_focus_last_line ();
-	}
-	else if (focus > max_possible_focus ()) {
-		focus = max_possible_focus ();
-		assert (focus >= first);
+	} else if (focus_ > max_focus) {
+		focus_ = max_focus;
+		assert(focus_ >= first_);
 	}
 	recalculate_len ();
 }
 
-void Scroll::scroll_focus_to_first ()
-{
-	first = focus;
+void Scroll::scroll_focus_to_first() {
+	first_ = focus_;
 	recalculate_len ();
 }
 
@@ -154,19 +138,19 @@ void Scroll::scroll_focus_to_last ()
 
 void Scroll::modify_number_delete ()
 {
-	if (focus >= number) {
+	if (focus_ >= number_) {
 		return; // Nothing to delete
 	}
 
 	// Only in one situation will the focus be moved
-	unsigned old_wid = accumulate_height[focus+1] - accumulate_height[focus];
-	for (unsigned i=focus; i<number; ++i) {
-		accumulate_height[i+1] = accumulate_height[i+2] - old_wid;
+	unsigned old_wid = accumulate_height_[focus_ + 1] - accumulate_height_[focus_];
+	for (unsigned i = focus_; i < number_; ++i) {
+		accumulate_height_[i + 1] = accumulate_height_[i + 2] - old_wid;
 	}
-	--number;
-	accumulate_height.resize (number + 2);
-	if (!allow_focus_end && number && focus>=number) {
-		focus = number - 1;
+	--number_;
+	accumulate_height_.resize(number_ + 2);
+	if (!allow_focus_end_ && number_ && focus_ >= number_) {
+		focus_ = number_ - 1;
 		put_focus_last_line ();
 	}
 	recalculate_len ();
@@ -174,68 +158,68 @@ void Scroll::modify_number_delete ()
 
 void Scroll::modify_number_backspace ()
 {
-	if (focus == 0) {
+	if (focus_ == 0) {
 		return; // Nothing to remove
 	}
-	modify_focus (focus - 1);
+	modify_focus(focus_ - 1);
 	modify_number_delete ();
 }
 
 void Scroll::modify_number_insert ()
 {
-	++number;
-	accumulate_height.resize (number + 2);
-	unsigned add_wid = get_item_screen_size (focus);
-	unsigned focus_next = focus + 1;
-	for (unsigned i=number+1; i>=focus_next; --i) {
-		accumulate_height[i] = accumulate_height[i-1] + add_wid;
+	++number_;
+	accumulate_height_.resize(number_ + 2);
+	unsigned add_wid = get_item_screen_size_ ? get_item_screen_size_(focus_) : 1;
+	unsigned focus_next = focus_ + 1;
+	for (unsigned i = number_ + 1; i >= focus_next; --i) {
+		accumulate_height_[i] = accumulate_height_[i - 1] + add_wid;
 	}
 	modify_focus (focus_next);
 }
 
 void Scroll::recalculate_accumulate_height ()
 {
-	accumulate_height.resize (number + 2);
-	accumulate_height[0] = 0;
+	unsigned n = number_;
+	accumulate_height_.resize(n + 2);
+	accumulate_height_[0] = 0;
 	unsigned acc = 0;
-	for (unsigned i=0; i<number; ++i) {
-		accumulate_height[i+1] = acc += get_item_screen_size(i);
+	for (unsigned i = 0; i < n; ++i) {
+		accumulate_height_[i + 1] = acc += get_item_screen_size_ ? get_item_screen_size_(i) : 1;
 	}
-	accumulate_height[number+1] = acc += 1;
+	accumulate_height_[n + 1] = acc += 1;
 }
 
 unsigned Scroll::recalculate_len ()
 {
-	// Find the maximum possible len, such that
-	// accumulate_height[first+len] <= accumulate_height[first] + height
-	unsigned j = first;
-	unsigned max = accumulate_height[first] + height;
-	while (j<number && accumulate_height[j+1]<=max) {
+	// Find the maximum possible len_, such that
+	// accumulate_height_[first_ + len_] <= accumulate_height_[first_] + height_
+	unsigned j = first_;
+	unsigned max = accumulate_height_[first_] + height_;
+	while (j < number_ && accumulate_height_[j + 1] <= max) {
 		++j;
 	}
-	return (len = j-first);
+	return (len_ = j - first_);
 }
 
-unsigned Scroll::max_possible_focus () const
-{
-	if (allow_focus_end || number == 0) {
-		return number;
+unsigned Scroll::max_possible_focus() const {
+	if (allow_focus_end_ || number_ == 0) {
+		return number_;
 	}
 	else {
-		return (number - 1);
+		return (number_ - 1);
 	}
 }
 
 void Scroll::put_focus_last_line ()
 {
-	// Find the minimal possible first, such that
-	// accumulate_height[focus+1] <= accumulate_height[first] + height
-	unsigned j = focus;
-	unsigned tmp = accumulate_height[focus+1];
-	while (j && tmp<=accumulate_height[j-1]+height) {
+	// Find the minimal possible first_, such that
+	// accumulate_height_[focus_ + 1] <= accumulate_height_[first_] + height_
+	unsigned j = focus_;
+	unsigned tmp = accumulate_height_[focus_ + 1];
+	while (j && tmp <= accumulate_height_[j - 1] + height_) {
 		--j;
 	}
-	first = j;
+	first_ = j;
 }
 
 } // namespace tiary::ui
