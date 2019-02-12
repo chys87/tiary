@@ -39,19 +39,15 @@ template <typename ChT> const std::basic_string<ChT> &get_home_dir ();
  * If the empty is NULL or empty, returns the home dir of the current user
  */
 std::string get_home_dir (const char *user);
-std::wstring get_home_dir (const wchar_t *user);
 std::string get_home_dir (const std::string &);
-std::wstring get_home_dir (const std::wstring &);
+std::wstring get_home_dir(std::wstring_view);
 
 /**
  * @brief	Concatenates the home dir with a name under the home
  *
- * E.g. make_home_dirname(NULL) = "/home/xxx";
- *
  * make_home_dirname("abc") = "/home/xxx/abc";
  */
-std::string make_home_dirname (const char *);
-std::wstring make_home_dirname (const wchar_t *);
+std::string make_home_dirname(std::string_view);
 
 /**
  * @brief	Return the absolute path of current directory

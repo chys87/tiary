@@ -65,31 +65,30 @@ namespace tiary {
 
 namespace {
 
-std::string get_home_dir_base ()
-{
+std::string get_home_dir_base() {
 	const char *result = getenv ("HOME");
-	if (result == 0 || *result != '/') {
-		if (struct passwd *data = getpwuid (getuid ())) {
-			result = data->pw_dir;
-		}
+	if (result && result[0] == '/') {
+		return result;
 	}
-	if (result == 0 || *result != '/') {
-		result = "/";
+
+	if (struct passwd *data = getpwuid(getuid())) {
+		return data->pw_dir;
 	}
-	return result;
+
+	return "/";
 }
 
 } // anonymous namespace
 
 template <> const std::basic_string<char> &get_home_dir <char> ()
 {
-	static std::string dir = get_home_dir_base ();
+	static const std::string dir = get_home_dir_base();
 	return dir;
 }
 
 template <> const std::basic_string<wchar_t> &get_home_dir <wchar_t> ()
 {
-	static std::wstring dir = mbs_to_wstring (get_home_dir <char> ());
+	static const std::wstring dir = mbs_to_wstring(get_home_dir<char>());
 	return dir;
 }
 
@@ -109,42 +108,21 @@ std::string get_home_dir (const char *user)
 	return std::string(result);
 }
 
-std::wstring get_home_dir (const wchar_t *user)
-{
-	return mbs_to_wstring (get_home_dir (wstring_to_mbs (user).c_str()));
-}
-
 std::string get_home_dir (const std::string &user)
 {
 	return get_home_dir (user.c_str ());
 }
 
-std::wstring get_home_dir (const std::wstring &user)
-{
+std::wstring get_home_dir(std::wstring_view user) {
 	return mbs_to_wstring (get_home_dir (wstring_to_mbs (user).c_str()));
 }
 
-std::string make_home_dirname (const char *file)
-{
+std::string make_home_dirname(std::string_view file) {
 	std::string ret = get_home_dir <char> ();
-	if (file) {
-		if (file[0] != '/') {
-			ret += '/';
-		}
-		ret += file;
+	if (!file.empty() && file[0] != '/') {
+		ret += '/';
 	}
-	return ret;
-}
-
-std::wstring make_home_dirname (const wchar_t *file)
-{
-	std::wstring ret = get_home_dir <wchar_t> ();
-	if (file) {
-		if (file[0] != L'/') {
-			ret += L'/';
-		}
-		ret += file;
-	}
+	ret += file;
 	return ret;
 }
 
