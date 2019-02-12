@@ -105,6 +105,15 @@ typename std::iterator_traits<InputIterator>::value_type join (InputIterator fir
 	return ret;
 }
 
+inline bool starts_with(std::string_view haystack, std::string_view needle) {
+	return haystack.length() >= needle.length() && haystack.substr(0, needle.length()) == needle;
+}
+
+inline bool starts_with(std::wstring_view haystack, std::wstring_view needle) {
+	return haystack.length() >= needle.length() && haystack.substr(0, needle.length()) == needle;
+}
+
+
 } // namespace tiary
 
 #endif // include guard

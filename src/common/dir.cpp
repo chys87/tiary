@@ -201,12 +201,8 @@ std::basic_string<ChT> home_fold_pathname_impl(std::basic_string_view<ChT> name)
 	std::basic_string<ChT> fullname(name);
 	const std::basic_string <ChT> &homedir = get_home_dir <ChT> ();
 	size_t homelen = homedir.length ();
-	if (fullname.length () >= homelen) {
-		if (fullname.length() == homelen || fullname[homelen] == ChT('/')) {
-			if (fullname.compare (0, homelen, homedir) == 0) {
-				fullname.replace (0, homelen, 1, ChT('~'));
-			}
-		}
+	if (starts_with(fullname, homedir) && (fullname.length() == homelen || fullname[homelen] == ChT('/'))) {
+		fullname.replace(0, homelen, 1, ChT('~'));
 	}
 	return fullname;
 }
