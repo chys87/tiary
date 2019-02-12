@@ -33,7 +33,7 @@ void init_color_pairs ()
 	use_default_colors ();
 	for (unsigned back=0; back<8; ++back) {
 		for (unsigned fore=0; fore<8; ++fore) {
-			init_pair (internal_color_pair (fore, back), fore, back ? int/*Supress warning*/(back) : -1);
+			init_pair(internal_color_pair(Color(fore), Color(back)), fore, back ? int/*Supress warning*/(back) : -1);
 		}
 	}
 }

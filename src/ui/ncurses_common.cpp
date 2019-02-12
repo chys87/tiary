@@ -94,7 +94,7 @@ unsigned internal_color_pair (Color f, Color b)
 	// [0,7]x[0,7] to [0,64] while keeping (WHITE,BLACK) is mapped to 0
 	
 	/* b = (b + 8 - BLACK) % 8; */
-	f = (f + 8 - WHITE) % 8;
+	f = static_cast<Color>((f + 8 - WHITE) % 8);
 	return b*8+f;
 }
 

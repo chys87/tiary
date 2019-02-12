@@ -223,7 +223,6 @@ inline constexpr bool special_printable(wchar_t c) {
 
 
 typedef unsigned char Attr;
-typedef unsigned char Color;
 typedef unsigned PaletteID;
 const unsigned NUMBER_PALETTES = 256;
 
@@ -234,19 +233,21 @@ const Attr REVERSE   = 4;
 const Attr BLINK     = 8;
 const Attr ALL_ATTR  = UNDERLINE|HIGHLIGHT|REVERSE|BLINK;
 
-const Color BLACK   = 0;
-const Color RED     = 1;
-const Color GREEN   = 2;
-const Color YELLOW  = 3;
-const Color BLUE    = 4;
-const Color MAGENTA = 5;
-const Color CYAN    = 6;
-const Color WHITE   = 7;
+enum Color: unsigned char {
+	BLACK   = 0,
+	RED     = 1,
+	GREEN   = 2,
+	YELLOW  = 3,
+	BLUE    = 4,
+	MAGENTA = 5,
+	CYAN    = 6,
+	WHITE   = 7,
 
-const Color NOCOLOR = 8;
+	NOCOLOR = 8,
 
-const Color DEFAULT_FORECOLOR = WHITE;
-const Color DEFAULT_BACKCOLOR = BLACK;
+	DEFAULT_FORECOLOR = WHITE,
+	DEFAULT_BACKCOLOR = BLACK,
+};
 
 struct ColorAttr
 {
