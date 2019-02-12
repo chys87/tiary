@@ -41,91 +41,92 @@ namespace {
 [Show Hidden?][Text][OK][Cancel]
  */
 
-class WindowSelectFile : public virtual Window, private ButtonDefault
+class WindowSelectFile final : public virtual Window, private ButtonDefault
 {
 public:
 	WindowSelectFile(std::wstring_view hint, std::wstring_view default_file, unsigned options_);
 	~WindowSelectFile ();
 
-	void redraw ();
+	void redraw() override;
 
-	const std::wstring &get_result () const { return result; }
-	std::wstring &&move_result() { return std::move(result); }
+	const std::wstring &get_result() const { return result_; }
+	std::wstring &&move_result() { return std::move(result_); }
 
 private:
-	TextBox text_input;
-	ListBox list_files;
-	CheckBoxLabel check_hidden_files;
-	Button btn_ok;
-	Button btn_cancel;
-	Layout layout_main;
-	Layout layout_buttons;
-	std::wstring result;
-	std::wstring list_dir; // Full name of the directory listed in list_files (initial "")
-	unsigned options;
-
-	void slot_input ();
-	void slot_select ();
-	void slot_ok ();
-	void slot_refresh ();
+	void slot_input();
+	void slot_select();
+	void slot_ok();
+	void slot_refresh();
 
 	void set_text(std::wstring_view, bool rewrite_input_box = true);
+
+private:
+	TextBox text_input_;
+	ListBox list_files_;
+	CheckBoxLabel check_hidden_files_;
+	Button btn_ok_;
+	Button btn_cancel_;
+	Layout layout_main_;
+	Layout layout_buttons_;
+	std::wstring result_;
+	std::wstring list_dir_; // Full name of the directory listed in list_files_ (initial "")
+	unsigned options_;
 };
 
 const wchar_t string_show_hidden_files[] = L"Show &hidden files";
 // Minus 2: Null terminator and the "&" character
 const size_t len_show_hidden_files = sizeof string_show_hidden_files / sizeof (wchar_t) - 2;
 
-WindowSelectFile::WindowSelectFile(std::wstring_view hint, std::wstring_view default_file, unsigned options_)
+WindowSelectFile::WindowSelectFile(std::wstring_view hint, std::wstring_view default_file, unsigned options)
 	: Window (0, hint)
 	, ButtonDefault ()
-	, text_input (*this)
-	, list_files (*this)
-	, check_hidden_files(*this, std::wstring_view(string_show_hidden_files, sizeof(string_show_hidden_files) - 1), true)
-	, btn_ok(*this, L"&OK"sv)
-	, btn_cancel(*this, L"&Cancel"sv)
-	, layout_main (VERTICAL)
-	, layout_buttons (HORIZONTAL)
-	, result (default_file)
-	, list_dir ()
-	, options (options_)
+	, text_input_(*this)
+	, list_files_(*this)
+	, check_hidden_files_(*this, std::wstring_view(string_show_hidden_files, sizeof(string_show_hidden_files) - 1), true)
+	, btn_ok_(*this, L"&OK"sv)
+	, btn_cancel_(*this, L"&Cancel"sv)
+	, layout_main_(VERTICAL)
+	, layout_buttons_(HORIZONTAL)
+	, result_(default_file)
+	, list_dir_()
+	, options_(options)
 {
-	ChainControlsHorizontal{&check_hidden_files.checkbox, &btn_ok, &btn_cancel};
-	ChainControlsVerticalNC{&text_input, &list_files, &btn_ok};
-	check_hidden_files.checkbox.ctrl_up = btn_cancel.ctrl_up = &list_files;
-	check_hidden_files.checkbox.ctrl_down = btn_cancel.ctrl_down = &text_input;
+	ChainControlsHorizontal{&check_hidden_files_.checkbox, &btn_ok_, &btn_cancel_};
+	ChainControlsVerticalNC{&text_input_, &list_files_, &btn_ok_};
+	check_hidden_files_.checkbox.ctrl_up = btn_cancel_.ctrl_up = &list_files_;
+	check_hidden_files_.checkbox.ctrl_down = btn_cancel_.ctrl_down = &text_input_;
 
-	text_input.sig_changed.connect (this, &WindowSelectFile::slot_input);
-	check_hidden_files.checkbox.sig_toggled.connect (this, &WindowSelectFile::slot_refresh);
-	list_files.sig_focus.connect (this, &WindowSelectFile::slot_select);
-	list_files.sig_select_changed.connect (this, &WindowSelectFile::slot_select);
-	list_files.sig_double_clicked.connect (this, &WindowSelectFile::slot_ok);
-	btn_ok.sig_clicked.connect (this, &WindowSelectFile::slot_ok);
-	btn_cancel.sig_clicked.connect (this, &Window::request_close);
+	text_input_.sig_changed.connect(this, &WindowSelectFile::slot_input);
+	check_hidden_files_.checkbox.sig_toggled.connect(this, &WindowSelectFile::slot_refresh);
+	list_files_.sig_focus.connect(this, &WindowSelectFile::slot_select);
+	list_files_.sig_select_changed.connect(this, &WindowSelectFile::slot_select);
+	list_files_.sig_double_clicked.connect(this, &WindowSelectFile::slot_ok);
+	btn_ok_.sig_clicked.connect(this, &WindowSelectFile::slot_ok);
+	btn_cancel_.sig_clicked.connect(this, &Window::request_close);
 
-	set_default_button (btn_ok);
-	register_hotkey (ESCAPE, btn_cancel.sig_clicked);
+	set_default_button(btn_ok_);
+	register_hotkey(ESCAPE, btn_cancel_.sig_clicked);
 
 //	register_hotkey (F5, Signal (this, &WindowSelectFile::slot_refresh));
 
-	layout_buttons.add({
-			{check_hidden_files, 4 + len_show_hidden_files, 4 + len_show_hidden_files, 1, 0},
+	layout_buttons_.add({
+			{check_hidden_files_, 4 + len_show_hidden_files, 4 + len_show_hidden_files, 1, 0},
 			{0, 3},
-			{btn_ok, 10, 10, 3},
+			{btn_ok_, 10, 10, 3},
 			{0, 2},
-			{btn_cancel, 10, 10, 3},
+			{btn_cancel_, 10, 10, 3},
 		});
 
-	layout_main.add({
-			{text_input, 1, 1},
+	layout_main_.add({
+			{text_input_, 1, 1},
 			{1, 1},
-			{list_files, 2, Layout::UNLIMITED},
+			{list_files_, 2, Layout::UNLIMITED},
 			{1, 1},
-			{layout_buttons, 3, 3},
+			{layout_buttons_, 3, 3},
 		});
 
 	// redraw before set_text so that the focus is properly positioned
-	// (redraw guarantees that list_files has a non-zero height)
+	// (redraw guarantees that list_files_ has a non-zero height)
 	WindowSelectFile::redraw ();
 
 	set_text (default_file);
@@ -141,25 +142,25 @@ void WindowSelectFile::redraw ()
 	Size size = scrsize & Size{100, 40};
 	move_resize ((scrsize - size) / 2, size);
 
-	layout_main.move_resize({2, 1}, size - Size{4, 2});
+	layout_main_.move_resize({2, 1}, size - Size{4, 2});
 
 	Window::redraw ();
 }
 
 void WindowSelectFile::slot_input ()
 {
-	set_text (text_input.get_text (), false);
+	set_text(text_input_.get_text(), false);
 }
 
 void WindowSelectFile::slot_select ()
 {
-	size_t select = list_files.get_select ();
-	if (select < list_files.get_items (). size()) {
-		std::wstring tmp = list_dir;
+	size_t select = list_files_.get_select();
+	if (select < list_files_.get_items(). size()) {
+		std::wstring tmp = list_dir_;
 		if (tmp.empty() || *tmp.rbegin() != L'/') {
 			tmp += L'/';
 		}
-		const std::wstring &file = list_files.get_items()[select];
+		const std::wstring &file = list_files_.get_items()[select];
 		tmp.append (file, 0,  file.length() - (*file.rbegin () == L'/'));
 		set_text (tmp);
 	}
@@ -167,22 +168,22 @@ void WindowSelectFile::slot_select ()
 
 void WindowSelectFile::slot_ok ()
 {
-	std::wstring expanded_name = home_expand_pathname (text_input.get_text ());
+	std::wstring expanded_name = home_expand_pathname(text_input_.get_text());
 	unsigned attr = get_file_attr (expanded_name);
 	if (attr & FILE_ATTR_DIRECTORY) {
 		// Selected a directory. Open it
 		set_text (expanded_name + L'/', true);
-		if (get_focus () == &list_files) {
+		if (get_focus () == &list_files_) {
 			slot_select ();
 		}
 		return;
 	}
-	if (options & SELECT_FILE_WRITE) {
+	if (options_ & SELECT_FILE_WRITE) {
 		// File selected for writing.
 		// Possibly need to warn against overwriting
-		if (!(attr & FILE_ATTR_NONEXIST) && (options & SELECT_FILE_WARN_OVERWRITE)) {
+		if (!(attr & FILE_ATTR_NONEXIST) && (options_ & SELECT_FILE_WARN_OVERWRITE)) {
 			// Warn
-			if (dialog_message(format(L"File \"%a\" already exists. Overwrite it?"sv, text_input.get_text()),
+			if (dialog_message(format(L"File \"%a\" already exists. Overwrite it?"sv, text_input_.get_text()),
 						MESSAGE_YES|MESSAGE_NO|MESSAGE_DEFAULT_NO) != MESSAGE_YES) {
 				return;
 			}
@@ -195,13 +196,13 @@ void WindowSelectFile::slot_ok ()
 			return;
 		}
 	}
-	result = std::move(expanded_name);
+	result_ = std::move(expanded_name);
 	request_close ();
 }
 
 void WindowSelectFile::slot_refresh ()
 {
-	list_dir.clear ();
+	list_dir_.clear();
 	slot_input ();
 }
 
@@ -233,43 +234,39 @@ void WindowSelectFile::set_text(std::wstring_view newname, bool rewrite_input_bo
 	std::pair<std::wstring, std::wstring> split_fullname = split_pathname (newname_expanded, true);
 	if (rewrite_input_box) {
 		std::wstring display_name = combine_pathname (get_nice_pathname (split_fullname.first), split_fullname.second);
-		text_input.set_text (display_name, false, display_name.length ());
+		text_input_.set_text(display_name, false, display_name.length());
 	}
-	if (list_dir != split_fullname.first) {
-		list_dir = split_fullname.first;
-		// Refresh items in list_files
-		DirEntList files = tiary::list_dir (list_dir, FilterDots(list_dir == L"/"sv, check_hidden_files.get_status ()));
+	if (list_dir_ != split_fullname.first) {
+		list_dir_ = split_fullname.first;
+		// Refresh items in list_files_
+		DirEntList files = list_dir(list_dir_, FilterDots(list_dir_ == L"/"sv, check_hidden_files_.get_status()));
 		ListBox::ItemList display_list;
 		display_list.reserve (files.size ());
-		for (DirEntList::iterator it = files.begin();
-				it != files.end();
-				++it) {
-			if (it->attr & FILE_ATTR_DIRECTORY) {
-				it->name += L'/';
+		for (DirEnt &ent: files) {
+			if (ent.attr & FILE_ATTR_DIRECTORY) {
+				ent.name += L'/';
 			}
-			display_list.push_back (it->name);
+			display_list.push_back(ent.name);
 		}
-		list_files.set_items (std::move (display_list), size_t(-1), false);
+		list_files_.set_items(std::move(display_list), size_t(-1), false);
 	}
 	// Select a corresponding item
 	// If our item is "r", and we have "rel" and "r", we must make
 	// sure "r" instead of "rel" is selected, even though "rel" may
 	// be listed first
 	size_t select = size_t(-1);
-	for (ListBox::ItemList::const_iterator it = list_files.get_items().begin();
-			it != list_files.get_items().end();
-			++it) {
-		if (*it == split_fullname.second) {
-			select = it - list_files.get_items().begin();
+	for (const std::wstring &item: list_files_.get_items()) {
+		if (item == split_fullname.second) {
+			select = &item - &list_files_.get_items().front();
 			break;
 		}
 		if (select==size_t(-1) &&
-				it->compare (0, split_fullname.second.length (), split_fullname.second) == 0) {
-			select = it - list_files.get_items().begin();
+				std::wstring_view(item).substr(0, split_fullname.second.length()) == split_fullname.second) {
+			select = &item - &list_files_.get_items().front();
 		}
 	}
-	if (select != list_files.get_select ()) {
-		list_files.set_select (select, false);
+	if (select != list_files_.get_select()) {
+		list_files_.set_select(select, false);
 	}
 }
 
