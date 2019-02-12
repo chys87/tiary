@@ -86,7 +86,7 @@ inline int internal_attributes (Attr attr)
 // Map color pair to internal color pair
 unsigned internal_color_pair (Color f, Color b)
 {
-	if (f>=NOCOLOR || b>=NOCOLOR) {
+	if (!is_valid_color(f) || !is_valid_color(b)) {
 		return 0;
 	}
 	// Pair 0 is reserved for (Fore,Back) = (WHITE,BLACK)

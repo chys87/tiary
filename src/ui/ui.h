@@ -243,11 +243,13 @@ enum Color: unsigned char {
 	CYAN    = 6,
 	WHITE   = 7,
 
-	NOCOLOR = 8,
-
 	DEFAULT_FORECOLOR = WHITE,
 	DEFAULT_BACKCOLOR = BLACK,
 };
+
+inline constexpr bool is_valid_color(Color c) {
+	return (c >= BLACK && c <= WHITE);
+}
 
 struct ColorAttr
 {

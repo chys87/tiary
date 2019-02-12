@@ -507,14 +507,14 @@ void Window::choose_palette (PaletteID id)
 
 void Window::choose_fore_color (Color fore)
 {
-	if (fore < NOCOLOR) {
+	if (is_valid_color(fore)) {
 		cur_attr.fore = fore;
 	}
 }
 
 void Window::choose_back_color (Color back)
 {
-	if (back < NOCOLOR) {
+	if (is_valid_color(back)) {
 		cur_attr.back = back;
 	}
 }
