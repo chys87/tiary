@@ -136,38 +136,6 @@ std::wstring strip(std::wstring_view str) {
 	return strip_impl(str, L" \t\v\r\n"sv);
 }
 
-
-namespace {
-
-template <typename T> inline
-std::vector<std::basic_string<T>> split_string_impl(const T *str, T delimiter) {
-	std::vector<std::basic_string<T>> ret_list;
-	for (;;) {
-		while (*str == delimiter) {
-			++str;
-		}
-		if (*str == T ()) {
-			break;
-		}
-		const T *del = strchrnul (str, delimiter);
-		ret_list.emplace_back(str, del);
-		if (*del != delimiter) {
-			break;
-		}
-		str = del + 1;
-	}
-	return ret_list;
-}
-
-} // anonymous namespace
-
-std::vector<std::string> split_string(const char *str, char delimiter) {
-	return split_string_impl<char> (str, delimiter);
-}
-std::vector<std::wstring> split_string(const wchar_t *str, wchar_t delimiter) {
-	return split_string_impl (str, delimiter);
-}
-
 namespace {
 
 template <typename T> inline
@@ -177,6 +145,9 @@ std::vector<std::basic_string_view<T>> split_string_view_impl(std::basic_string_
 	while (pos < str.length()) {
 		while (pos < str.length() && str[pos] == delimiter) {
 			++pos;
+		}
+		if (pos >= str.length()) {
+			break;
 		}
 		size_t end_pos = str.find(delimiter, pos);
 		ret_list.push_back(str.substr(pos, end_pos - pos));
@@ -192,6 +163,10 @@ std::vector<std::string_view> split_string_view(std::string_view str, char delim
 }
 
 std::vector<std::wstring_view> split_string_view(std::wstring_view str, wchar_t delimiter) {
+	return split_string_view_impl(str, delimiter);
+}
+
+std::vector<std::u32string_view> split_string_view(std::u32string_view str, char32_t delimiter) {
 	return split_string_view_impl(str, delimiter);
 }
 

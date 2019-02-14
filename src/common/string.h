@@ -77,17 +77,9 @@ std::wstring strip(std::wstring_view);
 
 
 // Split a string into tokens
-std::vector<std::string> split_string(const char *, char delimiter);
-std::vector<std::wstring> split_string(const wchar_t *, wchar_t delimiter);
-inline std::vector<std::string> split_string(const std::string &str, char delimiter) {
-	return split_string (str.c_str (), delimiter);
-}
-inline std::vector<std::wstring> split_string(const std::wstring &str, wchar_t delimiter) {
-	return split_string (str.c_str (), delimiter);
-}
-
 std::vector<std::string_view> split_string_view(std::string_view str, char delimiter);
 std::vector<std::wstring_view> split_string_view(std::wstring_view str, wchar_t delimiter);
+std::vector<std::u32string_view> split_string_view(std::u32string_view str, char32_t delimiter);
 
 
 // Join tokens into a string

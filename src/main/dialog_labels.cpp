@@ -129,7 +129,7 @@ WStringLocaleOrderedSet set_from_text (const std::wstring &text)
 {
 	WStringLocaleOrderedSet set;
 
-	for (std::wstring_view label : split_string(text, L',')) {
+	for (std::wstring_view label : split_string_view(text, L',')) {
 		set.insert(strip(label));
 	}
 
