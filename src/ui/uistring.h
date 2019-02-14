@@ -41,8 +41,8 @@ class Window;
 class UIString : public UIStringBase
 {
 public:
-	explicit UIString(std::wstring_view, unsigned options = 0);
-	explicit UIString(std::wstring && = std::wstring(), unsigned options = 0);
+	explicit UIString(std::wstring_view = {}, unsigned options = 0);
+	explicit UIString(std::wstring &&, unsigned options = 0);
 	void set_text(std::wstring_view, unsigned options = 0);
 	void set_text(std::wstring &&, unsigned options = 0);
 

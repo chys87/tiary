@@ -31,8 +31,8 @@ class UIStringBase
 public:
 	static const unsigned NO_HOTKEY = 1;
 
-	explicit UIStringBase(std::wstring_view, unsigned options = 0);
-	explicit UIStringBase(std::wstring && = std::wstring(), unsigned options = 0);
+	explicit UIStringBase(std::wstring_view = {}, unsigned options = 0);
+	explicit UIStringBase(std::wstring &&, unsigned options = 0);
 
 	void set_text(std::wstring_view, unsigned options = 0);
 	void set_text(std::wstring &&, unsigned options = 0);

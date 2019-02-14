@@ -34,8 +34,8 @@ class Control;
 class UIStringOne : public UIStringBase
 {
 public:
-	explicit UIStringOne(std::wstring_view, unsigned options = 0);
-	explicit UIStringOne(std::wstring && = std::wstring(), unsigned options = 0);
+	explicit UIStringOne(std::wstring_view = {}, unsigned options = 0);
+	explicit UIStringOne(std::wstring &&, unsigned options = 0);
 	void set_text(std::wstring_view, unsigned options = 0);
 	void set_text(std::wstring &&, unsigned options = 0);
 
