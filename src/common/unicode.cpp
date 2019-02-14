@@ -132,7 +132,7 @@ size_t utf8_count_chars(std::string_view str) {
 	return ret;
 }
 
-char *wchar_to_utf8 (char *dst, char32_t u) {
+char *wchar_to_utf8(char *dst, char32_t u) {
 	if (u < 0x800) {
 		if (u < 0x80) {
 			*dst++ = u;
@@ -156,32 +156,28 @@ char *wchar_to_utf8 (char *dst, char32_t u) {
 	return dst;
 }
 
-char *wchar_to_utf8 (char *d, const wchar_t *s)
-{
-	for (; *s; ++s) {
-		d = wchar_to_utf8 (d, *s);
-	}
-	*d = 0;
-	return d;
-}
+namespace {
 
-char *wchar_to_utf8 (char *d, const wchar_t *s, size_t n)
-{
-	for (; n; --n) {
-		d = wchar_to_utf8 (d, *s++);
-	}
-	return d;
-}
-
-std::string wstring_to_utf8(std::wstring_view src) {
+template <typename C>
+inline std::string wstring_to_utf8_impl(std::basic_string_view<C> src) {
 	std::string dst;
 	dst.reserve (src.length () * 2);
-	for (wchar_t c : src) {
+	for (char32_t c: src) {
 		char buf[4];
 		char *end = wchar_to_utf8(buf, c);
 		dst.append (buf, end);
 	}
 	return dst;
+}
+
+} // namespace
+
+std::string wstring_to_utf8(std::wstring_view src) {
+	return wstring_to_utf8_impl(src);
+}
+
+std::string wstring_to_utf8(std::u32string_view src) {
+	return wstring_to_utf8_impl(src);
 }
 
 std::wstring mbs_to_wstring(std::string_view src) {
@@ -206,8 +202,9 @@ std::wstring mbs_to_wstring(std::string_view src) {
 }
 
 
-std::string wstring_to_mbs (const wchar_t *src, size_t srclen, char substitute)
-{
+std::string wstring_to_mbs(std::wstring_view s, char substitute) {
+	const wchar_t *src = s.data();
+	size_t srclen = s.length();
 	std::string ret;
 	mbstate_t state;
 	memset (&state, 0, sizeof state);
@@ -227,17 +224,12 @@ std::string wstring_to_mbs (const wchar_t *src, size_t srclen, char substitute)
 	return ret;
 }
 
-std::string wstring_to_mbs(std::wstring_view src, char substitute) {
-	return wstring_to_mbs (src.data (), src.length (), substitute);
-}
-
 /**
  * This function is implemented with </code>wcwidth</code>,
  * But be aware of the return value for abnormal and nonprintable characters.
  */
-unsigned ucs_width (wchar_t c)
-{
-	if (uint32_t (c) < 0x80) {
+unsigned ucs_width(char32_t c) {
+	if (c < 0x80) {
 		return 1;
 	}
 	if (wcwidth (c) > 1) {
@@ -248,67 +240,56 @@ unsigned ucs_width (wchar_t c)
 	}
 }
 
-unsigned ucs_width (const wchar_t *s)
-{
-	unsigned w = 0;
-	while (*s) {
-		w += ucs_width (*s++);
-	}
-	return w;
-}
-
-unsigned ucs_width (const wchar_t *s, size_t n)
-{
-	unsigned w = 0;
-	for (; n; --n) {
-		w += ucs_width (*s++);
-	}
-	return w;
-}
-
 unsigned ucs_width(std::wstring_view s) {
-	return ucs_width (s.data(), s.length());
-}
-
-size_t max_chars_in_width(std::wstring_view s, unsigned scrwid) {
-	return max_chars_in_width (s.data (), s.length (), scrwid);
-}
-
-size_t max_chars_in_width (const wchar_t *s, unsigned scrwid)
-{
-	const wchar_t *p = s;
-	while (wchar_t c = *p) {
-		unsigned w = ucs_width (c);
-		if (int (scrwid -= w) <= 0) {
-			if (scrwid == 0) {
-				++p;
-			}
-			break;
-		}
-		++p;
+	unsigned w = 0;
+	for (wchar_t c: s) {
+		w += ucs_width(c);
 	}
-	return (p - s);
+	return w;
 }
 
-size_t max_chars_in_width (const wchar_t *s, size_t len, unsigned scrwid)
-{
-	const wchar_t *p = s;
+unsigned ucs_width(std::u32string_view s) {
+	unsigned w = 0;
+	for (char32_t c: s) {
+		w += ucs_width(c);
+	}
+	return w;
+}
+
+namespace {
+
+template <typename C>
+inline size_t max_chars_in_width_impl(std::basic_string_view<C> s, unsigned scrwid) {
+	const C *p = s.data();
+	size_t len = s.length();
 	for (; len; --len) {
 		unsigned w = ucs_width (*p);
-		if (int (scrwid -= w) <= 0) {
-			if (scrwid == 0) {
-				++p;
-			}
+		if (scrwid < w) {
 			break;
+		} else if (scrwid == w) {
+			++p;
+			break;
+		} else {
+			scrwid -= w;
+			++p;
 		}
-		++p;
 	}
-	return (p - s);
+	return (p - s.data());
 }
 
-wchar_t ucs_reverse_case (wchar_t c)
-{
-	wchar_t d;
+
+} // namespace
+
+size_t max_chars_in_width(std::wstring_view s, unsigned scrwid) {
+	return max_chars_in_width_impl(s, scrwid);
+}
+
+size_t max_chars_in_width(std::u32string_view s, unsigned scrwid) {
+	return max_chars_in_width_impl(s, scrwid);
+}
+
+char32_t ucs_reverse_case(char32_t c) {
+	char32_t d;
 	if ((d = towlower (c)) != c) {
 		return d;
 	}

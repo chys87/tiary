@@ -47,10 +47,6 @@ unsigned utf8_len_by_wchar(char32_t c);
  *			A return value of 0 indicates an error.
  */
 unsigned utf8_len_by_first_byte(unsigned char b);
-/**
- * Allows non-const pointers too.
- */
-wchar_t utf8_to_wchar (char *src, char **dst);
 
 /**
  * @brief	Converts a UTF-8 encoded string to a wide (Unicode) string
@@ -77,27 +73,12 @@ size_t utf8_count_chars(std::string_view str);
  */
 char *wchar_to_utf8(char *dst, char32_t c);
 /**
- * @brief	Converts a null-terminated wide (Unicode) string to UTF-8
- * @param	dst	Points to a block of memory, which must be sufficient
- *			to store the converted UTF-8 sequence.
- * @param	src	Points to the first character in the string to be converted.
- * @result	Points to the byte following the last one in the converted sequence.
- */
-char *wchar_to_utf8 (char *dst, const wchar_t *src);
-/**
- * @brief	Converts a wide (Unicode) string to UTF-8
- * @param	dst	Points to a block of memory, which must be sufficient
- *			to store the converted UTF-8 string.
- * @param	srclen	Length of the string to be converted, in <code>wchar_t</code>'s
- * @result	Points to the byte following the last one in the converted string
- */
-char *wchar_to_utf8 (char *dst, const wchar_t *src, size_t srclen);
-/**
  * @brief	Converts a wide (Unicode) string to UTF-8
  * @param	src	The wide (Unicode) string to be converted.
  * @result	The converted UTF-8 string.
  */
 std::string wstring_to_utf8(std::wstring_view src);
+std::string wstring_to_utf8(std::u32string_view src);
 
 
 /**
@@ -114,35 +95,18 @@ std::wstring mbs_to_wstring(std::string_view);
 /**
  * @brief	Converts a wide (Unicode) string to multi-byte
  * @param	src	The wide (Unicode) string to be converted
- * @param	srclen Length of src
  * @param	substitute character to replace nonrepresentable characters ('0' = ignore)
  * @result	The converted multi-byte string encoded in the current LC_CTYPE locale
  */
-std::string wstring_to_mbs (const wchar_t *src, size_t srclen, char substitute = '?');
 std::string wstring_to_mbs(std::wstring_view src, char substitute = '?');
 
 
 /**
  * @brief	Returns the on-screen width of a character
- * @param	c	Input wide (Unicode) character
+ * @param	c	Input UTF-32 character
  * @result	2 or 1. For abnormal or nonprintable characters, returns 1.
  */
-unsigned ucs_width (wchar_t c);
-/**
- * @brief	Returns the on-screen width of a wide (Unicode) string
- * @param	str	Points to the beginnong of the input wide (Unicode) string
- * @result	The total on-screen width of str. \n
- *			Abnormal and nonprintable characters are counted as 1.
- */
-unsigned ucs_width (const wchar_t *str);
-/**
- * @brief	Returns the on-screen width of a wide (Unicode) string
- * @param	str	Points to the beginnong of the input wide (Unicode) string
- * @param	len	Length of the input string in <code>wchar_t</code>'s
- * @result	The total on-screen width of characters in [str,str+len). \n
- *			Abnormal and nonprintable characters are counted as 1.
- */
-unsigned ucs_width (const wchar_t *str, size_t len);
+unsigned ucs_width(char32_t c);
 /**
  * @brief	Returns the on-screen width of a wide (Unicode) string
  * @param	str	Input wide (Unicode) string
@@ -151,24 +115,30 @@ unsigned ucs_width (const wchar_t *str, size_t len);
  */
 unsigned ucs_width(std::wstring_view str);
 /**
+ * @brief	Returns the on-screen width of a wide (Unicode) string
+ * @param	str	Input UTF-32 string
+ * @result	The total on-screen width of str. \n
+ *			Abnormal and nonprintable characters are counted as 1.
+ */
+unsigned ucs_width(std::u32string_view str);
+/**
  * @brief	Returns the maximum number of characters to fit in the specified screen width
  * @param	str	The given wide (Unicode) string
  * @param	scrwid	The given screen width
  */
 size_t max_chars_in_width(std::wstring_view str, unsigned scrwid);
-size_t max_chars_in_width (const wchar_t *, unsigned scrwid);
-size_t max_chars_in_width (const wchar_t *, size_t, unsigned scrwid);
+size_t max_chars_in_width(std::u32string_view str, unsigned scrwid);
 
 /**
- * @brief	Reverse the case of a wide (Unicode) character
+ * @brief	Reverse the case of a Unicode character
  * @param	c	Input character to be converted.
- * @result	The converted wide (Unicode) character
+ * @result	The converted  character
  *
  * An uppercase character is converted to the corresponding lowercase character;
  * A lowercase character is converted to the corresponding uppcase character;
  * Any other character is returned as is.
  */
-wchar_t ucs_reverse_case (wchar_t c);
+char32_t ucs_reverse_case(char32_t c);
 
 /**
  * @brief	Determines whether a character is an alphabetic character

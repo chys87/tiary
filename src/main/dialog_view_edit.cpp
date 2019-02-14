@@ -82,7 +82,7 @@ bool write_for_edit (int fd, const std::wstring &title, const std::wstring &text
 	mbs.reserve(mbs.length() + text.length() * 2);
 	mbs.append (2, '\n');
 	for (const auto &item: split_line(edit_line_width, text)) {
-		mbs += wstring_to_mbs(text.data() + item.begin, item.len);
+		mbs += wstring_to_mbs({text.data() + item.begin, item.len});
 		mbs += '\n';
 	}
 	return (size_t)write (fd, mbs.data (), mbs.length ()) == mbs.length ();
