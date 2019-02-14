@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,8 +22,7 @@ namespace tiary {
 namespace ui {
 
 
-class CheckBoxLabel : public MovableObject
-{
+class CheckBoxLabel final : public MovableObject {
 public:
 	CheckBox checkbox;
 	Label label;
@@ -33,10 +32,13 @@ public:
 	CheckBoxLabel(Window &win, const wchar_t *text,bool initial_status = false) : CheckBoxLabel(win, std::wstring_view(text), initial_status) {}
 	~CheckBoxLabel ();
 
-	void move_resize (Size, Size);
+	void move_resize(Size, Size) override;
 
 	void set_status (bool status, bool emit_signal = true) { checkbox.set_status (status, emit_signal); }
 	bool get_status () const { return checkbox.get_status (); }
+
+private:
+	void common_initialize();
 };
 
 

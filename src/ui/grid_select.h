@@ -23,29 +23,28 @@ namespace tiary {
 namespace ui {
 
 
+struct GridItem {
+	std::wstring text;
+	bool selectable = false;
+
+	GridItem() = default;
+	GridItem(const std::wstring &t, bool s = true)
+		: text(t), selectable(s) {
+	}
+	GridItem(std::wstring_view t, bool s = true)
+		: text(t), selectable(s) {
+	}
+	GridItem(const wchar_t *t, bool s = true)
+		: text(t), selectable(s) {
+	}
+};
+
 class GridSelect final : public Control {
 public:
 	GridSelect (Window &win);
 	~GridSelect ();
 
-	struct Item
-	{
-		std::wstring text;
-		bool selectable;
-
-		Item () : text (), selectable (false) {}
-
-		Item (const std::wstring &text_, bool selectable_ = true)
-			: text (text_)
-			, selectable (selectable_)
-		{
-		}
-		Item (const wchar_t *text_, bool selectable_ = true)
-			: text (text_)
-			, selectable (selectable_)
-		{
-		}
-	};
+	using Item = GridItem;
 
 	void set_grid (
 			unsigned grid_width, ///< The width of each grid on screen

@@ -46,12 +46,12 @@ public:
 
 	void set_text(std::wstring_view, unsigned = 0 /**< UIString options */);
 	void set_text(std::wstring &&, unsigned = 0 /**< UIString options */);
-	const UIString &get_uistring () const { return text; }
-	const std::wstring &get_text () const { return text.get_text (); }
+	const UIString &get_uistring() const { return text_; }
+	const std::wstring &get_text() const { return text_.get_text(); }
 
 	// Two "relay" wrappers
-	unsigned get_max_text_width () const { return text.get_max_width (); }
-	const SplitStringLineList & split_line (unsigned wid) { return text.split_line (wid); }
+	unsigned get_max_text_width() const { return text_.get_max_width(); }
+	const SplitStringLineList & split_line(unsigned wid) { return text_.split_line(wid); }
 
 	/**
 	 * @brief	Handles the hotkey of the label
@@ -64,8 +64,10 @@ public:
 	Signal sig_hotkey;
 
 private:
+	void common_initialize();
 
-	UIString text;
+private:
+	UIString text_;
 };
 
 } // namespace tiary::ui

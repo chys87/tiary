@@ -23,14 +23,14 @@ namespace ui {
 
 namespace {
 
-const unsigned first_year = 1900;
-const unsigned last_year = 2100;
+constexpr unsigned kFirstYear = 1900;
+constexpr unsigned kLastYear = 2100;
+constexpr unsigned kYears = kLastYear - kFirstYear + 1;
 
-std::vector<std::wstring> make_year_names ()
-{
-	std::vector<std::wstring> r (last_year - first_year + 1);
-	for (unsigned k=0; k<last_year-first_year+1; ++k) {
-		r[k] = format_dec (k + first_year);
+std::vector<std::wstring> make_year_names() {
+	std::vector<std::wstring> r(kYears);
+	for (unsigned k = 0; k < kYears; ++k) {
+		r[k] = format_dec(k + kFirstYear);
 	}
 	return r;
 }
@@ -59,56 +59,42 @@ DateSelect::DateSelect (Window &win)
 	, lbl_weekday(win, L" S  M  T  W  T  F  S"sv)
 	, day (win)
 	, sig_date_changed ()
-	, offset (0)
-	, dom (0)
+	, offset_(0)
+	, dom_(0)
 {
-	month.set_grid (4, 2, 6, std::vector <GridSelect::Item> (month_names, array_end (month_names)));
+	month.set_grid(4, 2, 6, std::vector<GridItem>(month_names, array_end(month_names)));
 
 	year.sig_select_changed = month.sig_select_changed = Signal (this, &DateSelect::update_day_list, true);
 	day.sig_select_changed.connect (sig_date_changed);
 }
 
-DateSelect::~DateSelect ()
-{
-}
+DateSelect::~DateSelect() = default;
 
 void DateSelect::set_date (Date date, bool emit_signal)
 {
 	ReadableDate rd = date.extract ();
-	unsigned y = minU (maxU (rd.y, first_year), last_year);
-	year.set_select (y - first_year, false);
+	unsigned y = minU(maxU(rd.y, kFirstYear), kLastYear);
+	year.set_select(y - kFirstYear, false);
 	unsigned m = rd.m - 1;
 	month.set_select (m/6 + (m%6)*2, false);
 	update_day_list (false);
-	day.set_select (offset + rd.d - 1);
+	day.set_select(offset_ + rd.d - 1);
 	if (emit_signal) {
 		sig_date_changed.emit ();
 	}
 	DateSelect::redraw ();
 }
 
-void DateSelect::set_date (Date date, const SelectableDates &selectable, bool emit_signal)
-{
-	selectable_dates = selectable;
-	set_date (date, emit_signal);
-}
-
-void DateSelect::set_date (Date date, SelectableDates &&selectable, bool emit_signal)
-{
-	selectable_dates = std::forward <SelectableDates> (selectable);
-	set_date (date, emit_signal);
-}
-
 Date DateSelect::get_date () const
 {
-	unsigned d = day.get_select () - offset;
-	if (d >= dom) {
+	unsigned d = day.get_select() - offset_;
+	if (d >= dom_) {
 		return Date (INVALID_DATE);
 	}
 
 	unsigned m = month.get_select ();
 	return Date(
-		year.get_select () + first_year,
+		year.get_select() + kFirstYear,
 		m / 2 + (m % 2) * 6 + 1,
 		d + 1);
 }
@@ -133,37 +119,27 @@ void DateSelect::redraw ()
 
 void DateSelect::update_day_list (bool emit_signal)
 {
-	unsigned current_select_day = day.get_select () - offset;
-	if (current_select_day >= dom) {
+	unsigned current_select_day = day.get_select() - offset_;
+	if (current_select_day >= dom_) {
 		current_select_day = unsigned (-1);
 	}
 
-	unsigned y = year.get_select () + first_year;
+	unsigned y = year.get_select() + kFirstYear;
 	unsigned m = month.get_select ();
 	m = m/2 + (m%2)*6 + 1;
 	Date first_day_of_month (y, m, 1);
-	offset = first_day_of_month.extract ().w;
-	dom = days_of_month(y, m);
+	offset_ = first_day_of_month.weekday();
+	dom_ = days_of_month(y, m);
 
-	std::vector <GridSelect::Item> grid_items (6*7);
-	std::copy (day_names, day_names + dom, grid_items.begin () + offset);
-
-	if (!selectable_dates.empty ()) {
-		uint32_t dtv = first_day_of_month.get_value();
-		for (unsigned i=0; i<dom; ++i) {
-			if (selectable_dates.find (dtv) == selectable_dates.end ()) {
-				grid_items[i+offset].selectable = false;
-			}
-			++dtv;
-		}
-	}
+	std::vector<GridItem> grid_items(6 * 7);
+	std::copy(day_names, day_names + dom_, grid_items.begin() + offset_);
 
 	size_t grid_select = size_t (-1);
 	if (current_select_day < 31) {
-		grid_select = minU (current_select_day, dom - 1) + offset;
+		grid_select = minU(current_select_day, dom_ - 1) + offset_;
 	}
 
-	day.set_grid (3, 7, 6, grid_items, grid_select);
+	day.set_grid(3, 7, 6, std::move(grid_items), grid_select);
 
 	if (emit_signal) {
 		sig_date_changed.emit ();

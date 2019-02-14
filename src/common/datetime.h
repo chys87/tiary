@@ -127,6 +127,10 @@ inline constexpr uint32_t extract_time_from_datetime(uint64_t v) noexcept {
 	return uint32_t(v % SECONDS_PER_DAY);
 }
 
+inline constexpr unsigned extract_weekday_from_date(uint32_t dt) noexcept {
+	return (dt % 7);
+}
+
 ReadableDateTime extract_datetime (uint64_t) noexcept ATTRIBUTE_CONST;
 
 /*
@@ -161,6 +165,7 @@ public:
 		Date({y, m, d}, strict) {}
 	explicit constexpr Date(uint32_t x) : v_(x) {}
 	ReadableDate extract() const { return extract_date(v_); }
+	unsigned weekday() const { return extract_weekday_from_date(v_); }
 	constexpr uint32_t get_value() const { return v_; }
 
 private:

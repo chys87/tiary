@@ -23,22 +23,20 @@ namespace ui {
 
 Button::Button(Window &win, std::wstring_view str)
 	: Control(win, kRedrawOnFocusChange)
-	, text (str)
-{
-	// Register hotkey
-	if (wchar_t c = text.get_hotkey ()) {
-		win.register_hotkey (c, Signal (this, &Button::slot_clicked),
-				Hotkeys::CASE_INSENSITIVE|Hotkeys::ALLOW_ALT);
-	}
+	, text_(str) {
+	common_initialize();
 }
 
 Button::Button (Window &win, std::wstring &&str)
 	: Control(win, kRedrawOnFocusChange)
-	, text(std::move(str))
-{
+	, text_(std::move(str)) {
+	common_initialize();
+}
+
+void Button::common_initialize() {
 	// Register hotkey
-	if (wchar_t c = text.get_hotkey()) {
-		win.register_hotkey(c, Signal(this, &Button::slot_clicked),
+	if (wchar_t c = text_.get_hotkey()) {
+		window().register_hotkey(c, Signal(this, &Button::slot_clicked),
 				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
 	}
 }
@@ -68,7 +66,7 @@ void Button::slot_clicked ()
 void Button::redraw ()
 {
 	unsigned y = (get_size().y - 1) / 2;
-	unsigned w = minU (get_size().x, text.get_width () + 4);
+	unsigned w = minU(get_size().x, text_.get_width() + 4);
 	unsigned x = (get_size().x - w) / 2;
 
 	PaletteID id;
@@ -100,7 +98,7 @@ void Button::redraw ()
 	clear ();
 	move_cursor (pos);
 	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL && id != PALETTE_ID_BUTTON_INVALID) ? L"> " : L"  ");
-	pos = text.output (*this, pos, w-4);
+	pos = text_.output(*this, pos, w - 4);
 	pos = {x + w - 2, y};
 	pos = put (pos, (id != PALETTE_ID_BUTTON_NORMAL && id != PALETTE_ID_BUTTON_INVALID) ? L" <" : L"  ");
 }

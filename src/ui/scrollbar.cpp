@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -19,26 +19,19 @@ namespace ui {
 
 ScrollBarInfo scrollbar_info (unsigned height, unsigned num, unsigned pagestart)
 {
-	unsigned pos;
-	unsigned size;
-
 	if (num <= height) {
-		pos = 0;
-		size = height;
-	}
-	else {
-		size = height * height / num;
+		return {0, height};
+	} else {
+		unsigned size = height * height / num;
 		if (size == 0) {
 			size = 1;
 		}
-		pos = (height - size + 1) * pagestart / (num - height + 1);
+		unsigned pos = (height - size + 1) * pagestart / (num - height + 1);
 		if (pos > height - size) {
 			pos = height - size;
 		}
+		return {pos, size};
 	}
-
-	ScrollBarInfo ret = { pos, size };
-	return ret;
 }
 
 unsigned scrollbar_click (unsigned height, unsigned num, unsigned click_pos)

@@ -39,7 +39,10 @@ public:
 	void slot_clicked (); ///< Intentionally public
 
 private:
-	UIStringOne text;
+	void common_initialize();
+
+private:
+	UIStringOne text_;
 };
 
 

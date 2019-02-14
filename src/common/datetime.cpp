@@ -180,7 +180,7 @@ ReadableDate extract_date (uint32_t v) noexcept
 {
 	unsigned tmp;
 
-	unsigned w = v % 7;
+	unsigned w = extract_weekday_from_date(v);
 
 	v += 306; // To Pseudodate; 306 = days from Mar to Dec
 	--v; // Starting 0

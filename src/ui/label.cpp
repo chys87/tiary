@@ -23,24 +23,22 @@ namespace ui {
 
 Label::Label (Window &win, std::wstring_view str, unsigned options)
 	: Control(win, kUnfocusable)
-	, text (str, options)
-{
-	// Register hotkey
-	if (wchar_t c = text.get_hotkey ()) {
-		win.register_hotkey (c, Signal (sig_hotkey, 0),
-				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
-		sig_hotkey.connect (win, &Window::set_focus_ptr, this, 1);
-	}
+	, text_(str, options) {
+	common_initialize();
 }
 
 Label::Label(Window &win, std::wstring &&str, unsigned options)
 	: Control(win, kUnfocusable)
-	, text(std::move(str), options) {
+	, text_(std::move(str), options) {
+	common_initialize();
+}
+
+void Label::common_initialize() {
 	// Register hotkey
-	if (wchar_t c = text.get_hotkey ()) {
-		win.register_hotkey (c, Signal (sig_hotkey, 0),
+	if (wchar_t c = text_.get_hotkey()) {
+		window().register_hotkey(c, Signal(sig_hotkey, 0),
 				Hotkeys::CASE_INSENSITIVE | Hotkeys::ALLOW_ALT);
-		sig_hotkey.connect (win, &Window::set_focus_ptr, this, 1);
+		sig_hotkey.connect(window(), &Window::set_focus_ptr, this, 1);
 	}
 }
 
@@ -52,16 +50,16 @@ void Label::redraw ()
 {
 	choose_palette (PALETTE_ID_LABEL);
 	clear ();
-	text.output(*this, Size{}, get_size());
+	text_.output(*this, Size{}, get_size());
 }
 
 void Label::set_text(std::wstring_view str, unsigned options) {
-	text.set_text (str, options);
+	text_.set_text(str, options);
 	Label::redraw ();
 }
 
 void Label::set_text(std::wstring &&str, unsigned options) {
-	text.set_text(std::move(str), options);
+	text_.set_text(std::move(str), options);
 	Label::redraw();
 }
 

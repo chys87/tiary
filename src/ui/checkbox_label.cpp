@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,20 +22,19 @@ namespace ui {
 
 CheckBoxLabel::CheckBoxLabel(Window &win, std::wstring_view text, bool initial_status)
 	: checkbox (win, initial_status)
-	, label (win, text)
-{
-	label.sig_clicked.connect([this, &win] {
-			win.set_focus_ptr(&checkbox, 0);
-			checkbox.toggle(true);
-		});
-	label.sig_hotkey = label.sig_clicked.signal();
+	, label(win, text) {
+	common_initialize();
 }
 
 CheckBoxLabel::CheckBoxLabel(Window &win, std::wstring &&text, bool initial_status)
 	: checkbox(win, initial_status)
 	, label(win, std::move(text)) {
-	label.sig_clicked.connect([this, &win] {
-			win.set_focus_ptr(&checkbox, 0);
+	common_initialize();
+}
+
+void CheckBoxLabel::common_initialize() {
+	label.sig_clicked.connect([this] {
+			checkbox.window().set_focus_ptr(&checkbox, 0);
 			checkbox.toggle(true);
 		});
 	label.sig_hotkey = label.sig_clicked.signal();
