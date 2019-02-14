@@ -53,14 +53,9 @@ struct Size
 	 *  this->y = std::min (this->y, other.y);
 	 * </pre>
 	 */
-	Size & operator &= (const Size &other)
-	{
-		if (x > other.x) {
-			x = other.x;
-		}
-		if (y > other.y) {
-			y = other.y;
-		}
+	Size & operator &= (const Size &other) {
+		x = std::min(x, other.x);
+		y = std::min(y, other.y);
 		return *this;
 	}
 	/**
@@ -72,14 +67,9 @@ struct Size
 	 *  this->y = std::max (this->y, other.y);
 	 * </pre>
 	 */
-	Size & operator |= (const Size &other)
-	{
-		if (x < other.x) {
-			x = other.x;
-		}
-		if (y < other.y) {
-			y = other.y;
-		}
+	Size & operator |= (const Size &other) {
+		x = std::max(x, other.x);
+		y = std::max(y, other.y);
 		return *this;
 	}
 };
