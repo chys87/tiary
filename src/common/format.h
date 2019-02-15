@@ -75,9 +75,11 @@ std::wstring format_double (double x, unsigned int_digits, unsigned frac_digits)
 class Format {
 public:
 	static const unsigned MAX_ARGS = 26;
-	struct Result {};
+	struct Result {
+		std::wstring_view format;
+	};
 
-	explicit Format(std::wstring_view fmt) : format_(fmt), args_(), nargs_(0) { offset_[0] = 0; }
+	Format() : args_(), nargs_(0) { offset_[0] = 0; }
 	~Format ();
 
 	void add(wchar_t);
@@ -92,13 +94,11 @@ public:
 	// Hexidecimal
 	Format &operator << (HexTag v) { add(v); return *this; }
 
-	std::wstring result() const;
+	std::wstring result(std::wstring_view format) const;
 
-	operator std::wstring() const { return result(); }
-	std::wstring operator << (Result) const { return result(); }
+	std::wstring operator << (Result result_with_format) const { return result(result_with_format.format); }
 
 private:
-	std::wstring_view format_;      ///< Format string
 	std::wstring args_;             ///< The concatenation of all args
 	unsigned nargs_;                ///< Current number of args
 	unsigned offset_[MAX_ARGS + 1]; ///< Offset in args
@@ -107,7 +107,7 @@ private:
 
 template <typename... Args>
 inline std::wstring format(std::wstring_view fmt, Args&&... args) {
-	return (Format(fmt) << ... << std::forward<Args>(args));
+	return (Format() << ... << std::forward<Args>(args)).result(fmt);
 }
 
 } // namespace tiary

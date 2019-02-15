@@ -131,20 +131,20 @@ void Format::add(HexTag a) {
 	}
 }
 
-std::wstring Format::result() const {
+std::wstring Format::result(std::wstring_view format) const {
 	std::wstring ret;
-	ret.reserve(format_.size() + args_.size());
+	ret.reserve(format.size() + args_.size());
 	size_t start = 0;
 	size_t percent;
-	while ((percent = format_.find(L'%', start)) != format_.npos && percent + 1 < format_.size()) {
-		wchar_t next = format_[percent + 1];
+	while ((percent = format.find(L'%', start)) != format.npos && percent + 1 < format.size()) {
+		wchar_t next = format[percent + 1];
 		if (next == L'%') {
-			ret.append(&format_[start], &format_[percent + 1]);
+			ret.append(&format[start], &format[percent + 1]);
 			start = percent + 2;
 			continue;
 		}
 
-		ret.append(&format_[start], &format_[percent]);
+		ret.append(&format[start], &format[percent]);
 		start = percent + 1;
 
 		bool left_align = false;
@@ -157,10 +157,10 @@ std::wstring Format::result() const {
 			++start;
 		}
 		unsigned wid = 0;
-		while (start < format_.size() - 1 && (format_[start] >= L'0' && format_[start] <= L'9')) {
-			wid = wid * 10 + unsigned(format_[start++] - L'0');
+		while (start < format.size() - 1 && (format[start] >= L'0' && format[start] <= L'9')) {
+			wid = wid * 10 + unsigned(format[start++] - L'0');
 		}
-		unsigned id = format_[start++] - L'a';
+		unsigned id = format[start++] - L'a';
 		if (id < nargs_) {
 			std::wstring_view data{args_.data() + offset_[id], offset_[id + 1] - offset_[id]};
 			unsigned scrwid;
@@ -178,7 +178,7 @@ std::wstring Format::result() const {
 			}
 		}
 	}
-	ret.append(&format_[start], format_.size() - start);
+	ret.append(&format[start], format.size() - start);
 	return ret;
 }
 

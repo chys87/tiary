@@ -17,21 +17,21 @@
 namespace tiary {
 
 TEST(Format, Basic) {
-	EXPECT_EQ(L"abc", Format(L"abc") << Format::Result());
-	EXPECT_EQ(L"abc", Format(L"abc") << L"x" << Format::Result());
-	EXPECT_EQ(L"abcx", Format(L"abc%a") << L"x" << Format::Result());
-	EXPECT_EQ(L"abc65536xyz", Format(L"abc%axyz") << 65536u << Format::Result());
-	EXPECT_EQ(L"abc10000xyz", Format(L"abc%axyz") << hex(65536u) << Format::Result());
-	EXPECT_EQ(L"abc10000xyz!10000", Format(L"abc%axyz%b%a") << hex(65536u) << L'!' << L"www" << Format::Result());
-	EXPECT_EQ(L"The rate is 100%", Format(L"The rate is %a%%") << 100u << Format::Result());
+	EXPECT_EQ(L"abc", Format() << Format::Result{L"abc"});
+	EXPECT_EQ(L"abc", Format() << L"x" << Format::Result{L"abc"});
+	EXPECT_EQ(L"abcx", Format() << L"x" << Format::Result{L"abc%a"});
+	EXPECT_EQ(L"abc65536xyz", Format() << 65536u << Format::Result{L"abc%axyz"});
+	EXPECT_EQ(L"abc10000xyz", Format() << hex(65536u) << Format::Result{L"abc%axyz"});
+	EXPECT_EQ(L"abc10000xyz!10000", Format() << hex(65536u) << L'!' << L"www" << Format::Result{L"abc%axyz%b%a"});
+	EXPECT_EQ(L"The rate is 100%", Format() << 100u << Format::Result{L"The rate is %a%%"});
 }
 
 TEST(Format, Align) {
-	EXPECT_EQ(L" 1", Format(L"%2a") << 1u << Format::Result());
-	EXPECT_EQ(L"01", Format(L"%02a") << 1u << Format::Result());
-	EXPECT_EQ(L"1 ", Format(L"%-2a") << 1u << Format::Result());
-	EXPECT_EQ(L"1 ", Format(L"%-02a") << 1u << Format::Result());
-	EXPECT_EQ(L"100", Format(L"%2a") << 100u << Format::Result());
+	EXPECT_EQ(L" 1", Format() << 1u << Format::Result{L"%2a"});
+	EXPECT_EQ(L"01", Format() << 1u << Format::Result{L"%02a"});
+	EXPECT_EQ(L"1 ", Format() << 1u << Format::Result{L"%-2a"});
+	EXPECT_EQ(L"1 ", Format() << 1u << Format::Result{L"%-02a"});
+	EXPECT_EQ(L"100", Format() << 100u << Format::Result{L"%2a"});
 }
 
 TEST(Format, ConvenienceFunction) {
