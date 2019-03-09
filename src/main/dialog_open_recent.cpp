@@ -144,8 +144,7 @@ void WindowRecentFiles::slot_ok ()
 {
 	size_t select = lst_files.get_select ();
 	if (select < lst_orig.size ()) {
-		RecentFileList::const_iterator it = lst_orig.begin ();
-		std::advance (it, select);
+		RecentFileList::const_iterator it = std::next(lst_orig.begin(), select);
 		result = it->filename;
 	}
 	Window::request_close ();
@@ -155,8 +154,7 @@ void WindowRecentFiles::slot_remove ()
 {
 	size_t select = lst_files.get_select ();
 	if (select < lst_orig.size ()) {
-		RecentFileList::iterator it = lst_orig.begin ();
-		std::advance (it, select);
+		RecentFileList::iterator it = std::next(lst_orig.begin(), select);
 		lst_orig.erase (it);
 		ListBox::ItemList lst_display = lst_files.get_items ();
 		lst_display.erase (lst_display.begin() + select);
