@@ -19,7 +19,7 @@
  * For internal use by the UI system.
  */
 
-#include <ncursesw/curses.h>
+#include <curses.h>
 // ncurses defines many macros that have very short names.
 // We include it first to make sure
 // that an error is issued in case we have a symbol with the

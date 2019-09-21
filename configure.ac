@@ -60,16 +60,17 @@ AC_CHECK_LIB([bz2], [BZ2_bzBuffToBuffCompress], [LIBS="$LIBS -lbz2"],
 			 [AC_MSG_ERROR([*** libbz2 is required])])
 
 dnl Check for libncursesw (Required)
-AC_CHECK_HEADER([ncursesw/curses.h],[],
-				[AC_MSG_ERROR([*** ncursesw/curses.h not found])])
-AC_CHECK_LIB([ncursesw], [waddwstr], [LIBS="$LIBS -lncursesw"],
-			 [AC_MSG_ERROR([*** libncursesw not found])])
+PKG_CHECK_MODULES([ncursesw], [ncursesw >= 5.0], [], [AC_MSG_ERROR([*** ncursesw >= 5.0 is required.])])
 
-dnl Check for set_escdelay in libncursesw (Optional)
+dnl Check for set_escdelay and mouse support in libncursesw (Optional)
+bak_CXXFLAGS="$CXXFLAGS"
+bak_LIBS="$LIBS"
+CXXFLAGS="$CXXFLAGS $pkg_cv_ncursesw_CFLAGS"
+LIBS="$LIBS $pkg_cv_ncursesw_LIBS"
 AC_CHECK_FUNCS([set_escdelay])
-
-dnl Check for mouse support in libncursesw (Optional)
 AC_CHECK_FUNCS([mousemask], [AC_DEFINE([TIARY_USE_MOUSE], [1], [Define to 1 if mouse support is available])])
+CXXFLAGS="$bak_CXXFLAGS"
+LIBS="$bak_LIBS"
 
 dnl Check for libxml2 (Required)
 PKG_CHECK_MODULES([libxml2], [libxml-2.0 >= 2.6.0],[],[AC_MSG_ERROR([*** libxml2 >= 2.7.0 is required.])])
@@ -82,8 +83,8 @@ PKG_CHECK_MODULES([re2], [re2 >= 0.0.0], [
 dnl Check for libcrypto from OpenSSL (Required)
 PKG_CHECK_MODULES([libcrypto], [libcrypto >= 1.0.2], [AC_SUBST(LIBS)], [AC_MSG_ERROR([*** libcrypto >= 1.0.2 is required.])])
 
-CONF_CPPFLAGS="$CONF_CPPFLAGS $pkg_cv_libxml2_CFLAGS $pkg_cv_re2_CFLAGS $pkg_cv_libcrypto_CFLAGS"
-CONF_LIBS="$CONF_LIBS $pkg_cv_libxml2_LIBS $pkg_cv_re2_LIBS $pkg_cv_libcrypto_LIBS"
+CONF_CPPFLAGS="$CONF_CPPFLAGS $pkg_cv_ncursesw_CFLAGS $pkg_cv_libxml2_CFLAGS $pkg_cv_re2_CFLAGS $pkg_cv_libcrypto_CFLAGS"
+CONF_LIBS="$CONF_LIBS $pkg_cv_ncursesw_LIBS $pkg_cv_libxml2_LIBS $pkg_cv_re2_LIBS $pkg_cv_libcrypto_LIBS"
 
 dnl Check for required functions from libcrypto
 bak_CXXFLAGS="$CXXFLAGS"
