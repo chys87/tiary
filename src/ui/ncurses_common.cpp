@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -43,14 +43,12 @@ const std::pair<tiary::ui::MouseMask, mmask_t> mouse_mask_map[] = {
 
 } // Anonymous namespace
 
-mmask_t mousemask_to_internal (MouseMask mask)
-{
-	return bitwise_transform (mouse_mask_map, array_end (mouse_mask_map), mask);
+mmask_t mousemask_to_internal(MouseMask mask) {
+	return bitwise_transform(std::begin(mouse_mask_map), std::end(mouse_mask_map), mask);
 }
 
-MouseMask mousemask_from_internal (mmask_t mask)
-{
-	return bitwise_reverse_transform (mouse_mask_map, array_end (mouse_mask_map), mask);
+MouseMask mousemask_from_internal(mmask_t mask) {
+	return bitwise_reverse_transform(std::begin(mouse_mask_map), std::end(mouse_mask_map), mask);
 }
 
 #endif // TIARY_USE_MOUSE

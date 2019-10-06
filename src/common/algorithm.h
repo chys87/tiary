@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2016, 2018 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2016, 2018, 2019 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -176,14 +176,6 @@ A bitwise_reverse_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi
  * It's the caller's responsibility to guarantee the feasible set is not empty
  */
 void min_max_programming (unsigned *result, const unsigned *min, const unsigned *max, unsigned n, unsigned S);
-
-
-
-// Measure the length of an array conveniently
-template <typename T, size_t N> inline constexpr size_t array_length(T (&)[N]) { return N; }
-
-// Get the end of an array conveniently
-template <typename T, size_t N> inline constexpr T* array_end(T (&a)[N]) { return (a+N); }
 
 
 } // namespace tiary

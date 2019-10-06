@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -112,7 +112,7 @@ WindowGlobalOptions::WindowGlobalOptions (GlobalOptionGroup &options_, const std
 	, btn_default_file_current(*this, L"Use current file"sv)
 	, layout_default_file_buttons (HORIZONTAL)
 	, lbl_expand_lines(*this, L"Expand &lines:"sv)
-	, drp_expand_lines (*this, std::vector<std::wstring>(expand_lines_array, array_end (expand_lines_array)),
+	, drp_expand_lines(*this, std::vector<std::wstring>(std::begin(expand_lines_array), std::end(expand_lines_array)),
 			options_.get_num(GLOBAL_OPTION_EXPAND_LINES)-1)
 	, layout_expand_lines (HORIZONTAL)
 	, lbl_editor(*this, L"&Editor:"sv)

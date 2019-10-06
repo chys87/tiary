@@ -62,7 +62,7 @@ DateSelect::DateSelect (Window &win)
 	, offset_(0)
 	, dom_(0)
 {
-	month.set_grid(4, 2, 6, std::vector<GridItem>(month_names, array_end(month_names)));
+	month.set_grid(4, 2, 6, std::vector<GridItem>(std::begin(month_names), std::end(month_names)));
 
 	year.sig_select_changed = month.sig_select_changed = Signal (this, &DateSelect::update_day_list, true);
 	day.sig_select_changed.connect (sig_date_changed);

@@ -243,7 +243,7 @@ wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 				{ KEY_F(6), F6 }, { KEY_F(7), F7 }, { KEY_F(8), F8 }, { KEY_F(9), F9 }, { KEY_F(10), F10 },
 				{ KEY_F(11), F11 }, { KEY_F(12), F12 }, { KEY_RESIZE, WINCH }
 			};
-			return linear_transform (map, array_end (map), c, L'\0');
+			return linear_transform(std::begin(map), std::end(map), c, L'\0');
 		default: // Something wrong
 			return L'\0';
 	}
@@ -261,7 +261,7 @@ UnGetStackItem *stk_unget_top = stk_unget;
 
 void unget_input (wchar_t c, MouseEvent mouse_event)
 {
-	if (stk_unget_top < array_end (stk_unget)) {
+	if (stk_unget_top < std::end(stk_unget)) {
 		stk_unget_top->key = c;
 		stk_unget_top->mouse_event = mouse_event;
 		++stk_unget_top;
