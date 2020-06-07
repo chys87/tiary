@@ -84,9 +84,9 @@ std::vector<std::u32string_view> split_string_view(std::u32string_view str, char
 
 // Join tokens into a string
 template <typename InputIterator, typename JoinT>
-typename std::iterator_traits<InputIterator>::value_type join (InputIterator first, InputIterator last, const JoinT &joiner)
-{
-	typename std::iterator_traits<InputIterator>::value_type ret;
+std::basic_string<std::remove_cv_t<std::remove_reference_t<decltype((*std::declval<InputIterator>())[0])>>>
+join(InputIterator first, InputIterator last, const JoinT &joiner) {
+	std::basic_string<std::remove_cv_t<std::remove_reference_t<decltype((*std::declval<InputIterator>())[0])>>> ret;
 	if (first != last) {
 		ret = *first;
 		while (++first != last) {

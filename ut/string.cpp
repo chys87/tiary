@@ -13,6 +13,8 @@
 
 #include <gtest/gtest.h>
 #include <locale.h>
+#include <list>
+#include <set>
 #include "common/string.h"
 
 
@@ -21,6 +23,21 @@ namespace tiary {
 TEST(SplitTest, Split) {
 	EXPECT_EQ((std::vector<std::string_view>{"a", "b", "c"}), split_string_view("a b c"sv, ' '));
 	EXPECT_EQ((std::vector<std::string_view>{"a", "bb", "ccc"}), split_string_view("  a  bb  ccc "sv, ' '));
+}
+
+TEST(JoinTest, JoinPointers) {
+	const char* strings[] {"Hello", "world"};
+	EXPECT_EQ("Hello world", join(std::begin(strings), std::end(strings), " "));
+}
+
+TEST(JoinTest, ListOfStrings) {
+	std::list<std::wstring> ls{L"world", L"Hello"};
+	EXPECT_EQ(L"Hello world", join(ls.rbegin(), ls.rend(), L' '));
+}
+
+TEST(JoinTest, SetOfStringViews) {
+	std::set<std::string_view> ss{"Hello", "world"};
+	EXPECT_EQ("Hello world", join(ss.begin(), ss.end(), ' '));
 }
 
 } // namespace tiary
