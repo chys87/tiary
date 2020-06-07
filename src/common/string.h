@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2019, 2020, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -72,8 +72,8 @@ std::vector <std::pair <size_t, size_t> >
 // Returns if the string was changed
 bool strip_in_place(std::string &);
 bool strip_in_place(std::wstring &);
-std::string strip(std::string_view);
-std::wstring strip(std::wstring_view);
+std::string_view strip(std::string_view);
+std::wstring_view strip(std::wstring_view);
 
 
 // Split a string into tokens

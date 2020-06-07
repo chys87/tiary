@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2016, 2018, 2019, 2020, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -130,10 +130,12 @@ WStringLocaleOrderedSet set_from_text (const std::wstring &text)
 	WStringLocaleOrderedSet set;
 
 	for (std::wstring_view label : split_string_view(text, L',')) {
-		set.insert(strip(label));
+		auto stripped_label = strip(label);
+		if (!stripped_label.empty()) {
+			set.emplace(stripped_label);
+		}
 	}
 
-	set.erase (std::wstring ());
 	return set;
 }
 

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, 2019, 2020, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -108,13 +108,13 @@ bool strip_in_place_impl(std::basic_string<T> &str, std::basic_string_view<T> tr
 }
 
 template <typename T>
-inline std::basic_string<T> strip_impl(std::basic_string_view<T> str, std::basic_string_view<T> trim) {
+inline std::basic_string_view<T> strip_impl(std::basic_string_view<T> str, std::basic_string_view<T> trim) {
 	size_t start = str.find_first_not_of(trim);
 	if (start == str.npos) {
-		return {};
+		return {str.data(), std::size_t(0)};
 	} else {
 		size_t end = str.find_last_not_of(trim);
-		return std::basic_string<T>(str.substr(start, end - start + 1));
+		return str.substr(start, end - start + 1);
 	}
 }
 
@@ -128,11 +128,11 @@ bool strip_in_place(std::wstring &str) {
 	return strip_in_place_impl(str, L" \t\v\r\n"sv);
 }
 
-std::string strip(std::string_view str) {
+std::string_view strip(std::string_view str) {
 	return strip_impl(str, " \t\v\r\n"sv);
 }
 
-std::wstring strip(std::wstring_view str) {
+std::wstring_view strip(std::wstring_view str) {
 	return strip_impl(str, L" \t\v\r\n"sv);
 }
 
