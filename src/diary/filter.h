@@ -31,7 +31,7 @@ public:
 	 * @result	Returns @c true if the entry should be displayed
 	 */
 	virtual bool operator () (const DiaryEntry &) const = 0;
-	virtual ~Filter () { }
+	virtual ~Filter() = default;
 
 	/**
 	 * @brief	Filter the whole entry list
@@ -46,14 +46,14 @@ public:
  */
 struct FilterByLabel final : public Filter {
 public:
-	explicit FilterByLabel(const std::wstring &label) : label_(label) {}
-	explicit FilterByLabel(std::wstring &&label) : label_(std::move(label)) {}
-	const std::wstring &label() const { return label_; }
+	explicit FilterByLabel(std::wstring_view label);
+	const std::vector<std::wstring>& labels() const { return labels_; }
+	std::wstring label() const;
 	bool operator()(const DiaryEntry &) const override;
-	~FilterByLabel ();
+	~FilterByLabel() = default;
 
 private:
-	std::wstring label_;
+	std::vector<std::wstring> labels_;
 };
 
 

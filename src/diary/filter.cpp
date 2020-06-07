@@ -15,6 +15,7 @@
 #include "diary/filter.h"
 #include "diary/diary.h"
 #include "common/algorithm.h"
+#include "common/string.h"
 
 
 namespace tiary {
@@ -30,16 +31,30 @@ DiaryEntryList Filter::filter (const DiaryEntryList &lst) const
 	return new_lst;
 }
 
+FilterByLabel::FilterByLabel(std::wstring_view label) {
+	for (auto& label: split_string_view(label, L',')) {
+		labels_.emplace_back(label.data(), label.size());
+	}
+}
+
 bool FilterByLabel::operator () (const DiaryEntry &entry) const
 {
-	return (entry.labels.find(label_) != entry.labels.end());
+	for (auto& label: labels_) {
+		if (entry.labels.find(label) == entry.labels.end())
+			return false;
+	}
+	return true;
 }
 
-FilterByLabel::~FilterByLabel ()
-{
+std::wstring FilterByLabel::label() const {
+	std::wstring res;
+	for (auto& label: labels_) {
+		if (!res.empty())
+			res += L',';
+		res += label;
+	}
+	return res;
 }
-
-
 
 bool FilterByText::operator () (const DiaryEntry &entry) const
 {
