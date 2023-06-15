@@ -71,7 +71,7 @@ unsigned utf8_len_by_first_byte(unsigned char b) {
 
 std::wstring utf8_to_wstring(std::string_view s, wchar_t substitute) {
 	std::wstring r(s.length(), L'\0');
-	auto iw = r.begin();
+	auto iw = r.data();
 
 	const char *p = s.data();
 	const char *e = p + s.length();
@@ -115,7 +115,7 @@ std::wstring utf8_to_wstring(std::string_view s, wchar_t substitute) {
 		}
 	}
 
-	r.erase (iw, r.end ());
+	r.resize(iw - r.data());
 	return r;
 }
 
@@ -161,12 +161,22 @@ namespace {
 template <typename C>
 inline std::string wstring_to_utf8_impl(std::basic_string_view<C> src) {
 	std::string dst;
+#ifdef __cpp_lib_string_resize_and_overwrite
+	dst.resize_and_overwrite(src.length() * 4, [&](char* w, size_t) {
+		char* start = w;
+		for (char32_t c : src) {
+			w = wchar_to_utf8(w, c);
+		}
+		return w - start;
+	});
+#else
 	dst.reserve (src.length () * 2);
 	for (char32_t c: src) {
 		char buf[4];
 		char *end = wchar_to_utf8(buf, c);
 		dst.append (buf, end);
 	}
+#endif
 	return dst;
 }
 
