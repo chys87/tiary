@@ -120,16 +120,11 @@ std::wstring utf8_to_wstring(std::string_view s, wchar_t substitute) {
 }
 
 size_t utf8_count_chars(std::string_view str) {
-	const char *s = str.data();
-	const char *e = s + str.length();
-	size_t ret = 0;
-	while (s < e) {
-		unsigned n = utf8_len_by_first_byte(*s++);
-		if (n > 1)
-			s += n - 1;
-		++ret;
+	size_t r = 0;
+	for (uint8_t c : str) {
+		r += !(c >= 0x80 && c < 0xc0);
 	}
-	return ret;
+	return r;
 }
 
 char *wchar_to_utf8(char *dst, char32_t u) {
