@@ -232,7 +232,7 @@ wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 #endif // TIARY_USE_MOUSE && KEY_MOUSE
 
 			// Other keys - look into the table
-			static const std::pair<wint_t,wchar_t> map[] = {
+			static constexpr std::pair<wint_t,wchar_t> map[] = {
 				{ KEY_UP, UP }, { KEY_DOWN, DOWN }, { KEY_LEFT, LEFT }, { KEY_RIGHT, RIGHT },
 				{ KEY_HOME, HOME }, { KEY_END, END },
 				{ KEY_NPAGE, PAGEDOWN }, { KEY_PPAGE, PAGEUP },
@@ -243,7 +243,8 @@ wchar_t get_input_base (MouseEvent *pmouse_event, bool block)
 				{ KEY_F(6), F6 }, { KEY_F(7), F7 }, { KEY_F(8), F8 }, { KEY_F(9), F9 }, { KEY_F(10), F10 },
 				{ KEY_F(11), F11 }, { KEY_F(12), F12 }, { KEY_RESIZE, WINCH }
 			};
-			return linear_transform(std::begin(map), std::end(map), c, L'\0');
+			static constexpr auto sorted_map = copy_sort_const(map);
+			return binary_transform(sorted_map, c, L'\0');
 		default: // Something wrong
 			return L'\0';
 	}

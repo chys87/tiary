@@ -22,8 +22,10 @@
 #define TIARY_COMMON_ALGORITHM_H
 
 #include <algorithm>
+#include <array>
 #include <compare>
 #include <functional>
+#include <span>
 
 namespace tiary {
 
@@ -37,6 +39,15 @@ inline int minS (int a, int b) { return (a<b) ? a : b; }
 // These functions make sure arguments are cast to size_t
 inline size_t maxSize (size_t a, size_t b) { return (a<b) ? b : a; }
 inline size_t minSize (size_t a, size_t b) { return (a<b) ? a : b; }
+
+// Takes advantage of C++20 constexpr-ness of std::sort
+template <typename T, size_t N>
+consteval std::array<T, N> copy_sort_const(const T (&src)[N]) {
+	std::array<T, N> res;
+	std::copy_n(src, N, res.data());
+	std::sort(res.begin(), res.end());
+	return res;
+}
 
 // Performs a binary search.
 // Returns pointer (or 0 if not found)
@@ -63,24 +74,6 @@ template <typename T, typename T2> T* binary_search_null (T *lo, T *hi, T2 v)
 	return binary_search_null(lo, hi, v, std::identity());
 }
 
-// Performs a linear search. Returns 0 if not found
-template <typename T, typename T2, typename K> T* linear_search_null (T *lo, T *hi, T2 v, K key)
-{
-	while (lo < hi) {
-		if (key (*lo) == v) {
-			return lo;
-		}
-		++lo;
-	}
-	return 0;
-}
-
-// No key necessary
-template <typename T, typename T2> T* linear_search_null (T *lo, T *hi, T2 v)
-{
-	return linear_search_null(lo, hi, v, std::identity());
-}
-
 
 /* Map transform using binary search. For example:
  * static const std::pair<char,char> upper_map[] = {
@@ -89,25 +82,15 @@ template <typename T, typename T2> T* linear_search_null (T *lo, T *hi, T2 v)
  *   .....
  *   { 'z', 'Z' }
  * };
- * Then binary_transform(upper_map, array_end(upper_map), ch, ch) is equivalent to toupper(ch) (in C locale)
+ * Then binary_transform(upper_map, ch, ch) is equivalent to toupper(ch) (in C locale)
  */
 template <typename A, typename B>
-B binary_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, A from, B defto) {
-	if (const std::pair<A, B> *p = binary_search_null(lo, hi, from, std::mem_fn(&std::pair<A, B>::first))) {
+B binary_transform(std::type_identity_t<std::span<const std::pair<A, B>>> range, A from, B defto) {
+	if (const std::pair<A, B> *p = binary_search_null(range.data(), range.data() + range.size(), from, std::mem_fn(&std::pair<A, B>::first))) {
 		return p->second;
 	}
 	return defto;
 }
-
-// Map transform using linear search
-template <typename A, typename B>
-B linear_transform(const std::pair<A, B> *lo, const std::pair<A, B> *hi, A from, B defto) {
-	if (const std::pair<A, B> *p = linear_search_null(lo, hi, from, std::mem_fn(&std::pair<A, B>::first))) {
-		return p->second;
-	}
-	return defto;
-}
-
 
 
 // Transform between two bit-wise schemes
