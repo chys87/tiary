@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009, 2010, 2018, 2019, 2022 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -112,19 +112,18 @@ void show_license ()
 			});
 }
 
-constexpr std::wstring_view about = L"\
-Tiary %a.%b.%c\n\
-\n\
-\n\
-Tiary, a terminal-based diary keeping system for Unix-like systems\n\
-Copyright (C) %d, chys <admin@CHYS.INFO>\n\
-\n\
-This software is licensed under the 3-clause BSD license.\n\
-See License for details.\n\
-\n\
-This product includes cryptographic software written by\n\
-Eric Young (eay@cryptsoft.com)\n\
-"sv;
+constexpr std::wstring_view about = LR"(Tiary %a.%b.%c
+
+
+Tiary, a terminal-based diary keeping system for Unix-like systems
+Copyright (C) %d, chys <admin@CHYS.INFO>
+
+This software is licensed under the 3-clause BSD license.
+See License for details.
+
+This product includes software developed by the OpenSSL Project
+for use in the OpenSSL Toolkit (http://www.openssl.org/).
+)"sv;
 
 void show_about ()
 {
