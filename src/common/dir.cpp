@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -494,7 +494,7 @@ int my_mkstemp(std::string *name, std::string_view name_template) {
 
 	for (unsigned left_attempts = 20; left_attempts; seed += 7777, --left_attempts) {
 		static const char letters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_+";
-		static_assert(sizeof(letters) >= 64, "Not enough letters");
+		static_assert(sizeof(letters) > 64, "Not enough letters");
 		uint64_t v = seed;
 		std::string::iterator iw = name->begin() + pipe_sign;
 		*iw++ = letters[v % 64];
