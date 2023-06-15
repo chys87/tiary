@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2016, 2018, 2019 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023 chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -21,8 +21,9 @@
 #ifndef TIARY_COMMON_ALGORITHM_H
 #define TIARY_COMMON_ALGORITHM_H
 
-#include <functional>
 #include <algorithm>
+#include <compare>
+#include <functional>
 
 namespace tiary {
 
@@ -37,35 +38,6 @@ inline int minS (int a, int b) { return (a<b) ? a : b; }
 inline size_t maxSize (size_t a, size_t b) { return (a<b) ? b : a; }
 inline size_t minSize (size_t a, size_t b) { return (a<b) ? a : b; }
 
-/*
- * Same as std::identity in C++20
- */
-struct identity {
-	template <typename T>
-	constexpr T &&operator()(T &&t) const {
-		return std::forward<T>(t);
-	}
-};
-
-
-namespace detail {
-
-template <typename A, typename B> inline
-int compare_helper (const A &x, const B &y)
-{
-	if (x < y) {
-		return -1;
-	}
-	else if (x == y) {
-		return 0;
-	}
-	else {
-		return 1;
-	}
-}
-
-} // namespace detail
-
 // Performs a binary search.
 // Returns pointer (or 0 if not found)
 template <typename T, typename T2, typename K>
@@ -73,15 +45,13 @@ T *binary_search_null (T *lo, T *hi, T2 v, K key)
 {
 	while (lo < hi) {
 		T *m = lo + size_t(hi-lo)/2;
-		switch (detail::compare_helper (key (*m), v)) {
-			case -1:
-				lo = m + 1;
-				break;
-			case 0:
-				return m;
-			case 1:
-				hi = m;
-				break;
+		auto cmp = key(*m) <=> v;
+		if (cmp < 0) {
+			lo = m + 1;
+		} else if (cmp == 0) {
+			return m;
+		} else {
+			hi = m;
 		}
 	}
 	return 0;
@@ -90,7 +60,7 @@ T *binary_search_null (T *lo, T *hi, T2 v, K key)
 // No key necessary
 template <typename T, typename T2> T* binary_search_null (T *lo, T *hi, T2 v)
 {
-	return binary_search_null(lo, hi, v, identity());
+	return binary_search_null(lo, hi, v, std::identity());
 }
 
 // Performs a linear search. Returns 0 if not found
@@ -108,7 +78,7 @@ template <typename T, typename T2, typename K> T* linear_search_null (T *lo, T *
 // No key necessary
 template <typename T, typename T2> T* linear_search_null (T *lo, T *hi, T2 v)
 {
-	return linear_search_null(lo, hi, v, identity());
+	return linear_search_null(lo, hi, v, std::identity());
 }
 
 

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2019-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -19,6 +19,11 @@
 
 
 namespace tiary {
+
+TEST(StrLowerTest, StrLower) {
+	setlocale(LC_ALL, "zh_CN.UTF-8");
+	EXPECT_EQ(strlower(L"AbCäÄÈÑÕ"sv), L"abcääèñõ"sv);
+}
 
 TEST(SplitTest, Split) {
 	EXPECT_EQ((std::vector<std::string_view>{"a", "b", "c"}), split_string_view("a b c"sv, ' '));

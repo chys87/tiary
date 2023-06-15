@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -24,7 +24,6 @@
 #include "ui/control.h"
 #include "ui/direction.h"
 #include <initializer_list>
-#include <type_traits>
 
 namespace tiary {
 namespace ui {
@@ -54,8 +53,8 @@ public:
 	{
 	}
 
-	// T must be either Control or a derivative class of Control
-	template <typename T> ChainControls (T *const *lst, size_t n)
+	template <std::derived_from<Control> T>
+	ChainControls (T *const *lst, size_t n)
 		: first_control (n ? lst[0] : 0)
 		, last_control (n ? lst[n-1] : 0)
 		, nonempty (n)

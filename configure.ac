@@ -190,11 +190,15 @@ AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fn
 AX_APPEND_COMPILE_FLAGS([-Werror=return-type])
 AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
 
-dnl Check whether the compiler has some support for C++17
-AX_CHECK_COMPILE_FLAG([-std=gnu++17],[
-	AX_APPEND_FLAG([-std=gnu++17])
-],[
-	AC_MSG_ERROR(["-std=gnu++17" is not supported. You need a modern compiler.])
+dnl Check whether the compiler has some support for C++20 (prefer C++23/2b)
+AX_CHECK_COMPILE_FLAG([-std=gnu++2b],[
+	AX_APPEND_FLAG([-std=gnu++2b])
+], [
+	AX_CHECK_COMPILE_FLAG([-std=gnu++20],[
+		AX_APPEND_FLAG([-std=gnu++20])
+	],[
+		AC_MSG_ERROR(["-std=gnu++20" is not supported. You need a modern compiler.])
+	])
 ])
 
 dnl Let's always include tiary-config.h (renamed to avoid conflict with src/diary/config.h)

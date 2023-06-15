@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -21,12 +21,12 @@
  * @brief	Declares the class tiary::Signal
  */
 
+#include <concepts>
 #include <functional>
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "common/type_identity.h"
 
 namespace tiary {
 
@@ -91,16 +91,23 @@ public:
 	Signal(Signal &&) = default;
 	Signal &operator = (Signal &&sig) = default;
 
-	template <typename R, typename...T, typename = typename std::invoke_result<R, T...>::type>
+	template <typename R, typename... T>
+		requires std::invocable<R, T...>
 	explicit Signal(R f, T... args) :
 		f_(new detail::SignalCallable<R, T...>(std::move(f), std::move(args)...)) {}
 
-	template<typename R, typename D, typename...T, typename = decltype((std::declval<D*>()->*std::declval<R D::*>())(std::declval<T>()...))>
-	Signal(type_identity_t<D> &o, R D::*f, T... args) :
+	template<typename R, typename D, typename... T>
+		requires requires(D& o, R D::* f, T... args) {
+			{ (o.*f)(args...) };
+		}
+	Signal(std::type_identity_t<D> &o, R D::*f, T... args) :
 		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), &o, std::move(args)...)) {}
 
-	template<typename R, typename D, typename...T, typename = decltype((std::declval<D*>()->*std::declval<R D::*>())(std::declval<T>()...))>
-	Signal(type_identity_t<D> *o, R D::*f, T... args) :
+	template<typename R, typename D, typename... T>
+		requires requires(D* o, R D::* f, T... args) {
+			{ (o->*f)(args...) };
+		}
+	Signal(std::type_identity_t<D> *o, R D::*f, T... args) :
 		f_(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), o, std::move(args)...)) {}
 
 	Signal(const Signal &sig);
@@ -109,15 +116,22 @@ public:
 	Signal(Signal *sig, int) : f_(new detail::SignalRecursive(*sig)) {}
 
 	template <typename R, typename... T>
-	std::void_t<typename std::invoke_result<R, T...>::type> connect(R f, T... args) {
+		requires std::invocable<R, T...>
+	void connect(R f, T... args) {
 		f_.reset(new detail::SignalCallable<R, T...>(std::move(f), std::move(args)...));
 	}
 	template<typename R, typename D, typename... T>
-	auto connect(type_identity_t<D> &o, R D::*f, T... args) -> std::void_t<decltype((o.*f)(args...))> {
+		requires requires(D& o, R D::* f, T... args) {
+			{ (o.*f)(args...) };
+		}
+	void connect(std::type_identity_t<D> &o, R D::* f, T... args) {
 		f_.reset(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), &o, std::move(args)...));
 	}
 	template<typename R, typename D, typename... T>
-	auto connect(type_identity_t<D> *o, R D::*f, T... args) -> std::void_t<decltype((o->*f)(args...))> {
+		requires requires(D*o, R D::* f, T... args) {
+			{ (o->*f)(args...) };
+		}
+	void connect(std::type_identity_t<D> *o, R D::* f, T... args) {
 		f_.reset(new detail::SignalCallable<decltype(std::mem_fn(f)), D*, T...>(std::mem_fn(f), o, std::move(args)...));
 	}
 

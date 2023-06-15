@@ -51,8 +51,17 @@ const wchar_t *strchrnul (const wchar_t *str, wchar_t ch)
 
 std::wstring strlower(std::wstring_view str) {
 	std::wstring result;
+#ifdef __cpp_lib_string_resize_and_overwrite
+	result.resize_and_overwrite(str.length(), [&](wchar_t* w, size_t n) {
+		for (wchar_t c : str) {
+			*w++ = towlower(c);
+		}
+		return str.length();
+	});
+#else
 	result.resize (str.length ());
 	std::transform (str.begin (), str.end (), result.begin (), towlower);
+#endif
 	return result;
 }
 

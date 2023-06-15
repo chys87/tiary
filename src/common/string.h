@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2019, 2020, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -84,9 +84,8 @@ std::vector<std::u32string_view> split_string_view(std::u32string_view str, char
 
 // Join tokens into a string
 template <typename InputIterator, typename JoinT>
-std::basic_string<std::remove_cv_t<std::remove_reference_t<decltype((*std::declval<InputIterator>())[0])>>>
-join(InputIterator first, InputIterator last, const JoinT &joiner) {
-	std::basic_string<std::remove_cv_t<std::remove_reference_t<decltype((*std::declval<InputIterator>())[0])>>> ret;
+auto join(InputIterator first, InputIterator last, const JoinT &joiner) {
+	std::basic_string<std::remove_cvref_t<decltype((*first)[0])>> ret;
 	if (first != last) {
 		ret = *first;
 		while (++first != last) {
@@ -96,15 +95,6 @@ join(InputIterator first, InputIterator last, const JoinT &joiner) {
 	}
 	return ret;
 }
-
-inline bool starts_with(std::string_view haystack, std::string_view needle) {
-	return haystack.length() >= needle.length() && haystack.substr(0, needle.length()) == needle;
-}
-
-inline bool starts_with(std::wstring_view haystack, std::wstring_view needle) {
-	return haystack.length() >= needle.length() && haystack.substr(0, needle.length()) == needle;
-}
-
 
 } // namespace tiary
 

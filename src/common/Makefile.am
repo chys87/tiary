@@ -51,7 +51,6 @@ libcommon_a_SOURCES = \
 	string.cpp \
 	string_match.h \
 	string_match.cpp \
-	type_identity.h \
 	unicode.h \
 	unicode.cpp \
 	unicode.gen.cpp \

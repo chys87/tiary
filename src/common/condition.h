@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2016, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,10 +26,11 @@
  * (menu items, buttons, etc.)
  */
 
+#include <concepts>
 #include <functional>
 #include <memory>
+#include <type_traits>
 #include <utility>
-#include "common/type_identity.h"
 
 namespace tiary {
 
@@ -42,7 +43,8 @@ public:
 	virtual ~CondBase () {}
 };
 
-template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::invoke_result<C>::type, bool>::value, void>::type>
+template <typename C>
+	requires std::predicate<C>
 class CondC final : public CondBase {
 public:
 	CondC(const C &callable) : callable_(callable) {}
@@ -66,17 +68,18 @@ public:
 	Condition &operator = (Condition &&other) = default;
 
 	// Condition itself doesn't meet the requirement that it's callable, so we don't need to explicitly exclude it
-	template <typename C, typename = typename std::enable_if<std::is_convertible<typename std::invoke_result<C>::type, bool>::value>::type>
+	template <typename C>
+		requires std::predicate<C>
 	Condition(C &&callable) : info_(new detail::CondC(std::forward<C>(callable))) {}
 
 	template <typename D>
-		Condition(type_identity_t<D> &obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), &obj))) {}
+		Condition(std::type_identity_t<D> &obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), &obj))) {}
 	template <typename D>
-		Condition(type_identity_t<D> *obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), obj))) {}
+		Condition(std::type_identity_t<D> *obj, bool (D::*foo)()) : info_(new detail::CondC(std::bind(std::mem_fn(foo), obj))) {}
 	template <typename D>
-		Condition (const type_identity_t<D> &obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), &obj))) {}
+		Condition(const std::type_identity_t<D> &obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), &obj))) {}
 	template <typename D>
-		Condition (const type_identity_t<D> *obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), obj))) {}
+		Condition(const std::type_identity_t<D> *obj, bool (D::*foo)() const) : info_(new detail::CondC(std::bind(std::mem_fn(foo), obj))) {}
 
 	bool call() const { return (info_ ? info_->call() : true); }
 	explicit operator bool() const { return static_cast<bool>(info_); }
@@ -116,7 +119,7 @@ private:
 	Condition obj_;
 };
 
-class CondAnd : public CondBase {
+class CondAnd final : public CondBase {
 public:
 	CondAnd(const Condition &oa, const Condition &ob) : a_(oa), b_(ob) {}
 	CondAnd(const Condition &oa, Condition &&ob) : a_(oa), b_(std::move(ob)) {}
@@ -131,7 +134,7 @@ private:
 	Condition b_;
 };
 
-class CondOr : public CondBase {
+class CondOr final : public CondBase {
 public:
 	CondOr(const Condition &oa, const Condition &ob) : a_(oa), b_(ob) {}
 	CondOr(const Condition &oa, Condition &&ob) : a_(oa), b_(std::move(ob)) {}
