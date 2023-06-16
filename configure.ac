@@ -186,9 +186,11 @@ m4_foreach_w([f],[
 
 
 dnl Add several useful flags if supported by compiler
-AX_APPEND_COMPILE_FLAGS([-Wall -fmerge-all-constants -fno-threadsafe-statics -fno-exceptions -finput-charset=utf-8])
-AX_APPEND_COMPILE_FLAGS([-Werror=return-type])
-AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed])
+AX_APPEND_COMPILE_FLAGS([-fmerge-all-constants -fno-common -fno-ident -Qn -fno-threadsafe-statics -fno-exceptions -finput-charset=utf-8])
+AX_APPEND_COMPILE_FLAGS([-fPIE -pie -fvisibility-inlines-hidden -fabi-version=0 -ftemplate-backtrace-limit=0])
+AX_APPEND_COMPILE_FLAGS([-mcmodel=tiny])
+AX_APPEND_COMPILE_FLAGS([-Wall -Werror=return-type -Werror=delete-incomplete])
+AX_APPEND_LINK_FLAGS([-Wl,-O1 -Wl,--as-needed -Wl,--fatal-warnings -Wl,-z,relro -Wl,-z,noexecstack -Wl,-z,start-stop-visibility=hidden])
 
 dnl Check whether the compiler has some support for C++20 (prefer C++23/2b)
 AX_CHECK_COMPILE_FLAG([-std=gnu++2b],[
