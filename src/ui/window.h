@@ -42,10 +42,10 @@ class Window : public MovableObject
 	 */
 	class DummyControl final : public Control {
 	public:
-		DummyControl (Window &win) : Control (win) {}
+		explicit DummyControl(Window &win) : Control (win) {}
 		~DummyControl ();
-		bool on_focus ();
-		void redraw ();
+		bool on_focus() override;
+		void redraw() override;
 	};
 
 

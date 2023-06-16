@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -84,7 +84,7 @@ struct Menu
 		add (text, sig);
 		return *this;
 	}
-	
+
 	Menu &operator () (std::wstring_view text, const Action &act) {
 		add (text, act);
 		return *this;

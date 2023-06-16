@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2011, 2016, 2018, 2019 chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -307,7 +307,7 @@ void MainWin::on_ready ()
 void MainWin::updated_filter ()
 {
 	if (filter_) {
-		filtered_entries_.reset(new DiaryEntryList(filter_->filter(entries)));
+		filtered_entries_.emplace(filter_->filter(entries));
 		main_ctrl.modify_number(filtered_entries_->size ());
 	} else {
 		filtered_entries_.reset ();
@@ -863,7 +863,7 @@ void MainWin::edit_perfile_options ()
 void MainWin::display_statistics ()
 {
 	if (!entries.empty ()) {
-		tiary::display_statistics(entries, filtered_entries_.get(), get_current());
+		tiary::display_statistics(entries, filtered_entries_ ? &*filtered_entries_ : nullptr, get_current());
 	}
 }
 

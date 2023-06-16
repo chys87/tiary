@@ -17,7 +17,7 @@
 
 /**
  * An "UI string" stores a string, and does some useful analysis
- * so that controls can use it conveniently:
+ * so that controls can use it conveniently.  This includes:
  *
  * (1) Remove the first '&' character and remember its position;
  * (2) Number of lines, max line width, etc.

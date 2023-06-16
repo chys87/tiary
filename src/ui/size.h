@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -30,14 +30,8 @@ namespace ui {
  * @ingroup	uisystem
  * @brief	A pair of integer coordinates to describe a size or position
  */
-struct Size
-{
+struct Size {
 	unsigned x, y;
-
-	constexpr Size() : x(0), y(0) {}
-	constexpr Size(unsigned X, unsigned Y) : x(X), y(Y) {}
-	Size(const Size &) = default;
-	Size &operator = (const Size &) = default;
 
 	Size & operator += (const Size &other) { x += other.x; y += other.y; return *this; }
 	Size & operator -= (const Size &other) { x -= other.x; y -= other.y; return *this; }
@@ -124,52 +118,49 @@ inline constexpr Size operator | (const Size &a, const Size &b) {
  *
  */
 
+enum struct SizeCompareBoolPolicy {kBoth, kEither};
+
 /**
  * @brief	The result of the comparison between to Size strucutres
  */
+template <SizeCompareBoolPolicy p = SizeCompareBoolPolicy::kBoth>
 struct SizeCompareResult {
-	enum struct BoolPolicy {kBoth, kEither};
 
 	bool x, y;
-	BoolPolicy p;
-
-	constexpr SizeCompareResult(bool X, bool Y, BoolPolicy P = BoolPolicy::kBoth) : x(X), y(Y), p(P) {}
-	SizeCompareResult(const SizeCompareResult &) = default;
-	SizeCompareResult &operator = (const SizeCompareResult &) = default;
 
 	constexpr bool both() const { return x && y; }
 	constexpr bool either() const { return x || y; }
 	constexpr bool neither() const { return !x && !y; }
 
-	explicit constexpr operator bool() const { return (p == BoolPolicy::kBoth) ? both() : either(); }
+	explicit constexpr operator bool() const { return (p == SizeCompareBoolPolicy::kBoth) ? both() : either(); }
 	constexpr bool operator !() const { return !operator bool(); }
+
+	friend inline constexpr bool both(const SizeCompareResult &r) { return r.both(); }
+	friend inline constexpr bool either(const SizeCompareResult &r) { return r.either(); }
+	friend inline constexpr bool neither(const SizeCompareResult &r) { return r.neither(); }
 };
 
-inline constexpr bool both(const SizeCompareResult &r) { return r.both(); }
-inline constexpr bool either(const SizeCompareResult &r) { return r.either(); }
-inline constexpr bool neither(const SizeCompareResult &r) { return r.neither(); }
-
-inline constexpr SizeCompareResult operator == (Size a, Size b) {
+inline constexpr SizeCompareResult<> operator == (Size a, Size b) {
 	return {a.x == b.x, a.y == b.y};
 }
 
-inline constexpr SizeCompareResult operator != (Size a, Size b) {
-	return {a.x != b.x, a.y != b.y, SizeCompareResult::BoolPolicy::kEither};
+inline constexpr SizeCompareResult<SizeCompareBoolPolicy::kEither> operator != (Size a, Size b) {
+	return {a.x != b.x, a.y != b.y};
 }
 
-inline constexpr SizeCompareResult operator > (Size a, Size b) {
+inline constexpr SizeCompareResult<> operator > (Size a, Size b) {
 	return {a.x > b.x, a.y > b.y};
 }
 
-inline constexpr SizeCompareResult operator < (Size a, Size b) {
+inline constexpr SizeCompareResult<> operator < (Size a, Size b) {
 	return {a.x < b.x, a.y < b.y};
 }
 
-inline constexpr SizeCompareResult operator >= (Size a, Size b) {
+inline constexpr SizeCompareResult<> operator >= (Size a, Size b) {
 	return {a.x >= b.x, a.y >= b.y};
 }
 
-inline constexpr SizeCompareResult operator <= (Size a, Size b) {
+inline constexpr SizeCompareResult<> operator <= (Size a, Size b) {
 	return {a.x <= b.x, a.y <= b.y};
 }
 

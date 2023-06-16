@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -29,6 +29,7 @@
 #include "diary/diary.h"
 #include "main/mainctrl.h"
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -66,7 +67,7 @@ private:
 	bool saved; ///< Whether all modifications have been saved
 
 	std::unique_ptr<FilterGroup> filter_; ///< Current filter
-	std::unique_ptr<std::vector<DiaryEntry *>> filtered_entries_; ///< filter_.filter(entries)
+	std::optional<std::vector<DiaryEntry*>> filtered_entries_; ///< filter_.filter(entries)
 	void updated_filter (); ///< Must be called every time filter is modified
 	bool unavailable_filtered (); ///< Display an error message "Unavaiable in filtering mode"
 

@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -22,8 +22,8 @@ namespace tiary {
 namespace ui {
 
 /**
- * This class mains information of a search request,
- * including the text, direction and 
+ * This class maintains information of a search request,
+ * including the pattern and direction
  */
 class SearchInfo {
 public:
