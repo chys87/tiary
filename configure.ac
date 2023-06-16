@@ -1,8 +1,7 @@
 dnl /***********************************************************************
 dnl  *
 dnl  * Tiary, a terminal-based diary keeping system for Unix-like systems
-dnl  * Copyright (C) 2009-2023,
-dnl  * chys <admin@CHYS.INFO>
+dnl  * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
 dnl  *
 dnl  * This software is licensed under the 3-clause BSD license.
 dnl  * See LICENSE in the source package and/or online info for details.
@@ -22,6 +21,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB
 AC_PROG_INSTALL
+AM_PROG_AR
 PKG_PROG_PKG_CONFIG
 
 dnl Use CXX compiler during configure

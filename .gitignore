@@ -11,6 +11,7 @@ install-sh
 missing
 test-driver
 stamp-h1
+ar-lib
 /src/tiary-config.h
 /src/tiary-config.h.in
 config.guess
