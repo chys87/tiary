@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2018-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -16,7 +16,7 @@
 #define TIARY_COMMON_AES_H
 
 /**
- * @file	common/md5.h
+ * @file	common/aes.h
  * @author	chys <admin@chys.info>
  * @brief	Wraps AES encryption and decryption from libcrypto (part of OpenSSL)
  */

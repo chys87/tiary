@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -26,19 +26,10 @@
 #include <array>
 #include <string>
 #include <string_view>
-#include <openssl/md5.h>
 #include <openssl/sha.h>
 
 namespace tiary {
 namespace digest_detail {
-
-struct MD5Desc {
-	using CTX = MD5_CTX;
-	static constexpr auto init = MD5_Init;
-	static constexpr auto update = MD5_Update;
-	static constexpr auto final = MD5_Final;
-	static constexpr auto DIGEST_LENGTH = MD5_DIGEST_LENGTH;
-};
 
 struct SHA512Desc {
 	using CTX = SHA512_CTX;
@@ -93,7 +84,6 @@ private:
 
 } // namespace digest_detail
 
-using MD5 = digest_detail::Digest<digest_detail::MD5Desc>;
 using SHA512 = digest_detail::Digest<digest_detail::SHA512Desc>;
 
 } // namespace tiary

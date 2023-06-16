@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2010, 2016, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2023, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -44,7 +44,7 @@
  * </tiary>
  *
  *
- * Diary file format (encrypted file 2009):
+ * Diary file format (encrypted file 2009, obsolete):
  * 0000~000F Signature
  * 0010~001F MD5(passwoord+salt1)
  * 0020~     encrypt (bzip2 (XML), password)
@@ -78,9 +78,6 @@ namespace tiary {
 namespace {
 
 // For convenience, the null terminators are also part of the salts
-const char password_salt1[] = "Tiary, written by chys <admin@chys.info>";
-const char password_salt2[] = "tIARY, WRITTEN BY CHYS <ADMIN@CHYS.INFO>";
-const char password_salt3[] = "TiArY, WrItTeN By ChYs <AdMiN@ChYs.InFo>";
 const char password_salt2018a[] = "tIaRy, wRiTtEn bY cHyS <aDmIn@cHyS.iNfO>";
 const char password_salt2018b[] = "TIARY, WRITTEN BY CHYS <ADMIN@CHYS.INFO>";
 
@@ -325,57 +322,6 @@ bool general_analyze_xml (const XMLNode *root,
 }
 
 
-void decrypt_2009(void *data, size_t datalen, std::string_view pass) {
-	alignas(16) uint8_t xor_byte[256];
-	alignas(16) uint8_t xor_byte2[256];
-
-	{
-		MD5 md5_tmp{pass};
-		(MD5(md5_tmp))(password_salt2, sizeof password_salt2).result(xor_byte + 240);
-		md5_tmp(password_salt3, sizeof password_salt3).result(xor_byte2 + 240);
-	}
-	for (int i=28; i>=0; i-=2) {
-		MD5(xor_byte + (i + 2) * 8, (30 - i) * 8)(password_salt2, sizeof password_salt2).result(xor_byte + i * 8);
-		MD5(xor_byte2 + (i + 2) * 8, (30 - i) * 8)(password_salt3, sizeof password_salt3).result(xor_byte2 + i * 8);
-	}
-
-	/*
-	 * Let's leave the optimization to the compiler.
-	 * A recent compiler, when optimization is fully enabled,
-	 * may do some vectorization.
-	 *
-	 * The loops are written in a way which most current
-	 * vectorization-supporting compiler recognize, as opposed
-	 * to something like this (harder for optimizer):
-	 *
-	 * for (size_t i=0; i<datalen; ++i) {
-	 *     byte[i] ^= xor_byte[i%256];
-	 * }
-	 */
-	uint8_t *byte = reinterpret_cast<uint8_t *>(data);
-
-	for (size_t i=0; i<datalen/256; ++i) {
-		for (int j=0; j<256; ++j) {
-			byte[j] ^= xor_byte[j];
-		}
-		byte += 256;
-	}
-	for (size_t i=0; i<datalen%256; ++i) {
-		byte[i] ^= xor_byte[i];
-	}
-
-	byte = reinterpret_cast<uint8_t *>(data);
-	for (size_t i=0; i<datalen/255; ++i) {
-		for (int j=0; j<255; ++j) {
-			byte[j] ^= xor_byte2[j];
-		}
-		byte += 255;
-	}
-	for (size_t i=0; i<datalen%255; ++i) {
-		byte[i] ^= xor_byte2[i];
-	}
-}
-
 std::array<unsigned char, SHA512::DIGEST_LENGTH> format_2018_password_digest(std::string_view password) {
 	SHA512 h;
 	h(password_salt2018a, sizeof(password_salt2018a));
@@ -434,29 +380,12 @@ LoadFileRet load_file (
 		return LOAD_FILE_READ_ERROR;
 	}
 
-	LoadFileRet success_ret = LOAD_FILE_SUCCESS;
-
 	password.clear ();
 
 	// Encrypted?
 	if (everything.size() >= 32 && !memcmp(&everything[0], new_format_signature_2009, 16)) {
-		// Second 16 bytes: MD5(password+salt1)
-		password = enter_password ();
-		if (password.empty ()) { // User cancelation
-			return LOAD_FILE_PASSWORD;
-		}
-		if (memcmp(MD5(password)(password_salt1, sizeof password_salt1).result().data(),
-					&everything[16], 16) != 0) { // Password incorrect
-			password.clear ();
-			return LOAD_FILE_PASSWORD;
-		}
-
-		// Password correct. Decrypt now
-		decrypt_2009(&everything[32], everything.size() - 32, password);
-		// Decompress
-		everything = bunzip2 (&everything[32], everything.size () - 32);
-
-		success_ret = LOAD_FILE_DEPRECATED;
+		// Obsolete encryption format (insecure, prior to 2018)
+		return LOAD_FILE_OBSOLETE;
 	} else if (everything.size() >= 16 + SHA512::DIGEST_LENGTH && !memcmp(&everything[0], new_format_signature_2018, 16)) {
 		// Second 64 bytes: SHA(salt_2018a + password + salt_2018b)
 		password = enter_password();
@@ -495,7 +424,7 @@ LoadFileRet load_file (
 	if (!bool_ret) {
 		return LOAD_FILE_CONTENT;
 	}
-	return success_ret;
+	return LOAD_FILE_SUCCESS;
 }
 
 

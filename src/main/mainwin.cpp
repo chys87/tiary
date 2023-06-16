@@ -350,7 +350,6 @@ void MainWin::load(std::wstring_view filename) {
 				per_file_options,
 				password_);
 	switch (load_ret) {
-		case LOAD_FILE_DEPRECATED:
 		case LOAD_FILE_SUCCESS:
 			current_filename_ = full_filename;
 			main_ctrl.touch ();
@@ -361,14 +360,11 @@ void MainWin::load(std::wstring_view filename) {
 					main_ctrl.set_focus (it->focus_entry);
 				}
 			}
-			if (load_ret == LOAD_FILE_DEPRECATED) {
-				// Do it here so that the content has been drawn on screen
-				ui::dialog_message(L"This file is stored in a cryptographically non-secure format, dating back from 2009.\n"
-					L"Please re-save as soon as possible, but please note that the re-saved file cannot be read "
-					L"by old versions of tiary."sv);
-			}
 			return;
 
+		case LOAD_FILE_OBSOLETE:
+			error_info = format(L"Obsolete encrypted format (before 2018) is no longer supported: %a"sv, nice_filename);
+			break;
 		case LOAD_FILE_NOT_FOUND: // Not found. Warning
 			error_info = format(L"File not found: %a"sv, nice_filename);
 			break;
