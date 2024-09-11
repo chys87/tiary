@@ -4,7 +4,7 @@
 /***************************************************************************
  *
  * Tiary, a terminal-based diary keeping system for Unix-like systems
- * Copyright (C) 2009, 2018, 2019, chys <admin@CHYS.INFO>
+ * Copyright (C) 2009-2024, chys <admin@CHYS.INFO>
  *
  * This software is licensed under the 3-clause BSD license.
  * See LICENSE in the source package and/or online info for details.
@@ -17,6 +17,7 @@
 #include <vector>
 #include <libxml/tree.h>
 #include <libxml/parser.h>
+#include <libxml/xmlerror.h>
 #include <stdlib.h>
 #include <string.h>
 #include "common/string.h"
@@ -117,8 +118,9 @@ xmlNodePtr shallow_copy(const XMLNode *iptr) {
 	}
 }
 
-extern "C" void generic_error_silent (void *, const char *, ...) {}
-extern "C" void structured_error_silent (void *, xmlErrorPtr) {}
+void generic_error_silent (void *, const char *, ...) {}
+// Signature changed - use auto to support old and new libxml2
+void structured_error_silent(void *, auto) {}
 
 void libxml2_init ()
 {
